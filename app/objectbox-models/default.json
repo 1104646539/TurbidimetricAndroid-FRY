@@ -1,0 +1,175 @@
+{
+  "_note1": "KEEP THIS FILE! Check it into a version control system (VCS) like git.",
+  "_note2": "ObjectBox manages crucial IDs for your object model. See docs for details.",
+  "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
+  "entities": [
+    {
+      "id": "2:2105184471347257659",
+      "lastPropertyId": "15:3083978679730466104",
+      "name": "ProjectModel",
+      "properties": [
+        {
+          "id": "6:3077093396318059713",
+          "name": "projectId",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "7:7876507816795945848",
+          "name": "projectName",
+          "type": 9
+        },
+        {
+          "id": "8:4218971684697649653",
+          "name": "projectCode",
+          "type": 9
+        },
+        {
+          "id": "9:2982655270796179476",
+          "name": "projectLjz",
+          "type": 9
+        },
+        {
+          "id": "10:6066767741804149077",
+          "name": "projectUnit",
+          "type": 9
+        },
+        {
+          "id": "11:8342923011608585143",
+          "name": "a1",
+          "type": 8
+        },
+        {
+          "id": "12:1646808971098359971",
+          "name": "a2",
+          "type": 8
+        },
+        {
+          "id": "13:8842476606991025676",
+          "name": "x0",
+          "type": 8
+        },
+        {
+          "id": "14:7467987783571111820",
+          "name": "p",
+          "type": 8
+        },
+        {
+          "id": "15:3083978679730466104",
+          "name": "createTime",
+          "type": 6
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "4:2539073134430729651",
+      "lastPropertyId": "11:6455013015245942546",
+      "name": "TestResultModel",
+      "properties": [
+        {
+          "id": "1:5085919872580886257",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:6441083780701718557",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "3:1832350194955958180",
+          "name": "gender",
+          "type": 9
+        },
+        {
+          "id": "4:4730473121392492078",
+          "name": "age",
+          "type": 9
+        },
+        {
+          "id": "5:3224839621075881154",
+          "name": "testResult",
+          "type": 9
+        },
+        {
+          "id": "6:8672874981653986731",
+          "name": "concentration",
+          "type": 9
+        },
+        {
+          "id": "7:5816576921161575958",
+          "name": "testValue1",
+          "type": 9
+        },
+        {
+          "id": "8:1871754810812068382",
+          "name": "testValue2",
+          "type": 9
+        },
+        {
+          "id": "9:1996942886221152348",
+          "name": "testValue3",
+          "type": 9
+        },
+        {
+          "id": "10:2063495664770940915",
+          "name": "testValue4",
+          "type": 9
+        },
+        {
+          "id": "11:6455013015245942546",
+          "name": "projectId",
+          "indexId": "3:6999653465265232873",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "ProjectModel"
+        }
+      ],
+      "relations": []
+    }
+  ],
+  "lastEntityId": "4:2539073134430729651",
+  "lastIndexId": "3:6999653465265232873",
+  "lastRelationId": "0:0",
+  "lastSequenceId": "0:0",
+  "modelVersion": 5,
+  "modelVersionParserMinimum": 5,
+  "retiredEntityUids": [
+    1025928549887382670,
+    9082947916670780980
+  ],
+  "retiredIndexUids": [
+    8427310129297459854,
+    2842503652665961635
+  ],
+  "retiredPropertyUids": [
+    2396939841999724435,
+    3536118618465103724,
+    2249744524431479769,
+    404570817941193576,
+    860952325255769071,
+    311915731575469293,
+    5640479385858594390,
+    631098599618120720,
+    3040892400610901982,
+    4368545647386417302,
+    4920173568565726681,
+    6833656688856240313,
+    9104041985612349177,
+    5997358385393706146,
+    3100770307480954972,
+    5165208420300737297,
+    9101140713805582704,
+    3291114584901111733,
+    3339481229598480646,
+    753406851637128012,
+    1362336080732654417,
+    2736198263326369135,
+    4701901022663644266,
+    8172810098059048517
+  ],
+  "retiredRelationUids": [],
+  "version": 1
+}

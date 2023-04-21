@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    app:startDestination="@id/fragment_home"
+    android:id="@+id/nav_main">
+    <fragment
+        android:id="@+id/fragment_home"
+        tools:layout="@layout/fragment_home"
+        android:name="com.wl.turbidimetric.home.HomeFragment">
+    </fragment>
+    <fragment
+        android:id="@+id/fragment_data_manager"
+        tools:layout="@layout/fragment_data_manager"
+        android:name="com.wl.turbidimetric.datamanager.DataManagerFragment">
+    </fragment>
+    <fragment
+        android:id="@+id/fragment_settings"
+        tools:layout="@layout/fragment_settings"
+        android:name="com.wl.turbidimetric.settings.SettingsFragment">
+    </fragment>
+</navigation>

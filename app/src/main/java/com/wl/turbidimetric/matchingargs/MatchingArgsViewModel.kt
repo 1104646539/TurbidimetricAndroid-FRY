@@ -1,6 +1,8 @@
 package com.wl.turbidimetric.matchingargs
 
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -9,6 +11,7 @@ import com.wl.turbidimetric.db.DBManager
 import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.global.SystemGlobal.matchingTestState
+import com.wl.turbidimetric.home.ProjectRepository
 import com.wl.turbidimetric.model.*
 import com.wl.turbidimetric.util.Callback2
 import com.wl.turbidimetric.util.SerialPortUtil
@@ -18,6 +21,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.util.Date
 import kotlin.math.absoluteValue
 
 /**
@@ -25,7 +29,7 @@ import kotlin.math.absoluteValue
  *
  * @property quality Boolean
  */
-class MatchingArgsViewModel : BaseViewModel(), Callback2 {
+class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : BaseViewModel(), Callback2 {
 
     init {
         listener()
@@ -38,10 +42,10 @@ class MatchingArgsViewModel : BaseViewModel(), Callback2 {
     /**
      * 四次检测的值
      */
-    private var resultTest1 = arrayListOf<Int>()
-    private var resultTest2 = arrayListOf<Int>()
-    private var resultTest3 = arrayListOf<Int>()
-    private var resultTest4 = arrayListOf<Int>()
+    private var resultTest1 = arrayListOf<Double>()
+    private var resultTest2 = arrayListOf<Double>()
+    private var resultTest3 = arrayListOf<Double>()
+    private var resultTest4 = arrayListOf<Double>()
 
     /**
      * 吸光度
@@ -195,10 +199,10 @@ class MatchingArgsViewModel : BaseViewModel(), Callback2 {
      * 测试用的 start
      */
     //检测的值
-    private val testValues1 = intArrayOf(65265, 65265, 65265, 65265, 65265, 65265, 65265, 0, 0, 0)
-    private val testValues2 = intArrayOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-    private val testValues3 = intArrayOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-    private val testValues4 = intArrayOf(57583, 29937, 36804, 47721, 56879, 222222, 60000, 0, 0, 0)
+    private val testValues1 = doubleArrayOf(0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2)
+    private val testValues2 = doubleArrayOf(0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3)
+    private val testValues3 = doubleArrayOf(0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3)
+    private val testValues4 = doubleArrayOf(0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4)
 
     //测试用 每排之间的检测间隔
     val testS: Long = 100;
@@ -214,13 +218,7 @@ class MatchingArgsViewModel : BaseViewModel(), Callback2 {
 
     }
 
-    val datas = Pager(
-        PagingConfig(pageSize = 30),
-        pagingSourceFactory = ObjectBoxDataSource.Factory(
-            DBManager.projectBox.query().build()
-        )
-            .asPagingSourceFactory(Dispatchers.IO)
-    ).flow.cachedIn(viewModelScope)
+    val datas = projectRepository.paginDatas.flow.cachedIn(viewModelScope)
 
 
     /**
@@ -244,7 +242,24 @@ class MatchingArgsViewModel : BaseViewModel(), Callback2 {
         }
         return array
     }
-
+    /**
+     * 报错
+     * @param cmd UByte
+     * @param state UByte
+     */
+    override fun readDataStateFailed(cmd: UByte, state: UByte) {
+        if (!runningMatching()) return
+        SystemGlobal.machineArgState = MachineState.RunningError
+        Timber.d("报错了，cmd=$cmd state=$state")
+        testMsg.postValue("报错了，cmd=$cmd state=$state")
+    }
+    /**
+     * 仪器是否正常
+     * @return Boolean
+     */
+    private fun machineStateNormal(): Boolean {
+        return SystemGlobal.machineArgState == MachineState.Normal
+    }
     /**
      * 点击开始拟合
      */
@@ -292,6 +307,7 @@ class MatchingArgsViewModel : BaseViewModel(), Callback2 {
      */
     override fun readDataGetStateModel(reply: ReplyModel<GetStateModel>) {
         if (!runningMatching()) return
+        if (!machineStateNormal()) return
         Timber.d("接收到 获取状态 reply=$reply")
         cuvetteShelfStates = reply.data.cuvetteShelfs
         shitTubeShelfStates = reply.data.shitTubeShelfs
@@ -304,8 +320,8 @@ class MatchingArgsViewModel : BaseViewModel(), Callback2 {
         Timber.d("cuvetteShelfPos=${cuvetteShelfPos} shitTubeShelfPos=${shitTubeShelfPos}")
         if (cuvetteShelfPos == -1) {
             Timber.d("没有比色皿架")
-            dialogGetStateNotExist.postValue(true)
             getStateNotExistMsg.postValue("比色皿不足，请添加")
+            dialogGetStateNotExist.postValue(true)
             return
         }
         if (shitTubeShelfPos == -1) {
@@ -383,6 +399,7 @@ class MatchingArgsViewModel : BaseViewModel(), Callback2 {
      */
     override fun readDataMoveCuvetteShelfModel(reply: ReplyModel<MoveCuvetteShelfModel>) {
         if (!runningMatching()) return
+        if (!machineStateNormal()) return
         Timber.d("接收到 移动比色皿架 reply=$reply")
         cuvettePos = 0
         when (matchingTestState) {
@@ -409,6 +426,7 @@ class MatchingArgsViewModel : BaseViewModel(), Callback2 {
      */
     override fun readDataMoveShitTubeModel(reply: ReplyModel<MoveShitTubeModel>) {
         if (!runningMatching()) return
+        if (!machineStateNormal()) return
         Timber.d("接收到 移动采便管 reply=$reply shitTubePos=$shitTubePos matchingTestState=$matchingTestState sampleStep=$sampleStep")
         shitTubeMoveFinish = true
 
@@ -439,7 +457,6 @@ class MatchingArgsViewModel : BaseViewModel(), Callback2 {
         }
 
     }
-
     /**
      * 获取当前位置取样加样的量
      * @param matchingTestState
@@ -460,6 +477,7 @@ class MatchingArgsViewModel : BaseViewModel(), Callback2 {
      */
     override fun readDataMoveCuvetteDripSampleModel(reply: ReplyModel<MoveCuvetteDripSampleModel>) {
         if (!runningMatching()) return
+        if (!machineStateNormal()) return
         Timber.d("接收到 移动比色皿到加样位 reply=$reply cuvetteStates=$cuvetteStates")
 
         cuvetteMoveFinish = true
@@ -479,6 +497,7 @@ class MatchingArgsViewModel : BaseViewModel(), Callback2 {
      */
     override fun readDataMoveCuvetteDripReagentModel(reply: ReplyModel<MoveCuvetteDripReagentModel>) {
         if (!runningMatching()) return
+        if (!machineStateNormal()) return
         Timber.d("接收到 移动比色皿到加试剂位 reply=$reply cuvetteStates=$cuvetteStates")
 
         cuvetteMoveFinish = true
@@ -541,12 +560,16 @@ class MatchingArgsViewModel : BaseViewModel(), Callback2 {
      */
     override fun readDataMoveShitTubeShelfModel(reply: ReplyModel<MoveShitTubeShelfModel>) {
         if (!runningMatching()) return
-        Timber.d("接收到 移动采便管架 reply=$reply")
+        if (!machineStateNormal()) return
+        Timber.d("接收到 移动采便管架 reply=$reply matchingTestState=$matchingTestState")
 
 
         if (matchingTestState != MatchingArgState.Finish) {
             //一开始就要移动到第二个位置去取第一个位置的稀释液
             moveShitTube(2)
+        }else{
+            //拟合结束动作完成
+            matchingTestState = MatchingArgState.None
         }
     }
 
@@ -556,18 +579,23 @@ class MatchingArgsViewModel : BaseViewModel(), Callback2 {
      * @param reply ReplyModel<TestModel>
      */
     override fun readDataTestModel(reply: ReplyModel<TestModel>) {
-        Timber.d("接收到 检测 reply=$reply cuvettePos=$cuvettePos matchingTestState=$matchingTestState 检测值=${reply.data.value}")
         if (!runningMatching()) return
+        if (!machineStateNormal()) return
+        Timber.d("接收到 检测 reply=$reply cuvettePos=$cuvettePos matchingTestState=$matchingTestState 检测值=${reply.data.value}")
+
+        calcTestResult(reply.data.value)
+    }
+    private fun calcTestResult(value: Int) {
         when (matchingTestState) {
             MatchingArgState.DripReagent -> {
                 updateCuvetteState(cuvettePos - 3, CuvetteState.Test1)
-                resultTest1.add(reply.data.value)
+                resultTest1.add(calcAbsorbance(value.toDouble()))
 //                resultTest1.add(testValues1[cuvettePos - 3])
                 dripReagentAndStirAndTestFinish()
             }
             MatchingArgState.Test2 -> {
                 updateCuvetteState(cuvettePos, CuvetteState.Test2)
-                resultTest2.add(reply.data.value)
+                resultTest2.add(calcAbsorbance(value.toDouble()))
 //                resultTest2.add(testValues2[cuvettePos])
                 //检测结束,开始检测第三次
                 if ((cuvettePos == 4 && !quality) || (cuvettePos == 6 && quality)) {
@@ -586,7 +614,7 @@ class MatchingArgsViewModel : BaseViewModel(), Callback2 {
             }
             MatchingArgState.Test3 -> {
                 updateCuvetteState(cuvettePos, CuvetteState.Test3)
-                resultTest3.add(reply.data.value)
+                resultTest3.add(calcAbsorbance(value.toDouble()))
 //                resultTest3.add(testValues3[cuvettePos])
                 //检测结束,开始检测第四次
                 if ((cuvettePos == 4 && !quality) || (cuvettePos == 6 && quality)) {
@@ -604,7 +632,7 @@ class MatchingArgsViewModel : BaseViewModel(), Callback2 {
             }
             MatchingArgState.Test4 -> {
                 updateCuvetteState(cuvettePos, CuvetteState.Test4)
-                resultTest4.add(reply.data.value)
+                resultTest4.add(calcAbsorbance(value.toDouble()))
 //                resultTest4.add(testValues4[cuvettePos])
 
                 //检测结束,计算拟合参数
@@ -624,7 +652,6 @@ class MatchingArgsViewModel : BaseViewModel(), Callback2 {
         }
 
     }
-
     /**
      * 计算拟合曲线
      */
@@ -673,6 +700,9 @@ class MatchingArgsViewModel : BaseViewModel(), Callback2 {
             this.a2 = a2
             this.x0 = x0
             this.p = p
+            this.fitGoodness = cf.fitGoodness
+            this.createTime = Date().toLongString()
+            this.projectLjz = 100
         }
         if (quality) {
             val hValue = result[5];
@@ -687,7 +717,7 @@ class MatchingArgsViewModel : BaseViewModel(), Callback2 {
         testMsg.postValue(msg.toString())
 
         //添加到参数列表，刷新
-        project.put()
+        projectRepository.addProject(project)
     }
 
     /**
@@ -696,6 +726,7 @@ class MatchingArgsViewModel : BaseViewModel(), Callback2 {
      */
     override fun readDataStirModel(reply: ReplyModel<StirModel>) {
         if (!runningMatching()) return
+        if (!machineStateNormal()) return
         Timber.d("接收到 搅拌 reply=$reply cuvettePos=$cuvettePos")
 
         stirFinish = true
@@ -709,6 +740,7 @@ class MatchingArgsViewModel : BaseViewModel(), Callback2 {
      */
     override fun readDataDripReagentModel(reply: ReplyModel<DripReagentModel>) {
         if (!runningMatching()) return
+        if (!machineStateNormal()) return
         Timber.d("接收到 加试剂 reply=$reply cuvettePos=$cuvettePos")
         dripReagentFinish = true
         updateCuvetteState(cuvettePos, CuvetteState.DripReagent)
@@ -722,6 +754,7 @@ class MatchingArgsViewModel : BaseViewModel(), Callback2 {
      */
     override fun readDataDripSampleModel(reply: ReplyModel<DripSampleModel>) {
         if (!runningMatching()) return
+        if (!machineStateNormal()) return
         Timber.d("接收到 加样 reply=$reply cuvettePos=$cuvettePos matchingTestState=$matchingTestState sampleStep=$sampleStep shitTubePos=$shitTubePos")
 
         dripSamplingFinish = true
@@ -754,6 +787,7 @@ class MatchingArgsViewModel : BaseViewModel(), Callback2 {
      */
     override fun readDataSamplingModel(reply: ReplyModel<SamplingModel>) {
         if (!runningMatching()) return
+        if (!machineStateNormal()) return
         Timber.d("接收到 取样 reply=$reply matchingTestState=$matchingTestState sampleStep=$sampleStep shitTubePos=$shitTubePos")
 
         samplingFinish = true
@@ -806,6 +840,7 @@ class MatchingArgsViewModel : BaseViewModel(), Callback2 {
      */
     override fun readDataMoveCuvetteTestModel(reply: ReplyModel<MoveCuvetteTestModel>) {
         if (!runningMatching()) return
+        if (!machineStateNormal()) return
         Timber.d("接收到 移动比色皿到检测位 reply=$reply cuvetteStates=$cuvetteStates matchingTestState=$matchingTestState")
 
         when (matchingTestState) {
@@ -824,6 +859,7 @@ class MatchingArgsViewModel : BaseViewModel(), Callback2 {
      */
     override fun readDataTakeReagentModel(reply: ReplyModel<TakeReagentModel>) {
         if (!runningMatching()) return
+        if (!machineStateNormal()) return
         Timber.d("接收到 取试剂 reply=$reply")
         takeReagentFinish = true
 
@@ -839,6 +875,7 @@ class MatchingArgsViewModel : BaseViewModel(), Callback2 {
      */
     override fun readDataSamplingProbeCleaningModelModel(reply: ReplyModel<SamplingProbeCleaningModel>) {
         if (!runningMatching()) return
+        if (!machineStateNormal()) return
         Timber.d("接收到 取样针清洗 reply=$reply shitTubePos=$shitTubePos sampleStep=$sampleStep")
         if (matchingTestState == MatchingArgState.DripDiluentVolume) {//加完稀释液后的清洗
             sampleStep = 0
@@ -879,6 +916,7 @@ class MatchingArgsViewModel : BaseViewModel(), Callback2 {
      */
     override fun readDataStirProbeCleaningModel(reply: ReplyModel<StirProbeCleaningModel>) {
         if (!runningMatching()) return
+        if (!machineStateNormal()) return
         Timber.d("接收到 搅拌针清洗 reply=$reply")
         stirProbeCleaningFinish = true
         dripReagentAndStirAndTestFinish()
@@ -890,6 +928,7 @@ class MatchingArgsViewModel : BaseViewModel(), Callback2 {
      */
     override fun readDataShitTubeDoorModel(reply: ReplyModel<ShitTubeDoorModel>) {
         if (!runningMatching()) return
+        if (!machineStateNormal()) return
         Timber.d("接收到 采便管舱门状态 reply=$reply")
     }
 
@@ -899,6 +938,7 @@ class MatchingArgsViewModel : BaseViewModel(), Callback2 {
      */
     override fun readDataPiercedModel(reply: ReplyModel<PiercedModel>) {
         if (!runningMatching()) return
+        if (!machineStateNormal()) return
         Timber.d("接收到 刺破 reply=$reply")
     }
 
@@ -908,6 +948,7 @@ class MatchingArgsViewModel : BaseViewModel(), Callback2 {
      */
     override fun readDataGetVersionModel(reply: ReplyModel<GetVersionModel>) {
         if (!runningMatching()) return
+        if (!machineStateNormal()) return
         Timber.d("接收到 获取版本号 reply=$reply")
     }
 
@@ -917,6 +958,7 @@ class MatchingArgsViewModel : BaseViewModel(), Callback2 {
      */
     override fun readDataCuvetteDoorModel(reply: ReplyModel<CuvetteDoorModel>) {
         if (!runningMatching()) return
+        if (!machineStateNormal()) return
         Timber.d("接收到 比色皿舱门状态 reply=$reply")
 
     }
@@ -1088,5 +1130,14 @@ class MatchingArgsViewModel : BaseViewModel(), Callback2 {
      */
     fun runningMatching(): Boolean {
         return matchingTestState != MatchingArgState.None && matchingTestState != MatchingArgState.Finish
+    }
+}
+class MatchingArgsViewModelFactory(private val projectRepository: ProjectRepository = ProjectRepository()) :
+    ViewModelProvider.NewInstanceFactory() {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(MatchingArgsViewModel::class.java)) {
+            return MatchingArgsViewModel(projectRepository) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

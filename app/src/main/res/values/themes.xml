@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.Mvvmdemo" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+    <style name="Theme.Mvvmdemo" parent="Theme.AppCompat.Light">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/purple_500</item>
         <item name="colorPrimaryVariant">@color/purple_700</item>
@@ -12,5 +12,48 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
+    </style>
+
+
+    <style name="TextHilt">
+        <item name="android:textSize">22sp</item>
+        <item name="android:textColor">@color/textColor</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="TextTitle" parent="TextHilt">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="BtnBase" parent="Widget.AppCompat.Button.Borderless">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="BtnDefault" parent="BtnBase">
+        <item name="android:paddingLeft">15dp</item>
+        <item name="android:paddingRight">15dp</item>
+        <item name="android:paddingTop">15dp</item>
+        <item name="android:paddingBottom">15dp</item>
+    </style>
+
+    <style name="BtnNegative" parent="BtnDefault">
+        <item name="android:background">@drawable/rip_negative</item>
+    </style>
+
+    <style name="BtnPositive" parent="BtnDefault">
+        <item name="android:background">@drawable/rip_positive</item>
+    </style>
+
+    <style name="EtDefault">
+        <item name="android:textSize">26sp</item>
+        <item name="android:textColor">@color/textColor</item>
+        <item name="android:paddingLeft">10dp</item>
+        <item name="android:paddingRight">10dp</item>
+        <item name="android:paddingTop">5dp</item>
+        <item name="android:paddingBottom">5dp</item>
     </style>
 </resources>

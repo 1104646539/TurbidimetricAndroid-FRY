@@ -3,25 +3,20 @@ package com.wl.turbidimetric.view;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.PixelFormat;
-import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
+import android.view.View;
 
 import com.wl.turbidimetric.R;
 
 
-public class RightNavigationView extends SurfaceView implements SurfaceHolder.Callback, Runnable {
-    private SurfaceHolder mSurfaceHolder;
+public class RightNavigationView extends View {
     private final static String TAG = RightNavigationView.class.getSimpleName();
     private int width;
     private int height;
@@ -32,17 +27,13 @@ public class RightNavigationView extends SurfaceView implements SurfaceHolder.Ca
     private Paint paintBg;
     private Paint paintSelectedBg;
 
-    private int selectIndex = 0;
-    private int colorBg = getResources().getColor(R.color.purple_700);
+    public int selectIndex = 0;
+    private int colorBg = getResources().getColor(R.color.themePositiveColor);
     private int colorSelectedBg = getResources().getColor(R.color.white);
     private float iconRadius = 10;
     private Path bgPath;
     private Path selectedPath;
     private boolean selectIndexChange = false;
-    //绘图的Canvas
-    private Canvas mCanvas;
-    //子线程标志位
-    private boolean mIsDrawing;
 
     public RightNavigationView(Context context) {
         this(context, null);
@@ -57,70 +48,28 @@ public class RightNavigationView extends SurfaceView implements SurfaceHolder.Ca
         init(context, attrs);
     }
 
-    @Override
-    public void surfaceCreated(SurfaceHolder holder) {
-        mIsDrawing = true;
-        //开启子线程
-        new Thread(this).start();
-    }
 
     @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-
-    }
-
-    @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
-        mIsDrawing = false;
-    }
-
-    @Override
-    public void run() {
-        while (mIsDrawing) {
-            drawSomething();
-            try {
-                Thread.sleep(50);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                mIsDrawing = false;
-                return;
-            }
-        }
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        drawSomething(canvas);
     }
 
     //绘图逻辑
-    private void drawSomething() {
-        try {
-            //获得canvas对象
-            mCanvas = mSurfaceHolder.lockCanvas();
-            //绘制背景
-            mCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-            //绘图
-            drawFF(mCanvas);
-        } catch (Exception e) {
-            return;
-        } finally {
-            if (mCanvas != null) {
-                //释放canvas对象并提交画布
-                mSurfaceHolder.unlockCanvasAndPost(mCanvas);
-            }
-        }
+    private void drawSomething(Canvas canvas) {
+        //绘图
+        drawFF(canvas);
     }
 
     /**
      * 初始化View
      */
     private void initView() {
-        mSurfaceHolder = getHolder();
-        mSurfaceHolder.addCallback(this);
         setFocusable(true);
         setKeepScreenOn(true);
         setFocusableInTouchMode(true);
         bgPath = new Path();
         selectedPath = new Path();
-        this.setZOrderOnTop(true);
-        this.mSurfaceHolder.setFormat(PixelFormat.TRANSLUCENT);
-
     }
 
 
@@ -128,7 +77,6 @@ public class RightNavigationView extends SurfaceView implements SurfaceHolder.Ca
         this.resIds = resIds;
         selectIndex = -1;
         initBitmapRect();
-        selectIndexChange = false;
     }
 
     RectF[] rects;
@@ -241,9 +189,6 @@ public class RightNavigationView extends SurfaceView implements SurfaceHolder.Ca
 
         drawSelectedBg(canvas);
         drawIcon(canvas);
-        if (selectIndexChange) {
-            selectIndexChange = false;
-        }
     }
 
 

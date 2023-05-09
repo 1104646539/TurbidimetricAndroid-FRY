@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "2:2105184471347257659",
-      "lastPropertyId": "15:3083978679730466104",
+      "lastPropertyId": "16:421764154376441030",
       "name": "ProjectModel",
       "properties": [
         {
@@ -27,7 +27,7 @@
         {
           "id": "9:2982655270796179476",
           "name": "projectLjz",
-          "type": 9
+          "type": 5
         },
         {
           "id": "10:6066767741804149077",
@@ -57,14 +57,19 @@
         {
           "id": "15:3083978679730466104",
           "name": "createTime",
-          "type": 6
+          "type": 9
+        },
+        {
+          "id": "16:421764154376441030",
+          "name": "fitGoodness",
+          "type": 8
         }
       ],
       "relations": []
     },
     {
       "id": "4:2539073134430729651",
-      "lastPropertyId": "11:6455013015245942546",
+      "lastPropertyId": "18:1313451733077050788",
       "name": "TestResultModel",
       "properties": [
         {
@@ -96,27 +101,27 @@
         {
           "id": "6:8672874981653986731",
           "name": "concentration",
-          "type": 9
+          "type": 8
         },
         {
           "id": "7:5816576921161575958",
           "name": "testValue1",
-          "type": 9
+          "type": 8
         },
         {
           "id": "8:1871754810812068382",
           "name": "testValue2",
-          "type": 9
+          "type": 8
         },
         {
           "id": "9:1996942886221152348",
           "name": "testValue3",
-          "type": 9
+          "type": 8
         },
         {
           "id": "10:2063495664770940915",
           "name": "testValue4",
-          "type": 9
+          "type": 8
         },
         {
           "id": "11:6455013015245942546",
@@ -125,6 +130,41 @@
           "type": 11,
           "flags": 520,
           "relationTarget": "ProjectModel"
+        },
+        {
+          "id": "12:2515398612214530018",
+          "name": "sampleQRCode",
+          "type": 9
+        },
+        {
+          "id": "13:4468770525281012004",
+          "name": "testState",
+          "type": 5
+        },
+        {
+          "id": "14:4513838846184756558",
+          "name": "absorbances",
+          "type": 8
+        },
+        {
+          "id": "15:2265262141528886796",
+          "name": "createTime",
+          "type": 9
+        },
+        {
+          "id": "16:2746732943648192385",
+          "name": "testTime",
+          "type": 9
+        },
+        {
+          "id": "17:4950287143086404695",
+          "name": "detectionNum",
+          "type": 9
+        },
+        {
+          "id": "18:1313451733077050788",
+          "name": "isSelect",
+          "type": 1
         }
       ],
       "relations": []

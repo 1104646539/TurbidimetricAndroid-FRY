@@ -5,6 +5,7 @@ import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.SerialGlobal
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.*
+import com.wl.turbidimetric.test.TestSerialPort
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -13,7 +14,6 @@ import timber.log.Timber
 import java.util.*
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.LinkedBlockingQueue
-import kotlin.concurrent.thread
 
 /**
  * 串口操作类
@@ -34,12 +34,12 @@ class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("Co
     val sendQueue: BlockingQueue<UByteArray> = LinkedBlockingQueue()
 
     fun open() {
-        serialPort.open()
-        openRead()
-        openWrite()
-
         if (SystemGlobal.isCodeDebug) {
             TestSerialPort.callback = this::dispatchData
+        } else {
+            serialPort.open()
+            openRead()
+            openWrite()
         }
     }
 
@@ -58,15 +58,29 @@ class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("Co
         dispatchData(ready)
     }
 
+    fun callback(ready: UByteArray, call: (Callback2) -> Unit) {
+        callback.forEach {
+            call.invoke(it)
+        }
+    }
 
     /**
      * 收到的消息分发
      */
     @OptIn(ExperimentalUnsignedTypes::class)
     private fun dispatchData(ready: UByteArray) = runBlocking {
+        if (ready[1].toInt() != 0) {
+            callback(ready) {
+                it.readDataStateFailed(ready[0],ready[1])
+            }
+            return@runBlocking
+        }
 
         when (ready[0]) {
             SerialGlobal.CMD_GetMachineState -> {
+                callback(ready) {
+                    it.readDataGetMachineStateModel(transitionGetMachineStateModel(ready))
+                }
                 callback.forEach {
                     it.readDataGetMachineStateModel(transitionGetMachineStateModel(ready))
                 }
@@ -503,7 +517,7 @@ class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("Co
 //        Timber.d("发送 取样针清洗")
         if (SystemGlobal.isCodeDebug) {
             GlobalScope.launch {
-                delay(1000 * 3)
+                delay(1000)
                 writeAsync(
                     createCmd(
                         SerialGlobal.CMD_SamplingProbeCleaning,
@@ -599,7 +613,7 @@ class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("Co
 //        Timber.d("发送 搅拌针清洗")
         if (SystemGlobal.isCodeDebug) {
             GlobalScope.launch {
-                delay(1000 * 3)
+                delay(1000)
                 writeAsync(
                     createCmd(
                         SerialGlobal.CMD_StirProbeCleaning,
@@ -715,8 +729,6 @@ class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("Co
     }
 }
 
-typealias Callback<UByteArray> = (UByteArray) -> Unit
-
 interface Callback2 {
     fun readDataGetMachineStateModel(reply: ReplyModel<GetMachineStateModel>)
     fun readDataGetStateModel(reply: ReplyModel<GetStateModel>)
@@ -738,4 +750,5 @@ interface Callback2 {
     fun readDataShitTubeDoorModel(reply: ReplyModel<ShitTubeDoorModel>)
     fun readDataPiercedModel(reply: ReplyModel<PiercedModel>)
     fun readDataGetVersionModel(reply: ReplyModel<GetVersionModel>)
+    fun readDataStateFailed(cmd: UByte, state: UByte)
 }

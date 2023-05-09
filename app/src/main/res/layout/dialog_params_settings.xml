@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_dialog_hint"
+    android:orientation="vertical"
+    android:padding="10dp">
+
+    <TextView
+        style="@style/TextTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:text="取R1试剂量（uL）" />
+
+    <EditText
+        android:id="@+id/et_take_r1"
+        style="@style/EtDefault"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:numeric="signed"
+        android:textSize="24sp" />
+
+    <TextView
+        style="@style/TextTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:text="取R2试剂量（uL）" />
+
+    <EditText
+        android:id="@+id/et_take_r2"
+        style="@style/EtDefault"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:numeric="signed"
+        android:textSize="24sp" />
+
+    <TextView
+        style="@style/TextTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:text="取样量（uL）" />
+
+    <EditText
+        android:id="@+id/et_sampling"
+        style="@style/EtDefault"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="numberDecimal"
+        android:numeric="decimal"
+        android:textSize="24sp" />
+
+
+</LinearLayout>

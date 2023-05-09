@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="8dp">
+
+        <ImageView
+            android:id="@+id/ivSelect"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/select_cb_query_data" />
+
+        <TextView
+            android:id="@+id/tvID"
+            style="@style/TextTitle"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:text="ID" />
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            app:dividerColor="@color/divider" />
+
+        <TextView
+            android:id="@+id/tvDetectionNum"
+            style="@style/TextTitle"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="编号" />
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            app:dividerColor="@color/divider" />
+
+        <TextView
+            android:id="@+id/tvName"
+            style="@style/TextTitle"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:text="姓名" />
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            app:dividerColor="@color/divider" />
+
+        <TextView
+            android:id="@+id/tvGender"
+            style="@style/TextTitle"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:text="性别" />
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            app:dividerColor="@color/divider" />
+
+        <TextView
+            android:id="@+id/tvAge"
+            style="@style/TextTitle"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:text="年龄" />
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            app:dividerColor="@color/divider" />
+
+        <TextView
+            android:id="@+id/tvAbsorbances"
+            style="@style/TextTitle"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:text="吸光度" />
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            app:dividerColor="@color/divider" />
+
+        <TextView
+            android:id="@+id/tvConcentration"
+            style="@style/TextTitle"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:text="浓度" />
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            app:dividerColor="@color/divider" />
+
+        <TextView
+            android:id="@+id/tvResult"
+            style="@style/TextTitle"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="检测结果" />
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            app:dividerColor="@color/divider" />
+
+        <TextView
+            android:id="@+id/tvTestTime"
+            style="@style/TextTitle"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:text="检测时间" />
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            app:dividerColor="@color/divider" />
+
+        <TextView
+            android:id="@+id/tvTestValue1"
+            style="@style/TextTitle"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="吸光度1" />
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            app:dividerColor="@color/divider" />
+
+        <TextView
+            android:id="@+id/tvTestValue2"
+            style="@style/TextTitle"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="吸光度2" />
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            app:dividerColor="@color/divider" />
+
+        <TextView
+            android:id="@+id/tvTestValue3"
+            style="@style/TextTitle"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="吸光度3" />
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            app:dividerColor="@color/divider" />
+
+        <TextView
+            android:id="@+id/tvTestValue4"
+            style="@style/TextTitle"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="吸光度4" />
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            app:dividerColor="@color/divider" />
+
+        <TextView
+            android:id="@+id/tvProjectName"
+            style="@style/TextTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+
+    </LinearLayout>
+</layout>

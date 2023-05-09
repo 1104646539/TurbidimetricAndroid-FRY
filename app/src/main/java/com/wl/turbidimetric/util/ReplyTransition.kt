@@ -21,8 +21,10 @@ val Motors = listOf(
     "样本针Z",
     "试剂泵",
     "搅拌",
-    "样本架舱门未关",
-    "比色皿架舱门未关",
+    "扶正",
+    "转盘",
+    "请移除样本架和比色皿",
+    "舱门未关",
     "缓冲液不足",
     "清洗液不足",
 )
@@ -36,22 +38,22 @@ val Motors = listOf(
 fun transitionGetMachineStateModel(data: UByteArray): ReplyModel<GetMachineStateModel> {
     val errorInfo = mutableListOf<ErrorInfo>()
     val states = merge(data.copyOfRange(2, 6))
-    for (i in 0..10) {
+    for (i in 0..12) {
         val num = (states shr (i * 2)) and 3
 //        println("states=$states num=$num i =$i ")
         if (num > 0) {
             errorInfo.add(ErrorInfo("错误号:$num", "电机:${Motors[(i)]}"))
         }
     }
-    val shitTubeDoor = (states shr 22) and 1
-    val cuvetteDoor = (states shr 23) and 1
-    val r1 = (states shr 24) and 1
-    val cleanoutFluid = (states shr 25) and 1
+    val removeSampleAndCuvette = (states shr 26) and 1
+    val door = (states shr 27) and 1
+    val r1 = (states shr 28) and 1
+    val cleanoutFluid = (states shr 29) and 1
 
-    if (shitTubeDoor == 1) errorInfo.add(ErrorInfo("错误号:1", "错误信息:${Motors[(11)]}"))
-    if (cuvetteDoor == 1) errorInfo.add(ErrorInfo("错误号:1", "错误信息:${Motors[(12)]}"))
-    if (r1 == 1) errorInfo.add(ErrorInfo("错误号:1", "错误信息:${Motors[13]}"))
-    if (cleanoutFluid == 1) errorInfo.add(ErrorInfo("错误号:1", "错误信息:${Motors[(14)]}"))
+    if (removeSampleAndCuvette == 1) errorInfo.add(ErrorInfo("错误号:1", "错误信息:${Motors[(13)]}"))
+    if (door == 1) errorInfo.add(ErrorInfo("错误号:1", "错误信息:${Motors[(14)]}"))
+    if (r1 == 1) errorInfo.add(ErrorInfo("错误号:1", "错误信息:${Motors[15]}"))
+    if (cleanoutFluid == 1) errorInfo.add(ErrorInfo("错误号:1", "错误信息:${Motors[(16)]}"))
 
     return ReplyModel(
         SerialGlobal.CMD_GetMachineState,

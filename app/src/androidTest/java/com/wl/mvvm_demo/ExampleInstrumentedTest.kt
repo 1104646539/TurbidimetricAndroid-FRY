@@ -3,6 +3,8 @@ package com.wl.turbidimetric
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.wl.turbidimetric.home.HomeViewModel
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -24,5 +26,6 @@ class ExampleInstrumentedTest {
 //        assertEquals("com.wl.turbidimetric", appContext.packageName)
 
 
+        GlobalScope.launch{}
     }
 }

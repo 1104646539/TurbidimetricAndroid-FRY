@@ -9,12 +9,13 @@ import io.objectbox.DebugFlags
 
 object DBManager {
     lateinit var boxStore: BoxStore
-    val testResultBox by lazy {
+    val TestResultBox by lazy {
         boxStore.boxFor(TestResultModel::class.java)
     }
-    val projectBox by lazy {
+    val ProjectBox by lazy {
         boxStore.boxFor(ProjectModel::class.java)
     }
+
     fun init(context: Context) {
         boxStore = MyObjectBox.builder().androidContext(context)
             .debugFlags(DebugFlags.LOG_QUERIES or DebugFlags.LOG_QUERY_PARAMETERS).build()

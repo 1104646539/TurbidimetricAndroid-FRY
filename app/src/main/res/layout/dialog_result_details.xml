@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_dialog_hint"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+            style="@style/TextTitle"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:text="ID" />
+
+        <TextView
+            android:id="@+id/tvID"
+            style="@style/TextHilt"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            style="@style/TextTitle"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:text="编号：" />
+
+        <TextView
+            android:id="@+id/tvDetectionNum"
+            style="@style/TextHilt"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+            style="@style/TextTitle"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:text="姓名：" />
+
+        <EditText
+            android:id="@+id/etName"
+            style="@style/TextHilt"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            style="@style/TextTitle"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:text="性别：" />
+
+        <EditText
+            android:id="@+id/etGender"
+            style="@style/TextHilt"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+            style="@style/TextTitle"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:text="吸光度：" />
+
+        <EditText
+            android:id="@+id/etAbs"
+            style="@style/TextHilt"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal" />
+
+        <TextView
+            style="@style/TextTitle"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:inputType="numberDecimal"
+            android:text="浓度：" />
+
+        <EditText
+            android:id="@+id/etCon"
+            style="@style/TextHilt"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+            style="@style/TextTitle"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:text="结果：" />
+
+        <EditText
+            android:id="@+id/etResult"
+            style="@style/TextHilt"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            style="@style/TextTitle"
+            android:layout_width="120dp"
+            android:layout_marginLeft="20dp"
+            android:layout_height="wrap_content"
+            android:text="检测时间：" />
+
+        <TextView
+            android:id="@+id/tvTestTime"
+            style="@style/TextHilt"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content" />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnConfirm"
+            style="@style/BtnDefault"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="30dp"
+            android:layout_weight="1"
+            android:text="确定" />
+
+        <Button
+            android:id="@+id/btnCancel"
+            style="@style/BtnDefault"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_weight="1"
+            android:text="取消" />
+
+    </LinearLayout>
+
+</LinearLayout>

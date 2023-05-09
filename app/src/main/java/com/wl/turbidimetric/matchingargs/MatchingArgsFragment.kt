@@ -19,7 +19,9 @@ import timber.log.Timber
  */
 class MatchingArgsFragment :
     BaseFragment<MatchingArgsViewModel, FragmentMatchingArgsBinding>(R.layout.fragment_matching_args) {
-    override val viewModel: MatchingArgsViewModel by viewModels()
+    override val vm: MatchingArgsViewModel by viewModels {
+        MatchingArgsViewModelFactory()
+    }
 
     companion object {
         @JvmStatic
@@ -32,7 +34,7 @@ class MatchingArgsFragment :
     }
 
     override fun initViewModel() {
-        viewDataBinding.model = viewModel
+        vd.model = vm
     }
 
     val adapter: MatchingArgsAdapter by lazy {
@@ -40,28 +42,27 @@ class MatchingArgsFragment :
     }
 
     override fun init(savedInstanceState: Bundle?) {
-
         listenerDialog()
         listenerView()
     }
 
     private fun listenerView() {
-        viewModel.testMsg.observe(this) {
-            viewDataBinding.tvMsg.text = it
+        vm.testMsg.observe(this) {
+            vd.tvMsg.text = it
         }
 
-        viewDataBinding.rv.layoutManager =
+        vd.rv.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        viewDataBinding.rv.adapter = adapter
+        vd.rv.adapter = adapter
 
-        viewModel.viewModelScope.launch {
-            viewModel.datas.collectLatest {
+        vm.viewModelScope.launch {
+            vm.datas.collectLatest {
                 adapter.submitData(it)
             }
         }
-        viewModel.toastMsg.observe(this) { msg ->
+        vm.toastMsg.observe(this) { msg ->
             Timber.d("msg=$msg")
-            snack(viewDataBinding.root, msg)
+            snack(vd.root, msg)
         }
     }
 
@@ -69,20 +70,20 @@ class MatchingArgsFragment :
         /**
          * 开始检测 比色皿,采便管，试剂不足
          */
-        viewModel.dialogGetStateNotExist.observe(this) { show ->
+        vm.dialogGetStateNotExist.observe(this) { show ->
             if (show) {
                 dialog.show(
-                    msg = "${viewModel.getStateNotExistMsg.value}",
+                    msg = "${vm.getStateNotExistMsg.value}",
                     confirmMsg = "我已添加", onConfirm = {
                         it.dismiss()
-                        viewModel.dialogGetStateNotExistConfirm()
+                        vm.dialogGetStateNotExistConfirm()
                     },
                     cancelMsg = "结束检测", onCancel = {
                         it.dismiss()
-                        viewModel.dialogGetStateNotExistCancel()
+                        vm.dialogGetStateNotExistCancel()
                     }
                 )
-                viewModel.dialogGetStateNotExist.postValue(false)
+                vm.dialogGetStateNotExist.postValue(false)
             }
         }
     }

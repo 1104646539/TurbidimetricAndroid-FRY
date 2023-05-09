@@ -2,11 +2,13 @@ package com.wl.turbidimetric.ex
 
 import android.app.Activity
 import android.content.Intent
+import android.widget.EditText
 import com.wl.turbidimetric.model.ProjectModel
 import com.wl.turbidimetric.util.CRC
 import com.wl.turbidimetric.util.CurveFitter
 import java.math.BigDecimal
 import kotlin.math.log10
+import kotlin.math.pow
 
 /**
  * 浓度梯度
@@ -17,11 +19,7 @@ val nds = doubleArrayOf(
 //    200.0,
 //    500.0,
 //    1000.0,
-    0.0,
-    1000.0,
-    500.0,
-    200.0,
-    50.0
+    0.0, 1000.0, 500.0, 200.0, 50.0
 )
 
 /**
@@ -105,20 +103,15 @@ inline fun <reified T : Activity> Activity.startActivity() {
  * 计算吸光度
  */
 fun calcAbsorbances(
-    resultTest1: ArrayList<Int>,
-    resultTest2: ArrayList<Int>,
-    resultTest3: ArrayList<Int>,
-    resultTest4: ArrayList<Int>
+    resultTest1: ArrayList<Double>,
+    resultTest2: ArrayList<Double>,
+    resultTest3: ArrayList<Double>,
+    resultTest4: ArrayList<Double>
 ): ArrayList<Double> {
     var absorbances = arrayListOf<Double>()
     for (i in resultTest1.indices) {
         absorbances.add(
-            calcAbsorbance(
-                resultTest1[i],
-                resultTest2[i],
-                resultTest3[i],
-                resultTest4[i]
-            )
+            resultTest4[i] - resultTest1[i]
         )
     }
     return absorbances
@@ -128,15 +121,9 @@ fun calcAbsorbances(
  * 计算吸光度
  */
 fun calcAbsorbance(
-    resultTest1: Int,
-    resultTest2: Int,
-    resultTest3: Int,
-    resultTest4: Int
+    resultTest: Double
 ): Double {
-    if (resultTest4 == 0) {
-        return 0.0
-    }
-    return log10((resultTest1.toDouble() / resultTest4.toDouble()))
+    return log10((65535.toDouble() / resultTest))
 }
 
 /**
@@ -167,8 +154,28 @@ fun calcCon(absorbance: Double, project: ProjectModel): Double {
     val a2 = project.a2;
     val x0 = project.x0;
     val p = project.p;
-    var con: Double = x0 * Math.pow((a2 - a1) / (a2 - absorbance) - 1, 1 / p)
+    var con: Double = x0 * ((a2 - a1) / (a2 - absorbance) - 1).pow(1 / p)
 
     return con.scale(2)
 }
 
+/**
+ * 判断String是否是数字
+ * @receiver String
+ * @return Boolean
+ */
+fun String.isNum(): Boolean {
+    return toDoubleOrNull()?.let {
+        true
+    } ?: false
+}
+
+/**
+ * 把EditText的光标移动到最后
+ * @receiver EditText
+ */
+fun EditText.selectionLast() {
+    if (this != null && this.text != null && this.text.toString().isNotEmpty()) {
+        setSelection(this.text.toString().length)
+    }
+}

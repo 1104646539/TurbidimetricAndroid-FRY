@@ -1,64 +1,129 @@
 package com.wl.turbidimetric.settings
 
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.widget.EditText
+import android.widget.TextView
 import com.wl.turbidimetric.R
+import com.wl.turbidimetric.databinding.FragmentSettingsBinding
+import com.wl.turbidimetric.datastore.LocalData
+import com.wl.turbidimetric.ex.isNum
+import com.wl.turbidimetric.ex.selectionLast
+import com.wl.turbidimetric.ex.toast
+import com.wl.turbidimetric.view.BaseDialog
+import com.wl.turbidimetric.view.HiltDialog
+import com.wl.turbidimetric.view.OneEditDialog
+import com.wl.wwanandroid.base.BaseFragment
+import com.wl.wwanandroid.base.BaseViewModel
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [SettingsFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
-class SettingsFragment : Fragment() {
-
+class SettingsFragment :
+    BaseFragment<BaseViewModel, FragmentSettingsBinding>(R.layout.fragment_settings) {
     val TAG = "SettingsFragment"
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        Log.d(TAG,"onCreate");
-    }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        Log.d(TAG,"onCreateView");
-
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_settings, container, false)
-    }
-    override fun onDestroyView() {
-        super.onDestroyView()
-        Log.d(TAG,"onDestroyView");
-    }
-    override fun onHiddenChanged(hidden: Boolean) {
-        super.onHiddenChanged(hidden)
-        Log.d(TAG,"hidden=$hidden｝");
-    }
-    override fun onDestroy() {
-        super.onDestroy()
-        Log.d(TAG,"onDestroy");
-    }
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment DataManagerFragment.
-         */
-        // TODO: Rename and change types and number of parameters
         @JvmStatic
-        fun newInstance() =
-            SettingsFragment()
+        fun newInstance() = SettingsFragment()
+    }
+
+    override val vm: BaseViewModel by lazy { BaseViewModel() }
+
+    override fun initViewModel() {
+
+    }
+
+    override fun init(savedInstanceState: Bundle?) {
+        listener()
+    }
+
+    private fun listener() {
+        vd.tvParamsSetting.setOnClickListener {
+            showParamsSettingDialog()
+
+        }
+        vd.tvTestHint.setOnClickListener {
+            testHiltDialog.show("测试", "确定", {
+                toast("确定")
+                it.dismiss()
+            }, "取消", {
+                toast("取消")
+                it.dismiss()
+            })
+        }
+        vd.tvDetectionNumSetting.setOnClickListener {
+            showDetectionNumDialog()
+        }
+    }
+
+    /**
+     * 显示编号设置
+     */
+    private fun showDetectionNumDialog() {
+        detectionNumDialog.show("请输入编号", "${LocalData.getDetectionNum()}", "确定", l@{
+            val content = it.etContent.text.toString()
+            if (content.trim().isNullOrEmpty()) {
+                toast("请输入数字")
+                return@l
+            }
+            if (!content.isNum()) {
+                toast("请输入数字")
+                return@l
+            }
+            LocalData.putDetectionNum(content)
+            it.dismiss()
+        }, "取消", {
+            it.dismiss()
+        }, true)
+    }
+
+    /**
+     * 显示参数设置
+     */
+    private fun showParamsSettingDialog() {
+        val etTakeR1 = paramsDialog.getView<EditText>(R.id.et_take_r1)
+        val etTakeR2 = paramsDialog.getView<EditText>(R.id.et_take_r2)
+        val etSampling = paramsDialog.getView<EditText>(R.id.et_sampling)
+        paramsDialog.show("确定", l@{
+            val takeR1 = etTakeR1.text.toString()
+            val takeR2 = etTakeR2.text.toString()
+            val sampling = etSampling.text.toString()
+
+            if (takeR1.trim().isNullOrEmpty() || takeR2.trim().isNullOrEmpty() || sampling.trim()
+                    .isNullOrEmpty()
+            ) {
+                toast("请输入数字")
+                return@l
+            }
+            if (!takeR1.isNum() || !takeR2.isNum() || !sampling.isNum()) {
+                toast("请输入数字")
+                return@l
+            }
+
+            LocalData.setTakeReagentR1(takeR1.toInt())
+            LocalData.setTakeReagentR2(takeR2.toInt())
+            LocalData.setSamplingVolume(sampling.toInt())
+            it.dismiss()
+        }, "取消", {
+            it.dismiss()
+        })
+
+        etTakeR1.setText(LocalData.getTakeReagentR1().toString())
+        etTakeR1.selectionLast()
+        etTakeR2.setText(LocalData.getTakeReagentR2().toString())
+        etTakeR2.selectionLast()
+        etSampling.setText(LocalData.getSamplingVolume().toString())
+        etSampling.selectionLast()
+    }
+
+    val paramsDialog by lazy {
+        BaseDialog(requireContext()).apply {
+            addView(R.layout.dialog_params_settings)
+        }
+    }
+    val testHiltDialog by lazy {
+        HiltDialog(requireContext())
+    }
+    val detectionNumDialog by lazy {
+        OneEditDialog(requireContext()).apply {
+            setEditType(OneEditDialog.EditType.NUM_POSITIVE)
+        }
     }
 }

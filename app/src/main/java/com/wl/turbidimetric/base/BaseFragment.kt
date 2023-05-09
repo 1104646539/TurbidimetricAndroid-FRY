@@ -14,10 +14,9 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 
-open abstract class BaseFragment<VM : ViewModel, VD : ViewDataBinding>(@LayoutRes val layoutId: Int) :
-    Fragment() {
-    protected abstract val viewModel: VM
-    lateinit var viewDataBinding: VD
+open abstract class BaseFragment<VM : ViewModel, VD : ViewDataBinding>(@LayoutRes val layoutId: Int) : Fragment() {
+    protected abstract val vm: VM
+    lateinit var vd: VD
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -25,7 +24,7 @@ open abstract class BaseFragment<VM : ViewModel, VD : ViewDataBinding>(@LayoutRe
     ): View? {
         return DataBindingUtil.inflate<VD>(inflater, layoutId, container, false).also {
             it.lifecycleOwner = viewLifecycleOwner
-            viewDataBinding = it
+            vd = it
         }.root
     }
 

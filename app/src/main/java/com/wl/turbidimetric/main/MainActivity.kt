@@ -1,8 +1,9 @@
-package com.wl.turbidimetric
+package com.wl.turbidimetric.main
 
 import android.app.Activity
 import android.app.PendingIntent
 import android.content.*
+import android.content.res.Configuration
 import android.hardware.usb.UsbDevice
 import android.hardware.usb.UsbManager
 import android.os.Build
@@ -14,27 +15,28 @@ import android.os.storage.StorageVolume
 import android.util.Log
 import androidx.activity.viewModels
 import androidx.documentfile.provider.DocumentFile
+import com.wl.turbidimetric.MainViewModel
+import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.ActivityMainBinding
-import com.wl.turbidimetric.ex.put
 import com.wl.turbidimetric.global.EventGlobal
 import com.wl.turbidimetric.global.EventMsg
 import com.wl.turbidimetric.global.SystemGlobal
-import com.wl.turbidimetric.model.ProjectModel
 import com.wl.turbidimetric.util.ActivityDataBindingDelegate
 import com.wl.turbidimetric.util.DocumentsUtils
+import com.wl.turbidimetric.util.StorageUtil
 import com.wl.wllib.*
 import com.wl.wwanandroid.base.BaseActivity
 import org.greenrobot.eventbus.EventBus
+import timber.log.Timber
 import java.io.File
-import java.util.Date
-import java.util.Random
+import java.lang.reflect.Method
 
 class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     val TAG = "MainActivity"
-    override val viewDataBinding: ActivityMainBinding by ActivityDataBindingDelegate(R.layout.activity_main)
-    override val viewModel: MainViewModel by viewModels()
+    override val vd: ActivityMainBinding by ActivityDataBindingDelegate(R.layout.activity_main)
+    override val vm: MainViewModel by viewModels()
 
-    private val vb: ActivityMainBinding by ActivityDataBindingDelegate(R.layout.activity_main)
+//    private val vb: ActivityMainBinding by ActivityDataBindingDelegate(R.layout.activity_main)
 
     var mPermissionIntent: PendingIntent? = null
     private lateinit var usbManager: UsbManager
@@ -62,22 +64,19 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     }
 
     private fun initUpan() {
-        if (DocumentsUtils.checkWritableRootPath(
-                this,
-                SystemGlobal.uPath
-            )
-        ) {   //检查sd卡/u盘路径是否有 权限 没有显示dialog
-            showOpenDocumentTree()
-        } else {
-            //有权限
-
-            val root = File(SystemGlobal.uPath)
-            for (f in root.list()) {
-                Log.d(TAG, "f=${f}")
-            }
-
-        }
-
+//        if (DocumentsUtils.checkWritableRootPath(
+//                this,
+//                SystemGlobal.uPath
+//            )
+//        ) {   //检查sd卡/u盘路径是否有 权限 没有显示dialog
+//            showOpenDocumentTree()
+//        } else {
+//            //有权限
+//            val root = File(SystemGlobal.uPath)
+//            for (f in root.list()) {
+//                Log.d(TAG, "f=${f}")
+//            }
+//        }
 
     }
 
@@ -145,62 +144,79 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         usbManager = getSystemService(Context.USB_SERVICE) as UsbManager
         listener()
         getAllDeviceRegister()
+        StorageUtil.startInit(this)
+        initNav()
 
-        vb.rnv.setResIds(viewModel.ids.value!!.toIntArray())
-        vb.rnv.setRightNavigationSelectedIndexChangeListener { it ->
-            viewModel.curIndex.value = it
-        }
-        viewModel.curIndex.observe(this) { it ->
-            if (it == viewModel.prevIndex.value) {
-                return@observe
-            }
-            Log.d(
-                TAG,
-                "it=${it} viewModel.prevIndex=${viewModel.prevIndex.value}"
-            )
-            val fbt = supportFragmentManager.beginTransaction();
-            val curF = viewModel.fragments.value!![it]
-            viewModel.prevIndex.value?.let {
-                if (it >= 0) {
-                    val lastF = viewModel.fragments.value!![viewModel.prevIndex.value!!]
-                    //隐藏以前的
-                    fbt.hide(lastF)
-                }
-            }
-            //恢复现在的，如果没添加过就添加
-            if (!curF.isAdded) {
-                fbt.add(R.id.fl_content, curF).show(curF)
-            } else {
-                fbt.show(curF)
-            }
-            viewModel.prevIndex.value = it
-            fbt.commitAllowingStateLoss()
-        }
 
-//        test()
+        test()
+    }
+
+    /**
+     * 初始化导航栏
+     */
+    private fun initNav() {
+        preload()
+
+        vd.vp.adapter = MainViewPagerAdapter(this)
+        vd.vp.isUserInputEnabled = false
+        vd.vp.offscreenPageLimit = 6
+        vd.rnv.setResIds(vm.ids.value!!.toIntArray())
+        vd.rnv.setRightNavigationSelectedIndexChangeListener { it ->
+            vm.curIndex.value = it
+        }
+        vm.curIndex.observe(this) {
+            vd.vp.setCurrentItem(it, false)
+        }
+        Timber.d("rnv=${vd.vp.id}")
+//        viewModel.curIndex.observe(this) { it ->
+//            if (it == viewModel.prevIndex.value) {
+//                return@observe
+//            }
+//            Log.d(
+//                TAG,
+//                "it=${it} viewModel.prevIndex=${viewModel.prevIndex.value}"
+//            )
+//            val fbt = supportFragmentManager.beginTransaction();
+//            val curF = viewModel.fragments.value!![it]
+//            viewModel.prevIndex.value?.let {
+//                //第一次就不用隐藏了
+//                if (it >= 0) {
+//                    val lastF = viewModel.fragments.value!![viewModel.prevIndex.value!!]
+//                    //隐藏以前的
+//                    fbt.hide(lastF)
+//                }
+//            }
+//            //恢复现在的，如果没添加过就添加
+//            if (!curF.isAdded) {
+//                supportFragmentManager.executePendingTransactions()
+//                fbt.add(R.id.fl_content, curF).show(curF)
+//                fbt.addToBackStack(null)
+//            } else {
+//                fbt.show(curF)
+//            }
+//            viewModel.prevIndex.value = it
+//            fbt.commitAllowingStateLoss()
+//        }
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        Timber.d("onConfigurationChanged")
+    }
+
+    private fun preload() {
     }
 
     private fun test() {
-
-        for (i in 1..10) {
-            val project = ProjectModel().apply {
-                a1 = 0.1
-                a2 = 0.2
-                x0 = 0.3
-                p = 0.4
-                createTime = Date().time
-            }
-            project.put()
-        }
     }
 
     private fun getAllDeviceRegister() {
-        val usbDevices: HashMap<String, UsbDevice> = usbManager.getDeviceList()
+        val usbDevices: HashMap<String, UsbDevice> = usbManager.deviceList
         val iterator: Iterator<String> = usbDevices.keys.iterator()
         while (iterator.hasNext()) {
             val key = iterator.next()
             val usbDevice = usbDevices[key]
-            LogToFile.d(TAG, "getAllDeviceRegister =" + usbDevice.toString())
+            Timber.d("getAllDeviceRegister =" + usbDevice.toString())
             if (usbDevice!!.vendorId == UsbToSerialPortUtil.VENDOR_PL2303) {
                 getPermission(usbDevice)
             } else if (usbDevice!!.vendorId == UsbToSerialPortUtil.VENDOR_FT) {
@@ -211,7 +227,6 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
                 getPermission(usbDevice)
             }
         }
-
     }
 
     private fun getPermission(usbDevice: UsbDevice) {
@@ -250,15 +265,21 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     val usbFlashDiskReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             val action = intent!!.action
-            SystemGlobal.uPath = intent.data?.path
-            Log.d(TAG, "action=$action SystemGlobal.uPath=${SystemGlobal.uPath}")
-            Log.d(TAG, "SystemGlobal.uPath=${SystemGlobal.uPath}")
+            val path = intent.data?.path
+            StorageUtil.startInit(context!!)
+//            var temp =DocumentFile.fromTreeUri(context!!,Uri.parse(path!!))
+//            Log.d(TAG, "temp=$temp path=${path}")
+//            SystemGlobal.uPath = path
+//            StorageUtil.setCurPath(path)
+            Log.d(TAG, "action=$action path=${path}")
+
             if (action.equals(Intent.ACTION_MEDIA_REMOVED)) {
                 Log.d(TAG, "u盘 已移除action=$action")
-
+                //  snack(viewDataBinding.root,"u盘已移除")
             } else if (action.equals(Intent.ACTION_MEDIA_MOUNTED)) {
                 Log.d(TAG, "u盘 已插入action=$action")
                 mHandler.sendEmptyMessage(handler_init_upan)
+                // snack(viewDataBinding.root,"u盘已插入")
             }
         }
     }
@@ -285,5 +306,40 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
             }
         }
     }
+
+    /**
+     * 通过反射调用获取内置存储和外置sd卡根路径(通用)
+     *
+     * @param mContext    上下文
+     * @param is_removale 是否可移除，false返回内部存储路径，true返回外置SD卡路径
+     * @return
+     */
+    fun getStoragePath(mContext: Context, is_removale: Boolean): String? {
+        var path: String? = null
+        //使用getSystemService(String)检索一个StorageManager用于访问系统存储功能。
+        val mStorageManager = mContext.getSystemService(Context.STORAGE_SERVICE) as StorageManager
+        var storageVolumeClazz: Class<*>? = null
+        try {
+            storageVolumeClazz = Class.forName("android.os.storage.StorageVolume")
+            val getVolumeList: Method = mStorageManager.javaClass.getMethod("getVolumeList")
+            val getPath: Method = storageVolumeClazz.getMethod("getPath")
+            val isRemovable: Method = storageVolumeClazz.getMethod("isRemovable")
+            val result: Array<StorageVolume> =
+                getVolumeList.invoke(mStorageManager)!! as Array<StorageVolume>
+            for (i in result.indices) {
+                val storageVolumeElement: Any = result[i]
+                path = getPath.invoke(storageVolumeElement) as String
+                val removable = isRemovable.invoke(storageVolumeElement) as Boolean
+                Timber.d("path=$path")
+                if (is_removale == removable) {
+                    return path
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return path
+    }
+
 
 }

@@ -1,11 +1,13 @@
 package com.wl.mvvm_demo
 
+import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.ex.*
-import com.wl.turbidimetric.util.CRC
 import org.junit.Assert
 import org.junit.Test
-import org.junit.function.ThrowingRunnable
-import java.util.Arrays
+import java.math.BigDecimal
+import java.math.RoundingMode
+import kotlin.math.log
+import kotlin.math.log10
 
 class ToolExTest {
 
@@ -81,9 +83,69 @@ class ToolExTest {
 
 
     @Test
-    fun scaleTest(){
-        val re:Double  = 380.251125412.scale(2)
-        Assert.assertEquals(re,380.25,0.01)
+    fun scaleTest() {
+        val re: Double = 380.251125412.scale(2)
+        Assert.assertEquals(re, 380.25, 0.01)
+    }
+
+    @Test
+    fun dateTest() {
+        val longStr = "2023-04-23 10:20:30 252"
+
+        Assert.assertEquals(longStr.bigLongStrToDate().toLongString(), "2023-04-23 10:20:30")
+        Assert.assertEquals(longStr.bigLongStrToDate().toBigLongString(), "2023-04-23 10:20:30 252")
+        Assert.assertEquals(longStr.bigLongStrToDate().time, 1682216430252)
+
+        val longDate = 1682827630000L
+        Assert.assertEquals(longDate.toDate().toBigLongString(), "2023-04-30 12:07:10 000")
+        Assert.assertEquals(longDate.toDate().toLongString(), "2023-04-30 12:07:10")
+//        println(longStr.bigLongStrToDate().toLongString())
+//        println(longStr.bigLongStrToDate().toBigLongString())
+//        println(longStr.bigLongStrToDate().time)
+
+    }
+
+    @Test
+    fun localDataTest() {
+        val num1 = "9"
+        Assert.assertEquals(LocalData.getDetectionNumInc(num1), "10")
+        val num2 = "0022"
+        Assert.assertEquals(LocalData.getDetectionNumInc(num2), "0023")
+
+    }
+
+    @Test
+    fun aTest() {
+        val base = 65536.toDouble()
+        val sourceValue1 = 65000.toDouble()
+        val sourceValue2 = 58888.toDouble()
+        val sourceValue3 = 46666.toDouble()
+        val sourceValue4 = 32000.toDouble()
+
+        val re1 = log10(base / sourceValue1)
+        val re2 = log10(base / sourceValue2)
+        val re3 = log10(base / sourceValue3)
+        val re4 = log10(base / sourceValue4)
+
+        val re = re4 - re1
+
+        println("re1=$re1 re2=$re2 re3=$re3 re4=$re4 re=$re ")
+        val oldRe = calcAbsorbance(
+            sourceValue1
+        )
+        println("oldRe=$oldRe ")
+    }
+
+    @Test
+    fun doubleTest() {
+        val v1 = 123.3 / 100
+
+        println("v1=$v1")
+
+        val d1 = BigDecimal(123.3)
+        val d2 = BigDecimal(100.0)
+        val v2 = d1.divide(d2, 10, BigDecimal.ROUND_HALF_UP).toDouble()
+        println("v2=$v2")
     }
 
 }

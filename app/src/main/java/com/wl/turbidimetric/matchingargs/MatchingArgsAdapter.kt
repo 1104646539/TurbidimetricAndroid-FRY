@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.ItemMatchingargsBinding
 import com.wl.turbidimetric.datamanager.DataManagerAdapter
+import com.wl.turbidimetric.ex.scale
 import com.wl.turbidimetric.model.ProjectModel
 
 class MatchingArgsAdapter :
@@ -34,6 +35,16 @@ class MatchingArgsAdapter :
         RecyclerView.ViewHolder(binding.root) {
         fun bindData(item: ProjectModel?) {
             binding.setVariable(BR.item, item)
+            binding.tvID.text = item?.projectId.toString()
+            binding.tvProjectName.text = item?.projectName ?: "-"
+            binding.tvA1.text = (item?.a1 ?: 0.0).scale(3).toString()
+            binding.tvA2.text = (item?.a2 ?: 0.0).scale(3).toString()
+            binding.tvX0.text = (item?.x0 ?: 0.0).scale(3).toString()
+            binding.tvP.text = (item?.p ?: 0.0).scale(3).toString()
+            binding.tvTestTime.text = item?.createTime ?: "-"
+            binding.tvFitGoodness.text = (item?.fitGoodness ?: 0.0).scale(3).toString()
+            binding.tvLjz.text = (item?.projectLjz ?: "-").toString()
+            binding.tvUnit.text = (item?.projectUnit ?: "-").toString()
         }
     }
 

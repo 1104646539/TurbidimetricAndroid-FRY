@@ -5,6 +5,8 @@ import com.wl.turbidimetric.global.SerialGlobal
 import com.wl.turbidimetric.model.*
 import com.wl.turbidimetric.util.CurveFitter
 import com.wl.turbidimetric.util.SerialPortUtil
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.junit.Test
 import java.util.*
 import kotlin.math.log10
@@ -20,6 +22,7 @@ import kotlin.reflect.KProperty
 class ExampleUnitTest {
     @Test
     fun addition_isCorrect() {
+
 //        assertEquals(4, 2 + 2)
 
 //        val returnData =

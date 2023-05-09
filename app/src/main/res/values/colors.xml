@@ -6,5 +6,11 @@
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
+    <color name="divider">#f1f1f1</color>
+    <color name="textColor">#444444</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="themePositiveColor">#CC018786</color>
+    <color name="themePositivePressColor">#FF018786</color>
+    <color name="themeNegativeColor">#CC3700B3</color>
+    <color name="themeNegativePressColor">#FF3700B3</color>
 </resources>

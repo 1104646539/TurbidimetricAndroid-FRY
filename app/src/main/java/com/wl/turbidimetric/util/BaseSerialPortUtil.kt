@@ -1,9 +1,6 @@
 package com.wl.turbidimetric.util
 
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 import weiqian.hardware.SerialPort
-import java.nio.Buffer
 
 open class BaseSerialPortUtil(private val com: String, private val baud: Int) {
 
@@ -19,7 +16,7 @@ open class BaseSerialPortUtil(private val com: String, private val baud: Int) {
         serialPort?.write(data, data.size)
     }
 
-    fun read(data: ByteArray) :Int{
-        return serialPort?.read(data, data.size)
+    fun read(data: ByteArray): Int {
+        return serialPort?.read(data, data.size) ?: -1
     }
 }

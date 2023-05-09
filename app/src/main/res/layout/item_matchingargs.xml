@@ -14,34 +14,84 @@
         android:orientation="horizontal">
 
         <TextView
-            android:layout_width="160dp"
+            android:id="@+id/tvID"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:text="@{item.projectName}"
+            android:gravity="center"
+            android:text="ID"
             android:textSize="18sp" />
 
         <TextView
-            android:layout_width="160dp"
+            android:id="@+id/tvProjectName"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:text="@{String.valueOf(item.a1)}"
+            android:gravity="center"
+            android:text="项目名"
             android:textSize="18sp" />
 
         <TextView
-            android:layout_width="160dp"
+            android:id="@+id/tvA1"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:text="@{String.valueOf(item.a2)}"
+            android:gravity="center"
+            android:text="A1"
             android:textSize="18sp" />
 
         <TextView
-            android:layout_width="160dp"
+            android:id="@+id/tvA2"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:text="@{String.valueOf(item.x0)}"
+            android:gravity="center"
+            android:text="A2"
             android:textSize="18sp" />
 
         <TextView
-            android:layout_width="160dp"
+            android:id="@+id/tvX0"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:text="@{String.valueOf(item.p)}"
+            android:gravity="center"
+            android:text="X0"
             android:textSize="18sp" />
 
+        <TextView
+            android:id="@+id/tvP"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="P"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/tvFitGoodness"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="拟合度"
+            android:textSize="18sp" />
+
+
+        <TextView
+            android:id="@+id/tvLjz"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="临界值"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/tvUnit"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="结果单位"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/tvTestTime"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="拟合时间"
+            android:textSize="18sp" />
     </LinearLayout>
 </layout>

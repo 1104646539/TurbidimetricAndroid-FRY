@@ -1,28 +1,37 @@
 package com.wl.turbidimetric.home
 
+import android.view.View
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.wl.turbidimetric.db.DBManager
-import com.wl.turbidimetric.ex.calcAbsorbances
-import com.wl.turbidimetric.ex.calcCon
+import com.wl.turbidimetric.datastore.LocalData
+import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.EventGlobal
 import com.wl.turbidimetric.global.EventMsg
 import com.wl.turbidimetric.global.SystemGlobal
+import com.wl.turbidimetric.global.SystemGlobal.machineArgState
+import com.wl.turbidimetric.global.SystemGlobal.matchingTestState
 import com.wl.turbidimetric.global.SystemGlobal.testState
 import com.wl.turbidimetric.model.*
 import com.wl.turbidimetric.util.Callback2
+import com.wl.turbidimetric.util.OnScanResult
+import com.wl.turbidimetric.util.ScanCodeUtil
 import com.wl.turbidimetric.util.SerialPortUtil
-import com.wl.wllib.QRCodeUtil
 import com.wl.wwanandroid.base.BaseViewModel
-import io.objectbox.android.ObjectBoxLiveData
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import io.objectbox.kotlin.flow
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
+import java.util.*
 import kotlin.math.absoluteValue
-import kotlin.math.pow
 
 
-class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 {
+class HomeViewModel(
+    private val projectRepository: ProjectRepository,
+    private val testResultRepository: TestResultRepository
+) : BaseViewModel(), Callback2, OnScanResult {
 
     init {
         listener()
@@ -31,7 +40,7 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
     /**
      * 自检
      */
-    public fun goGetMachineState() {
+    fun goGetMachineState() {
         dialogGetMachine.postValue(true)
         getMachineState()
     }
@@ -39,18 +48,26 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
 
     private fun listener() {
         SerialPortUtil.Instance.callback.add(this)
+        ScanCodeUtil.Instance.onScanResult = this
     }
 
-    // 四次检测的值
-    private var resultTest1 = arrayListOf<Int>()
-    private var resultTest2 = arrayListOf<Int>()
-    private var resultTest3 = arrayListOf<Int>()
-    private var resultTest4 = arrayListOf<Int>()
+    /**
+     * 检测结果
+     */
+    val resultModels = arrayListOf<TestResultModel?>()
+
+    /**
+     * 四次检测的值
+     */
+    private var resultTest1 = arrayListOf<Double>()
+    private var resultTest2 = arrayListOf<Double>()
+    private var resultTest3 = arrayListOf<Double>()
+    private var resultTest4 = arrayListOf<Double>()
 
     /**
      * 吸光度
      */
-    private var results = arrayListOf<Double>()
+    private var absorbances = arrayListOf<Double>()
 
     /**
      * 浓度
@@ -65,7 +82,6 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
     /**
      * 自检失败对话框
      */
-    val dialogGetMachineFailed = MutableLiveData(false);
     val getMachineFailedMsg = MutableLiveData("");
 
     /**
@@ -86,7 +102,6 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
     /**
      * 开始检测 比色皿，采便管，试剂不存在
      */
-    val dialogGetStateNotExist = MutableLiveData(false)
     val getStateNotExistMsg = MutableLiveData("")
 
     /**采便管架状态 1有 0无 顺序是从中间往旁边
@@ -105,7 +120,7 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
     private var cuvetteStates = initCuvetteStates()
 
 
-    /**当前排所有比色皿的状态
+    /**当前排所有采便管的状态
      *
      */
     private var shitTubesStates = initShitTubeStates()
@@ -265,8 +280,7 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
 
     val testMsg = MutableLiveData("");
 
-    val projectDatas =
-        ObjectBoxLiveData(DBManager.projectBox.query().order(ProjectModel_.createTime).build());
+    val projectDatas = projectRepository.allDatas.flow()
 
     var selectProject: ProjectModel? = null
 
@@ -280,24 +294,29 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
      */
     var testPosInterval: Long = 1000 * 10;
 
+    /**
+     * 扫码结果
+     */
+    var scanResults = arrayListOf<String?>()
 
     /**
      * 测试用的 start
      */
     //检测的值
-    private val testValues1 = intArrayOf(65265, 65265, 65265, 65265, 65265, 65265, 65265, 0, 0, 0)
-    private val testValues2 = intArrayOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-    private val testValues3 = intArrayOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-    private val testValues4 = intArrayOf(57583, 29937, 36804, 47721, 56879, 222222, 60000, 0, 0, 0)
+    private val testValues1 = doubleArrayOf(0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2)
+    private val testValues2 = doubleArrayOf(0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3)
+    private val testValues3 = doubleArrayOf(0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3)
+    private val testValues4 = doubleArrayOf(0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4)
 
     //测试用，扫码是否成功
     val tempShitTubeState = intArrayOf(1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+//    val tempShitTubeState = intArrayOf(1, 0, 1, 0, 1, 0, 0, 0, 0, 1)
 
     //测试用，采便管是否存在
     val shitTubeExists = mutableListOf(true, true, true, true, true, true, true, true, true, true)
 
     //测试用 每排之间的检测间隔
-    val testS: Long = 100;
+    val testS: Long = 1000;
 
     //测试用 每个比色皿之间的检测间隔
     val testP: Long = 1000;
@@ -306,7 +325,7 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
      * 测试用的 end
      */
     fun clickStart() {
-        if (testState != TestState.None && testState != TestState.TestFinish) {
+        if (testState != TestState.None) {
             return
         }
         initState()
@@ -322,10 +341,11 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
         Timber.d("跳过 $cuvetteStartPos 个比色皿")
         //跳过的比色皿结果为-1
         repeat(cuvetteStartPos) {
-            resultTest1.add(-1)
-            resultTest2.add(-1)
-            resultTest3.add(-1)
-            resultTest4.add(-1)
+//            resultTest1.add(-1)
+//            resultTest2.add(-1)0
+//            resultTest3.add(-1)
+//            resultTest4.add(-1)
+//            resultModels.add(null)
         }
         if (SystemGlobal.isCodeDebug) {
             testShelfInterval = testS;
@@ -342,6 +362,7 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
         for (i in 0 until 10) {
             array.add(CuvetteState.None)
         }
+        resultModels?.clear()
         return array
     }
 
@@ -354,6 +375,7 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
         for (i in 0 until 10) {
             array.add(ShitTubeState.None)
         }
+        scanResults?.clear()
         return array
     }
 
@@ -364,10 +386,12 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
      */
     override fun readDataTakeReagentModel(reply: ReplyModel<TakeReagentModel>) {
         if (!runningTest()) return
+        if (!machineStateNormal()) return
         Timber.d("接收到 取试剂 reply=$reply")
         takeReagentFinish = true
         goDripReagent()
     }
+
 
     /**
      * 去加试剂
@@ -386,6 +410,7 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
      */
     override fun readDataSamplingProbeCleaningModelModel(reply: ReplyModel<SamplingProbeCleaningModel>) {
         if (!runningTest()) return
+        if (!machineStateNormal()) return
         Timber.d("接收到 取样针清洗 reply=$reply samplingProbeCleaningRecoverSampling=$samplingProbeCleaningRecoverSampling")
         samplingProbeCleaningFinish = true
 
@@ -405,6 +430,7 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
      */
     override fun readDataStirProbeCleaningModel(reply: ReplyModel<StirProbeCleaningModel>) {
         if (!runningTest()) return
+        if (!machineStateNormal()) return
         Timber.d("接收到 搅拌针清洗 reply=$reply stirProbeCleaningRecoverStir=$stirProbeCleaningRecoverStir")
         stirProbeCleaningFinish = true
         nextDripReagent()
@@ -421,6 +447,7 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
      */
     override fun readDataShitTubeDoorModel(reply: ReplyModel<ShitTubeDoorModel>) {
         if (!runningTest()) return
+        if (!machineStateNormal()) return
         Timber.d("接收到 采便管舱门状态 reply=$reply")
     }
 
@@ -430,9 +457,15 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
      */
     override fun readDataPiercedModel(reply: ReplyModel<PiercedModel>) {
         if (!runningTest()) return
+        if (!machineStateNormal()) return
         Timber.d("接收到 刺破 reply=$reply")
         piercedFinish = true
         updateShitTubeState(shitTubePos, ShitTubeState.Pierced)
+        //当不需要取样时，直接下一步
+        if (!shitTubeNeedSampling(shitTubePos - 1)) {
+            samplingFinish = true
+            dripSampleFinish = true
+        }
         nextStepDripReagent()
     }
 
@@ -442,8 +475,12 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
      */
     private fun goDripSample() {
         Timber.d("shitTubeMoveFinish=$shitTubeMoveFinish samplingFinish=$samplingFinish cuvetteMoveFinish=$cuvetteMoveFinish")
-        if (shitTubeMoveFinish && samplingFinish && cuvetteMoveFinish) {
+        if (shitTubePos > 0 && shitTubeMoveFinish && samplingFinish && cuvetteMoveFinish && shitTubeNeedDripSampling(
+                shitTubePos - 1
+            )
+        ) {
             dripSample()
+
         }
     }
 
@@ -453,8 +490,21 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
      */
     override fun readDataGetVersionModel(reply: ReplyModel<GetVersionModel>) {
         if (!runningTest()) return
+        if (!machineStateNormal()) return
         Timber.d("接收到 获取版本号 reply=$reply")
 
+    }
+
+    /**
+     * 报错
+     * @param cmd UByte
+     * @param state UByte
+     */
+    override fun readDataStateFailed(cmd: UByte, state: UByte) {
+        if (!runningTest()) return
+        machineArgState = MachineState.RunningError
+        Timber.d("报错了，cmd=$cmd state=$state")
+        testMsg.postValue("报错了，cmd=$cmd state=$state")
     }
 
     /**
@@ -463,6 +513,7 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
      */
     override fun readDataCuvetteDoorModel(reply: ReplyModel<CuvetteDoorModel>) {
         if (!runningTest()) return
+        if (!machineStateNormal()) return
         Timber.d("接收到 比色皿舱门状态 reply=$reply")
 
     }
@@ -473,19 +524,22 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
      */
     override fun readDataMoveShitTubeModel(reply: ReplyModel<MoveShitTubeModel>) {
         if (!runningTest()) return
-        Timber.d("接收到 移动采便管 reply=$reply cuvettePos=$cuvettePos lastCuvetteShelfPos=$lastCuvetteShelfPos cuvetteShelfPos=$cuvetteShelfPos shitTubePos=$shitTubePos")
+        if (!machineStateNormal()) return
+        Timber.d("接收到 移动采便管 reply=$reply cuvettePos=$cuvettePos lastCuvetteShelfPos=$lastCuvetteShelfPos cuvetteShelfPos=$cuvetteShelfPos shitTubePos=$shitTubePos samplingProbeCleaningFinish=$samplingProbeCleaningFinish")
         shitTubeMoveFinish = true
         samplingFinish = false
         dripSampleFinish = false
         scanFinish = false
 
+
         //最后一个位置不需要扫码，直接取样
         if (shitTubePos < shitTubeMax) {
-//            if (!reply.data.exist) {
-            if (!shitTubeExists[shitTubePos]) {
-                //没有采便管
+            if ((SystemGlobal.isCodeDebug && !shitTubeExists[shitTubePos]) || (!SystemGlobal.isCodeDebug && !reply.data.exist)) {
+                //没有采便管，移动到下一个位置
                 Timber.d("没有采便管,移动到下一个位置")
                 scanFinish = true
+                scanResults.add(null)
+                Timber.d("scanResults=$scanResults")
                 nextStepDripReagent()
             } else {
                 //有采便管
@@ -495,16 +549,14 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
         }
         //判断是否需要取样。取样位和扫码位差一个位置
         if (shitTubeNeedSampling(shitTubePos - 1)) {
-            //注：如果上次取样针清洗未结束，就等待清洗结束后再加样
+            //注：如果上次取样针清洗未结束，就等待清洗结束后再加样,否则直接加样
             if (samplingProbeCleaningFinish) {
                 sampling()
             } else {
                 samplingProbeCleaningRecoverSampling = true
             }
-        } else if (shitTubePos > 0) {
-            //如果不需要取样，就判断是否需要直接移动下一个
-            samplingFinish = true
-            dripSampleFinish = true
+        } else if (shitTubePos == shitTubeMax) {
+            //最后一个采便管位置，并且不需要取样时，下一步
             nextStepDripReagent()
         }
     }
@@ -520,12 +572,22 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
     }
 
     /**
+     * 判断当前位置是否需要加样，只有取样完成并且比色皿已经移动到位了才需要加样
+     * @param shitTubePos Int
+     * @return Boolean
+     */
+    private fun shitTubeNeedDripSampling(shitTubePos: Int): Boolean {
+        if (shitTubePos < 0) return false
+        return shitTubesStates[shitTubePos] == ShitTubeState.Sampling
+    }
+
+    /**
      * 更新采便管状态
      * @param shitTubePos Int
      * @param state ShitTubeState
      */
     private fun updateShitTubeState(shitTubePos: Int, state: ShitTubeState) {
-        if (shitTubePos >= shitTubesStates.size) {
+        if (shitTubePos < 0 || shitTubePos >= shitTubesStates.size) {
             return
         }
         shitTubesStates[shitTubePos] = state
@@ -553,23 +615,62 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
         scanFinish = false
         piercedFinish = false
 
-//        SystemGlobal.qrCode?.sendOpenScan(step)
-
+//        if (SystemGlobal.isCodeDebug) {
         if (tempShitTubeState[shitTubePos] == 1) {
-            onSuccess("ffaa$shitTubePos", shitTubePos)
+            scanSuccess("ffaa$shitTubePos")
         } else {
-            onFailed(shitTubePos)
+            scanFailed()
         }
+//        } else {
+//            viewModelScope.launch {
+//                ScanCodeUtil.Instance.startScan()
+//            }
+//        }
     }
 
     /**
      * 扫码成功
      */
-    private fun scanSuccess(str: String?, pos: Int) {
+    override fun scanSuccess(str: String) {
         Timber.d("扫码成功 str=$str")
-        updateShitTubeState(pos, ShitTubeState.ScanSuccess)
+        updateShitTubeState(shitTubePos, ShitTubeState.ScanSuccess)
         scanFinish = true
         pierced()
+        scanResults.add(str ?: "")
+        Timber.d("scanResults=$scanResults")
+    }
+
+    /**
+     * 扫码失败
+     */
+    override fun scanFailed() {
+        Timber.d("扫码失败")
+        updateShitTubeState(shitTubePos, ShitTubeState.ScanFailed)
+        scanFinish = true
+        piercedFinish = true
+        //当不需要取样时，直接下一步
+        if (!shitTubeNeedSampling(shitTubePos - 1)) {
+            samplingFinish = true
+            dripSampleFinish = true
+        }
+        nextStepDripReagent()
+        scanResults.add(null)
+        Timber.d("scanResults=$scanResults")
+    }
+
+
+    /**
+     * 新建检测记录
+     * @param str String?
+     */
+    private fun createResultModel(str: String?) {
+        val resultModel = TestResultModel(
+            sampleQRCode = str ?: "",
+            createTime = Date().toLongString(),
+            detectionNum = LocalData.getDetectionNumInc()
+        )
+
+        resultModels.add(resultModel)
     }
 
     /**
@@ -581,22 +682,13 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
         SerialPortUtil.Instance.pierced()
     }
 
-    /**
-     * 扫码失败
-     */
-    private fun scanFailed(pos: Int) {
-        Timber.d("扫码失败")
-        updateShitTubeState(pos, ShitTubeState.ScanFailed)
-        scanFinish = true
-        piercedFinish = true
-        nextStepDripReagent()
-    }
 
     /**
      * 接收到检测完成
      */
     override fun readDataTestModel(reply: ReplyModel<TestModel>) {
         if (!runningTest()) return
+        if (!machineStateNormal()) return
         Timber.d("接收到 检测完成 reply=$reply cuvettePos=$cuvettePos testState=$testState")
         testFinish = true
 
@@ -611,11 +703,13 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
             TestState.DripReagent -> {
                 updateCuvetteState(cuvettePos - 3, CuvetteState.Test1)
                 nextDripReagent()
-                resultTest1.add(value)
+                resultTest1.add(calcAbsorbance(value.toDouble()))
+                updateTestResultModel(cuvettePos - 3, CuvetteState.Test1)
             }
             TestState.Test2 -> {
                 updateCuvetteState(cuvettePos, CuvetteState.Test2)
-                resultTest2.add(value)
+                resultTest2.add(calcAbsorbance(value.toDouble()))
+                updateTestResultModel(cuvettePos, CuvetteState.Test2)
                 if (lastNeed(cuvettePos, CuvetteState.Test1)) {
                     //检测结束，下一个步骤，检测第三次
                     viewModelScope.launch {
@@ -632,7 +726,8 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
             }
             TestState.Test3 -> {
                 updateCuvetteState(cuvettePos, CuvetteState.Test3)
-                resultTest3.add(value)
+                resultTest3.add(calcAbsorbance(value.toDouble()))
+                updateTestResultModel(cuvettePos, CuvetteState.Test3)
                 if (lastNeed(cuvettePos, CuvetteState.Test2)) {
                     //检测结束，下一个步骤，检测第四次
                     viewModelScope.launch {
@@ -649,7 +744,8 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
             }
             TestState.Test4 -> {
                 updateCuvetteState(cuvettePos, CuvetteState.Test4)
-                resultTest4.add(value)
+                resultTest4.add(calcAbsorbance(value.toDouble()))
+                updateTestResultModel(cuvettePos, CuvetteState.Test4)
                 if (lastNeed(cuvettePos, CuvetteState.Test3)) {
                     //检测结束，下一个步骤，计算值
                     calcResult()
@@ -661,8 +757,45 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
                 }
             }
 
+            else -> {}
         }
 
+    }
+
+    /**
+     * 更新检测结果
+     * @param pos Int
+     * @param state CuvetteState
+     */
+    private fun updateTestResultModel(index: Int, state: CuvetteState) {
+        var pos = index
+        Timber.d("updateTestResultModel pos=$pos resultModels=$resultModels")
+        if (cuvetteStartPos > 0 && isFirstCuvetteShelf()) {
+            pos -= cuvetteStartPos
+        }
+        if (pos < 0 || pos >= resultModels.size) {
+            return
+        }
+        when (state) {
+            CuvetteState.Test1 -> {
+                resultModels[pos]?.testValue1 = resultTest1[pos]
+            }
+            CuvetteState.Test2 -> {
+                resultModels[pos]?.testValue2 = resultTest2[pos]
+            }
+            CuvetteState.Test3 -> {
+                resultModels[pos]?.testValue3 = resultTest3[pos]
+            }
+            CuvetteState.Test4 -> {
+                resultModels[pos]?.testValue4 = resultTest4[pos]
+                resultModels[pos]?.testTime = Date().toLongString()
+            }
+            else -> {}
+        }
+        resultModels[pos]?.let {
+            testResultRepository.updateTestResult(it)
+        }
+        Timber.d("updateTestResultModel resultModels=$resultModels")
     }
 
 
@@ -675,31 +808,42 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
             resultTest2.clear()
             resultTest3.clear()
             resultTest4.clear()
-            testValues1.forEach {
-                resultTest1.add(it)
-            }
-            testValues2.forEach {
-                resultTest2.add(it)
-            }
-            testValues3.forEach {
-                resultTest3.add(it)
-            }
-            testValues4.forEach {
-                resultTest4.add(it)
+            val size =
+                if (cuvetteStartPos > 0) 10 - cuvetteStartPos else scanResults.filterNotNull().size
+            repeat(size) {
+                resultTest1.add(testValues1[it])
+                resultTest2.add(testValues2[it])
+                resultTest3.add(testValues3[it])
+                resultTest4.add(testValues4[it])
             }
         }
-        results = calcAbsorbances(resultTest1, resultTest2, resultTest3, resultTest4)
-        selectProject?.let {
-            for (value in results) {
-                val con = calcCon(value, it)
+        //计算吸光度
+        absorbances = calcAbsorbances(resultTest1, resultTest2, resultTest3, resultTest4)
+        //计算浓度
+        selectProject?.let { it ->
+            for (i in absorbances.indices) {
+                val con = calcCon(absorbances[i], it)
                 cons.add(con)
+
+                resultModels[i]?.absorbances = absorbances[i].scale(5)
+                resultModels[i]?.testValue1 = resultTest1[i].scale(5)
+                resultModels[i]?.testValue2 = resultTest2[i].scale(5)
+                resultModels[i]?.testValue3 = resultTest3[i].scale(5)
+                resultModels[i]?.testValue4 = resultTest4[i].scale(5)
+                resultModels[i]?.concentration = con.scale(5)
+                resultModels[i]?.let {
+                    testResultRepository.updateTestResult(it)
+                }
             }
         }
+
         testMsg.postValue(
-            testMsg.value?.plus("这排比色皿检测结束 比色皿位置=$cuvetteShelfPos 采便管位置=$shitTubeShelfPos \n 第一次:$resultTest1 \n 第二次:$resultTest2 \n 第三次:$resultTest3 \n 第四次:$resultTest4 \n  吸光度:$results \n 浓度=$cons \n选择的四参数为${selectProject ?: "未选择"}\n\n")
+            testMsg.value?.plus("这排比色皿检测结束 比色皿位置=$cuvetteShelfPos 采便管位置=$shitTubeShelfPos \n 第一次:$resultTest1 \n 第二次:$resultTest2 \n 第三次:$resultTest3 \n 第四次:$resultTest4 \n  吸光度:$absorbances \n 浓度=$cons \n选择的四参数为${selectProject ?: "未选择"}\n\n")
         )
 
-
+        resultModels.forEach {
+            Timber.d("resultModel=$it")
+        }
         Timber.d("这排比色皿检测结束")
 
         resultTest1.clear()
@@ -746,8 +890,6 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
                 moveCuvetteShelfNext()
             }
         }
-
-
     }
 
     /**
@@ -769,7 +911,10 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
                 }
                 if (cuvettePos >= 3 && lastNeedTest1(cuvettePos - 3)) {
                     Timber.d("已经检测最后一个了,进行下一个步骤，检测第二次")
-                    stepTest(TestState.Test2)
+                    viewModelScope.launch {
+                        delay(testShelfInterval)
+                        stepTest(TestState.Test2)
+                    }
                     return
                 } else {
                     moveCuvetteDripReagent()
@@ -866,6 +1011,7 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
      */
     override fun readDataStirModel(reply: ReplyModel<StirModel>) {
         if (!runningTest()) return
+        if (!machineStateNormal()) return
         Timber.d("接收到 搅拌 reply=$reply cuvettePos=$cuvettePos")
         stirFinish = true
         updateCuvetteState(cuvettePos - 2, CuvetteState.Stir)
@@ -893,6 +1039,7 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
      */
     override fun readDataDripReagentModel(reply: ReplyModel<DripReagentModel>) {
         if (!runningTest()) return
+        if (!machineStateNormal()) return
         Timber.d("接收到 加试剂 reply=$reply cuvettePos=$cuvettePos")
         dripReagentFinish = true
         updateCuvetteState(cuvettePos, CuvetteState.DripReagent)
@@ -929,10 +1076,12 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
      */
     override fun readDataDripSampleModel(reply: ReplyModel<DripSampleModel>) {
         if (!runningTest()) return
-        Timber.d("接收到 加样 reply=$reply cuvettePos=$cuvettePos")
+        if (!machineStateNormal()) return
+        Timber.d("接收到 加样 reply=$reply cuvettePos=$cuvettePos shitTubePos=$shitTubePos")
 
         updateCuvetteState(cuvettePos, CuvetteState.DripSample)
         dripSampleFinish = true
+        createResultModel(scanResults[shitTubePos - 1])
         samplingProbeCleaning()
 
         nextStepDripReagent()
@@ -982,14 +1131,25 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
 
     private fun nextStepDripReagent() {
         Timber.d("piercedFinish=$piercedFinish scanFinish=$scanFinish samplingFinish=$samplingFinish dripSampleFinish=$dripSampleFinish cuvettePos=$cuvettePos shitTubePos=$shitTubePos")
-        if ((piercedFinish && (scanFinish || lastShitTubePos(shitTubePos)) && samplingFinish && dripSampleFinish) || shitTubePos == 0) {
+        //|| shitTubePos == 0
+        if ((piercedFinish && (scanFinish || lastShitTubePos(shitTubePos)) && (shitTubeNeedSampling(
+                shitTubePos - 1
+            ) && samplingFinish && dripSampleFinish) || (!shitTubeNeedSampling(
+                shitTubePos - 1
+            ))) || shitTubePos == 0
+        ) {
             if (lastCuvettePos(cuvettePos)) {//这排最后一个比色皿，需要去下一个步骤，加试剂
                 stepDripReagent()
             } else if (lastShitTubePos(shitTubePos)) {//这排最后一个采便管
                 if (lastShitTubeShelf(shitTubeShelfPos)) {//最后一排
                     //已经加完了最后一个采便管了，加样结束，去下一个步骤，加试剂
                     Timber.d("采便管加样完成！")
-                    stepDripReagent()
+                    if (shelfNeedDripReagent()) {
+                        stepDripReagent()
+                    } else {
+                        Timber.d("不需要加试剂,检测结束！")
+                        testFinishAction()
+                    }
                 } else {
                     //这排采便管已经取完样了，移动到下一排接着取样
                     moveNextShitTubeAndCuvette()
@@ -999,6 +1159,14 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
                 moveNextShitTubeAndCuvette()
             }
         }
+    }
+
+    /**
+     * 判断这排比色皿是否需要加样
+     * @return Boolean
+     */
+    private fun shelfNeedDripReagent(): Boolean {
+        return cuvetteStates.any { it == CuvetteState.DripSample }
     }
 
     /**
@@ -1028,6 +1196,7 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
      */
     override fun readDataSamplingModel(reply: ReplyModel<SamplingModel>) {
         if (!runningTest()) return
+        if (!machineStateNormal()) return
         Timber.d("接收到 取样 reply=$reply cuvettePos=$cuvettePos shitTubePos=$shitTubePos cuvetteShelfPos=$cuvetteShelfPos shitTubeShelfPos=$shitTubeShelfPos")
         samplingFinish = true
         updateShitTubeState(shitTubePos - 1, ShitTubeState.Sampling)
@@ -1051,6 +1220,7 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
      */
     override fun readDataMoveCuvetteTestModel(reply: ReplyModel<MoveCuvetteTestModel>) {
         if (!runningTest()) return;
+        if (!machineStateNormal()) return
         Timber.d("接收到 移动比色皿 检测位 reply=$reply")
         cuvetteMoveFinish = true
 
@@ -1062,6 +1232,7 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
      */
     override fun readDataMoveCuvetteDripReagentModel(reply: ReplyModel<MoveCuvetteDripReagentModel>) {
         if (!runningTest()) return
+        if (!machineStateNormal()) return
         Timber.d("接收到 移动比色皿 加试剂位 reply=$reply cuvettePos=$cuvettePos stirProbeCleaningFinish=$stirProbeCleaningFinish stirProbeCleaningRecoverStir=$stirProbeCleaningRecoverStir")
         cuvetteMoveFinish = true
         goDripReagent()
@@ -1100,6 +1271,7 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
      */
     override fun readDataMoveCuvetteDripSampleModel(reply: ReplyModel<MoveCuvetteDripSampleModel>) {
         if (!runningTest()) return
+        if (!machineStateNormal()) return
         Timber.d("接收到 移动比色皿 加样位 reply=$reply cuvetteStartPos=$cuvetteStartPos cuvettePos=$cuvettePos samplingFinish=$samplingFinish")
         cuvetteMoveFinish = true
         goDripSample()
@@ -1110,6 +1282,7 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
      */
     override fun readDataMoveCuvetteShelfModel(reply: ReplyModel<MoveCuvetteShelfModel>) {
         if (!runningTest()) return
+        if (!machineStateNormal()) return
         Timber.d("接收到 移动比色皿架 reply=$reply cuvetteShelfPos=$cuvetteShelfPos cuvetteStartPos=$cuvetteStartPos")
         cuvetteShelfMoveFinish = true
 
@@ -1139,6 +1312,7 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
      */
     private fun showFinishDialog() {
         dialogTestFinish.postValue(true)
+        testState = TestState.None
     }
 
     private fun isTestFinish(): Boolean {
@@ -1151,6 +1325,7 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
      */
     override fun readDataMoveShitTubeShelfModel(reply: ReplyModel<MoveShitTubeShelfModel>) {
         if (!runningTest()) return
+        if (!machineStateNormal()) return
         Timber.d("接收到移动采便管架 reply=$reply shitTubeShelfPos=$shitTubeShelfPos")
         shitTubeShelfMoveFinish = true
 
@@ -1227,7 +1402,9 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
         val errorInfo = reply.data.errorInfo
         if (errorInfo.isNullOrEmpty()) {
             Timber.d("自检完成")
+            machineArgState = MachineState.Normal
         } else {
+            machineArgState = MachineState.NotGetMachineState
             val sb = StringBuffer()
             for (error in errorInfo) {
                 sb.append(error.errorMsg)
@@ -1236,7 +1413,6 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
             }
             Timber.d("自检失败，错误信息=${sb}")
             getMachineFailedMsg.postValue(sb.toString())
-            dialogGetMachineFailed.postValue(true)
         }
     }
 
@@ -1245,6 +1421,7 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
      */
     override fun readDataGetStateModel(reply: ReplyModel<GetStateModel>) {
         if (!runningTest()) return
+        if (!machineStateNormal()) return
         Timber.d("接收到 获取状态 reply=$reply")
         cuvetteShelfStates = reply.data.cuvetteShelfs
         shitTubeShelfStates = reply.data.shitTubeShelfs
@@ -1288,39 +1465,41 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
         Timber.d("cuvetteShelfPos=${cuvetteShelfPos} shitTubeShelfPos=${shitTubeShelfPos}")
         if (cuvetteShelfPos == -1) {
             Timber.d("没有比色皿架")
-            moveCuvetteShelfNext()
-            dialogGetStateNotExist.postValue(true)
             getStateNotExistMsg.postValue("比色皿不足，请添加")
             return
         }
         if (shitTubeShelfPos == -1) {
             Timber.d("没有采便管架")
             getStateNotExistMsg.postValue("采便管不足，请添加")
-            dialogGetStateNotExist.postValue(true)
             return
         }
         if (!r1Reagent) {
             Timber.d("没有R1试剂")
             getStateNotExistMsg.postValue("R1试剂不足，请添加")
-            dialogGetStateNotExist.postValue(true)
             return
         }
         if (!r2Reagent) {
             Timber.d("没有R2试剂")
             getStateNotExistMsg.postValue("R2试剂不足，请添加")
-            dialogGetStateNotExist.postValue(true)
             return
         }
         if (!cleanoutFluid) {
             Timber.d("没有清洗液试剂")
             getStateNotExistMsg.postValue("清洗液不足，请添加")
-            dialogGetStateNotExist.postValue(true)
             return
         }
 
         //开始检测
         moveShitTubeShelf(shitTubeShelfPos)
         moveCuvetteShelf(cuvetteShelfPos)
+    }
+
+    /**
+     * 仪器是否正常
+     * @return Boolean
+     */
+    private fun machineStateNormal(): Boolean {
+        return machineArgState == MachineState.Normal
     }
 
     /**
@@ -1407,7 +1586,6 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
         super.onMessageEvent(event)
         when (event.what) {
             EventGlobal.WHAT_INIT_QRCODE -> {
-                SystemGlobal.qrCode?.setOnQRCodeListener(this)
             }
             else -> {}
         }
@@ -1485,7 +1663,7 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
      */
     fun dialogTestShitTubeDeficiencyCancel() {
         Timber.d("dialogDripSampleShitTubeDeficiencyCancel 点击结束检测")
-        testState = TestState.TestFinish
+        testFinishAction();
     }
 
     /**
@@ -1505,6 +1683,7 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
      */
     fun dialogGetStateNotExistCancel() {
         Timber.d("dialogGetStateNotExistCancel 点击结束检测")
+        testFinishAction();
     }
 
     /**
@@ -1660,18 +1839,27 @@ class HomeViewModel() : BaseViewModel(), QRCodeUtil.OnQRCodeListener, Callback2 
         SerialPortUtil.Instance.test()
     }
 
-    override fun onSuccess(str: String?, step: Int) {
-        scanSuccess(str, step)
-    }
-
-    override fun onFailed(step: Int) {
-        scanFailed(step)
-    }
 
     /**
      * 是否正在检测
      */
     private fun runningTest(): Boolean {
-        return testState != TestState.None
+        return testState != TestState.None && matchingTestState == MatchingArgState.None
+    }
+
+    fun clickTest1(view: View) {
+
+    }
+}
+
+class HomeViewModelFactory(
+    private val projectRepository: ProjectRepository = ProjectRepository(),
+    private val testResultRepository: TestResultRepository = TestResultRepository()
+) : ViewModelProvider.NewInstanceFactory() {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(HomeViewModel::class.java)) {
+            return HomeViewModel(projectRepository, testResultRepository) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

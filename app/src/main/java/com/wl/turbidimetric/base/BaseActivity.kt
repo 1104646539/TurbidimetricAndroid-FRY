@@ -11,12 +11,12 @@ import org.greenrobot.eventbus.ThreadMode
 
 abstract class BaseActivity<VM : BaseViewModel, VD : ViewDataBinding> : AppCompatActivity() {
 
-    protected abstract val viewDataBinding: VD
-    protected abstract val viewModel: VM
+    protected abstract val vd: VD
+    protected abstract val vm: VM
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.init()
+        vm.init()
         EventBus.getDefault().register(this)
         init()
     }

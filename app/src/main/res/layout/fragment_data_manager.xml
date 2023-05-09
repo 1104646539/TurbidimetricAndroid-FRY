@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <data>
 
-        <variable
-            name="vm"
-            type="com.wl.turbidimetric.datamanager.vm.DataManagerViewModel" />
-    </data>
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
@@ -15,51 +10,92 @@
         android:orientation="vertical"
         tools:context=".datamanager.DataManagerFragment">
 
-        <!-- TODO: Update blank fragment layout -->
-        <TextView
+        <include
+            android:id="@+id/header"
+            layout="@layout/datamanager_item_result_header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="datamanager" />
-
-        <Button
-            android:id="@+id/btnInsert"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="插入" />
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/btnChange"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="修改" />
-
-            <EditText
-                android:id="@+id/etRow"
-                android:layout_width="100dp"
-                android:layout_height="wrap_content"
-                android:numeric="integer"
-                android:text="@={vm.row}" />
-        </LinearLayout>
-
-        <Button
-            android:id="@+id/btnQuery"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="查找" />
-        <Button
-            android:id="@+id/btnDelete"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="删除" />
+            app:layout_constraintBottom_toTopOf="@id/rv"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            app:layout_constraintBottom_toTopOf="@id/llBottom"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/header" />
+
+        <LinearLayout
+            android:id="@+id/llBottom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/rv">
+
+            <Button
+                android:id="@+id/btnDelete"
+                style="@style/BtnPositive"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:minWidth="150dp"
+                android:text="删除" />
+
+            <Button
+                android:id="@+id/btnClean"
+                style="@style/BtnPositive"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:minWidth="150dp"
+                android:text="清空" />
+
+            <Button
+                android:id="@+id/btnInsert"
+                style="@style/BtnPositive"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:minWidth="150dp"
+                android:text="添加" />
+
+            <Button
+                android:id="@+id/btnInsert2"
+                style="@style/BtnPositive"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:minWidth="150dp"
+                android:text="添加1000" />
+
+            <Button
+                android:id="@+id/btnQuery"
+                style="@style/BtnPositive"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:minWidth="150dp"
+                android:text="根据ID正序" />
+
+            <Button
+                android:id="@+id/btnQuery2"
+                style="@style/BtnPositive"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:minWidth="150dp"
+                android:text="根据ID倒序" />
+        </LinearLayout>
+
+
     </LinearLayout>
 </layout>

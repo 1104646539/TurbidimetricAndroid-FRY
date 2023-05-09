@@ -30,9 +30,13 @@
             android:layout_height="wrap_content" />
 
         <Button
+            style="@style/BtnPositive"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="80dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
             android:onClick="@{()->model.clickStart()}"
+            android:stateListAnimator="@null"
             android:text="开始" />
 
         <androidx.core.widget.NestedScrollView
@@ -53,20 +57,33 @@
 
                 <Button
                     android:id="@+id/btnGet"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="80dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:onClick="@{(v)->model.clickTest1(v)}"
                     android:text="获取" />
 
                 <Button
                     android:id="@+id/btnGetU"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    style="@style/BtnNegative"
+                    android:layout_width="match_parent"
+                    android:layout_height="80dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginRight="20dp"
+                    android:stateListAnimator="@null"
                     android:text="获取u" />
 
                 <Button
                     android:id="@+id/btnGetU2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    style="@style/BtnPositive"
+                    android:layout_width="match_parent"
+                    android:layout_height="80dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginRight="20dp"
+                    android:stateListAnimator="@null"
                     android:text="获取2" />
             </LinearLayout>
 

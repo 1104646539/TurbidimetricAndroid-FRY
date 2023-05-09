@@ -1,4 +1,4 @@
-package com.wl.turbidimetric.util
+package com.wl.turbidimetric.test
 
 import com.wl.turbidimetric.ex.CRC16
 import com.wl.turbidimetric.ex.toHex
@@ -8,11 +8,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
-import java.util.concurrent.ArrayBlockingQueue
-import java.util.concurrent.BlockingDeque
-import java.util.concurrent.BlockingQueue
 import java.util.concurrent.LinkedBlockingQueue
-import kotlin.reflect.KSuspendFunction1
 
 /**
  * 仅测试回复用
@@ -32,11 +28,12 @@ object TestSerialPort {
         var reply = ubyteArrayOf(data[0], state)
         when (data[0]) {
             SerialGlobal.CMD_GetMachineState -> {
-                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x0u))
+//                reply = reply.plus(ubyteArrayOf(0x3Fu, 0xFFu, 0xFFu, 0xFFu))
+                reply = reply.plus(ubyteArrayOf(0x00u, 0x00u, 0x00u, 0x00u))
             }
             SerialGlobal.CMD_GetState -> {
 //                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x33u, 0xffu))// 0011 0011
-                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x37u, 0xffu))//0011 0111
+                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x11u, 0xffu))//0001 0001
             }
             SerialGlobal.CMD_MoveShitTube -> {
                 reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x1u))
@@ -63,7 +60,7 @@ object TestSerialPort {
         GlobalScope.launch {
             launch {
                 while (true) {
-                    delay(20)
+                    delay(50)
                     val re = results.take()
                     if (re != null) {
                         callback?.invoke(re)

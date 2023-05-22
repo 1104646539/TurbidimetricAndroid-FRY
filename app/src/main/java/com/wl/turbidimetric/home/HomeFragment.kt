@@ -6,21 +6,35 @@ import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.FragmentHomeBinding
-import com.wl.turbidimetric.ex.put
-import com.wl.turbidimetric.ex.snack
+import com.wl.turbidimetric.datastore.LocalDataGlobal
+import com.wl.turbidimetric.datastore.LocalDataGlobal.cache
+import com.wl.turbidimetric.ex.*
+import com.wl.turbidimetric.global.SystemGlobal
+import com.wl.turbidimetric.global.SystemGlobal.cuvetteDoorIsOpen
+import com.wl.turbidimetric.global.SystemGlobal.shitTubeDoorIsOpen
+import com.wl.turbidimetric.global.SystemGlobal.testState
 import com.wl.turbidimetric.model.ProjectModel
+import com.wl.turbidimetric.model.TestState
+import com.wl.turbidimetric.print.PrintUtil
 import com.wl.turbidimetric.util.ScanCodeUtil
+import com.wl.turbidimetric.util.SerialPortUtil
 import com.wl.turbidimetric.util.StorageUtil
 import com.wl.turbidimetric.view.HiltDialog
 import com.wl.wwanandroid.base.BaseFragment
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.util.Date
+import kotlin.concurrent.timer
 
 
 class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.fragment_home) {
@@ -54,12 +68,12 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         vd.model = vm
     }
 
+
     override fun init(savedInstanceState: Bundle?) {
         test()
-        listenerDialog()
-        //自检
-        vm.goGetMachineState()
+        listener()
 
+        vm.goGetMachineState()
 //        vd.btnGet.setOnClickListener {
 ////            viewModelScope.launch {
 ////                Timber.d("2 Key.TakeReagentR2= before}")
@@ -74,7 +88,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 ////            f1.writeText("test")
 //            //写入u盘文件 end
 //        }
-
+        vd.btnGet.setOnClickListener {
+        }
         vd.btnGetU.setOnClickListener {
 //            Timber.d("Key.TakeReagentR2= before}")
 //            val TakeReagentR1 =
@@ -87,6 +102,22 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 //                ScanCodeUtil.Instance.startScan()
 //                ScanCodeUtil.Instance.onScanResult = null
 //            }
+
+//            lifecycleScope.launch {
+//                repeat(1000) {
+//                    delay(100)
+//                    SerialPortUtil.Instance.pierced()
+//                }
+//            }
+//            PrintUtil.Instance.test()
+
+//            PrintUtil.printMatchingQuality(
+//                doubleArrayOf(0.0, 1400.0, 681.0, 174.0, 35.0,500.0,1200.0).toList(),
+//                nds,
+//                doubleArrayOf(0.0, 1000.0, 500.0, 200.0, 48.0,162.0,465.0).toList(),
+//                doubleArrayOf(0.00000001, 2.02354123, 1.21235454, 0.212335412),
+//                true
+//            )
         }
 
 
@@ -120,6 +151,52 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         }
     }
 
+    private fun listener() {
+        listenerDialog()
+
+        cuvetteDoorIsOpen.observe(this) {
+//            if (testState == TestState.TestFinish && (cuvetteDoorIsOpen.value == true) && (shitTubeDoorIsOpen.value == true)) {
+//                vm.showFinishDialog()
+//            }
+
+            vd.tvShow.text = "采便管舱门状态:${
+                if (shitTubeDoorIsOpen.value == true) {
+                    "已开启"
+                } else {
+                    "已关闭"
+                }
+            }" +
+                    "\t采便管舱门状态${
+                        if (cuvetteDoorIsOpen.value == true) {
+                            "已开启"
+                        } else {
+                            "已关闭"
+                        }
+                    }"
+        }
+        shitTubeDoorIsOpen.observe(this) {
+//            if (testState == TestState.TestFinish && (cuvetteDoorIsOpen.value == true) && (shitTubeDoorIsOpen.value == true)) {
+//                vm.showFinishDialog()
+//            }
+
+            vd.tvShow.text = "采便管舱门状态:${
+                if (shitTubeDoorIsOpen.value == true) {
+                    "已开启"
+                } else {
+                    "已关闭"
+                }
+            }" +
+                    "\t采便管舱门状态${
+                        if (cuvetteDoorIsOpen.value == true) {
+                            "已开启"
+                        } else {
+                            "已关闭"
+                        }
+                    }"
+        }
+    }
+
+
     val items: MutableList<ProjectModel> = mutableListOf()
     lateinit var projectAdapter: HomeProjectAdapter
     private fun test() {
@@ -136,7 +213,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             val exist = StorageUtil.isExist()
             Timber.d("exist=$exist")
         }
-
 
     }
 
@@ -155,7 +231,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
          * 自检失败对话框
          */
         vm.getMachineFailedMsg.observe(this) { show ->
-            dialog.show(msg = show,
+            dialog.show(
+                msg = show,
                 confirmMsg = "重新自检",
                 onConfirm = {
                     it.dismiss()
@@ -165,10 +242,10 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 onCancel = {
                     it.dismiss()
                     vm.dialogGetMachineFailedCancel()
-                }).takeIf {
+                }, false
+            ).takeIf {
                 show.isNotEmpty()
             }
-
         }
         /**
          * 检测结束后 比色皿不足
@@ -180,13 +257,14 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             }, cancelMsg = "结束检测", onCancel = {
                 it.dismiss()
                 vm.dialogTestFinishCuvetteDeficiencyCancel()
-            })
+            }, false)
         }
         /**
          * 开始检测 比色皿,采便管，试剂不足
          */
         vm.getStateNotExistMsg.observe(this) { show ->
-            dialog.show(msg = show,
+            dialog.show(
+                msg = show,
                 confirmMsg = "我已添加",
                 onConfirm = {
                     it.dismiss()
@@ -196,7 +274,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 onCancel = {
                     it.dismiss()
                     vm.dialogGetStateNotExistCancel()
-                }).takeIf {
+                }, false
+            ).takeIf {
                 show.isNotEmpty()
             }
         }
@@ -210,7 +289,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             }, cancelMsg = "结束检测", onCancel = {
                 it.dismiss()
                 vm.dialogTestShitTubeDeficiencyCancel()
-            })
+            }, false)
         }
 
         /**
@@ -225,8 +304,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 dialog.dismiss()
             }
         }
-
-
     }
 
     private val dialog: HiltDialog by lazy {

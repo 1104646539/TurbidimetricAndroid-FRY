@@ -11,6 +11,7 @@ import java.util.Date
  */
 class ScanCodeUtil private constructor(
     private val serialPort: BaseSerialPortUtil = BaseSerialPortUtil(
+//        "/dev/ttyS3",
         "Com2",
         9600
     )

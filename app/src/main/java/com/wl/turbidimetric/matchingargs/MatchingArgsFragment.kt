@@ -48,6 +48,7 @@ class MatchingArgsFragment :
 
     private fun listenerView() {
         vm.testMsg.observe(this) {
+            Timber.d("it=$it")
             vd.tvMsg.text = it
         }
 
@@ -70,8 +71,8 @@ class MatchingArgsFragment :
         /**
          * 开始检测 比色皿,采便管，试剂不足
          */
-        vm.dialogGetStateNotExist.observe(this) { show ->
-            if (show) {
+        vm.getStateNotExistMsg.observe(this) { msg ->
+            if (msg.isNotEmpty()) {
                 dialog.show(
                     msg = "${vm.getStateNotExistMsg.value}",
                     confirmMsg = "我已添加", onConfirm = {
@@ -83,7 +84,16 @@ class MatchingArgsFragment :
                         vm.dialogGetStateNotExistCancel()
                     }
                 )
-                vm.dialogGetStateNotExist.postValue(false)
+            }
+        }
+        vm.matchingFinishMsg.observe(this){
+            if(it.isNotEmpty()){
+                dialog.show(
+                    msg = it,
+                    confirmMsg = "我知道了", onConfirm = {
+                        it.dismiss()
+                    }
+                )
             }
         }
     }

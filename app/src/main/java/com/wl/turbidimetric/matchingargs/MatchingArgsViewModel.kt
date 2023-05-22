@@ -11,8 +11,10 @@ import com.wl.turbidimetric.db.DBManager
 import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.global.SystemGlobal.matchingTestState
+import com.wl.turbidimetric.global.SystemGlobal.testState
 import com.wl.turbidimetric.home.ProjectRepository
 import com.wl.turbidimetric.model.*
+import com.wl.turbidimetric.print.PrintUtil
 import com.wl.turbidimetric.util.Callback2
 import com.wl.turbidimetric.util.SerialPortUtil
 import com.wl.wwanandroid.base.BaseViewModel
@@ -21,6 +23,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.math.BigDecimal
 import java.util.Date
 import kotlin.math.absoluteValue
 
@@ -29,7 +32,8 @@ import kotlin.math.absoluteValue
  *
  * @property quality Boolean
  */
-class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : BaseViewModel(), Callback2 {
+class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : BaseViewModel(),
+    Callback2 {
 
     init {
         listener()
@@ -40,17 +44,25 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
     }
 
     /**
-     * 四次检测的值
+     * 四次检测的吸光度值
      */
-    private var resultTest1 = arrayListOf<Double>()
-    private var resultTest2 = arrayListOf<Double>()
-    private var resultTest3 = arrayListOf<Double>()
-    private var resultTest4 = arrayListOf<Double>()
+    private var resultTest1 = arrayListOf<BigDecimal>()
+    private var resultTest2 = arrayListOf<BigDecimal>()
+    private var resultTest3 = arrayListOf<BigDecimal>()
+    private var resultTest4 = arrayListOf<BigDecimal>()
+
+    /**
+     * 四次检测的原始值
+     */
+    private var resultOriginalTest1 = arrayListOf<Int>()
+    private var resultOriginalTest2 = arrayListOf<Int>()
+    private var resultOriginalTest3 = arrayListOf<Int>()
+    private var resultOriginalTest4 = arrayListOf<Int>()
 
     /**
      * 吸光度
      */
-    private var result = arrayListOf<Double>()
+    private var result = arrayListOf<BigDecimal>()
 
     /**
      * 加稀释液的量
@@ -84,6 +96,16 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
      * 当前取样的步骤
      */
     private var sampleStep: Int = 0
+
+    /**比色皿架是否移动完毕
+     *
+     */
+    private var cuvetteShelfMoveFinish = false
+
+    /**采便管架是否移动完毕
+     *
+     */
+    private var shitTubeShelfMoveFinish = false
 
     /**
      * 当前排所有比色皿的状态
@@ -179,11 +201,39 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
     /**
      * 开始检测 比色皿，采便管，试剂,清洗液不存在
      */
-    val dialogGetStateNotExist = MutableLiveData(false)
     val getStateNotExistMsg = MutableLiveData("")
+
+    /**
+     * 拟合质控结束提示
+     */
+    val matchingFinishMsg = MutableLiveData("")
+
 
     val testMsg = MutableLiveData("")
     val toastMsg = MutableLiveData("")
+
+    /**
+     * 比色皿锁状态
+     */
+    private val shitTubeDoorLockedLD = MutableLiveData(false)
+
+    /**
+     * 比色皿锁状态
+     */
+    private val cuvetteDoorLockedLD = MutableLiveData(false)
+
+
+    private var shitTubeDoorLocked = false
+    private var cuvetteDoorLocked = false
+
+//    /**
+//     * 点击获取采便管锁状态
+//     */
+//    private val clickShitTubeDoor = false;
+//    /**
+//     * 点击获取比色皿锁状态
+//     */
+//    private val clickCuvetteDoor = false;
 
     /**
      * 每排之间的检测间隔
@@ -199,10 +249,19 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
      * 测试用的 start
      */
     //检测的值
-    private val testValues1 = doubleArrayOf(0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2)
+    private val testValues1 = doubleArrayOf(1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)
     private val testValues2 = doubleArrayOf(0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3)
     private val testValues3 = doubleArrayOf(0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3)
-    private val testValues4 = doubleArrayOf(0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4)
+    private val testValues4 =
+        doubleArrayOf(0.9998, 1.1586, 1.0642, 1.0178, 1.0035, 1.0141, 1.0585, 1.0, 1.0, 1.0)
+    private val testOriginalValues1 =
+        intArrayOf(65532, 65532, 65532, 65532, 65532, 65532, 65532, 65532, 65532, 65532)
+    private val testOriginalValues2 =
+        intArrayOf(65520, 65520, 65520, 65520, 65520, 65520, 65520, 65520, 65520, 65520)
+    private val testOriginalValues3 =
+        intArrayOf(60000, 60000, 60000, 60000, 60000, 60000, 60000, 60000, 60000, 60000)
+    private val testOriginalValues4 =
+        intArrayOf(56000, 56000, 56000, 56000, 56000, 56000, 56000, 56000, 56000, 56000)
 
     //测试用 每排之间的检测间隔
     val testS: Long = 100;
@@ -242,6 +301,7 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
         }
         return array
     }
+
     /**
      * 报错
      * @param cmd UByte
@@ -253,6 +313,7 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
         Timber.d("报错了，cmd=$cmd state=$state")
         testMsg.postValue("报错了，cmd=$cmd state=$state")
     }
+
     /**
      * 仪器是否正常
      * @return Boolean
@@ -260,24 +321,37 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
     private fun machineStateNormal(): Boolean {
         return SystemGlobal.machineArgState == MachineState.Normal
     }
+
     /**
      * 点击开始拟合
      */
     fun clickStart() {
+        if (DoorAllOpen()) {
+            toast("舱门未关")
+            return
+        }
+        if (testState != TestState.None) {
+            toastMsg.postValue("正在检测，请勿操作！")
+            return
+        }
         if (matchingTestState != MatchingArgState.None && matchingTestState != MatchingArgState.Finish) {
             toastMsg.postValue("正在质控，请勿操作！")
             return
         }
-        clearState()
+        initState()
         matchingTestState = MatchingArgState.GetState;
         getState()
     }
 
-    private fun clearState() {
+    private fun initState() {
         resultTest1.clear()
         resultTest2.clear()
         resultTest3.clear()
         resultTest4.clear()
+        resultOriginalTest1.clear()
+        resultOriginalTest2.clear()
+        resultOriginalTest3.clear()
+        resultOriginalTest4.clear()
         matchingTestState = MatchingArgState.None
         sampleStep = 0
         testMsg.postValue("")
@@ -289,6 +363,15 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
         if (SystemGlobal.isCodeDebug) {
             testShelfInterval = testS;
             testPosInterval = testP;
+
+        } else {
+//            testShelfInterval =
+//                ((1000 * 10 * 10) - ((5 + (if (quality) 2 else 0)) * 10 * 1000)).toLong()
+            testShelfInterval = if (quality) {
+                33 * 1000
+            } else {
+                55 * 1000
+            }
         }
     }
 
@@ -321,31 +404,26 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
         if (cuvetteShelfPos == -1) {
             Timber.d("没有比色皿架")
             getStateNotExistMsg.postValue("比色皿不足，请添加")
-            dialogGetStateNotExist.postValue(true)
             return
         }
         if (shitTubeShelfPos == -1) {
             Timber.d("没有采便管架")
             getStateNotExistMsg.postValue("采便管不足，请添加")
-            dialogGetStateNotExist.postValue(true)
             return
         }
         if (!r1Reagent) {
             Timber.d("没有R1试剂")
             getStateNotExistMsg.postValue("R1试剂不足，请添加")
-            dialogGetStateNotExist.postValue(true)
             return
         }
         if (!r2Reagent) {
             Timber.d("没有R2试剂")
             getStateNotExistMsg.postValue("R2试剂不足，请添加")
-            dialogGetStateNotExist.postValue(true)
             return
         }
         if (!cleanoutFluid) {
             Timber.d("没有清洗液试剂")
             getStateNotExistMsg.postValue("清洗液不足，请添加")
-            dialogGetStateNotExist.postValue(true)
             return
         }
         matchingTestState = MatchingArgState.DripDiluentVolume
@@ -398,6 +476,13 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
      * @param reply ReplyModel<MoveCuvetteShelfModel>
      */
     override fun readDataMoveCuvetteShelfModel(reply: ReplyModel<MoveCuvetteShelfModel>) {
+        if (matchingTestState == MatchingArgState.Finish) {
+            cuvetteShelfMoveFinish = true
+            if (isMatchingFinish()) {
+                showMatchingDialog()
+                openAllDoor()
+            }
+        }
         if (!runningMatching()) return
         if (!machineStateNormal()) return
         Timber.d("接收到 移动比色皿架 reply=$reply")
@@ -417,6 +502,39 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
             else -> {}
         }
 
+    }
+
+    private fun openAllDoor() {
+        openShitTubeDoor()
+        openCuvetteDoor()
+    }
+
+    /**
+     * 发送 开样本仓门
+     */
+    private fun openShitTubeDoor() {
+        Timber.d("发送 开样本仓门")
+        SerialPortUtil.Instance.openShitTubeDoor()
+    }
+
+    /**
+     * 发送 开比色皿仓门
+     */
+    private fun openCuvetteDoor() {
+        Timber.d("发送 开比色皿仓门")
+        SerialPortUtil.Instance.openCuvetteDoor()
+    }
+
+    /**
+     * 获取样本仓门状态
+     */
+    private fun getShitTubeDoor() {
+        Timber.d("发送 获取样本仓门状态")
+        SerialPortUtil.Instance.getShitTubeDoorState()
+    }
+
+    private fun isMatchingFinish(): Boolean {
+        return matchingTestState == MatchingArgState.Finish && cuvetteShelfMoveFinish && shitTubeShelfMoveFinish
     }
 
 
@@ -457,6 +575,7 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
         }
 
     }
+
     /**
      * 获取当前位置取样加样的量
      * @param matchingTestState
@@ -485,6 +604,9 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
         goDripSample()
     }
 
+    /**
+     * 去比色皿加样
+     */
     private fun goDripSample() {
         if (cuvetteMoveFinish && samplingFinish) {
             dripSample(autoBlending = false, inplace = false, moveSampleVolume)
@@ -559,17 +681,20 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
      * @param reply ReplyModel<MoveShitTubeShelfModel>
      */
     override fun readDataMoveShitTubeShelfModel(reply: ReplyModel<MoveShitTubeShelfModel>) {
+        Timber.d("接收到 移动采便管架 reply=$reply matchingTestState=$matchingTestState")
+        if (matchingTestState == MatchingArgState.Finish) {
+            shitTubeShelfMoveFinish = true
+            if (isMatchingFinish()) {
+                showMatchingDialog()
+                openAllDoor()
+            }
+        }
         if (!runningMatching()) return
         if (!machineStateNormal()) return
-        Timber.d("接收到 移动采便管架 reply=$reply matchingTestState=$matchingTestState")
-
-
+        shitTubeShelfMoveFinish = true
         if (matchingTestState != MatchingArgState.Finish) {
             //一开始就要移动到第二个位置去取第一个位置的稀释液
             moveShitTube(2)
-        }else{
-            //拟合结束动作完成
-            matchingTestState = MatchingArgState.None
         }
     }
 
@@ -585,18 +710,21 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
 
         calcTestResult(reply.data.value)
     }
+
     private fun calcTestResult(value: Int) {
         when (matchingTestState) {
             MatchingArgState.DripReagent -> {
                 updateCuvetteState(cuvettePos - 3, CuvetteState.Test1)
-                resultTest1.add(calcAbsorbance(value.toDouble()))
-//                resultTest1.add(testValues1[cuvettePos - 3])
+                resultTest1.add(calcAbsorbance(value.toBigDecimal()))
+                resultOriginalTest1.add(value)
+                updateResult()
                 dripReagentAndStirAndTestFinish()
             }
             MatchingArgState.Test2 -> {
                 updateCuvetteState(cuvettePos, CuvetteState.Test2)
-                resultTest2.add(calcAbsorbance(value.toDouble()))
-//                resultTest2.add(testValues2[cuvettePos])
+                resultTest2.add(calcAbsorbance(value.toBigDecimal()))
+                resultOriginalTest2.add(value)
+                updateResult()
                 //检测结束,开始检测第三次
                 if ((cuvettePos == 4 && !quality) || (cuvettePos == 6 && quality)) {
                     matchingTestState = MatchingArgState.Test3
@@ -611,11 +739,13 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
                         moveCuvetteTest()
                     }
                 }
+
             }
             MatchingArgState.Test3 -> {
                 updateCuvetteState(cuvettePos, CuvetteState.Test3)
-                resultTest3.add(calcAbsorbance(value.toDouble()))
-//                resultTest3.add(testValues3[cuvettePos])
+                resultTest3.add(calcAbsorbance(value.toBigDecimal()))
+                resultOriginalTest3.add(value)
+                updateResult()
                 //检测结束,开始检测第四次
                 if ((cuvettePos == 4 && !quality) || (cuvettePos == 6 && quality)) {
                     matchingTestState = MatchingArgState.Test4
@@ -629,17 +759,16 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
                         moveCuvetteTest()
                     }
                 }
+
             }
             MatchingArgState.Test4 -> {
                 updateCuvetteState(cuvettePos, CuvetteState.Test4)
-                resultTest4.add(calcAbsorbance(value.toDouble()))
-//                resultTest4.add(testValues4[cuvettePos])
-
+                resultTest4.add(calcAbsorbance(value.toBigDecimal()))
+                resultOriginalTest4.add(value)
+                updateResult()
                 //检测结束,计算拟合参数
                 if ((cuvettePos == 4 && !quality) || (cuvettePos == 6 && quality)) {
-                    matchingTestState = MatchingArgState.Finish
-                    moveCuvetteShelf(-1)
-                    moveShitTubeShelf(-1)
+                    matchingFinish()
                     calcMatchingArg()
                 } else {
                     viewModelScope.launch {
@@ -651,7 +780,34 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
             else -> {}
         }
 
+
     }
+
+    /**
+     * 拟合结束，复位
+     */
+    private fun matchingFinish() {
+        matchingTestState = MatchingArgState.Finish
+        moveCuvetteShelf(-1)
+        moveShitTubeShelf(-1)
+    }
+
+    /**
+     * 测试用，更新每次检测的值
+     */
+    private fun updateResult() {
+        testMsg.postValue(
+            "第一次原始:$resultOriginalTest1 \n" +
+                    "第一次:$resultTest1 \n" +
+                    "第二次原始:$resultOriginalTest2 \n" +
+                    " 第二次:$resultTest2 \n" +
+                    "第三次原始:$resultOriginalTest3 \n" +
+                    " 第三次:$resultTest3 \n" +
+                    "第四次原始:$resultOriginalTest4 \n" +
+                    " 第四次:$resultTest4 \n"
+        )
+    }
+
     /**
      * 计算拟合曲线
      */
@@ -661,58 +817,79 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
             resultTest2.clear()
             resultTest3.clear()
             resultTest4.clear()
-            testValues1.forEach {
-                resultTest1.add(it)
+            resultOriginalTest1.clear()
+            resultOriginalTest2.clear()
+            resultOriginalTest3.clear()
+            resultOriginalTest4.clear()
+            repeat(testValues1.size) {
+                resultTest1.add(testValues1[it].toBigDecimal())
+                resultTest2.add(testValues2[it].toBigDecimal())
+                resultTest3.add(testValues3[it].toBigDecimal())
+                resultTest4.add(testValues4[it].toBigDecimal())
+
+                resultOriginalTest1.add(testOriginalValues1[it])
+                resultOriginalTest2.add(testOriginalValues2[it])
+                resultOriginalTest3.add(testOriginalValues3[it])
+                resultOriginalTest4.add(testOriginalValues4[it])
             }
-            testValues2.forEach {
-                resultTest2.add(it)
-            }
-            testValues3.forEach {
-                resultTest3.add(it)
-            }
-            testValues4.forEach {
-                resultTest4.add(it)
-            }
+
         }
         Timber.d("开始计算拟合曲线 $resultTest1 $resultTest2 $resultTest3 $resultTest4")
 
         result = calcAbsorbances(resultTest1, resultTest2, resultTest3, resultTest4)
 
-        val cf = matchingArg(result)
+        val absorbancys = result.map { it.toDouble() * 10000 }
+        val cf = matchingArg(absorbancys)
         val res = cf.params
         for (i in res.indices) {
             println(res[i])
         }
         Timber.d("拟合度：${cf.fitGoodness}")
-        Timber.d("四参数：a1=${res[0]} a2=${res[3]} x0=${res[2]} p=${res[1]}")
+//        Timber.d("四参数：a1=${res[0]} a2=${res[3]} x0=${res[2]} p=${res[1]}")
+        val f0 = res[0]
+        val f1 = res[1]
+        val f2 = res[2]
+        val f3 = res[3]
 
-        val a1 = res[0]
-        val a2 = res[3]
-        val x0 = res[2]
-        val p = res[1]
+        Timber.d("四参数：f0=${f0} f1=${f1} f2=${f2} f3=${f3}")
+
+        val yzs = absorbancys.map {
+            val yz = cf.f(res, it).scale(2)
+            yz
+        }
 
         var msg: StringBuilder = StringBuilder(
-            "第一次:$resultTest1 \n 第二次:$resultTest2 \n 第三次:$resultTest3 \n 第四次:$resultTest4 \n  吸光度:$result 拟合度：${cf.fitGoodness} \n" +
-                    " 四参数：a1=${a1} a2=${a2} x0=${x0} p=${p} \n "
+            "第一次原始:$resultOriginalTest1 \n" +
+                    "第一次:$resultTest1 \n" +
+                    "第二次原始:$resultOriginalTest2 \n" +
+                    "第二次:$resultTest2 \n" +
+                    "第三次原始:$resultOriginalTest3 \n" +
+                    "第三次:$resultTest3 \n" +
+                    "第四次原始:$resultOriginalTest4 \n" +
+                    "第四次:$resultTest4 \n" +
+                    "吸光度:$result 拟合度：${cf.fitGoodness} \n" +
+                    "四参数：f0=${f0} f1=${f1} f2=${f2} f3=${f3} \n " +
+                    "验算 ${yzs}\n"
         )
         val project = ProjectModel().apply {
-            this.a1 = a1
-            this.a2 = a2
-            this.x0 = x0
-            this.p = p
+            this.f0 = f0
+            this.f1 = f1
+            this.f2 = f2
+            this.f3 = f3
             this.fitGoodness = cf.fitGoodness
             this.createTime = Date().toLongString()
             this.projectLjz = 100
         }
-        if (quality) {
-            val hValue = result[5];
-            val lValue = result[6];
-
-            val hCon = calcCon(hValue, project);
-            val lCon = calcCon(lValue, project);
-            msg.append("质控(H):$hCon\n")
-            msg.append("质控(L):$lCon\n")
-        }
+        PrintUtil.printMatchingQuality(absorbancys, nds, yzs, cf.params, quality)
+//        if (quality) {
+//            val hValue = result[5];
+//            val lValue = result[6];
+//
+//            val hCon = calcCon(hValue, project);
+//            val lCon = calcCon(lValue, project);
+//            msg.append("质控(H):$hCon\n")
+//            msg.append("质控(L):$lCon\n")
+//        }
 
         testMsg.postValue(msg.toString())
 
@@ -922,15 +1099,6 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
         dripReagentAndStirAndTestFinish()
     }
 
-    /**
-     * 接收到采便管舱门状态
-     * @param reply ReplyModel<ShitTubeDoorModel>
-     */
-    override fun readDataShitTubeDoorModel(reply: ReplyModel<ShitTubeDoorModel>) {
-        if (!runningMatching()) return
-        if (!machineStateNormal()) return
-        Timber.d("接收到 采便管舱门状态 reply=$reply")
-    }
 
     /**
      * 接收到刺破
@@ -952,15 +1120,54 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
         Timber.d("接收到 获取版本号 reply=$reply")
     }
 
+
     /**
-     * 接收到比色皿舱门状态
+     * 接收到 样本架锁状态
+     * @param reply ReplyModel<ShitTubeDoorModel>
+     */
+    override fun readDataShitTubeDoorModel(reply: ReplyModel<ShitTubeDoorModel>) {
+//        Timber.d("接收到 样本门状态 reply=$reply")
+//        shitTubeDoorLocked = reply.data.isOpen
+//        shitTubeDoorLockedLD.postValue(reply.data.isOpen)
+//        //拟合完成后的开门，不成功代表有故障
+//        if (matchingTestState == MatchingArgState.Finish) {
+//            if (cuvetteDoorLocked && shitTubeDoorLocked) {
+//                showMatchingDialog()
+//            } else if (!shitTubeDoorLocked) {
+//                Timber.d("样本门打开失败")
+//                testMsg.postValue("样本门打开失败")
+//            }
+//        }
+//        if (!runningMatching()) return
+//        if (!machineStateNormal()) return
+        //开始检测前的检测状态，必须开门
+//        if (matchingTestState == MatchingArgState.None) {
+//
+//        }
+
+    }
+
+    /**
+     * 接收到 比色皿架锁状态
      * @param reply ReplyModel<CuvetteDoorModel>
      */
     override fun readDataCuvetteDoorModel(reply: ReplyModel<CuvetteDoorModel>) {
-        if (!runningMatching()) return
-        if (!machineStateNormal()) return
-        Timber.d("接收到 比色皿舱门状态 reply=$reply")
+//        Timber.d("接收到 比色皿门状态 reply=$reply")
+//        cuvetteDoorLocked = reply.data.isOpen
+//        cuvetteDoorLockedLD.postValue(reply.data.isOpen)
+//        if (matchingTestState == MatchingArgState.Finish && cuvetteDoorLocked && shitTubeDoorLocked) {
+//            showMatchingDialog()
+//        }
+//        if (!runningMatching()) return
+//        if (!machineStateNormal()) return
+    }
 
+    /**
+     * 显示拟合结束对话框
+     */
+    fun showMatchingDialog() {
+        matchingFinishMsg.postValue("拟合结束")
+        matchingTestState = MatchingArgState.None
     }
 
     /**
@@ -978,6 +1185,7 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
      */
     private fun moveShitTubeShelf(pos: Int) {
         Timber.d("发送 移动采便管架 pos=$pos")
+        shitTubeShelfMoveFinish = false
         SerialPortUtil.Instance.moveShitTubeShelf(pos + 1)
     }
 
@@ -987,6 +1195,7 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
      */
     private fun moveCuvetteShelf(pos: Int) {
         Timber.d("发送 移动比色皿架 pos=$pos")
+        cuvetteShelfMoveFinish = false
         SerialPortUtil.Instance.moveCuvetteShelf(pos + 1)
     }
 
@@ -1123,6 +1332,7 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
      */
     fun dialogGetStateNotExistCancel() {
         Timber.d("dialogGetStateNotExistCancel 点击结束检测")
+
     }
 
     /**
@@ -1132,6 +1342,7 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
         return matchingTestState != MatchingArgState.None && matchingTestState != MatchingArgState.Finish
     }
 }
+
 class MatchingArgsViewModelFactory(private val projectRepository: ProjectRepository = ProjectRepository()) :
     ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

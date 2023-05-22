@@ -282,7 +282,7 @@ fun transitionCuvetteDoorModel(data: UByteArray): ReplyModel<CuvetteDoorModel> {
     return ReplyModel(
         SerialGlobal.CMD_CuvetteDoor,
         data[1].toInt(),
-        CuvetteDoorModel(isOpen = getStep(data[5], 0) == 0)
+        CuvetteDoorModel(isOpen = getStep(data[5], 0) == 1)
     )
 }
 
@@ -295,7 +295,7 @@ fun transitionShitTubeDoorModel(data: UByteArray): ReplyModel<ShitTubeDoorModel>
     return ReplyModel(
         SerialGlobal.CMD_ShitTubeDoor,
         data[1].toInt(),
-        ShitTubeDoorModel(isOpen = getStep(data[5], 0) == 0)
+        ShitTubeDoorModel(isOpen = getStep(data[5], 0) == 1)
     )
 }
 

@@ -6,10 +6,7 @@ import com.wl.turbidimetric.global.SerialGlobal
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.*
 import com.wl.turbidimetric.test.TestSerialPort
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import timber.log.Timber
 import java.util.*
 import java.util.concurrent.BlockingQueue
@@ -18,7 +15,8 @@ import java.util.concurrent.LinkedBlockingQueue
 /**
  * 串口操作类
  */
-class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("Com1", 115200)) {
+class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("Com1", 9600)) {
+//class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("/dev/ttyS1", 9600)) {
     companion object {
         val Instance: SerialPortUtil = SerialPortUtil()
     }
@@ -32,6 +30,8 @@ class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("Co
     var byteArray = ByteArray(100)
     val responseCommand1: UByte = SerialGlobal.CMD_Response;
     val sendQueue: BlockingQueue<UByteArray> = LinkedBlockingQueue()
+
+    private val sendMap = mutableMapOf<UByte, Int>()
 
     fun open() {
         if (SystemGlobal.isCodeDebug) {
@@ -58,7 +58,7 @@ class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("Co
         dispatchData(ready)
     }
 
-    fun callback(ready: UByteArray, call: (Callback2) -> Unit) {
+    fun callback(call: (Callback2) -> Unit) {
         callback.forEach {
             call.invoke(it)
         }
@@ -69,44 +69,56 @@ class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("Co
      */
     @OptIn(ExperimentalUnsignedTypes::class)
     private fun dispatchData(ready: UByteArray) = runBlocking {
-        if (ready[1].toInt() != 0) {
-            callback(ready) {
-                it.readDataStateFailed(ready[0],ready[1])
+        val cmd = ready[0]
+        val state = ready[1]
+        //重发的信息就不处理了
+        if (!SystemGlobal.isCodeDebug) {
+            if (cmd.toInt() != 0xffu.toInt()) {
+                if (sendMap[cmd] != null && sendMap[cmd]!! > 0) {
+//                    Timber.d("dispatchData 正常的 $ready")
+                    sendMap[cmd] = 0
+                } else {
+                    Timber.d("dispatchData 重发的 $ready")
+                    return@runBlocking
+                }
+            }
+        }
+        //状态错误的(不为0)
+        if (state.toInt() != 0) {
+            callback {
+                it.readDataStateFailed(cmd, state)
             }
             return@runBlocking
         }
 
-        when (ready[0]) {
+        when (cmd) {
             SerialGlobal.CMD_GetMachineState -> {
-                callback(ready) {
-                    it.readDataGetMachineStateModel(transitionGetMachineStateModel(ready))
-                }
-                callback.forEach {
+                callback {
                     it.readDataGetMachineStateModel(transitionGetMachineStateModel(ready))
                 }
             }
             SerialGlobal.CMD_GetState -> {
-                callback.forEach {
+                callback {
                     it.readDataGetStateModel(transitionGetStateModel(ready))
                 }
             }
             SerialGlobal.CMD_MoveShitTubeShelf -> {
-                callback.forEach {
+                callback {
                     it.readDataMoveShitTubeShelfModel(transitionMoveShitTubeShelfModel(ready))
                 }
             }
             SerialGlobal.CMD_MoveCuvetteShelf -> {
-                callback.forEach {
+                callback {
                     it.readDataMoveCuvetteShelfModel(transitionMoveCuvetteShelfModel(ready))
                 }
             }
             SerialGlobal.CMD_MoveShitTube -> {
-                callback.forEach {
+                callback {
                     it.readDataMoveShitTubeModel(transitionMoveShitTubeModel(ready))
                 }
             }
             SerialGlobal.CMD_MoveCuvetteDripSample -> {
-                callback.forEach {
+                callback {
                     it.readDataMoveCuvetteDripSampleModel(
                         transitionMoveCuvetteDripSampleModel(
                             ready
@@ -115,7 +127,7 @@ class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("Co
                 }
             }
             SerialGlobal.CMD_MoveCuvetteDripReagent -> {
-                callback.forEach {
+                callback {
                     it.readDataMoveCuvetteDripReagentModel(
                         transitionMoveCuvetteDripReagentModel(
                             ready
@@ -124,17 +136,17 @@ class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("Co
                 }
             }
             SerialGlobal.CMD_MoveCuvetteTest -> {
-                callback.forEach {
+                callback {
                     it.readDataMoveCuvetteTestModel(transitionMoveCuvetteTestModel(ready))
                 }
             }
             SerialGlobal.CMD_Sampling -> {
-                callback.forEach {
+                callback {
                     it.readDataSamplingModel(transitionSamplingModel(ready))
                 }
             }
             SerialGlobal.CMD_SamplingProbeCleaning -> {
-                callback.forEach {
+                callback {
                     it.readDataSamplingProbeCleaningModelModel(
                         transitionSamplingProbeCleaningModel(
                             ready
@@ -143,55 +155,56 @@ class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("Co
                 }
             }
             SerialGlobal.CMD_DripSample -> {
-                callback.forEach {
+                callback {
                     it.readDataDripSampleModel(transitionDripSampleModel(ready))
                 }
             }
             SerialGlobal.CMD_DripReagent -> {
-                callback.forEach {
+                callback {
                     it.readDataDripReagentModel(transitionDripReagentModel(ready))
                 }
             }
             SerialGlobal.CMD_TakeReagent -> {
-                callback.forEach {
+                callback {
                     it.readDataTakeReagentModel(transitionTakeReagentModel(ready))
                 }
             }
             SerialGlobal.CMD_Stir -> {
-                callback.forEach {
+                callback {
                     it.readDataStirModel(transitionStirModel(ready))
                 }
             }
             SerialGlobal.CMD_StirProbeCleaning -> {
-                callback.forEach {
+                callback {
                     it.readDataStirProbeCleaningModel(transitionStirProbeCleaningModel(ready))
                 }
             }
             SerialGlobal.CMD_Test -> {
-                callback.forEach {
+                callback {
                     it.readDataTestModel(transitionTestModel(ready))
                 }
             }
             SerialGlobal.CMD_CuvetteDoor -> {
-                callback.forEach {
+                callback {
                     it.readDataCuvetteDoorModel(transitionCuvetteDoorModel(ready))
                 }
             }
             SerialGlobal.CMD_ShitTubeDoor -> {
-                callback.forEach {
+                callback {
                     it.readDataShitTubeDoorModel(transitionShitTubeDoorModel(ready))
                 }
             }
             SerialGlobal.CMD_Pierced -> {
-                callback.forEach {
+                callback {
                     it.readDataPiercedModel(transitionPiercedModel(ready))
                 }
             }
             SerialGlobal.CMD_GetVersion -> {
-                callback.forEach {
+                callback {
                     it.readDataGetVersionModel(transitionGetVersionModel(ready))
                 }
             }
+
             else -> {}
         }
     }
@@ -245,73 +258,17 @@ class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("Co
      *
      */
     private fun openRead() {
-//        thread {
-//            while (true) {
-//                Thread.sleep(100)
-//                val count = serialPort.read(byteArray)
-//                val re = byteArray.copyOf(count).toUByteArray()
-//                data.addAll(re)
-//
-//                i@ for (i in data.indices) {
-//                    if (data.size >= hCount + allCount && data[i] == header[0]) {
-//                        var k = i;
-//                        var count = 0
-//                        j@ for (element in header) {
-//                            if (data[k] == element) {
-//                                count++
-//                                if (hCount == count) {
-////                                        println("date2 ${Date().time}")
-////                                        println("匹配了")
-//
-//                                    //找到了前缀
-//                                    val temp: UByteArray =
-//                                        data.toUByteArray().copyOfRange(0, k + allCount + 1)
-//                                    val ready =
-//                                        temp.copyOfRange(temp.size - allCount, temp.size)
-//                                    if (temp.size < data.size) {
-//                                        val remaining = data.toUByteArray()
-//                                            .copyOfRange(k + allCount + 1, data.size)
-//                                        data.clear()
-//                                        data.addAll(remaining)
-//                                    } else {
-//                                        data.clear()
-//                                    }
-//
-//                                    println(
-//                                        "带前缀的 temp=${temp.toHex()} data=${
-//                                            data.toUByteArray().toHex()
-//                                        } ready=${ready.toHex()}"
-//                                    )
-//                                    parse(ready)
-//                                    break@i
-//                                }
-//                            } else {
-//                                println("不对了")
-//                                continue@i
-//                            }
-//                            k++
-//                        }
-//                    } else {
-//                        if (!data.isNullOrEmpty()) {
-//                            println(
-//                                "data.size ${
-//                                    data.toUByteArray().toHex()
-//                                }"
-//                            )
-//                        }
-//
-//                        break@i
-//                    }
-//                }
-//            }
-//        }
         GlobalScope.launch {
-            launch {
+            withContext(Dispatchers.IO) {
                 while (true) {
-                    delay(100)
+                    delay(50)
                     val count = serialPort.read(byteArray)
                     val re = byteArray.copyOf(count).toUByteArray()
                     data.addAll(re)
+
+                    if(data.size < hCount + allCount){
+                        continue
+                    }
 
                     i@ for (i in data.indices) {
                         if (data.size >= hCount + allCount && data[i] == header[0]) {
@@ -334,6 +291,9 @@ class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("Co
                                                 .copyOfRange(k + allCount + 1, data.size)
                                             data.clear()
                                             data.addAll(remaining)
+                                            println(
+                                                "remaining=${remaining} k=$k"
+                                            )
                                         } else {
                                             data.clear()
                                         }
@@ -367,6 +327,70 @@ class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("Co
                 }
             }
         }
+
+//        GlobalScope.launch {
+//            launch {
+//                while (true) {
+//                    delay(50)
+//                    val count = serialPort.read(byteArray)
+//                    val re = byteArray.copyOf(count).toUByteArray()
+//                    data.addAll(re)
+//                    println("re=$count")
+//
+//                    i@ for (i in data.indices) {
+//                        if (data.size >= hCount + allCount && data[i] == header[0]) {
+//                            var k = i;
+//                            var count = 0
+//                            j@ for (element in header) {
+//                                if (data[k] == element) {
+//                                    count++
+//                                    if (hCount == count) {
+////                                        println("date2 ${Date().time}")
+////                                        println("匹配了")
+//
+//                                        //找到了前缀
+//                                        val temp: UByteArray =
+//                                            data.toUByteArray().copyOfRange(0, k + allCount + 1)
+//                                        val ready =
+//                                            temp.copyOfRange(temp.size - allCount, temp.size)
+//                                        if (temp.size < data.size) {
+//                                            val remaining = data.toUByteArray()
+//                                                .copyOfRange(k + allCount + 1, data.size)
+//                                            data.clear()
+//                                            data.addAll(remaining)
+//                                        } else {
+//                                            data.clear()
+//                                        }
+//
+//                                        println(
+//                                            "带前缀的 temp=${temp.toHex()} data=${
+//                                                data.toUByteArray().toHex()
+//                                            } ready=${ready.toHex()}"
+//                                        )
+//                                        parse(ready)
+//                                        break@i
+//                                    }
+//                                } else {
+//                                    println("不对了")
+//                                    continue@i
+//                                }
+//                                k++
+//                            }
+//                        } else {
+//                            if (!data.isNullOrEmpty()) {
+//                                println(
+//                                    "data.size ${
+//                                        data.toUByteArray().toHex()
+//                                    }"
+//                                )
+//                            }
+//
+//                            break@i
+//                        }
+//                    }
+//                }
+//            }
+//        }
     }
 
     private fun writeAsync(data: UByteArray) {
@@ -383,6 +407,11 @@ class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("Co
         Timber.d("write ${data.toHex()}")
         val d = data.toByteArray()
         serialPort.write(d)
+        val a1 = data[0].toInt()
+        val a2 = 0xffu.toInt()
+        if (a1 != a2) {
+            sendMap[data[0]] = 1
+        }
     }
 
     /**
@@ -398,7 +427,6 @@ class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("Co
      */
     fun getMachineState() {
 //        Timber.d("发送 自检")
-
         writeAsync(createCmd(SerialGlobal.CMD_GetMachineState))
     }
 
@@ -498,7 +526,7 @@ class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("Co
      * @param volume 取样量
      * @param squeezing 是否挤压
      */
-    fun sampling(volume: Int = LocalData.getSamplingVolume(), squeezing: Boolean = true) {
+    fun sampling(volume: Int = LocalData.SamplingVolume, squeezing: Boolean = true) {
 //        Timber.d("发送 取样")
         writeAsync(
             createCmd(
@@ -521,8 +549,8 @@ class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("Co
                 writeAsync(
                     createCmd(
                         SerialGlobal.CMD_SamplingProbeCleaning,
-                        data3 = (2000 shr 8).toUByte(),
-                        data4 = 2000.toUByte()
+                        data3 = (LocalData.SamplingProbeCleaningDuration shr 8).toUByte(),
+                        data4 = LocalData.SamplingProbeCleaningDuration.toUByte()
                     )
                 )
             }
@@ -530,8 +558,8 @@ class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("Co
             writeAsync(
                 createCmd(
                     SerialGlobal.CMD_SamplingProbeCleaning,
-                    data3 = (2000 shr 8).toUByte(),
-                    data4 = 2000.toUByte()
+                    data3 = (LocalData.SamplingProbeCleaningDuration shr 8).toUByte(),
+                    data4 = LocalData.SamplingProbeCleaningDuration.toUByte()
                 )
             )
         }
@@ -546,7 +574,7 @@ class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("Co
     fun dripSample(
         autoBlending: Boolean = false,
         inplace: Boolean = false,
-        volume: Int = LocalData.getSamplingVolume()
+        volume: Int = LocalData.SamplingVolume
     ) {
 //        Timber.d("发送 加样")
         writeAsync(
@@ -568,10 +596,10 @@ class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("Co
         writeAsync(
             createCmd(
                 SerialGlobal.CMD_DripReagent,
-                data1 = (LocalData.getTakeReagentR2() shr 8).toUByte(),
-                data2 = LocalData.getTakeReagentR2().toUByte(),
-                data3 = (LocalData.getTakeReagentR1() shr 8).toUByte(),
-                data4 = LocalData.getTakeReagentR1().toUByte()
+                data1 = (LocalData.TakeReagentR2 shr 8).toUByte(),
+                data2 = LocalData.TakeReagentR2.toUByte(),
+                data3 = (LocalData.TakeReagentR1 shr 8).toUByte(),
+                data4 = LocalData.TakeReagentR1.toUByte()
             )
         )
     }
@@ -584,10 +612,10 @@ class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("Co
         writeAsync(
             createCmd(
                 SerialGlobal.CMD_TakeReagent,
-                data1 = (LocalData.getTakeReagentR2() shr 8).toUByte(),
-                data2 = LocalData.getTakeReagentR2().toUByte(),
-                data3 = (LocalData.getTakeReagentR1() shr 8).toUByte(),
-                data4 = LocalData.getTakeReagentR1().toUByte()
+                data1 = (LocalData.TakeReagentR2 shr 8).toUByte(),
+                data2 = LocalData.TakeReagentR2.toUByte(),
+                data3 = (LocalData.TakeReagentR1 shr 8).toUByte(),
+                data4 = LocalData.TakeReagentR1.toUByte()
             )
         )
     }
@@ -599,9 +627,7 @@ class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("Co
 //        Timber.d("发送 搅拌")
         writeAsync(
             createCmd(
-                SerialGlobal.CMD_Stir,
-                data3 = (500 shr 8).toUByte(),
-                data4 = 500.toUByte()
+                SerialGlobal.CMD_Stir, data3 = (LocalData.StirDuration shr 8).toUByte(), data4 = LocalData.StirDuration.toUByte()
             )
         )
     }
@@ -617,8 +643,8 @@ class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("Co
                 writeAsync(
                     createCmd(
                         SerialGlobal.CMD_StirProbeCleaning,
-                        data3 = (2000 shr 8).toUByte(),
-                        data4 = 2000.toUByte()
+                        data3 = (LocalData.StirProbeCleaningDuration shr 8).toUByte(),
+                        data4 = LocalData.StirProbeCleaningDuration.toUByte()
                     )
                 )
             }
@@ -626,8 +652,8 @@ class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("Co
             writeAsync(
                 createCmd(
                     SerialGlobal.CMD_StirProbeCleaning,
-                    data3 = (2000 shr 8).toUByte(),
-                    data4 = 2000.toUByte()
+                    data3 = (LocalData.StirProbeCleaningDuration shr 8).toUByte(),
+                    data4 = LocalData.StirProbeCleaningDuration.toUByte()
                 )
             )
         }
@@ -672,7 +698,7 @@ class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("Co
     /**
      * 获取比色皿舱门状态
      */
-    fun getGetCuvetteDoorState() {
+    fun getCuvetteDoorState() {
 //        Timber.d("发送 获取比色皿舱门状态")
         setGetCuvetteDoor(false)
     }

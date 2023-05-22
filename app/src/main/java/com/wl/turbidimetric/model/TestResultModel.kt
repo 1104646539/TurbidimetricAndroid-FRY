@@ -1,7 +1,9 @@
 package com.wl.turbidimetric.model
 
+import com.wl.turbidimetric.ob.BigDecimalConverter
 import io.objectbox.annotation.*
 import io.objectbox.relation.ToOne
+import java.math.BigDecimal
 
 @Entity
 data class TestResultModel(
@@ -15,7 +17,6 @@ data class TestResultModel(
      * 采便管码
      */
     var sampleQRCode: String = "",
-
     /**
      * 编号
      */
@@ -23,7 +24,6 @@ data class TestResultModel(
     /**
      * 检测状态
      */
-
     var testState: Int = 0,
     /**
      * 判定结果
@@ -32,27 +32,49 @@ data class TestResultModel(
     /**
      * 吸光度
      */
-    var absorbances: Double = 0.0,
+    @Convert(dbType = String::class, converter = BigDecimalConverter::class)
+    var absorbances: BigDecimal = BigDecimal("0.0"),
     /**
      * 浓度
      */
-    var concentration: Double = 0.0,
+    @Convert(dbType = String::class, converter = BigDecimalConverter::class)
+    var concentration: BigDecimal = BigDecimal("0.0"),
     /**
      * 第一次检测值
      */
-    var testValue1: Double = 0.0,
+    @Convert(dbType = String::class, converter = BigDecimalConverter::class)
+    var testValue1: BigDecimal = BigDecimal("0.0"),
     /**
      * 第二次检测值
      */
-    var testValue2: Double = 0.0,
+    @Convert(dbType = String::class, converter = BigDecimalConverter::class)
+    var testValue2: BigDecimal = BigDecimal("0.0"),
     /**
      * 第三次检测值
      */
-    var testValue3: Double = 0.0,
+    @Convert(dbType = String::class, converter = BigDecimalConverter::class)
+    var testValue3: BigDecimal = BigDecimal("0.0"),
     /**
      * 第四次检测值
      */
-    var testValue4: Double = 0.0,
+    @Convert(dbType = String::class, converter = BigDecimalConverter::class)
+    var testValue4: BigDecimal = BigDecimal("0.0"),
+    /**
+     * 第一次检测值
+     */
+    var testOriginalValue1: Int = 0,
+    /**
+     * 第二次检测值
+     */
+    var testOriginalValue2: Int = 0,
+    /**
+     * 第三次检测值
+     */
+    var testOriginalValue3: Int = 0,
+    /**
+     * 第四次检测值
+     */
+    var testOriginalValue4: Int = 0,
     /**
      * 创建时间
      */
@@ -98,6 +120,10 @@ data class TestResultModel(
         if (testValue2 != other.testValue2) return false
         if (testValue3 != other.testValue3) return false
         if (testValue4 != other.testValue4) return false
+        if (testOriginalValue1 != other.testOriginalValue1) return false
+        if (testOriginalValue2 != other.testOriginalValue2) return false
+        if (testOriginalValue3 != other.testOriginalValue3) return false
+        if (testOriginalValue4 != other.testOriginalValue4) return false
         if (createTime != other.createTime) return false
         if (testTime != other.testTime) return false
         if (project != other.project) return false
@@ -121,6 +147,10 @@ data class TestResultModel(
         result = 31 * result + testValue2.hashCode()
         result = 31 * result + testValue3.hashCode()
         result = 31 * result + testValue4.hashCode()
+        result = 31 * result + testOriginalValue1
+        result = 31 * result + testOriginalValue2
+        result = 31 * result + testOriginalValue3
+        result = 31 * result + testOriginalValue4
         result = 31 * result + createTime.hashCode()
         result = 31 * result + testTime.hashCode()
         result = 31 * result + project.hashCode()

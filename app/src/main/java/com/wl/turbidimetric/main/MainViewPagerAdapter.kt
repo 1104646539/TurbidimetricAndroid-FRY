@@ -30,6 +30,9 @@ class MainViewPagerAdapter(fragmentActivity: FragmentActivity) :
             3 -> {
                 SettingsFragment.newInstance()
             }
+            4 -> {
+                TestDataFragment.newInstance()
+            }
             else -> {
                 TestDataFragment.newInstance()
             }

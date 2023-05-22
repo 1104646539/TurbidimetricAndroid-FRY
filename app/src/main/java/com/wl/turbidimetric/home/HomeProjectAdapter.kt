@@ -44,10 +44,10 @@ class HomeProjectAdapter @JvmOverloads constructor(
         val tvA2 = convertView.findViewById<TextView>(R.id.tvA2)
         val tvX0 = convertView.findViewById<TextView>(R.id.tvX0)
         val tvP = convertView.findViewById<TextView>(R.id.tvP)
-        tvA1.text = "A1:" + items?.get(position)?.a1?.scale(3).toString()
-        tvA2.text = "A2:" + items?.get(position)?.a2?.scale(3).toString()
-        tvX0.text = "X0:" + items?.get(position)?.x0?.scale(3).toString()
-        tvP.text = "P:" + items?.get(position)?.p?.scale(3).toString()
+        tvA1.text = "f0:" + items?.get(position)?.f0?.scale(6).toString()
+        tvA2.text = "f1:" + items?.get(position)?.f1?.scale(6).toString()
+        tvX0.text = "f2:" + items?.get(position)?.f2?.scale(6).toString()
+        tvP.text = "f3:" + items?.get(position)?.f3?.scale(6).toString()
         return convertView
     }
 
@@ -72,10 +72,10 @@ class HomeProjectAdapter @JvmOverloads constructor(
         val tvA2 = convertView.findViewById<TextView>(R.id.tvA2)
         val tvX0 = convertView.findViewById<TextView>(R.id.tvX0)
         val tvP = convertView.findViewById<TextView>(R.id.tvP)
-        tvA1.text = "A1:" + items?.get(position)?.a1?.scale(3).toString()
-        tvA2.text = "A2:" + items?.get(position)?.a2?.scale(3).toString()
-        tvX0.text = "X0:" + items?.get(position)?.x0?.scale(3).toString()
-        tvP.text = "P:" + items?.get(position)?.p?.scale(3).toString()
+        tvA1.text = "f0:" + items?.get(position)?.f0?.scale(6).toString()
+        tvA2.text = "f1:" + items?.get(position)?.f1?.scale(6).toString()
+        tvX0.text = "f2:" + items?.get(position)?.f2?.scale(6).toString()
+        tvP.text = "f3:" + items?.get(position)?.f3?.scale(6).toString()
         return convertView
     }
 }

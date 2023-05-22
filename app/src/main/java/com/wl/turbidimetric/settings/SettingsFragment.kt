@@ -57,7 +57,7 @@ class SettingsFragment :
      * 显示编号设置
      */
     private fun showDetectionNumDialog() {
-        detectionNumDialog.show("请输入编号", "${LocalData.getDetectionNum()}", "确定", l@{
+        detectionNumDialog.show("请输入编号", "${LocalData.DetectionNum}", "确定", l@{
             val content = it.etContent.text.toString()
             if (content.trim().isNullOrEmpty()) {
                 toast("请输入数字")
@@ -67,7 +67,7 @@ class SettingsFragment :
                 toast("请输入数字")
                 return@l
             }
-            LocalData.putDetectionNum(content)
+            LocalData.DetectionNum=content
             it.dismiss()
         }, "取消", {
             it.dismiss()
@@ -97,19 +97,19 @@ class SettingsFragment :
                 return@l
             }
 
-            LocalData.setTakeReagentR1(takeR1.toInt())
-            LocalData.setTakeReagentR2(takeR2.toInt())
-            LocalData.setSamplingVolume(sampling.toInt())
+            LocalData.TakeReagentR1=takeR1.toInt()
+            LocalData.TakeReagentR2=takeR2.toInt()
+            LocalData.SamplingVolume=sampling.toInt()
             it.dismiss()
         }, "取消", {
             it.dismiss()
         })
 
-        etTakeR1.setText(LocalData.getTakeReagentR1().toString())
+        etTakeR1.setText(LocalData.TakeReagentR1.toString())
         etTakeR1.selectionLast()
-        etTakeR2.setText(LocalData.getTakeReagentR2().toString())
+        etTakeR2.setText(LocalData.TakeReagentR2.toString())
         etTakeR2.selectionLast()
-        etSampling.setText(LocalData.getSamplingVolume().toString())
+        etSampling.setText(LocalData.SamplingVolume.toString())
         etSampling.selectionLast()
     }
 

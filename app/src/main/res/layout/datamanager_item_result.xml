@@ -175,7 +175,53 @@
             android:layout_width="1dp"
             android:layout_height="match_parent"
             app:dividerColor="@color/divider" />
+        <TextView
+            android:id="@+id/tvTestOriginalValue1"
+            style="@style/TextTitle"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="原始值1" />
 
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            app:dividerColor="@color/divider" />
+
+        <TextView
+            android:id="@+id/tvTestOriginalValue2"
+            style="@style/TextTitle"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="原始值2" />
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            app:dividerColor="@color/divider" />
+
+        <TextView
+            android:id="@+id/tvTestOriginalValue3"
+            style="@style/TextTitle"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="原始值3" />
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            app:dividerColor="@color/divider" />
+
+        <TextView
+            android:id="@+id/tvTestOriginalValue4"
+            style="@style/TextTitle"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="原始值4" />
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            app:dividerColor="@color/divider" />
         <TextView
             android:id="@+id/tvProjectName"
             style="@style/TextHilt"

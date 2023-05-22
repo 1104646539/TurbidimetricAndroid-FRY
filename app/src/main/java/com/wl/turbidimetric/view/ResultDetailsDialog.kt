@@ -54,16 +54,16 @@ class ResultDetailsDialog(val context: Context) : BaseDialog(context) {
 
         etName.text = result.name
         etGender.text = result.gender
-        etAbs.text = result.absorbances.scale(3).toString()
-        etCon.text = result.concentration.scale(3).toString()
+        etAbs.text = result.absorbances.toString()
+        etCon.text = result.concentration.toString()
         etResult.text = result.testResult
 
 
         btnConfirm.setOnClickListener {
             result.name = etName.text.toString()
             result.gender = etGender.text.toString()
-            result.absorbances = etAbs.text.toString().toDoubleOrNull() ?: 0.0
-            result.concentration = etCon.text.toString().toDoubleOrNull() ?: 0.0
+            result.absorbances = (etAbs.text.toString().toDoubleOrNull() ?: 0.0).toBigDecimal()
+            result.concentration = (etCon.text.toString().toDoubleOrNull() ?: 0.0).toBigDecimal()
             result.testResult = etResult.text.toString()
             dismiss().takeIf {
                 onConfirm.invoke(result)

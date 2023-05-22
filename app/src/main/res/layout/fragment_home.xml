@@ -15,14 +15,25 @@
         android:orientation="vertical"
         tools:context=".datamanager.DataManagerFragment">
 
-
-        <EditText
-            android:layout_width="200dp"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="numberDecimal"
-            android:maxLength="1"
-            android:text="@={model.skipCuvetteNum}"
-            android:textSize="20sp" />
+            android:orientation="vertical">
+
+            <EditText
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:maxLength="1"
+                android:text="@={model.skipCuvetteNum}"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/tvShow"
+                android:textSize="28sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
 
         <Spinner
             android:id="@+id/spnProject"
@@ -61,7 +72,6 @@
                     android:layout_height="80dp"
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
-                    android:onClick="@{(v)->model.clickTest1(v)}"
                     android:text="获取" />
 
                 <Button

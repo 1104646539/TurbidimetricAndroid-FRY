@@ -34,7 +34,7 @@
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="A1"
+            android:text="f0"
             android:textSize="18sp" />
 
         <TextView
@@ -42,7 +42,7 @@
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="A2"
+            android:text="f1"
             android:textSize="18sp" />
 
         <TextView
@@ -50,7 +50,7 @@
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="X0"
+            android:text="f2"
             android:textSize="18sp" />
 
         <TextView
@@ -58,7 +58,7 @@
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="P"
+            android:text="f3"
             android:textSize="18sp" />
 
         <TextView

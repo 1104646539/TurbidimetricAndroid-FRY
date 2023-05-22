@@ -32,6 +32,7 @@ enum class ShitTubeState {
  */
 enum class TestState {
     None,//等待开始
+    GetMachineState,//自检中
     DripSample,//取样加样中
     DripReagent,//取试剂加试剂中
     Test1,//检测过第一次

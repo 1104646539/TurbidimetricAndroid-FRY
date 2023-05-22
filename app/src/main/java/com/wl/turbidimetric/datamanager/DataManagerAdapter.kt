@@ -41,14 +41,18 @@ class DataManagerAdapter :
             binding.tvName.text = item?.name ?: "-"
             binding.tvGender.text = item?.gender ?: "-"
             binding.tvAge.text = item?.age ?: "-"
-            binding.tvAbsorbances.text = item?.absorbances?.toString()?:""
+            binding.tvAbsorbances.text = item?.absorbances?.toString() ?: "-"
             binding.tvResult.text = item?.testResult ?: "-"
             binding.tvConcentration.text = item?.concentration?.toString() ?: "-"
             binding.tvTestTime.text = item?.testTime ?: "-"
-            binding.tvTestValue1.text = item?.testValue1?.toString()?:"-"
-            binding.tvTestValue2.text = item?.testValue2?.toString()?:"-"
-            binding.tvTestValue3.text = item?.testValue3?.toString()?:"-"
-            binding.tvTestValue4.text = item?.testValue4?.toString()?:"-"
+            binding.tvTestValue1.text = item?.testValue1?.toString() ?: "-"
+            binding.tvTestValue2.text = item?.testValue2?.toString() ?: "-"
+            binding.tvTestValue3.text = item?.testValue3?.toString() ?: "-"
+            binding.tvTestValue4.text = item?.testValue4?.toString() ?: "-"
+            binding.tvTestOriginalValue1.text = item?.testOriginalValue1?.toString() ?: "-"
+            binding.tvTestOriginalValue2.text = item?.testOriginalValue2?.toString() ?: "-"
+            binding.tvTestOriginalValue3.text = item?.testOriginalValue3?.toString() ?: "-"
+            binding.tvTestOriginalValue4.text = item?.testOriginalValue4?.toString() ?: "-"
 
             binding.root.setOnLongClickListener {
                 onLongClick?.invoke(item?.id ?: 0)

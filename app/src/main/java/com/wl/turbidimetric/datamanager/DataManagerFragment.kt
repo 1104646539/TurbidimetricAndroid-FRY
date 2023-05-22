@@ -17,6 +17,7 @@ import com.wl.turbidimetric.db.DBManager
 import com.wl.turbidimetric.ex.toast
 import com.wl.turbidimetric.model.TestResultModel
 import com.wl.turbidimetric.model.TestResultModel_
+import com.wl.turbidimetric.print.PrintUtil
 import com.wl.turbidimetric.view.ResultDetailsDialog
 import com.wl.wwanandroid.base.BaseFragment
 import io.objectbox.query.Query
@@ -52,7 +53,34 @@ class DataManagerFragment :
 
     override fun init(savedInstanceState: Bundle?) {
         Timber.d("init")
-//        vd.btnInsert.setOnClickListener {
+        listener()
+        initView()
+
+
+    }
+
+    private fun initView() {
+        vd.rv.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+        val itemDividerMode = DividerItemDecoration(
+            requireContext(), android.widget.LinearLayout.VERTICAL
+        ).apply { setDrawable(resources.getDrawable(R.drawable.item_hori_divider)!!) }
+        vd.rv.addItemDecoration(
+            itemDividerMode
+        )
+
+        val loadStateAdapter = adapter.withLoadStateFooter(DataManagerLoadStateAdapter())
+        vd.rv.adapter = loadStateAdapter
+        lifecycleScope.launch {
+            val con: Query<TestResultModel> = DBManager.TestResultBox.query().orderDesc(
+                TestResultModel_.id
+            ).build()
+            queryData(con)
+        }
+    }
+
+    private fun listener() {
+        //        vd.btnInsert.setOnClickListener {
 //            for (i in 0..1000) {
 //                val project = ProjectModel(
 //                    projectName = "便潜血",
@@ -114,24 +142,6 @@ class DataManagerFragment :
         vd.btnClean.setOnClickListener {
             DBManager.TestResultBox.removeAll()
         }
-
-        vd.rv.layoutManager =
-            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        val itemDividerMode = DividerItemDecoration(
-            requireContext(), android.widget.LinearLayout.VERTICAL
-        ).apply { setDrawable(resources.getDrawable(R.drawable.item_hori_divider)!!) }
-        vd.rv.addItemDecoration(
-            itemDividerMode
-        )
-
-        val loadStateAdapter = adapter.withLoadStateFooter(DataManagerLoadStateAdapter())
-        vd.rv.adapter = loadStateAdapter
-        lifecycleScope.launch {
-            val con: Query<TestResultModel> = DBManager.TestResultBox.query().orderDesc(
-                TestResultModel_.id
-            ).build()
-            queryData(con)
-        }
         vd.btnQuery.setOnClickListener {
             lifecycleScope.launch {
                 val condition: Query<TestResultModel> = DBManager.TestResultBox.query().order(
@@ -165,6 +175,12 @@ class DataManagerFragment :
                 toast("ID错误")
             }
         }
+
+        vd.btnPrint.setOnClickListener {
+            val results = adapter.snapshot().filter { it?.isSelect ?: false }
+            PrintUtil.printTest(results)
+        }
+
     }
 
     var datasJob: Job? = null

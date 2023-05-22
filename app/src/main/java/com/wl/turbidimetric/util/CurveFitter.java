@@ -65,10 +65,13 @@ public class CurveFitter {
         numPoints = xData.length;
     }
 
+//    public void doFitCon() {
+//        doFit(7);
+//    }
     public void doFitCon() {
-        doFit(7);
+        doFit(2);
     }
-    private void doFit(int fitType) {
+    public void doFit(int fitType) {
         doFit(fitType, false);
     }
 

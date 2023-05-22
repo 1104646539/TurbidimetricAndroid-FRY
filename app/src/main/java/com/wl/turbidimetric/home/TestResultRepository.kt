@@ -9,6 +9,7 @@ import io.objectbox.query.Query
 import kotlinx.coroutines.Dispatchers
 
 class TestResultRepository() {
+
     fun datas(condition: Query<TestResultModel>?) = Pager(
         PagingConfig(pageSize = 100),
         pagingSourceFactory = ObjectBoxDataSource.Factory(

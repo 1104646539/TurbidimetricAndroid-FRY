@@ -1,5 +1,6 @@
 package com.wl.turbidimetric.global
 
+import androidx.lifecycle.MutableLiveData
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.model.MachineState
 import com.wl.turbidimetric.model.MatchingArgState
@@ -13,12 +14,18 @@ object SystemGlobal {
     var matchingTestState = MatchingArgState.None
     var machineArgState = MachineState.None
 
-    var isCodeDebug = true;
+    var isCodeDebug = false;
+
+    val shitTubeDoorIsOpen = MutableLiveData(false)
+    val cuvetteDoorIsOpen = MutableLiveData(false)
+
+
 
     val icons = mutableListOf(
         R.drawable.icon_navigation_home,
         R.drawable.icon_navigation_datamanager,
         R.drawable.icon_navigation_parameterlist,
+        R.drawable.icon_navigation_settings,
         R.drawable.icon_navigation_settings,
     )
 }

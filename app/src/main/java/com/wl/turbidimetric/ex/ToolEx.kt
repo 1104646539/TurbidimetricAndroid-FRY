@@ -3,10 +3,12 @@ package com.wl.turbidimetric.ex
 import android.app.Activity
 import android.content.Intent
 import android.widget.EditText
+import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.ProjectModel
 import com.wl.turbidimetric.util.CRC
 import com.wl.turbidimetric.util.CurveFitter
 import java.math.BigDecimal
+import java.math.RoundingMode
 import kotlin.math.log10
 import kotlin.math.pow
 
@@ -103,12 +105,12 @@ inline fun <reified T : Activity> Activity.startActivity() {
  * 计算吸光度
  */
 fun calcAbsorbances(
-    resultTest1: ArrayList<Double>,
-    resultTest2: ArrayList<Double>,
-    resultTest3: ArrayList<Double>,
-    resultTest4: ArrayList<Double>
-): ArrayList<Double> {
-    var absorbances = arrayListOf<Double>()
+    resultTest1: ArrayList<BigDecimal>,
+    resultTest2: ArrayList<BigDecimal>,
+    resultTest3: ArrayList<BigDecimal>,
+    resultTest4: ArrayList<BigDecimal>
+): ArrayList<BigDecimal> {
+    var absorbances = arrayListOf<BigDecimal>()
     for (i in resultTest1.indices) {
         absorbances.add(
             resultTest4[i] - resultTest1[i]
@@ -117,46 +119,80 @@ fun calcAbsorbances(
     return absorbances
 }
 
+
 /**
  * 计算吸光度
  */
 fun calcAbsorbance(
-    resultTest: Double
-): Double {
-    return log10((65535.toDouble() / resultTest))
+    resultTest: BigDecimal
+): BigDecimal {
+    return log10(
+        65535.toBigDecimal().divide(resultTest, 5, RoundingMode.HALF_UP).toDouble()
+    ).toBigDecimal()
+        .setScale(5, RoundingMode.HALF_UP)
+//    return log10(BigDecimal(65535).divide(BigDecimal(resultTest),5,BigDecimal.ROUND_HALF_UP))
 }
 
 /**
  * 计算4参数
  * @return CurveFitter
  */
-fun matchingArg(absorbances: ArrayList<Double>): CurveFitter {
-    val curveFitter = CurveFitter(nds, absorbances.toDoubleArray())
+fun matchingArg(absorbances: List<Double>): CurveFitter {
+    val xs = absorbances.toDoubleArray().copyOfRange(0, nds.size)
+    val curveFitter = CurveFitter(xs, nds)
     curveFitter.doFitCon()
-    return curveFitter;
-//    val res = curveFitter.params
-
-//    for (i in res.indices) {
-//        println(res[i])
-//    }
-//    println("------")
-//    println(curveFitter.fitGoodness)
-//    println(curveFitter.resultString)
+    return curveFitter
 }
 
+///**
+// * 根据四参数，吸光度，计算浓度
+// * @param absorbance Double
+// * @param project 四参数
+// */
+//fun calcCon(absorbance: BigDecimal, project: ProjectModel): BigDecimal {
+//    val a1 = project.a1;
+//    val a2 = project.a2;
+//    val x0 = project.x0;
+//    val p = project.p;
+////    var con: Double = x0 * ((a2 - a1) / (a2 - absorbance) - 1).pow(1 / p)
+////
+////    return con.scale(2)
+//
+//    var dividend1 = BigDecimal(a2)
+//        .subtract(absorbance).setScale(10, BigDecimal.ROUND_HALF_UP)
+//    var dividend2 = p
+//    if (dividend1.compareTo(BigDecimal(0)) == 0 || dividend2 == 0.0) {
+//        println("newCalcBigD dividend1==0||dividend2==0 dividend1=$dividend1 dividend2=$dividend2")
+//        return BigDecimal(0)
+//    }
+//    val temp21 = BigDecimal(a2).subtract(BigDecimal(a1)).divide(
+//        dividend1, 10, BigDecimal.ROUND_HALF_UP
+//    ).subtract(BigDecimal(1))
+//
+//    val temp22 = temp21.toDouble().pow((1 / dividend2)).scale(10).toBigDecimal()
+//    val con = (x0.toBigDecimal() * temp22)
+//    return con
+//}
 /**
- * 根据四参数，吸光度，计算浓度
+ * 根据三次曲线方程参数，吸光度，计算浓度
  * @param absorbance Double
  * @param project 四参数
  */
-fun calcCon(absorbance: Double, project: ProjectModel): Double {
-    val a1 = project.a1;
-    val a2 = project.a2;
-    val x0 = project.x0;
-    val p = project.p;
-    var con: Double = x0 * ((a2 - a1) / (a2 - absorbance) - 1).pow(1 / p)
+fun calcCon(absorbance: BigDecimal, project: ProjectModel): BigDecimal {
+    val f0 = project.f0;
+    val f1 = project.f1;
+    val f2 = project.f2;
+    val f3 = project.f3;
+//    var con: Double = x0 * ((a2 - a1) / (a2 - absorbance) - 1).pow(1 / p)
 
-    return con.scale(2)
+//    return con.scale(2)
+    val con = CurveFitter.f(
+        2,
+        doubleArrayOf(f0, f1, f2, f3),
+        absorbance.multiply(10000.toBigDecimal()).toDouble()
+    )
+
+    return con.toBigDecimal().setScale(0, RoundingMode.HALF_UP)
 }
 
 /**
@@ -178,4 +214,8 @@ fun EditText.selectionLast() {
     if (this != null && this.text != null && this.text.toString().isNotEmpty()) {
         setSelection(this.text.toString().length)
     }
+}
+
+fun DoorAllOpen(): Boolean {
+    return (SystemGlobal.cuvetteDoorIsOpen.value == true) && (SystemGlobal.shitTubeDoorIsOpen.value == true)
 }

@@ -37,12 +37,12 @@ class MatchingArgsAdapter :
             binding.setVariable(BR.item, item)
             binding.tvID.text = item?.projectId.toString()
             binding.tvProjectName.text = item?.projectName ?: "-"
-            binding.tvA1.text = (item?.a1 ?: 0.0).scale(3).toString()
-            binding.tvA2.text = (item?.a2 ?: 0.0).scale(3).toString()
-            binding.tvX0.text = (item?.x0 ?: 0.0).scale(3).toString()
-            binding.tvP.text = (item?.p ?: 0.0).scale(3).toString()
+            binding.tvA1.text = (item?.f0 ?: 0.0).scale(10).toString()
+            binding.tvA2.text = (item?.f1 ?: 0.0).scale(10).toString()
+            binding.tvX0.text = (item?.f2 ?: 0.0).scale(10).toString()
+            binding.tvP.text = (item?.f3 ?: 0.0).scale(10).toString()
             binding.tvTestTime.text = item?.createTime ?: "-"
-            binding.tvFitGoodness.text = (item?.fitGoodness ?: 0.0).scale(3).toString()
+            binding.tvFitGoodness.text = (item?.fitGoodness ?: 0.0).scale(10).toString()
             binding.tvLjz.text = (item?.projectLjz ?: "-").toString()
             binding.tvUnit.text = (item?.projectUnit ?: "-").toString()
         }

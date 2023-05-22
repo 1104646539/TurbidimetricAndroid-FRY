@@ -69,7 +69,7 @@
     },
     {
       "id": "4:2539073134430729651",
-      "lastPropertyId": "18:1313451733077050788",
+      "lastPropertyId": "22:6139411301883623601",
       "name": "TestResultModel",
       "properties": [
         {
@@ -101,27 +101,27 @@
         {
           "id": "6:8672874981653986731",
           "name": "concentration",
-          "type": 8
+          "type": 9
         },
         {
           "id": "7:5816576921161575958",
           "name": "testValue1",
-          "type": 5
+          "type": 9
         },
         {
           "id": "8:1871754810812068382",
           "name": "testValue2",
-          "type": 5
+          "type": 9
         },
         {
           "id": "9:1996942886221152348",
           "name": "testValue3",
-          "type": 5
+          "type": 9
         },
         {
           "id": "10:2063495664770940915",
           "name": "testValue4",
-          "type": 5
+          "type": 9
         },
         {
           "id": "11:6455013015245942546",
@@ -144,7 +144,7 @@
         {
           "id": "14:4513838846184756558",
           "name": "absorbances",
-          "type": 8
+          "type": 9
         },
         {
           "id": "15:2265262141528886796",
@@ -165,6 +165,26 @@
           "id": "18:1313451733077050788",
           "name": "isSelect",
           "type": 1
+        },
+        {
+          "id": "19:2649977284349746052",
+          "name": "testOriginalValue1",
+          "type": 5
+        },
+        {
+          "id": "20:8063534304968056553",
+          "name": "testOriginalValue2",
+          "type": 5
+        },
+        {
+          "id": "21:4708787137433686853",
+          "name": "testOriginalValue3",
+          "type": 5
+        },
+        {
+          "id": "22:6139411301883623601",
+          "name": "testOriginalValue4",
+          "type": 5
         }
       ],
       "relations": []

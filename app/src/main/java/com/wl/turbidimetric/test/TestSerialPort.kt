@@ -41,6 +41,12 @@ object TestSerialPort {
             SerialGlobal.CMD_Test -> {
                 reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x23u, 0x0u))
             }
+            SerialGlobal.CMD_ShitTubeDoor -> {
+                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x00u, 0x0u))
+            }
+            SerialGlobal.CMD_CuvetteDoor -> {
+                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x00u, 0x0u))
+            }
             else -> {
                 reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x0u))
             }

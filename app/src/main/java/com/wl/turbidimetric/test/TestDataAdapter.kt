@@ -44,7 +44,7 @@ class TestDataAdapter :
             binding.tvName.text = item?.name ?: "-"
             binding.tvGender.text = item?.gender ?: "-"
             binding.tvAge.text = item?.age ?: "-"
-            binding.tvAbsorbances.text = item?.absorbances?.scale(3).toString()
+            binding.tvAbsorbances.text = item?.absorbances?.toString()
             binding.tvResult.text = item?.testResult ?: "-"
             binding.tvConcentration.text = item?.concentration.toString() ?: "-"
             binding.tvTestTime.text = item?.testTime ?: "-"

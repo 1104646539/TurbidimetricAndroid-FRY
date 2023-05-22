@@ -1,11 +1,9 @@
 package com.wl.turbidimetric
 
 import android.app.Application
-import com.tencent.mmkv.MMKV
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.datastore.LocalDataGlobal
 import com.wl.turbidimetric.db.DBManager
-import com.wl.turbidimetric.ex.put
 import com.wl.turbidimetric.model.ProjectModel
 import com.wl.turbidimetric.util.FileTree
 import com.wl.turbidimetric.util.ScanCodeUtil
@@ -18,7 +16,7 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         instance = this
-        MMKV.initialize(this)
+//        MMKV.initialize(this)
         ToastUtil.init(this)
         initData()
         DBManager.init(this)
@@ -36,14 +34,13 @@ class App : Application() {
 
 
     private fun initData() {
-        if (LocalData.getFirstOpen()) {
-            LocalData.setFirstOpen(false)
-            LocalDataGlobal.Key.TakeReagentR1.put(60)
-            LocalDataGlobal.Key.TakeReagentR2.put(300)
-            LocalDataGlobal.Key.DetectionNum.put("1")
+        //每次进入软件都会讲当前版本号存入，如果以前的版本号小于当前，说明是第一次打开当前版本
+        val packInfo = packageManager.getPackageInfo(packageName, 0)
+        if (LocalData.CurrentVersion < packInfo.versionCode) {
+            LocalData.CurrentVersion = packInfo.versionCode
         }
     }
- 
+
     private fun initDataStore() {
 
 

@@ -1,17 +1,17 @@
 package com.wl.turbidimetric.home
 
 import android.view.View
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
+import androidx.lifecycle.livedata.core.R
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.EventGlobal
 import com.wl.turbidimetric.global.EventMsg
 import com.wl.turbidimetric.global.SystemGlobal
+import com.wl.turbidimetric.global.SystemGlobal.cuvetteDoorIsOpen
 import com.wl.turbidimetric.global.SystemGlobal.machineArgState
 import com.wl.turbidimetric.global.SystemGlobal.matchingTestState
+import com.wl.turbidimetric.global.SystemGlobal.shitTubeDoorIsOpen
 import com.wl.turbidimetric.global.SystemGlobal.testState
 import com.wl.turbidimetric.model.*
 import com.wl.turbidimetric.util.Callback2
@@ -24,7 +24,9 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
+import java.math.BigDecimal
 import java.util.*
+import kotlin.concurrent.timer
 import kotlin.math.absoluteValue
 
 
@@ -42,6 +44,7 @@ class HomeViewModel(
      */
     fun goGetMachineState() {
         dialogGetMachine.postValue(true)
+        testState = TestState.GetMachineState
         getMachineState()
     }
 
@@ -49,6 +52,8 @@ class HomeViewModel(
     private fun listener() {
         SerialPortUtil.Instance.callback.add(this)
         ScanCodeUtil.Instance.onScanResult = this
+
+        listenerDoorState()
     }
 
     /**
@@ -57,22 +62,30 @@ class HomeViewModel(
     val resultModels = arrayListOf<TestResultModel?>()
 
     /**
-     * 四次检测的值
+     * 四次检测的吸光度值
      */
-    private var resultTest1 = arrayListOf<Double>()
-    private var resultTest2 = arrayListOf<Double>()
-    private var resultTest3 = arrayListOf<Double>()
-    private var resultTest4 = arrayListOf<Double>()
+    private var resultTest1 = arrayListOf<BigDecimal>()
+    private var resultTest2 = arrayListOf<BigDecimal>()
+    private var resultTest3 = arrayListOf<BigDecimal>()
+    private var resultTest4 = arrayListOf<BigDecimal>()
+
+    /**
+     * 四次检测的原始值
+     */
+    private var resultOriginalTest1 = arrayListOf<Int>()
+    private var resultOriginalTest2 = arrayListOf<Int>()
+    private var resultOriginalTest3 = arrayListOf<Int>()
+    private var resultOriginalTest4 = arrayListOf<Int>()
 
     /**
      * 吸光度
      */
-    private var absorbances = arrayListOf<Double>()
+    private var absorbances = arrayListOf<BigDecimal>()
 
     /**
      * 浓度
      */
-    private var cons = arrayListOf<Double>()
+    private var cons = arrayListOf<BigDecimal>()
 
     /**
      * 自检中对话框
@@ -287,7 +300,7 @@ class HomeViewModel(
     /**
      * 每排之间的检测间隔
      */
-    var testShelfInterval: Long = 1000 * 60;
+    var testShelfInterval: Long = 1000 * 0;
 
     /**
      * 每个比色皿之间的检测间隔
@@ -300,32 +313,90 @@ class HomeViewModel(
     var scanResults = arrayListOf<String?>()
 
     /**
+     * 比色皿锁状态
+     */
+    private val shitTubeDoorLockedLD = MutableLiveData(false)
+
+    /**
+     * 比色皿锁状态
+     */
+    private val cuvetteDoorLockedLD = MutableLiveData(false)
+
+
+    private var shitTubeDoorLocked = false
+    private var cuvetteDoorLocked = false
+
+    /**
      * 测试用的 start
      */
     //检测的值
-    private val testValues1 = doubleArrayOf(0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2)
+    private val testValues1 = doubleArrayOf(
+        0.544411,
+        0.555225,
+        0.252525,
+        0.22498982,
+        0.464510042,
+        0.2454562,
+        0.6633532,
+        0.74412212,
+        0.0122222,
+        0.1213342
+    )
     private val testValues2 = doubleArrayOf(0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3)
     private val testValues3 = doubleArrayOf(0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3)
     private val testValues4 = doubleArrayOf(0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4)
+    private val testOriginalValues1 =
+        intArrayOf(65532, 65532, 65532, 65532, 65532, 65532, 65532, 65532, 65532, 65532)
+    private val testOriginalValues2 =
+        intArrayOf(65520, 65520, 65520, 65520, 65520, 65520, 65520, 65520, 65520, 65520)
+    private val testOriginalValues3 =
+        intArrayOf(60000, 60000, 60000, 60000, 60000, 60000, 60000, 60000, 60000, 60000)
+    private val testOriginalValues4 =
+        intArrayOf(56000, 56000, 56000, 56000, 56000, 56000, 56000, 56000, 56000, 56000)
 
     //测试用，扫码是否成功
     val tempShitTubeState = intArrayOf(1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
-//    val tempShitTubeState = intArrayOf(1, 0, 1, 0, 1, 0, 0, 0, 0, 1)
+//  val tempShitTubeState = intArrayOf(1, 0, 1, 0, 1, 0, 0, 0, 0, 1)
 
     //测试用，采便管是否存在
     val shitTubeExists = mutableListOf(true, true, true, true, true, true, true, true, true, true)
 
     //测试用 每排之间的检测间隔
-    val testS: Long = 1000;
+    val testS: Long = 0;
 
     //测试用 每个比色皿之间的检测间隔
-    val testP: Long = 1000;
+    val testP: Long = 100;
+
+    /**
+     * 一直获取舱门状态
+     */
+    private fun listenerDoorState() {
+        viewModelScope.launch {
+            timer("", true, Date(), 1500) {
+                if ((testState == TestState.None || testState == TestState.TestFinish)
+                    && (matchingTestState == MatchingArgState.None || matchingTestState == MatchingArgState.Finish)
+                ) {
+                    SerialPortUtil.Instance.getShitTubeDoorState()
+                    SerialPortUtil.Instance.getCuvetteDoorState()
+                }
+            }
+        }
+    }
 
     /**
      * 测试用的 end
      */
     fun clickStart() {
+        if (DoorAllOpen()) {
+            toast("舱门未关")
+            return
+        }
         if (testState != TestState.None) {
+            toast("正在检测，请勿操作！")
+            return
+        }
+        if (matchingTestState != MatchingArgState.None) {
+            toast("正在拟合质控，请勿操作！")
             return
         }
         initState()
@@ -351,6 +422,15 @@ class HomeViewModel(
             testShelfInterval = testS;
             testPosInterval = testP;
         }
+        resultTest1.clear()
+        resultTest2.clear()
+        resultTest3.clear()
+        resultTest4.clear()
+        resultOriginalTest1.clear()
+        resultOriginalTest2.clear()
+        resultOriginalTest3.clear()
+        resultOriginalTest4.clear()
+        cons.clear()
     }
 
     /**
@@ -441,15 +521,6 @@ class HomeViewModel(
         }
     }
 
-    /**
-     * 接收到采便管舱门状态
-     * @param reply ReplyModel<ShitTubeDoorModel>
-     */
-    override fun readDataShitTubeDoorModel(reply: ReplyModel<ShitTubeDoorModel>) {
-        if (!runningTest()) return
-        if (!machineStateNormal()) return
-        Timber.d("接收到 采便管舱门状态 reply=$reply")
-    }
 
     /**
      * 接收到 刺破
@@ -508,16 +579,38 @@ class HomeViewModel(
     }
 
     /**
-     * 接收到比色皿舱门状态
-     * @param reply ReplyModel<CuvetteDoorModel>
+     * 接收到 样本门状态
+     * @param reply ReplyModel<ShitTubeDoorModel>
      */
-    override fun readDataCuvetteDoorModel(reply: ReplyModel<CuvetteDoorModel>) {
+    override fun readDataShitTubeDoorModel(reply: ReplyModel<ShitTubeDoorModel>) {
+        Timber.d("接收到 样本门状态 reply=$reply")
+        shitTubeDoorIsOpen.postValue(reply.data.isOpen)
+
+//        shitTubeDoorLocked = reply.data.isOpen
+//        shitTubeDoorLockedLD.postValue(reply.data.isOpen)
+//        if (testState == TestState.TestFinish && cuvetteDoorLocked && shitTubeDoorLocked) {
+//            showFinishDialog()
+//        }
         if (!runningTest()) return
         if (!machineStateNormal()) return
-        Timber.d("接收到 比色皿舱门状态 reply=$reply")
 
     }
 
+    /**
+     * 接收到 比色皿门状态
+     * @param reply ReplyModel<CuvetteDoorModel>
+     */
+    override fun readDataCuvetteDoorModel(reply: ReplyModel<CuvetteDoorModel>) {
+        Timber.d("接收到 比色皿门状态 reply=$reply")
+        cuvetteDoorIsOpen.postValue(reply.data.isOpen)
+//        cuvetteDoorLocked = reply.data.isOpen
+//        cuvetteDoorLockedLD.postValue(reply.data.isOpen)
+//        if (testState == TestState.TestFinish && cuvetteDoorLocked && shitTubeDoorLocked) {
+//            showFinishDialog()
+//        }
+        if (!runningTest()) return
+        if (!machineStateNormal()) return
+    }
 
     /**
      * 接收到移动采便管
@@ -703,13 +796,11 @@ class HomeViewModel(
             TestState.DripReagent -> {
                 updateCuvetteState(cuvettePos - 3, CuvetteState.Test1)
                 nextDripReagent()
-                resultTest1.add(calcAbsorbance(value.toDouble()))
-                updateTestResultModel(cuvettePos - 3, CuvetteState.Test1)
+                updateTestResultModel(value, cuvettePos - 3, CuvetteState.Test1)
             }
             TestState.Test2 -> {
                 updateCuvetteState(cuvettePos, CuvetteState.Test2)
-                resultTest2.add(calcAbsorbance(value.toDouble()))
-                updateTestResultModel(cuvettePos, CuvetteState.Test2)
+                updateTestResultModel(value, cuvettePos, CuvetteState.Test2)
                 if (lastNeed(cuvettePos, CuvetteState.Test1)) {
                     //检测结束，下一个步骤，检测第三次
                     viewModelScope.launch {
@@ -726,8 +817,7 @@ class HomeViewModel(
             }
             TestState.Test3 -> {
                 updateCuvetteState(cuvettePos, CuvetteState.Test3)
-                resultTest3.add(calcAbsorbance(value.toDouble()))
-                updateTestResultModel(cuvettePos, CuvetteState.Test3)
+                updateTestResultModel(value, cuvettePos, CuvetteState.Test3)
                 if (lastNeed(cuvettePos, CuvetteState.Test2)) {
                     //检测结束，下一个步骤，检测第四次
                     viewModelScope.launch {
@@ -744,8 +834,7 @@ class HomeViewModel(
             }
             TestState.Test4 -> {
                 updateCuvetteState(cuvettePos, CuvetteState.Test4)
-                resultTest4.add(calcAbsorbance(value.toDouble()))
-                updateTestResultModel(cuvettePos, CuvetteState.Test4)
+                updateTestResultModel(value, cuvettePos, CuvetteState.Test4)
                 if (lastNeed(cuvettePos, CuvetteState.Test3)) {
                     //检测结束，下一个步骤，计算值
                     calcResult()
@@ -767,7 +856,7 @@ class HomeViewModel(
      * @param pos Int
      * @param state CuvetteState
      */
-    private fun updateTestResultModel(index: Int, state: CuvetteState) {
+    private fun updateTestResultModel(value: Int, index: Int, state: CuvetteState) {
         var pos = index
         Timber.d("updateTestResultModel pos=$pos resultModels=$resultModels")
         if (cuvetteStartPos > 0 && isFirstCuvetteShelf()) {
@@ -778,16 +867,28 @@ class HomeViewModel(
         }
         when (state) {
             CuvetteState.Test1 -> {
+                resultOriginalTest1.add(value)
+                resultTest1.add(calcAbsorbance(value.toBigDecimal()))
                 resultModels[pos]?.testValue1 = resultTest1[pos]
+                resultModels[pos]?.testOriginalValue1 = resultOriginalTest1[pos]
             }
             CuvetteState.Test2 -> {
+                resultOriginalTest2.add(value)
+                resultTest2.add(calcAbsorbance(value.toBigDecimal()))
                 resultModels[pos]?.testValue2 = resultTest2[pos]
+                resultModels[pos]?.testOriginalValue2 = resultOriginalTest2[pos]
             }
             CuvetteState.Test3 -> {
+                resultOriginalTest3.add(value)
+                resultTest3.add(calcAbsorbance(value.toBigDecimal()))
                 resultModels[pos]?.testValue3 = resultTest3[pos]
+                resultModels[pos]?.testOriginalValue3 = resultOriginalTest3[pos]
             }
             CuvetteState.Test4 -> {
+                resultOriginalTest4.add(value)
+                resultTest4.add(calcAbsorbance(value.toBigDecimal()))
                 resultModels[pos]?.testValue4 = resultTest4[pos]
+                resultModels[pos]?.testOriginalValue4 = resultOriginalTest4[pos]
                 resultModels[pos]?.testTime = Date().toLongString()
             }
             else -> {}
@@ -808,13 +909,22 @@ class HomeViewModel(
             resultTest2.clear()
             resultTest3.clear()
             resultTest4.clear()
+            resultOriginalTest1.clear()
+            resultOriginalTest2.clear()
+            resultOriginalTest3.clear()
+            resultOriginalTest4.clear()
             val size =
                 if (cuvetteStartPos > 0) 10 - cuvetteStartPos else scanResults.filterNotNull().size
             repeat(size) {
-                resultTest1.add(testValues1[it])
-                resultTest2.add(testValues2[it])
-                resultTest3.add(testValues3[it])
-                resultTest4.add(testValues4[it])
+                resultTest1.add(testValues1[it].toBigDecimal())
+                resultTest2.add(testValues2[it].toBigDecimal())
+                resultTest3.add(testValues3[it].toBigDecimal())
+                resultTest4.add(testValues4[it].toBigDecimal())
+
+                resultOriginalTest1.add(testOriginalValues1[it])
+                resultOriginalTest2.add(testOriginalValues2[it])
+                resultOriginalTest3.add(testOriginalValues3[it])
+                resultOriginalTest4.add(testOriginalValues4[it])
             }
         }
         //计算吸光度
@@ -825,12 +935,19 @@ class HomeViewModel(
                 val con = calcCon(absorbances[i], it)
                 cons.add(con)
 
-                resultModels[i]?.absorbances = absorbances[i].scale(5)
-                resultModels[i]?.testValue1 = resultTest1[i].scale(5)
-                resultModels[i]?.testValue2 = resultTest2[i].scale(5)
-                resultModels[i]?.testValue3 = resultTest3[i].scale(5)
-                resultModels[i]?.testValue4 = resultTest4[i].scale(5)
-                resultModels[i]?.concentration = con.scale(5)
+                resultModels[i]?.absorbances = absorbances[i]
+                if (SystemGlobal.isCodeDebug) {
+                    resultModels[i]?.testValue1 = resultTest1[i]
+                    resultModels[i]?.testValue2 = resultTest2[i]
+                    resultModels[i]?.testValue3 = resultTest3[i]
+                    resultModels[i]?.testValue4 = resultTest4[i]
+                    resultModels[i]?.testOriginalValue1 = resultOriginalTest1[i]
+                    resultModels[i]?.testOriginalValue2 = resultOriginalTest2[i]
+                    resultModels[i]?.testOriginalValue3 = resultOriginalTest3[i]
+                    resultModels[i]?.testOriginalValue4 = resultOriginalTest4[i]
+                }
+
+                resultModels[i]?.concentration = con
                 resultModels[i]?.let {
                     testResultRepository.updateTestResult(it)
                 }
@@ -850,6 +967,11 @@ class HomeViewModel(
         resultTest2.clear()
         resultTest3.clear()
         resultTest4.clear()
+
+        resultOriginalTest1.clear()
+        resultOriginalTest2.clear()
+        resultOriginalTest3.clear()
+        resultOriginalTest4.clear()
         cons.clear()
 
         continueTestNextCuvette()
@@ -1281,16 +1403,19 @@ class HomeViewModel(
      * 接收到移动比色皿架
      */
     override fun readDataMoveCuvetteShelfModel(reply: ReplyModel<MoveCuvetteShelfModel>) {
+        if (testState == TestState.TestFinish) {
+            cuvetteShelfMoveFinish = true
+            if (isTestFinish()) {
+                showFinishDialog()
+                openAllDoor()
+            }
+        }
         if (!runningTest()) return
         if (!machineStateNormal()) return
         Timber.d("接收到 移动比色皿架 reply=$reply cuvetteShelfPos=$cuvetteShelfPos cuvetteStartPos=$cuvetteStartPos")
         cuvetteShelfMoveFinish = true
 
-        if (testState == TestState.TestFinish) {
-            if (isTestFinish()) {
-                showFinishDialog()
-            }
-        } else {
+        if (testState != TestState.TestFinish) {
             cuvettePos = getFirstCuvetteStartPos();
             cuvetteStates = initCuvetteStates()
 
@@ -1310,7 +1435,7 @@ class HomeViewModel(
     /**
      * 检测结束动作完成后提示
      */
-    private fun showFinishDialog() {
+    public fun showFinishDialog() {
         dialogTestFinish.postValue(true)
         testState = TestState.None
     }
@@ -1324,20 +1449,44 @@ class HomeViewModel(
      * 接收到移动采便管架
      */
     override fun readDataMoveShitTubeShelfModel(reply: ReplyModel<MoveShitTubeShelfModel>) {
-        if (!runningTest()) return
-        if (!machineStateNormal()) return
-        Timber.d("接收到移动采便管架 reply=$reply shitTubeShelfPos=$shitTubeShelfPos")
-        shitTubeShelfMoveFinish = true
-
+        Timber.d("接收到移动采便管架 reply=$reply shitTubeShelfPos=$shitTubeShelfPos $testState")
         if (testState == TestState.TestFinish) {
+            shitTubeShelfMoveFinish = true
             if (isTestFinish()) {
                 showFinishDialog()
+                openAllDoor()
             }
-        } else {
+        }
+        if (!runningTest()) return
+        if (!machineStateNormal()) return
+        shitTubeShelfMoveFinish = true
+
+        if (testState != TestState.TestFinish) {
             shitTubePos = -1;
             shitTubesStates = initShitTubeStates()
             moveShitTube()
         }
+    }
+
+    private fun openAllDoor() {
+        openShitTubeDoor()
+        openCuvetteDoor()
+    }
+
+    /**
+     * 发送 开样本仓门
+     */
+    private fun openShitTubeDoor() {
+        Timber.d("发送 开样本仓门")
+        SerialPortUtil.Instance.openShitTubeDoor()
+    }
+
+    /**
+     * 发送 开比色皿仓门
+     */
+    private fun openCuvetteDoor() {
+        Timber.d("发送 开比色皿仓门")
+        SerialPortUtil.Instance.openCuvetteDoor()
     }
 
     /**
@@ -1400,6 +1549,7 @@ class HomeViewModel(
         Timber.d("接收到 自检 reply=$reply")
         dialogGetMachine.postValue(false)
         val errorInfo = reply.data.errorInfo
+        testState = TestState.None
         if (errorInfo.isNullOrEmpty()) {
             Timber.d("自检完成")
             machineArgState = MachineState.Normal
@@ -1834,11 +1984,10 @@ class HomeViewModel(
      * 检测
      */
     private fun test() {
-        Timber.d("发送 检测")
+        Timber.d("发送 检测 $cuvettePos")
         testFinish = false
         SerialPortUtil.Instance.test()
     }
-
 
     /**
      * 是否正在检测

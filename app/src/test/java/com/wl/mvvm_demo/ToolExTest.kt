@@ -2,12 +2,13 @@ package com.wl.mvvm_demo
 
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.ex.*
+import com.wl.turbidimetric.util.CurveFitter
 import org.junit.Assert
 import org.junit.Test
 import java.math.BigDecimal
 import java.math.RoundingMode
-import kotlin.math.log
 import kotlin.math.log10
+import kotlin.math.pow
 
 class ToolExTest {
 
@@ -22,7 +23,6 @@ class ToolExTest {
             CRC16(ubyteArrayOf(0x01u, 0x01u, 0x00u, 0x00u, 0x00u)).toByteArray()
                 .contentEquals(ubyteArrayOf(0x00u, 0x00u).toByteArray())
         )
-
 
     }
 
@@ -131,7 +131,7 @@ class ToolExTest {
 
         println("re1=$re1 re2=$re2 re3=$re3 re4=$re4 re=$re ")
         val oldRe = calcAbsorbance(
-            sourceValue1
+            sourceValue1.toBigDecimal()
         )
         println("oldRe=$oldRe ")
     }
@@ -147,5 +147,44 @@ class ToolExTest {
         val v2 = d1.divide(d2, 10, BigDecimal.ROUND_HALF_UP).toDouble()
         println("v2=$v2")
     }
+
+
+    @Test
+    fun newCalcBigD() {
+        val a1 = -0.00283;
+        val a2 = 9.07;
+        val x0 = 34909;
+        val p = 0.82816;
+        val absorbance = 0.1
+        var d1 = a2 - absorbance
+        var d2 = p
+        if (d1 == 0.0 || d2 == 0.0) {
+            println("newCalcBigD dividend1==0||dividend2==0 d1=$d1 d2=$d2")
+            return
+        }
+        var temp11 = (a2 - a1) / d1 - 1
+        var temp12 = temp11.pow(1 / d2).scale(10)
+//        var con1: Double = x0 * ((a2 - a1) / (a2 - absorbance) - 1).pow(1 / p).scale(5)
+        var con1: Double = x0 * temp12
+        println("newCalcBigD con1=$con1 d1=$d1 d2=$d2 temp11=$temp11 temp12=$temp12")
+
+        var dividend1 = BigDecimal(a2)
+            .subtract(BigDecimal(absorbance)).setScale(10, BigDecimal.ROUND_HALF_UP)
+        var dividend2 = p
+        if (dividend1.compareTo(BigDecimal(0)) == 0 || dividend2 == 0.0) {
+            println("newCalcBigD dividend1==0||dividend2==0 dividend1=$dividend1 dividend2=$dividend2")
+            return
+        }
+        val temp21 = BigDecimal(a2).subtract(BigDecimal(a1)).divide(
+            dividend1, 10, BigDecimal.ROUND_HALF_UP
+        ).subtract(BigDecimal(1))
+
+        val temp22 = temp21.toDouble().pow((1 / dividend2)).scale(10)
+        val con2 = (x0 * temp22)
+
+        println("newCalcBigD con2=$con2 dividend1=$dividend1 dividend2=$dividend2 temp21=$temp21 temp22=$temp22")
+    }
+
+
 
 }

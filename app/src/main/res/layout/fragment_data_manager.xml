@@ -94,6 +94,14 @@
                 android:layout_marginLeft="20dp"
                 android:minWidth="150dp"
                 android:text="根据ID倒序" />
+            <Button
+                android:id="@+id/btnPrint"
+                style="@style/BtnPositive"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:minWidth="150dp"
+                android:text="打印" />
         </LinearLayout>
 
 

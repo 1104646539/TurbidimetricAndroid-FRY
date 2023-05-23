@@ -188,11 +188,11 @@ class DataManagerFragment :
         datasJob?.cancelAndJoin()
         datasJob = lifecycleScope.launch {
             vm.item(condition).collectLatest {
+                Timber.d("---监听到了变化---condition=$condition")
                 adapter?.submitData(it)
                 withContext(Dispatchers.Main) {
                     vd.rv.scrollToPosition(0)
                 }
-                Timber.d("---监听到了变化---condition=$condition")
             }
         }
     }

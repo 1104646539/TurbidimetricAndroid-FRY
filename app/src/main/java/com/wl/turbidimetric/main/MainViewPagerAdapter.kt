@@ -8,6 +8,7 @@ import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.home.HomeFragment
 import com.wl.turbidimetric.matchingargs.MatchingArgsFragment
 import com.wl.turbidimetric.settings.SettingsFragment
+import com.wl.turbidimetric.test.RepeatabilityFragment
 import com.wl.turbidimetric.test.TestDataFragment
 
 class MainViewPagerAdapter(fragmentActivity: FragmentActivity) :
@@ -31,7 +32,7 @@ class MainViewPagerAdapter(fragmentActivity: FragmentActivity) :
                 SettingsFragment.newInstance()
             }
             4 -> {
-                TestDataFragment.newInstance()
+                RepeatabilityFragment.newInstance()
             }
             else -> {
                 TestDataFragment.newInstance()

@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.model.MachineState
 import com.wl.turbidimetric.model.MatchingArgState
+import com.wl.turbidimetric.model.RepeatabilityState
 import com.wl.turbidimetric.model.TestState
 import com.wl.wllib.QRCodeUtil
 
@@ -12,6 +13,7 @@ object SystemGlobal {
     lateinit var qrCode: QRCodeUtil;
     var testState = TestState.None
     var matchingTestState = MatchingArgState.None
+    var repeatabilityState = RepeatabilityState.None
     var machineArgState = MachineState.None
 
     var isCodeDebug = false;

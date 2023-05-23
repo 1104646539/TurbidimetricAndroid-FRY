@@ -94,20 +94,20 @@ object PrintUtil {
         quality: Boolean
     ): String {
 
-        absorbancys[1] = absorbancys[4].apply {
-            absorbancys[4] = absorbancys[1]
-        }
-        absorbancys[2] = absorbancys[3].apply {
-            absorbancys[3] = absorbancys[2]
-        }
-        yzs[1] = yzs[4].apply {
-            yzs[4] = yzs[1]
-        }
-        yzs[2] = yzs[3].apply {
-            yzs[3] = yzs[2]
-        }
-
-        nds.sort()
+//        absorbancys[1] = absorbancys[4].apply {
+//            absorbancys[4] = absorbancys[1]
+//        }
+//        absorbancys[2] = absorbancys[3].apply {
+//            absorbancys[3] = absorbancys[2]
+//        }
+//        yzs[1] = yzs[4].apply {
+//            yzs[4] = yzs[1]
+//        }
+//        yzs[2] = yzs[3].apply {
+//            yzs[3] = yzs[2]
+//        }
+//
+//        nds.sort()
 
         val sb = StringBuilder()
         sb.append("\n\n")

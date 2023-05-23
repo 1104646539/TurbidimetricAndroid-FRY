@@ -157,4 +157,8 @@ data class TestResultModel(
         return result
     }
 
+    override fun toString(): String {
+        return "TestResultModel(id=$id, isSelect=$isSelect, name='$name', gender='$gender', age='$age', sampleQRCode='$sampleQRCode', detectionNum='$detectionNum', testState=$testState, testResult='$testResult', absorbances=$absorbances, concentration=$concentration, testValue1=$testValue1, testValue2=$testValue2, testValue3=$testValue3, testValue4=$testValue4, testOriginalValue1=$testOriginalValue1, testOriginalValue2=$testOriginalValue2, testOriginalValue3=$testOriginalValue3, testOriginalValue4=$testOriginalValue4, createTime='$createTime', testTime='$testTime', project=$project)"
+    }
+
 }

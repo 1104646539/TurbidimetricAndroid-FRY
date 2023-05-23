@@ -376,8 +376,10 @@ class HomeViewModel(
                 if ((testState == TestState.None || testState == TestState.TestFinish)
                     && (matchingTestState == MatchingArgState.None || matchingTestState == MatchingArgState.Finish)
                 ) {
-                    SerialPortUtil.Instance.getShitTubeDoorState()
-                    SerialPortUtil.Instance.getCuvetteDoorState()
+                    if (!SystemGlobal.isCodeDebug) {
+                        SerialPortUtil.Instance.getShitTubeDoorState()
+                        SerialPortUtil.Instance.getCuvetteDoorState()
+                    }
                 }
             }
         }

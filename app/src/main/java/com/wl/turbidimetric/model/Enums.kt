@@ -60,6 +60,21 @@ enum class MatchingArgState {
 }
 
 /**
+ * 拟合参数流程的状态
+ */
+enum class RepeatabilityState {
+    None,//等待开始
+    GetState,//获取状态中
+    MoveSample,//移动已混匀的
+    DripReagent,//加试剂中
+    Test1,//检测第一次
+    Test2,//检测第二次
+    Test3,//检测第三次
+    Test4,//检测第四次
+    Finish//拟合结束
+}
+
+/**
  * 仪器当前状态
  */
 enum class MachineState {

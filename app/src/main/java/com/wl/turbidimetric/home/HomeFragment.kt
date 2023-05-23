@@ -13,6 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.FragmentHomeBinding
+import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.datastore.LocalDataGlobal
 import com.wl.turbidimetric.datastore.LocalDataGlobal.cache
 import com.wl.turbidimetric.ex.*
@@ -21,6 +22,7 @@ import com.wl.turbidimetric.global.SystemGlobal.cuvetteDoorIsOpen
 import com.wl.turbidimetric.global.SystemGlobal.shitTubeDoorIsOpen
 import com.wl.turbidimetric.global.SystemGlobal.testState
 import com.wl.turbidimetric.model.ProjectModel
+import com.wl.turbidimetric.model.TestResultModel
 import com.wl.turbidimetric.model.TestState
 import com.wl.turbidimetric.print.PrintUtil
 import com.wl.turbidimetric.util.ScanCodeUtil
@@ -89,6 +91,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 //            //写入u盘文件 end
 //        }
         vd.btnGet.setOnClickListener {
+
         }
         vd.btnGetU.setOnClickListener {
 //            Timber.d("Key.TakeReagentR2= before}")

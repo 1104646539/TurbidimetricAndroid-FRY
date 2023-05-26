@@ -2,41 +2,25 @@ package com.wl.turbidimetric.home
 
 import android.app.ProgressDialog
 import android.os.Bundle
+import android.util.DisplayMetrics
 import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.FragmentHomeBinding
-import com.wl.turbidimetric.datastore.LocalData
-import com.wl.turbidimetric.datastore.LocalDataGlobal
-import com.wl.turbidimetric.datastore.LocalDataGlobal.cache
 import com.wl.turbidimetric.ex.*
-import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.global.SystemGlobal.cuvetteDoorIsOpen
 import com.wl.turbidimetric.global.SystemGlobal.shitTubeDoorIsOpen
-import com.wl.turbidimetric.global.SystemGlobal.testState
 import com.wl.turbidimetric.model.ProjectModel
-import com.wl.turbidimetric.model.TestResultModel
-import com.wl.turbidimetric.model.TestState
-import com.wl.turbidimetric.print.PrintUtil
-import com.wl.turbidimetric.util.ScanCodeUtil
-import com.wl.turbidimetric.util.SerialPortUtil
 import com.wl.turbidimetric.util.StorageUtil
 import com.wl.turbidimetric.view.HiltDialog
 import com.wl.wwanandroid.base.BaseFragment
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.util.Date
-import kotlin.concurrent.timer
 
 
 class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.fragment_home) {
@@ -155,6 +139,9 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
     }
 
     private fun listener() {
+        val dm = DisplayMetrics()
+        requireActivity().windowManager.defaultDisplay.getMetrics(dm)
+        Timber.d("dm.densityDpi=${dm.densityDpi} ${dm.widthPixels} ${dm.heightPixels} ${dm.scaledDensity}")
         listenerDialog()
 
         cuvetteDoorIsOpen.observe(this) {

@@ -16,7 +16,7 @@ import java.util.concurrent.LinkedBlockingQueue
  * 串口操作类
  */
 class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("Com1", 9600)) {
-//class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("/dev/ttyS1", 9600)) {
+    //class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("/dev/ttyS1", 9600)) {
     companion object {
         val Instance: SerialPortUtil = SerialPortUtil()
     }
@@ -266,7 +266,7 @@ class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("Co
                     val re = byteArray.copyOf(count).toUByteArray()
                     data.addAll(re)
 
-                    if(data.size < hCount + allCount){
+                    if (data.size < hCount + allCount) {
                         continue
                     }
 
@@ -627,7 +627,9 @@ class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("Co
 //        Timber.d("发送 搅拌")
         writeAsync(
             createCmd(
-                SerialGlobal.CMD_Stir, data3 = (LocalData.StirDuration shr 8).toUByte(), data4 = LocalData.StirDuration.toUByte()
+                SerialGlobal.CMD_Stir,
+                data3 = (LocalData.StirDuration shr 8).toUByte(),
+                data4 = LocalData.StirDuration.toUByte()
             )
         )
     }
@@ -664,7 +666,14 @@ class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("Co
      */
     fun test() {
 //        Timber.d("发送 检测")
-        writeAsync(createCmd(SerialGlobal.CMD_Test))
+        if (SystemGlobal.isCodeDebug) {
+            GlobalScope.launch {
+//                delay(5000)
+                writeAsync(createCmd(SerialGlobal.CMD_Test))
+            }
+        } else {
+            writeAsync(createCmd(SerialGlobal.CMD_Test))
+        }
     }
 
     /**

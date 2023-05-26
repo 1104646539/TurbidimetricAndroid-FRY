@@ -1,6 +1,8 @@
 package com.wl.turbidimetric.test
 
 import android.os.Bundle
+import android.view.View
+import android.widget.AdapterView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -8,6 +10,8 @@ import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.FragmentMatchingArgsBinding
 import com.wl.turbidimetric.databinding.FragmentRepeatabilityBinding
 import com.wl.turbidimetric.ex.snack
+import com.wl.turbidimetric.home.HomeProjectAdapter
+import com.wl.turbidimetric.model.ProjectModel
 import com.wl.turbidimetric.view.HiltDialog
 import com.wl.wwanandroid.base.BaseFragment
 import kotlinx.coroutines.flow.collectLatest
@@ -20,6 +24,8 @@ import timber.log.Timber
  */
 class RepeatabilityFragment :
     BaseFragment<RepeatabilityViewModel, FragmentRepeatabilityBinding>(R.layout.fragment_repeatability) {
+    val items: MutableList<ProjectModel> = mutableListOf()
+    lateinit var projectAdapter: HomeProjectAdapter
     override val vm: RepeatabilityViewModel by viewModels{
         RepeatabilityViewModelFactory()
     }
@@ -41,6 +47,7 @@ class RepeatabilityFragment :
     override fun init(savedInstanceState: Bundle?) {
         listenerDialog()
         listenerView()
+
     }
 
     private fun listenerView() {
@@ -51,6 +58,30 @@ class RepeatabilityFragment :
         vm.toastMsg.observe(this) { msg ->
             Timber.d("msg=$msg")
             snack(vd.root, msg)
+        }
+
+        projectAdapter = HomeProjectAdapter(requireContext(), items)
+        vd.spnProject.adapter = projectAdapter
+        projectAdapter.notifyDataSetChanged()
+
+        vm.viewModelScope.launch {
+            vm.projectDatas.collectLatest {
+                items.clear()
+                items.addAll(it)
+                projectAdapter.notifyDataSetChanged()
+            }
+        }
+
+        vd.spnProject.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?, view: View?, position: Int, id: Long
+            ) {
+                vm.selectProject = items?.get(position)
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                vm.selectProject = null
+            }
         }
     }
 

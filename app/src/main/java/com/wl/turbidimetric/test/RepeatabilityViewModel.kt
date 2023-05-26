@@ -4,28 +4,28 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
-import com.wl.turbidimetric.db.DBManager
 import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.SystemGlobal
+import com.wl.turbidimetric.global.SystemGlobal.matchingTestState
 import com.wl.turbidimetric.global.SystemGlobal.repeatabilityState
 import com.wl.turbidimetric.global.SystemGlobal.testState
 import com.wl.turbidimetric.home.ProjectRepository
 import com.wl.turbidimetric.model.*
-import com.wl.turbidimetric.print.PrintUtil
 import com.wl.turbidimetric.util.Callback2
 import com.wl.turbidimetric.util.SerialPortUtil
 import com.wl.wwanandroid.base.BaseViewModel
-import io.objectbox.android.ObjectBoxDataSource
-import kotlinx.coroutines.Dispatchers
+import io.objectbox.kotlin.flow
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.math.BigDecimal
-import java.util.Date
+import java.math.RoundingMode
+import java.text.Format
+import java.text.NumberFormat
 import kotlin.math.absoluteValue
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 /**
  * 重复性测试
@@ -191,6 +191,9 @@ class RepeatabilityViewModel(private val projectRepository: ProjectRepository) :
     val testMsg = MutableLiveData("")
     val toastMsg = MutableLiveData("")
 
+    val projectDatas = projectRepository.allDatas.flow()
+
+    var selectProject: ProjectModel? = null
 
     /**
      * 每排之间的检测间隔
@@ -294,6 +297,10 @@ class RepeatabilityViewModel(private val projectRepository: ProjectRepository) :
         }
         if (testState != TestState.None) {
             toastMsg.postValue("正在检测，请勿操作！")
+            return
+        }
+        if (matchingTestState != MatchingArgState.None) {
+            toast("正在拟合质控，请勿操作！")
             return
         }
         if (repeatabilityState != RepeatabilityState.None && repeatabilityState != RepeatabilityState.Finish) {
@@ -734,7 +741,7 @@ class RepeatabilityViewModel(private val projectRepository: ProjectRepository) :
     }
 
     /**
-     * 计算拟合曲线
+     * 计算重复性
      */
     private fun calcMatchingArg() {
         if (SystemGlobal.isCodeDebug) {
@@ -759,29 +766,43 @@ class RepeatabilityViewModel(private val projectRepository: ProjectRepository) :
             }
 
         }
-        Timber.d("开始计算拟合曲线 $resultTest1 $resultTest2 $resultTest3 $resultTest4")
+        Timber.d("开始计算重复性 $resultTest1 $resultTest2 $resultTest3 $resultTest4")
 
-        result = calcAbsorbances(resultTest1, resultTest2, resultTest3, resultTest4)
+        result = calcAbsorbanceDifferences(resultTest1, resultTest2, resultTest3, resultTest4)
 
-        val absorbancys = result.map { it.toDouble() * 10000 }
-        val cf = matchingArg(absorbancys)
-        val res = cf.params
-        for (i in res.indices) {
-            println(res[i])
+        //计算吸光度
+        val cons = mutableListOf<Double>()
+        //计算浓度
+        selectProject?.let { it ->
+            for (i in result.indices) {
+                val con = calcCon(result[i], it)
+                cons.add(con.setScale(2, RoundingMode.HALF_UP).toDouble())
+            }
         }
-        Timber.d("拟合度：${cf.fitGoodness}")
-//        Timber.d("四参数：a1=${res[0]} a2=${res[3]} x0=${res[2]} p=${res[1]}")
-        val f0 = res[0]
-        val f1 = res[1]
-        val f2 = res[2]
-        val f3 = res[3]
 
-        Timber.d("四参数：f0=${f0} f1=${f1} f2=${f2} f3=${f3}")
+//        cons.clear()
+//        cons.addAll(
+//            mutableListOf(
+//                495.0,
+//                489.0,
+//                481.0,
+//                490.0,
+//                469.0,
+//                473.0,
+//                465.0,
+//                470.0,
+//                459.0,
+//                471.0,
+//            )
+//        )
 
-        val yzs = absorbancys.map {
-            val yz = cf.f(res, it).scale(2)
-            yz
-        }
+        val sd = calculateSD(cons.toDoubleArray())
+        val mean = calculateMean(cons.toDoubleArray())
+        val cv = sd / mean
+
+        val pi = NumberFormat.getPercentInstance()
+        pi.maximumFractionDigits = 2
+        val ncv = pi.format(cv)
 
         var msg: StringBuilder = StringBuilder(
             "第一次原始:$resultOriginalTest1 \n" +
@@ -792,19 +813,12 @@ class RepeatabilityViewModel(private val projectRepository: ProjectRepository) :
                     "第三次:$resultTest3 \n" +
                     "第四次原始:$resultOriginalTest4 \n" +
                     "第四次:$resultTest4 \n" +
-                    "吸光度:$result 拟合度：${cf.fitGoodness} \n" +
-                    "四参数：f0=${f0} f1=${f1} f2=${f2} f3=${f3} \n " +
-                    "验算 ${yzs}\n"
+                    "吸光度:$result \n" +
+                    "四参数：f0=${selectProject!!.f0} f1=${selectProject!!.f1} f2=${selectProject!!.f2} f3=${selectProject!!.f3} \n " +
+                    "浓度 ${cons}\n" +
+                    "标准方差=$sd \n cv=${ncv} \n"
         )
-        val project = ProjectModel().apply {
-            this.f0 = f0
-            this.f1 = f1
-            this.f2 = f2
-            this.f3 = f3
-            this.fitGoodness = cf.fitGoodness
-            this.createTime = Date().toLongString()
-            this.projectLjz = 100
-        }
+
 //        PrintUtil.printMatchingQuality(absorbancys, nds, yzs, cf.params, quality)
 //        if (quality) {
 //            val hValue = result[5];
@@ -817,9 +831,6 @@ class RepeatabilityViewModel(private val projectRepository: ProjectRepository) :
 //        }
 
         testMsg.postValue(msg.toString())
-
-        //添加到参数列表，刷新
-        projectRepository.addProject(project)
     }
 
     /**
@@ -874,8 +885,10 @@ class RepeatabilityViewModel(private val projectRepository: ProjectRepository) :
                     moveCuvetteDripReagent()
 
                     takeReagent()
-                } else {//继续移动已混匀的样本
-                    moveShitTube()
+                } else {//继续取样。同一个采便管位置
+//                    moveShitTube()
+                    sampleStep++
+                    sampling(moveSampleVolume)
                     moveCuvetteDripSample()
                 }
             }
@@ -1072,7 +1085,7 @@ class RepeatabilityViewModel(private val projectRepository: ProjectRepository) :
      * 显示拟合结束对话框
      */
     fun showMatchingDialog() {
-        matchingFinishMsg.postValue("拟合结束")
+        matchingFinishMsg.postValue("重复性检测结束")
         repeatabilityState = RepeatabilityState.None
     }
 
@@ -1086,7 +1099,7 @@ class RepeatabilityViewModel(private val projectRepository: ProjectRepository) :
 
 
     /**
-     * 移动采便管架·
+     * 移动采便管架
      * @param pos Int
      */
     private fun moveShitTubeShelf(pos: Int) {

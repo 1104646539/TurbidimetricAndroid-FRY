@@ -11,6 +11,7 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import kotlin.math.log10
 import kotlin.math.pow
+import kotlin.math.sqrt
 
 /**
  * 浓度梯度
@@ -102,9 +103,9 @@ inline fun <reified T : Activity> Activity.startActivity() {
 }
 
 /**
- * 计算吸光度
+ * 计算一排的吸光度差异
  */
-fun calcAbsorbances(
+fun calcAbsorbanceDifferences(
     resultTest1: ArrayList<BigDecimal>,
     resultTest2: ArrayList<BigDecimal>,
     resultTest3: ArrayList<BigDecimal>,
@@ -113,12 +114,21 @@ fun calcAbsorbances(
     var absorbances = arrayListOf<BigDecimal>()
     for (i in resultTest1.indices) {
         absorbances.add(
-            resultTest4[i] - resultTest1[i]
+            calcAbsorbanceDifference(resultTest1[i],resultTest4[i])
         )
     }
     return absorbances
 }
 
+/**
+ * 计算单个吸光度差异
+ * @param resultTest1 BigDecimal
+ * @param resultTest4 BigDecimal
+ * @return BigDecimal
+ */
+fun calcAbsorbanceDifference(resultTest1: BigDecimal, resultTest4: BigDecimal): BigDecimal {
+    return resultTest4 - resultTest1
+}
 
 /**
  * 计算吸光度
@@ -218,4 +228,33 @@ fun EditText.selectionLast() {
 
 fun DoorAllOpen(): Boolean {
     return (SystemGlobal.cuvetteDoorIsOpen.value == true) && (SystemGlobal.shitTubeDoorIsOpen.value == true)
+}
+
+/**
+ * 计算标准方差
+ * @param numArray DoubleArray
+ * @return Double
+ */
+fun calculateSD(numArray: DoubleArray): Double {
+    var sum = numArray.sum()
+    var standardDeviation = 0.0
+
+    val mean = sum / numArray.size
+
+    for (num in numArray) {
+        standardDeviation += (num - mean).pow(2.0)
+    }
+
+    return sqrt(standardDeviation / (numArray.size - 1))
+}
+
+/**
+ * 计算平均值
+ * @param numArray DoubleArray
+ * @return Double
+ */
+fun calculateMean(numArray: DoubleArray): Double {
+    var sum = numArray.sum()
+    val mean = sum / numArray.size
+    return mean
 }

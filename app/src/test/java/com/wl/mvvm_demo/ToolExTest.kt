@@ -7,8 +7,10 @@ import org.junit.Assert
 import org.junit.Test
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.text.NumberFormat
 import kotlin.math.log10
 import kotlin.math.pow
+import kotlin.math.sqrt
 
 class ToolExTest {
 
@@ -185,6 +187,33 @@ class ToolExTest {
         println("newCalcBigD con2=$con2 dividend1=$dividend1 dividend2=$dividend2 temp21=$temp21 temp22=$temp22")
     }
 
+    @Test
+    fun cvTest() {
 
+        val cons = mutableListOf(
+            495.0,
+            489.0,
+            481.0,
+            490.0,
+            469.0,
+            473.0,
+            465.0,
+            470.0,
+            459.0,
+            471.0,
+//            1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0
+        )
+
+        val sd = calculateSD(cons.toDoubleArray())
+        val mean = calculateMean(cons.toDoubleArray())
+        val cv = sd / mean
+        println("nsd=$sd ncv=$cv")
+
+        val pi = NumberFormat.getPercentInstance()
+        pi.maximumFractionDigits = 2
+        val ncv = pi.format(cv)
+
+        println("ncv=$ncv")
+    }
 
 }

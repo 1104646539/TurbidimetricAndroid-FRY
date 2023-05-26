@@ -22,7 +22,6 @@ object SystemGlobal {
     val cuvetteDoorIsOpen = MutableLiveData(false)
 
 
-
     val icons = mutableListOf(
         R.drawable.icon_navigation_home,
         R.drawable.icon_navigation_datamanager,

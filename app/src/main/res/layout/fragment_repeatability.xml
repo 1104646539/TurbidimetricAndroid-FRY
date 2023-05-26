@@ -26,6 +26,10 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
+            <Spinner
+                android:id="@+id/spnProject"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
             <Button
                 style="@style/BtnPositive"

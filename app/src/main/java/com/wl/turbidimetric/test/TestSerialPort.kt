@@ -32,8 +32,8 @@ object TestSerialPort {
                 reply = reply.plus(ubyteArrayOf(0x00u, 0x00u, 0x00u, 0x00u))
             }
             SerialGlobal.CMD_GetState -> {
-//                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x33u, 0xffu))// 0011 0011
-                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x11u, 0xffu))//0001 0001
+                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x33u, 0xffu))// 0011 0011
+//                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x11u, 0xffu))//0001 0001
             }
             SerialGlobal.CMD_MoveShitTube -> {
                 reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x1u))

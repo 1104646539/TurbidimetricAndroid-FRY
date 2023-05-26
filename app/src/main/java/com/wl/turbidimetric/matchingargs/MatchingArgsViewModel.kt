@@ -11,6 +11,7 @@ import com.wl.turbidimetric.db.DBManager
 import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.global.SystemGlobal.matchingTestState
+import com.wl.turbidimetric.global.SystemGlobal.repeatabilityState
 import com.wl.turbidimetric.global.SystemGlobal.testState
 import com.wl.turbidimetric.home.ProjectRepository
 import com.wl.turbidimetric.model.*
@@ -77,6 +78,7 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
     /**
      * 移动已混匀的样本的下标顺序
      * 由样本架的样本移动到比色皿
+     * 样本  比色皿
      * 0        0
      * 1000     50
      * 500      200
@@ -85,7 +87,7 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
      * qc(l)    qc(l)
      * qc(h)    qc(h)
      */
-    private val moveBlendingPos = arrayListOf(0, 4, 3, 2, 1, 5, 6)
+    private val moveBlendingPos = arrayListOf(0, 5, 4, 3, 2, 6, 7)
 
 //    /**
 //     * 移动已混匀的样本
@@ -344,14 +346,19 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
      * 点击开始拟合
      */
     fun clickStart() {
-        if (DoorAllOpen()) {
-            toast("舱门未关")
-            return
-        }
+//        if (DoorAllOpen()) {
+//            toast("舱门未关")
+//            return
+//        }
         if (testState != TestState.None) {
             toastMsg.postValue("正在检测，请勿操作！")
             return
         }
+        if (repeatabilityState != RepeatabilityState.None) {
+            toast("正在进行重复性检测，请勿操作！")
+            return
+        }
+
         if (matchingTestState != MatchingArgState.None && matchingTestState != MatchingArgState.Finish) {
             toastMsg.postValue("正在质控，请勿操作！")
             return
@@ -523,8 +530,8 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
     }
 
     private fun openAllDoor() {
-        openShitTubeDoor()
-        openCuvetteDoor()
+//        openShitTubeDoor()
+//        openCuvetteDoor()
     }
 
     /**
@@ -854,7 +861,7 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
         }
         Timber.d("开始计算拟合曲线 $resultTest1 $resultTest2 $resultTest3 $resultTest4")
 
-        result = calcAbsorbances(resultTest1, resultTest2, resultTest3, resultTest4)
+        result = calcAbsorbanceDifferences(resultTest1, resultTest2, resultTest3, resultTest4)
 
         val absorbancys = result.map { it.toDouble() * 10000 }
         val cf = matchingArg(absorbancys)
@@ -953,6 +960,7 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
         Timber.d("接收到 加样 reply=$reply cuvettePos=$cuvettePos matchingTestState=$matchingTestState sampleStep=$sampleStep shitTubePos=$shitTubePos")
 
         dripSamplingFinish = true
+        samplingFinish = false
 
         when (matchingTestState) {
             MatchingArgState.DripDiluentVolume -> {//加稀释液

@@ -11,6 +11,7 @@ import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.global.SystemGlobal.cuvetteDoorIsOpen
 import com.wl.turbidimetric.global.SystemGlobal.machineArgState
 import com.wl.turbidimetric.global.SystemGlobal.matchingTestState
+import com.wl.turbidimetric.global.SystemGlobal.repeatabilityState
 import com.wl.turbidimetric.global.SystemGlobal.shitTubeDoorIsOpen
 import com.wl.turbidimetric.global.SystemGlobal.testState
 import com.wl.turbidimetric.model.*
@@ -373,12 +374,10 @@ class HomeViewModel(
     private fun listenerDoorState() {
         viewModelScope.launch {
             timer("", true, Date(), 1500) {
-                if ((testState == TestState.None || testState == TestState.TestFinish)
-                    && (matchingTestState == MatchingArgState.None || matchingTestState == MatchingArgState.Finish)
-                ) {
+                if ((testState == TestState.None || testState == TestState.TestFinish) && (matchingTestState == MatchingArgState.None || matchingTestState == MatchingArgState.Finish)) {
                     if (!SystemGlobal.isCodeDebug) {
-                        SerialPortUtil.Instance.getShitTubeDoorState()
-                        SerialPortUtil.Instance.getCuvetteDoorState()
+//                        SerialPortUtil.Instance.getShitTubeDoorState()
+//                        SerialPortUtil.Instance.getCuvetteDoorState()
                     }
                 }
             }
@@ -389,16 +388,20 @@ class HomeViewModel(
      * 测试用的 end
      */
     fun clickStart() {
-        if (DoorAllOpen()) {
-            toast("舱门未关")
-            return
-        }
+//        if (DoorAllOpen()) {
+//            toast("舱门未关")
+//            return
+//        }
         if (testState != TestState.None) {
             toast("正在检测，请勿操作！")
             return
         }
         if (matchingTestState != MatchingArgState.None) {
             toast("正在拟合质控，请勿操作！")
+            return
+        }
+        if (repeatabilityState != RepeatabilityState.None) {
+            toast("正在进行重复性检测，请勿操作！")
             return
         }
         initState()
@@ -410,10 +413,12 @@ class HomeViewModel(
         testState = TestState.DripSample
         cuvetteShelfPos = -1
         shitTubeShelfPos = -1
-        cuvetteStartPos = if (skipCuvetteNum.isNullOrEmpty()) 0 else skipCuvetteNum.toInt()
+        cuvetteStartPos = skipCuvetteNum.toIntOrNull() ?: 0
+
         Timber.d("跳过 $cuvetteStartPos 个比色皿")
         //跳过的比色皿结果为-1
-        repeat(cuvetteStartPos) {
+        repeat(cuvetteStartPos)
+        {
 //            resultTest1.add(-1)
 //            resultTest2.add(-1)0
 //            resultTest3.add(-1)
@@ -797,8 +802,8 @@ class HomeViewModel(
         when (testState) {
             TestState.DripReagent -> {
                 updateCuvetteState(cuvettePos - 3, CuvetteState.Test1)
-                nextDripReagent()
                 updateTestResultModel(value, cuvettePos - 3, CuvetteState.Test1)
+                nextDripReagent()
             }
             TestState.Test2 -> {
                 updateCuvetteState(cuvettePos, CuvetteState.Test2)
@@ -869,29 +874,59 @@ class HomeViewModel(
         }
         when (state) {
             CuvetteState.Test1 -> {
-                resultOriginalTest1.add(value)
-                resultTest1.add(calcAbsorbance(value.toBigDecimal()))
+                if (SystemGlobal.isCodeDebug) {
+                    resultTest1.add(testValues1[pos].toBigDecimal())
+                    resultOriginalTest1.add(testOriginalValues1[pos])
+                } else {
+                    resultOriginalTest1.add(value)
+                    resultTest1.add(calcAbsorbance(value.toBigDecimal()))
+                }
                 resultModels[pos]?.testValue1 = resultTest1[pos]
                 resultModels[pos]?.testOriginalValue1 = resultOriginalTest1[pos]
             }
             CuvetteState.Test2 -> {
-                resultOriginalTest2.add(value)
-                resultTest2.add(calcAbsorbance(value.toBigDecimal()))
+                if (SystemGlobal.isCodeDebug) {
+                    resultTest2.add(testValues2[pos].toBigDecimal())
+                    resultOriginalTest2.add(testOriginalValues2[pos])
+                } else {
+                    resultOriginalTest2.add(value)
+                    resultTest2.add(calcAbsorbance(value.toBigDecimal()))
+                }
                 resultModels[pos]?.testValue2 = resultTest2[pos]
                 resultModels[pos]?.testOriginalValue2 = resultOriginalTest2[pos]
             }
             CuvetteState.Test3 -> {
-                resultOriginalTest3.add(value)
-                resultTest3.add(calcAbsorbance(value.toBigDecimal()))
+                if (SystemGlobal.isCodeDebug) {
+                    resultTest3.add(testValues3[pos].toBigDecimal())
+                    resultOriginalTest3.add(testOriginalValues3[pos])
+                } else {
+                    resultOriginalTest3.add(value)
+                    resultTest3.add(calcAbsorbance(value.toBigDecimal()))
+                }
                 resultModels[pos]?.testValue3 = resultTest3[pos]
                 resultModels[pos]?.testOriginalValue3 = resultOriginalTest3[pos]
             }
             CuvetteState.Test4 -> {
-                resultOriginalTest4.add(value)
-                resultTest4.add(calcAbsorbance(value.toBigDecimal()))
+                if (SystemGlobal.isCodeDebug) {
+                    resultTest4.add(testValues4[pos].toBigDecimal())
+                    resultOriginalTest4.add(testOriginalValues4[pos])
+                } else {
+                    resultOriginalTest4.add(value)
+                    resultTest4.add(calcAbsorbance(value.toBigDecimal()))
+                }
                 resultModels[pos]?.testValue4 = resultTest4[pos]
                 resultModels[pos]?.testOriginalValue4 = resultOriginalTest4[pos]
                 resultModels[pos]?.testTime = Date().toLongString()
+
+                //计算单个结果浓度
+                val abs = calcAbsorbanceDifference(resultTest1[pos], resultTest4[pos])
+                absorbances.add(abs)
+                selectProject?.let { project ->
+                    val con = calcCon(abs, project)
+                    cons.add(con)
+                    resultModels[pos]?.absorbances = abs
+                    resultModels[pos]?.concentration = con
+                }
             }
             else -> {}
         }
@@ -906,55 +941,55 @@ class HomeViewModel(
      * 计算结果
      */
     private fun calcResult() {
-        if (SystemGlobal.isCodeDebug) {
-            resultTest1.clear()
-            resultTest2.clear()
-            resultTest3.clear()
-            resultTest4.clear()
-            resultOriginalTest1.clear()
-            resultOriginalTest2.clear()
-            resultOriginalTest3.clear()
-            resultOriginalTest4.clear()
-            val size =
-                if (cuvetteStartPos > 0) 10 - cuvetteStartPos else scanResults.filterNotNull().size
-            repeat(size) {
-                resultTest1.add(testValues1[it].toBigDecimal())
-                resultTest2.add(testValues2[it].toBigDecimal())
-                resultTest3.add(testValues3[it].toBigDecimal())
-                resultTest4.add(testValues4[it].toBigDecimal())
-
-                resultOriginalTest1.add(testOriginalValues1[it])
-                resultOriginalTest2.add(testOriginalValues2[it])
-                resultOriginalTest3.add(testOriginalValues3[it])
-                resultOriginalTest4.add(testOriginalValues4[it])
-            }
-        }
+//        if (SystemGlobal.isCodeDebug) {
+//            resultTest1.clear()
+//            resultTest2.clear()
+//            resultTest3.clear()
+//            resultTest4.clear()
+//            resultOriginalTest1.clear()
+//            resultOriginalTest2.clear()
+//            resultOriginalTest3.clear()
+//            resultOriginalTest4.clear()
+//            val size =
+//                if (cuvetteStartPos > 0) 10 - cuvetteStartPos else scanResults.filterNotNull().size
+//            repeat(size) {
+//                resultTest1.add(testValues1[it].toBigDecimal())
+//                resultTest2.add(testValues2[it].toBigDecimal())
+//                resultTest3.add(testValues3[it].toBigDecimal())
+//                resultTest4.add(testValues4[it].toBigDecimal())
+//
+//                resultOriginalTest1.add(testOriginalValues1[it])
+//                resultOriginalTest2.add(testOriginalValues2[it])
+//                resultOriginalTest3.add(testOriginalValues3[it])
+//                resultOriginalTest4.add(testOriginalValues4[it])
+//            }
+//        }
         //计算吸光度
-        absorbances = calcAbsorbances(resultTest1, resultTest2, resultTest3, resultTest4)
-        //计算浓度
-        selectProject?.let { it ->
-            for (i in absorbances.indices) {
-                val con = calcCon(absorbances[i], it)
-                cons.add(con)
+//        absorbances = calcAbsorbanceDifferences(resultTest1, resultTest2, resultTest3, resultTest4)
+//        //计算浓度
+//        selectProject?.let { it ->
+//            for (i in absorbances.indices) {
+//                val con = calcCon(absorbances[i], it)
+//                cons.add(con)
+//
+//                resultModels[i]?.absorbances = absorbances[i]
+//                if (SystemGlobal.isCodeDebug) {
+//                    resultModels[i]?.testValue1 = resultTest1[i]
+//                    resultModels[i]?.testValue2 = resultTest2[i]
+//                    resultModels[i]?.testValue3 = resultTest3[i]
+//                    resultModels[i]?.testValue4 = resultTest4[i]
+//                    resultModels[i]?.testOriginalValue1 = resultOriginalTest1[i]
+//                    resultModels[i]?.testOriginalValue2 = resultOriginalTest2[i]
+//                    resultModels[i]?.testOriginalValue3 = resultOriginalTest3[i]
+//                    resultModels[i]?.testOriginalValue4 = resultOriginalTest4[i]
+//                }
 
-                resultModels[i]?.absorbances = absorbances[i]
-                if (SystemGlobal.isCodeDebug) {
-                    resultModels[i]?.testValue1 = resultTest1[i]
-                    resultModels[i]?.testValue2 = resultTest2[i]
-                    resultModels[i]?.testValue3 = resultTest3[i]
-                    resultModels[i]?.testValue4 = resultTest4[i]
-                    resultModels[i]?.testOriginalValue1 = resultOriginalTest1[i]
-                    resultModels[i]?.testOriginalValue2 = resultOriginalTest2[i]
-                    resultModels[i]?.testOriginalValue3 = resultOriginalTest3[i]
-                    resultModels[i]?.testOriginalValue4 = resultOriginalTest4[i]
-                }
-
-                resultModels[i]?.concentration = con
-                resultModels[i]?.let {
-                    testResultRepository.updateTestResult(it)
-                }
-            }
-        }
+//                resultModels[i]?.concentration = con
+//                resultModels[i]?.let {
+//                    testResultRepository.updateTestResult(it)
+//                }
+//            }
+//        }
 
         testMsg.postValue(
             testMsg.value?.plus("这排比色皿检测结束 比色皿位置=$cuvetteShelfPos 采便管位置=$shitTubeShelfPos \n 第一次:$resultTest1 \n 第二次:$resultTest2 \n 第三次:$resultTest3 \n 第四次:$resultTest4 \n  吸光度:$absorbances \n 浓度=$cons \n选择的四参数为${selectProject ?: "未选择"}\n\n")
@@ -993,15 +1028,14 @@ class HomeViewModel(
                 //结束检测，采便管已经取完样了
                 testFinishAction();
             } else {
-                //移动采便管架
-                moveShitTubeShelfNext()
-
                 if (lastCuvetteShelf(cuvetteShelfPos)) {//最后一排比色皿
                     //提示，比色皿不足了
                     dialogTestFinishCuvetteDeficiency.postValue(true)
                 } else {
                     //还有比色皿。继续移动比色皿，检测
                     moveCuvetteShelfNext()
+                    //移动采便管架
+                    moveShitTubeShelfNext()
                 }
             }
         } else {
@@ -1140,7 +1174,6 @@ class HomeViewModel(
         stirFinish = true
         updateCuvetteState(cuvettePos - 2, CuvetteState.Stir)
         stirProbeCleaning()
-//        nextDripReagent()
     }
 
 
@@ -1471,8 +1504,8 @@ class HomeViewModel(
     }
 
     private fun openAllDoor() {
-        openShitTubeDoor()
-        openCuvetteDoor()
+//        openShitTubeDoor()
+//        openCuvetteDoor()
     }
 
     /**
@@ -1594,6 +1627,7 @@ class HomeViewModel(
             }
             continueTestCuvetteState = false
             moveCuvetteShelf(cuvetteShelfPos)
+            moveShitTubeShelfNext()
             return
         }
         //采便管不足才获取的状态

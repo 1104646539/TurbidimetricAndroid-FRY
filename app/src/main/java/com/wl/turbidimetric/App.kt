@@ -29,6 +29,8 @@ class App : Application() {
         //没有项目参数的时候，添加一个默认参数
         if (DBManager.ProjectBox.all.isNullOrEmpty()) {
             DBManager.ProjectBox.put(ProjectModel())
+            DBManager.ProjectBox.put(ProjectModel())
+            DBManager.ProjectBox.put(ProjectModel())
         }
     }
 

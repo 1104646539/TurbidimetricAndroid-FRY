@@ -96,4 +96,9 @@ class CmdProxy() : CmdIF() {
 
     }
 
+    override fun readDataTempModel(reply: ReplyModel<TempModel>) {
+
+
+    }
+
 }

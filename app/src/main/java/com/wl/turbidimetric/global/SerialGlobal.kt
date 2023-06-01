@@ -101,6 +101,10 @@ object SerialGlobal {
      */
     const val CMD_CuvetteDoor: UByte = 0x0fu
 
+    /**
+     * 获取设置温度
+     */
+    const val CMD_GetSetTemp:UByte = 0x15u
 
     /**
      * 响应

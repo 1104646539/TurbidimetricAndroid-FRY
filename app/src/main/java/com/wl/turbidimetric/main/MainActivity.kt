@@ -160,7 +160,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         vd.vp.adapter = MainViewPagerAdapter(this)
         vd.vp.isUserInputEnabled = false
         vd.vp.offscreenPageLimit = 6
-        vd.rnv.setResIds(vm.ids.value!!.toIntArray())
+        vd.rnv.setResIds(R.drawable.icon_logo,vm.ids.value!!.toIntArray())
         vd.rnv.setRightNavigationSelectedIndexChangeListener { it ->
             vm.curIndex.value = it
         }

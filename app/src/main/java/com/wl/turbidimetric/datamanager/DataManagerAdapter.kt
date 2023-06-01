@@ -1,5 +1,6 @@
 package com.wl.turbidimetric.datamanager
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
@@ -11,6 +12,7 @@ import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.DatamanagerItemResultBinding
 import com.wl.turbidimetric.ex.scale
 import com.wl.turbidimetric.model.TestResultModel
+import timber.log.Timber
 
 class DataManagerAdapter :
     PagingDataAdapter<TestResultModel, DataManagerAdapter.DataManagerViewHolder>(diffCallback = MyDiff()) {
@@ -32,7 +34,8 @@ class DataManagerAdapter :
 
     public var onLongClick: ((pos: Long) -> Unit)? = null
 
-    class DataManagerViewHolder(private val binding: DatamanagerItemResultBinding) :
+
+    class DataManagerViewHolder(val binding: DatamanagerItemResultBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bindData(item: TestResultModel?, onLongClick: ((pos: Long) -> Unit)?) {
             binding.setVariable(BR.item, item)
@@ -54,26 +57,49 @@ class DataManagerAdapter :
             binding.tvTestOriginalValue3.text = item?.testOriginalValue3?.toString() ?: "-"
             binding.tvTestOriginalValue4.text = item?.testOriginalValue4?.toString() ?: "-"
 
+
             binding.root.setOnLongClickListener {
                 onLongClick?.invoke(item?.id ?: 0)
                 true
             }
 
-            binding.ivSelect.setOnClickListener {
-                item?.let { item ->
-                    it?.let { view ->
-                        item.isSelect = !item.isSelect
-                        view.isSelected = !view.isSelected
-                    }
-                }
-            }
-            binding.ivSelect.isSelected = item?.isSelect ?: false
+
         }
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return position
     }
 
     override fun onBindViewHolder(holder: DataManagerViewHolder, position: Int) {
         if (holder is DataManagerViewHolder) {
-            holder.bindData(getItem(holder.absoluteAdapterPosition), onLongClick)
+            val item = getItem(holder.absoluteAdapterPosition)
+            holder.bindData(item, onLongClick)
+
+            holder.binding.ivSelect.setOnClickListener {
+                item?.let { item ->
+                    it?.let { view ->
+                        item.isSelect = !item.isSelect
+                        view.isSelected = !view.isSelected
+
+                        if (holder.binding.ivSelect.isSelected) {
+                            holder.binding.root.setBackgroundColor(Color.RED)
+                        } else if (holder.absoluteAdapterPosition % 2 == 0) {
+                            holder.binding.root.setBackgroundColor(Color.BLUE)
+                        } else {
+                            holder.binding.root.setBackgroundColor(Color.WHITE)
+                        }
+                    }
+                }
+            }
+            holder.binding.ivSelect.isSelected = item?.isSelect ?: false
+            if (holder.binding.ivSelect.isSelected) {
+                holder.binding.root.setBackgroundColor(Color.RED)
+            } else if (holder.absoluteAdapterPosition % 2 == 0) {
+                holder.binding.root.setBackgroundColor(Color.BLUE)
+            } else {
+                holder.binding.root.setBackgroundColor(Color.WHITE)
+            }
         }
     }
 
@@ -86,4 +112,6 @@ class DataManagerAdapter :
         )
         return DataManagerViewHolder(binding)
     }
+
+
 }

@@ -31,13 +31,23 @@
         <!--            app:layout_constraintTop_toTopOf="parent">-->
 
         <!--        </FrameLayout>-->
+        <com.wl.turbidimetric.view.NavigationView
+            android:id="@+id/rnv"
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toLeftOf="@+id/vp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/vp"
             android:layout_width="0dp"
+            app:layout_constraintHorizontal_weight="1"
             android:layout_height="match_parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@id/rnv"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintLeft_toRightOf="@id/rnv"
             app:layout_constraintTop_toTopOf="parent" />
 
 <!--        <LinearLayout-->
@@ -62,14 +72,6 @@
 <!--                android:text="测试下2" />-->
 <!--        </LinearLayout>-->
 
-        <com.wl.turbidimetric.view.RightNavigationView
-            android:id="@+id/rnv"
-            android:layout_width="80dp"
-            android:layout_height="match_parent"
-            android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toRightOf="@+id/vp"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

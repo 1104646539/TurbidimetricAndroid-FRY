@@ -1152,6 +1152,9 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
         Timber.d("接收到 获取版本号 reply=$reply")
     }
 
+    override fun readDataTempModel(reply: ReplyModel<TempModel>) {
+    }
+
 
     /**
      * 接收到 样本架锁状态

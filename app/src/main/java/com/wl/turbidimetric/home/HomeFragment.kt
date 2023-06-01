@@ -184,6 +184,26 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                         }
                     }"
         }
+
+        vm.r1State.observe(this){
+            Timber.d("r1State=$it")
+        }
+        vm.r2State.observe(this){
+            Timber.d("r2State=$it")
+        }
+        vm.r2Volume.observe(this){
+            Timber.d("r2Volume=$it")
+        }
+        vm.cleanoutFluidState.observe(this){
+            Timber.d("cleanoutFluidState=$it")
+        }
+        vm.reactionTemp.observe(this){
+            Timber.d("reactionTemp=$it")
+        }
+        vm.r1Temp.observe(this){
+            Timber.d("r1Temp=$it")
+            vd.tvTemp.text = "R1=${vm.r1State.value} R2=${vm.r2State.value} R2量=${vm.r2Volume.value} 清洗液=${vm.cleanoutFluidState.value} 反应槽温度=${vm.reactionTemp.value} R1温度=${vm.r1Temp.value}"
+        }
     }
 
 

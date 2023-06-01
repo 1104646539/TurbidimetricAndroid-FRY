@@ -17,5 +17,6 @@ data class ProjectModel(
     var f2: Double = 0.0,
     var f3: Double = 0.0,
     var fitGoodness: Double = 0.0,
-    var createTime: String = ""
-) : BaseOBModel(0)
+    var createTime: String = "",
+    var isSelect: Boolean = false,
+    ) : BaseOBModel(0)

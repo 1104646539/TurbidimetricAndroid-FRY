@@ -2,8 +2,12 @@ package com.wl.turbidimetric.matchingargs
 
 import android.os.Bundle
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.FragmentMatchingArgsBinding
 import com.wl.turbidimetric.ex.snack
@@ -56,14 +60,61 @@ class MatchingArgsFragment :
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         vd.rv.adapter = adapter
 
-        vm.viewModelScope.launch {
+        lifecycleScope.launch {
             vm.datas.collectLatest {
+                Timber.d("项目更新了")
                 adapter.submitData(it)
             }
         }
+        lifecycleScope.launch {
+            adapter.onPagesUpdatedFlow.collectLatest {
+                if (adapter.selectPos < 0 && adapter.snapshot().size > 0) {
+                    adapter.setSelectIndex(0)
+                    adapter.notifyItemChanged(0)
+                }
+            }
+        }
+
         vm.toastMsg.observe(this) { msg ->
             Timber.d("msg=$msg")
             snack(vd.root, msg)
+        }
+
+        adapter.onSelectChange = { project ->
+            Timber.d("选中的=${project}")
+
+            val values = ArrayList<Entry>()
+            val params = mutableListOf(0f, 50f, 200f, 6000f)
+            values.add(Entry(0.0F, 0f))
+            values.add(Entry(1.0F, 50f))
+            values.add(Entry(2.0F, 200f))
+            values.add(Entry(3.0F, 1000f))
+            values.add(Entry(4.0F, 6000f))
+
+            val set1 = LineDataSet(values, "")
+            set1.setDrawValues(false)
+            set1.setDrawIcons(false)
+//            set1.setDrawCircleHole(false)
+//            set1.setDrawCircles(false)
+            set1.label = ""
+
+            val dataSets = java.util.ArrayList<ILineDataSet>()
+            dataSets.add(set1) // add the data sets
+
+            val data = LineData(dataSets)
+
+            vd.lcCurve.axisRight.setValueFormatter { value, axis -> "" }
+            vd.lcCurve.description.text = ""
+            vd.lcCurve.xAxis.isEnabled = false
+
+            val yAxis = vd.lcCurve.axisLeft
+
+//            yAxis.axisMaximum = params.max().toFloat()
+//            yAxis.axisMinimum = params.min().toFloat()
+            yAxis.setDrawZeroLine(true)
+
+            vd.lcCurve.data = data
+            vd.lcCurve.invalidate()
         }
     }
 
@@ -86,8 +137,8 @@ class MatchingArgsFragment :
                 )
             }
         }
-        vm.matchingFinishMsg.observe(this){
-            if(it.isNotEmpty()){
+        vm.matchingFinishMsg.observe(this) {
+            if (it.isNotEmpty()) {
                 dialog.show(
                     msg = it,
                     confirmMsg = "我知道了", onConfirm = {

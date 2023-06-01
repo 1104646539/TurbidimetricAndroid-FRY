@@ -204,6 +204,11 @@ class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("Co
                     it.readDataGetVersionModel(transitionGetVersionModel(ready))
                 }
             }
+            SerialGlobal.CMD_GetSetTemp -> {
+                callback {
+                    it.readDataTempModel(transitionTempModel(ready))
+                }
+            }
 
             else -> {}
         }
@@ -327,70 +332,6 @@ class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("Co
                 }
             }
         }
-
-//        GlobalScope.launch {
-//            launch {
-//                while (true) {
-//                    delay(50)
-//                    val count = serialPort.read(byteArray)
-//                    val re = byteArray.copyOf(count).toUByteArray()
-//                    data.addAll(re)
-//                    println("re=$count")
-//
-//                    i@ for (i in data.indices) {
-//                        if (data.size >= hCount + allCount && data[i] == header[0]) {
-//                            var k = i;
-//                            var count = 0
-//                            j@ for (element in header) {
-//                                if (data[k] == element) {
-//                                    count++
-//                                    if (hCount == count) {
-////                                        println("date2 ${Date().time}")
-////                                        println("匹配了")
-//
-//                                        //找到了前缀
-//                                        val temp: UByteArray =
-//                                            data.toUByteArray().copyOfRange(0, k + allCount + 1)
-//                                        val ready =
-//                                            temp.copyOfRange(temp.size - allCount, temp.size)
-//                                        if (temp.size < data.size) {
-//                                            val remaining = data.toUByteArray()
-//                                                .copyOfRange(k + allCount + 1, data.size)
-//                                            data.clear()
-//                                            data.addAll(remaining)
-//                                        } else {
-//                                            data.clear()
-//                                        }
-//
-//                                        println(
-//                                            "带前缀的 temp=${temp.toHex()} data=${
-//                                                data.toUByteArray().toHex()
-//                                            } ready=${ready.toHex()}"
-//                                        )
-//                                        parse(ready)
-//                                        break@i
-//                                    }
-//                                } else {
-//                                    println("不对了")
-//                                    continue@i
-//                                }
-//                                k++
-//                            }
-//                        } else {
-//                            if (!data.isNullOrEmpty()) {
-//                                println(
-//                                    "data.size ${
-//                                        data.toUByteArray().toHex()
-//                                    }"
-//                                )
-//                            }
-//
-//                            break@i
-//                        }
-//                    }
-//                }
-//            }
-//        }
     }
 
     private fun writeAsync(data: UByteArray) {
@@ -747,6 +688,28 @@ class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("Co
     }
 
     /**
+     * 设置温度
+     */
+    public fun setTemp(reactionTemp: Int = 0, r1Temp: Int = 0) {
+        writeAsync(
+            createCmd(
+                SerialGlobal.CMD_GetSetTemp,
+                (reactionTemp shr 8).toUByte(),
+                (reactionTemp).toUByte(),
+                (r1Temp shr 8).toUByte(),
+                (r1Temp).toUByte()
+            )
+        )
+    }
+
+    /**
+     * 获取当前温度
+     */
+    public fun getTemp() {
+        setTemp(0, 0)
+    }
+
+    /**
      * 创建一个完整的命令
      */
     private fun createCmd(
@@ -785,5 +748,6 @@ interface Callback2 {
     fun readDataShitTubeDoorModel(reply: ReplyModel<ShitTubeDoorModel>)
     fun readDataPiercedModel(reply: ReplyModel<PiercedModel>)
     fun readDataGetVersionModel(reply: ReplyModel<GetVersionModel>)
+    fun readDataTempModel(reply: ReplyModel<TempModel>)
     fun readDataStateFailed(cmd: UByte, state: UByte)
 }

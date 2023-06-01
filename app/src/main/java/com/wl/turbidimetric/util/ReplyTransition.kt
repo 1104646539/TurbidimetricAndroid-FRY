@@ -63,7 +63,7 @@ fun transitionGetMachineStateModel(data: UByteArray): ReplyModel<GetMachineState
 }
 
 /**
- * 解析成 获取比色皿架|采便管架|试剂状态
+ * 解析成 获取比色皿架|采便管架|试剂状态|r2量
  * @param data UByteArray
  * @return ReplyModel<Any>
  */
@@ -87,6 +87,7 @@ fun transitionGetStateModel(data: UByteArray): ReplyModel<GetStateModel> {
             r1Reagent = getStep(data[5], 0) == 1,
             r2Reagent = getStep(data[5], 1) == 1,
             cleanoutFluid = getStep(data[5], 2) == 1,
+            r2Volume = data[3].toInt()
         )
     )
 }
@@ -322,5 +323,20 @@ fun transitionGetVersionModel(data: UByteArray): ReplyModel<GetVersionModel> {
         SerialGlobal.CMD_GetVersion,
         data[1].toInt(),
         GetVersionModel("${data[2].toInt()}.${data[3].toInt()}.${data[4].toInt()}.${data[5].toInt()}.")
+    )
+}
+
+/**
+ * 解析成 获取温度
+ * @param data UByteArray
+ */
+fun transitionTempModel(data: UByteArray): ReplyModel<TempModel> {
+    return ReplyModel(
+        SerialGlobal.CMD_GetSetTemp,
+        data[1].toInt(),
+        TempModel(
+            reactionTemp = merge(ubyteArrayOf(data[2], data[3])),
+            r1Temp = merge(ubyteArrayOf(data[4], data[5]))
+        )
     )
 }

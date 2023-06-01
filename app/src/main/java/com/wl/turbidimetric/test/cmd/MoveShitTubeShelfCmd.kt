@@ -92,4 +92,9 @@ class MoveShitTubeShelfCmd(private val pos: Int) : CmdIF() {
     override fun readDataStateFailed(cmd: UByte, state: UByte) {
         super.readDataStateFailed(cmd, state)
     }
+
+    override fun readDataTempModel(reply: ReplyModel<TempModel>) {
+
+
+    }
 }

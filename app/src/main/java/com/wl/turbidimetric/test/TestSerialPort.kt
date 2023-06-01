@@ -47,6 +47,9 @@ object TestSerialPort {
             SerialGlobal.CMD_CuvetteDoor -> {
                 reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x00u, 0x0u))
             }
+            SerialGlobal.CMD_GetSetTemp -> {
+                reply = reply.plus(ubyteArrayOf(0x1u, 0x13u, 0x01u, 0x45u))// 275 325
+            }
             else -> {
                 reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x0u))
             }

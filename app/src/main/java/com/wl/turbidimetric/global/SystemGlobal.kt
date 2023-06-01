@@ -16,7 +16,7 @@ object SystemGlobal {
     var repeatabilityState = RepeatabilityState.None
     var machineArgState = MachineState.None
 
-    var isCodeDebug = false;
+    var isCodeDebug = true;
 
     val shitTubeDoorIsOpen = MutableLiveData(false)
     val cuvetteDoorIsOpen = MutableLiveData(false)

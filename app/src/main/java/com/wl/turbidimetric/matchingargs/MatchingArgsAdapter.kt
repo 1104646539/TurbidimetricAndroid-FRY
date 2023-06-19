@@ -13,25 +13,32 @@ import com.wl.turbidimetric.databinding.ItemMatchingargsBinding
 import com.wl.turbidimetric.datamanager.DataManagerAdapter
 import com.wl.turbidimetric.ex.scale
 import com.wl.turbidimetric.model.ProjectModel
+import timber.log.Timber
 
-class MatchingArgsAdapter :
-    PagingDataAdapter<ProjectModel, MatchingArgsAdapter.MatchingArgsViewHolder>(diffCallback = MyDiff()) {
+class MatchingArgsAdapter() :
+    RecyclerView.Adapter<MatchingArgsAdapter.MatchingArgsViewHolder>() {
     var onSelectChange: ((ProjectModel) -> Unit)? = null
 
-    class MyDiff : DiffUtil.ItemCallback<ProjectModel>() {
-        override fun areItemsTheSame(
-            oldItem: ProjectModel,
-            newItem: ProjectModel
-        ): Boolean {
-            return oldItem == newItem;
-        }
-
-        override fun areContentsTheSame(
-            oldItem: ProjectModel,
-            newItem: ProjectModel
-        ): Boolean {
-            return oldItem == newItem;
-        }
+    //    class MyDiff : DiffUtil.ItemCallback<ProjectModel>() {
+//        override fun areItemsTheSame(
+//            oldItem: ProjectModel,
+//            newItem: ProjectModel
+//        ): Boolean {
+//            return oldItem == newItem;
+//        }
+//
+//        override fun areContentsTheSame(
+//            oldItem: ProjectModel,
+//            newItem: ProjectModel
+//        ): Boolean {
+//            return oldItem == newItem;
+//        }
+//    }
+    val items: MutableList<ProjectModel> = mutableListOf()
+    fun submit(items: MutableList<ProjectModel>) {
+        this.items.clear()
+        this.items.addAll(items)
+        notifyDataSetChanged()
     }
 
     class MatchingArgsViewHolder(
@@ -40,53 +47,49 @@ class MatchingArgsAdapter :
         RecyclerView.ViewHolder(binding.root) {
         fun bindData(item: ProjectModel?) {
             binding.setVariable(BR.item, item)
-            binding.tvID.text = item?.projectId.toString()
-            binding.tvProjectName.text = item?.projectName ?: "-"
-            binding.tvA1.text = (item?.f0 ?: 0.0).scale(10).toString()
-            binding.tvA2.text = (item?.f1 ?: 0.0).scale(10).toString()
-            binding.tvX0.text = (item?.f2 ?: 0.0).scale(10).toString()
-            binding.tvP.text = (item?.f3 ?: 0.0).scale(10).toString()
+            binding.tvID.text = (item?.reagentNO ?: "-").toString()
+            binding.tvA1.text = (item?.f0 ?: 0.0).scale(8).toString()
+            binding.tvA2.text = (item?.f1 ?: 0.0).scale(8).toString()
+            binding.tvX0.text = (item?.f2 ?: 0.0).scale(8).toString()
+            binding.tvP.text = (item?.f3 ?: 0.0).scale(8).toString()
             binding.tvTestTime.text = item?.createTime ?: "-"
-            binding.tvFitGoodness.text = (item?.fitGoodness ?: 0.0).scale(10).toString()
-            binding.tvLjz.text = (item?.projectLjz ?: "-").toString()
-            binding.tvUnit.text = (item?.projectUnit ?: "-").toString()
-
-
+            binding.tvFitGoodness.text = (item?.fitGoodness ?: 0.0).scale(8).toString()
         }
     }
 
+
     override fun onBindViewHolder(holder: MatchingArgsViewHolder, position: Int) {
         if (holder is MatchingArgsViewHolder) {
-            val item = getItem(holder.absoluteAdapterPosition)
+            val item = items[holder.absoluteAdapterPosition]
+//            Timber.d("holder.absoluteAdapterPosition=${holder.absoluteAdapterPosition} item=$item")
             holder.bindData(item)
 
-            holder.binding.ivSelect.setOnClickListener {
+            holder.binding.root.setOnClickListener {
+                val item = items[holder.absoluteAdapterPosition]
+                Timber.d("holder.absoluteAdapterPosition2=${holder.absoluteAdapterPosition} bindingAdapterPosition=${holder.bindingAdapterPosition} oldPosition=${holder.oldPosition} adapterPosition=${holder.adapterPosition} layoutPosition=${holder.layoutPosition}")
                 item?.let { item ->
                     it?.let { view ->
                         if (item.isSelect) {
                             return@setOnClickListener
                         }
-                        item.isSelect = !item.isSelect
-                        view.isSelected = !view.isSelected
+                        item.isSelect = true
+                        view.isSelected = true
 
-                        if (holder.binding.ivSelect.isSelected) {
-                            holder.binding.root.setBackgroundColor(Color.RED)
-                            setSelectIndex(holder.absoluteAdapterPosition)
-                        } else if (holder.absoluteAdapterPosition % 2 == 0) {
-                            holder.binding.root.setBackgroundColor(Color.BLUE)
-                        } else {
-                            holder.binding.root.setBackgroundColor(Color.WHITE)
-                        }
+                        holder.binding.ivSelect.isSelected = true
+                        holder.binding.root.setBackgroundResource(R.drawable.bg_item_select)
+                        setSelectIndex(holder.absoluteAdapterPosition)
                     }
                 }
             }
             holder.binding.ivSelect.isSelected = item?.isSelect ?: false
-            if (holder.binding.ivSelect.isSelected) {
-                holder.binding.root.setBackgroundColor(Color.RED)
-            } else if (holder.absoluteAdapterPosition % 2 == 0) {
-                holder.binding.root.setBackgroundColor(Color.BLUE)
-            } else {
-                holder.binding.root.setBackgroundColor(Color.WHITE)
+            item?.let {
+                if (it.isSelect) {
+                    holder.binding.root.setBackgroundResource(R.drawable.bg_item_select)
+                } else if (holder.absoluteAdapterPosition % 2 == 0) {
+                    holder.binding.root.setBackgroundColor(Color.WHITE)
+                } else {
+                    holder.binding.root.setBackgroundResource(R.drawable.rip_item)
+                }
             }
         }
     }
@@ -108,7 +111,6 @@ class MatchingArgsAdapter :
     }
 
     fun setSelectIndex(pos: Int) {
-        var items = snapshot().items.toMutableList()
         if (pos >= items.size) {
             return
         }
@@ -117,13 +119,22 @@ class MatchingArgsAdapter :
 
         if (oldSelectPos in items.indices) {
             items[oldSelectPos].isSelect = false
-            notifyItemChanged(oldSelectPos)
+            notifyItemChanged(oldSelectPos, "change")
         }
 
         if (selectPos in items.indices) {
             onSelectChange?.invoke((items[selectPos]))
             items[selectPos].isSelect = true
         }
+    }
 
+    override fun getItemCount(): Int {
+        return if (items.isNullOrEmpty()) {
+            0
+        } else if (items.size > 10) {
+            10
+        } else {
+            items.size
+        }
     }
 }

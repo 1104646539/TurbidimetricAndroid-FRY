@@ -32,7 +32,7 @@ android {
     defaultConfig {
         applicationId "com.wl.turbidimetric"
         minSdk 21
-        targetSdk 32
+        targetSdk 31
         versionCode 1
         versionName "1.0"
 
@@ -54,6 +54,11 @@ android {
     }
     kotlinOptions {
         jvmTarget = '1.8'
+    }
+    //忽略错误
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
     }
 }
 

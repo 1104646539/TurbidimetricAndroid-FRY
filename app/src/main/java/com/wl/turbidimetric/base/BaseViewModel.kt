@@ -13,11 +13,11 @@ open class BaseViewModel : ViewModel() {
     open fun init(): Unit {}
 
     init {
-        EventBus.getDefault().register(this)
+//        EventBus.getDefault().register(this)
     }
     override fun onCleared() {
+//        EventBus.getDefault().unregister(this)
         super.onCleared()
-        EventBus.getDefault().unregister(this)
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

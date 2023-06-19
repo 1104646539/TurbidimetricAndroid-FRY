@@ -102,9 +102,9 @@ class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("Co
                     it.readDataGetStateModel(transitionGetStateModel(ready))
                 }
             }
-            SerialGlobal.CMD_MoveShitTubeShelf -> {
+            SerialGlobal.CMD_MoveSampleShelf -> {
                 callback {
-                    it.readDataMoveShitTubeShelfModel(transitionMoveShitTubeShelfModel(ready))
+                    it.readDataMoveSampleShelfModel(transitionMoveSampleShelfModel(ready))
                 }
             }
             SerialGlobal.CMD_MoveCuvetteShelf -> {
@@ -112,9 +112,9 @@ class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("Co
                     it.readDataMoveCuvetteShelfModel(transitionMoveCuvetteShelfModel(ready))
                 }
             }
-            SerialGlobal.CMD_MoveShitTube -> {
+            SerialGlobal.CMD_MoveSample -> {
                 callback {
-                    it.readDataMoveShitTubeModel(transitionMoveShitTubeModel(ready))
+                    it.readDataMoveSampleModel(transitionMoveSampleModel(ready))
                 }
             }
             SerialGlobal.CMD_MoveCuvetteDripSample -> {
@@ -189,9 +189,9 @@ class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("Co
                     it.readDataCuvetteDoorModel(transitionCuvetteDoorModel(ready))
                 }
             }
-            SerialGlobal.CMD_ShitTubeDoor -> {
+            SerialGlobal.CMD_SampleDoor -> {
                 callback {
-                    it.readDataShitTubeDoorModel(transitionShitTubeDoorModel(ready))
+                    it.readDataSampleDoorModel(transitionSampleDoorModel(ready))
                 }
             }
             SerialGlobal.CMD_Pierced -> {
@@ -372,12 +372,12 @@ class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("Co
     }
 
     /**
-     * 移动采便管架
+     * 移动样本架
      * @param pos Int 移动位置，绝对的
      */
-    fun moveShitTubeShelf(pos: Int) {
-//        Timber.d("发送 移动采便管架")
-        writeAsync(createCmd(SerialGlobal.CMD_MoveShitTubeShelf, data4 = pos.toUByte()))
+    fun moveSampleShelf(pos: Int) {
+//        Timber.d("发送 移动样本架")
+        writeAsync(createCmd(SerialGlobal.CMD_MoveSampleShelf, data4 = pos.toUByte()))
     }
 
 
@@ -394,15 +394,15 @@ class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("Co
 
     /**
      *
-     * 移动采便管
+     * 移动样本
      * @param forward Boolean 是否向前
      * @param pos Int 移动多少个位置，相对的
      */
-    fun moveShitTube(forward: Boolean = true, pos: Int) {
-//        Timber.d("发送 移动采便管")
+    fun moveSample(forward: Boolean = true, pos: Int) {
+//        Timber.d("发送 移动样本")
         writeAsync(
             createCmd(
-                SerialGlobal.CMD_MoveShitTube,
+                SerialGlobal.CMD_MoveSample,
                 data3 = (if (forward) 0 else 1).toUByte(),
                 data4 = pos.toUByte()
             )
@@ -486,7 +486,7 @@ class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("Co
 //        Timber.d("发送 取样针清洗")
         if (SystemGlobal.isCodeDebug) {
             GlobalScope.launch {
-                delay(1000)
+                delay(300)
                 writeAsync(
                     createCmd(
                         SerialGlobal.CMD_SamplingProbeCleaning,
@@ -582,7 +582,7 @@ class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("Co
 //        Timber.d("发送 搅拌针清洗")
         if (SystemGlobal.isCodeDebug) {
             GlobalScope.launch {
-                delay(1000)
+                delay(300)
                 writeAsync(
                     createCmd(
                         SerialGlobal.CMD_StirProbeCleaning,
@@ -609,7 +609,7 @@ class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("Co
 //        Timber.d("发送 检测")
         if (SystemGlobal.isCodeDebug) {
             GlobalScope.launch {
-//                delay(5000)
+//                delay(10000)
                 writeAsync(createCmd(SerialGlobal.CMD_Test))
             }
         } else {
@@ -618,29 +618,29 @@ class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("Co
     }
 
     /**
-     * 获取采便管舱门状态
+     * 获取样本舱门状态
      */
-    fun getShitTubeDoorState() {
-//        Timber.d("发送 获取采便管舱门状态")
-        setGetShitTubeDoor(false)
+    fun getSampleDoorState() {
+//        Timber.d("发送 获取样本舱门状态")
+        setGetSampleDoor(false)
     }
 
     /**
-     * 开启采便管舱门
+     * 开启样本舱门
      */
-    fun openShitTubeDoor() {
-//        Timber.d("发送 开启采便管舱门")
-        setGetShitTubeDoor(true)
+    fun openSampleDoor() {
+//        Timber.d("发送 开启样本舱门")
+        setGetSampleDoor(true)
     }
 
     /**
-     * 获取采便管舱门状态|开采便管舱门
+     * 获取样本舱门状态|开样本舱门
      * @param open Boolean
      */
-    private fun setGetShitTubeDoor(open: Boolean = false) {
+    private fun setGetSampleDoor(open: Boolean = false) {
         writeAsync(
             createCmd(
-                SerialGlobal.CMD_ShitTubeDoor, data4 = if (open) 0x1u else 0x0u
+                SerialGlobal.CMD_SampleDoor, data4 = if (open) 0x1u else 0x0u
             )
         )
     }
@@ -703,6 +703,15 @@ class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("Co
     }
 
     /**
+     * 关机
+     */
+    public fun shutdown() {
+        writeAsync(
+            createCmd(SerialGlobal.CMD_Shutdown)
+        )
+    }
+
+    /**
      * 获取当前温度
      */
     public fun getTemp() {
@@ -730,9 +739,9 @@ class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("Co
 interface Callback2 {
     fun readDataGetMachineStateModel(reply: ReplyModel<GetMachineStateModel>)
     fun readDataGetStateModel(reply: ReplyModel<GetStateModel>)
-    fun readDataMoveShitTubeShelfModel(reply: ReplyModel<MoveShitTubeShelfModel>)
+    fun readDataMoveSampleShelfModel(reply: ReplyModel<MoveSampleShelfModel>)
     fun readDataMoveCuvetteShelfModel(reply: ReplyModel<MoveCuvetteShelfModel>)
-    fun readDataMoveShitTubeModel(reply: ReplyModel<MoveShitTubeModel>)
+    fun readDataMoveSampleModel(reply: ReplyModel<MoveSampleModel>)
     fun readDataMoveCuvetteDripSampleModel(reply: ReplyModel<MoveCuvetteDripSampleModel>)
     fun readDataMoveCuvetteDripReagentModel(reply: ReplyModel<MoveCuvetteDripReagentModel>)
     fun readDataMoveCuvetteTestModel(reply: ReplyModel<MoveCuvetteTestModel>)
@@ -745,7 +754,7 @@ interface Callback2 {
     fun readDataSamplingProbeCleaningModelModel(reply: ReplyModel<SamplingProbeCleaningModel>)
     fun readDataTestModel(reply: ReplyModel<TestModel>)
     fun readDataCuvetteDoorModel(reply: ReplyModel<CuvetteDoorModel>)
-    fun readDataShitTubeDoorModel(reply: ReplyModel<ShitTubeDoorModel>)
+    fun readDataSampleDoorModel(reply: ReplyModel<SampleDoorModel>)
     fun readDataPiercedModel(reply: ReplyModel<PiercedModel>)
     fun readDataGetVersionModel(reply: ReplyModel<GetVersionModel>)
     fun readDataTempModel(reply: ReplyModel<TempModel>)

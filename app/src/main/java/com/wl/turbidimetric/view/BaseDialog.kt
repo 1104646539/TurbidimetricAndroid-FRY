@@ -1,14 +1,9 @@
 package com.wl.turbidimetric.view
 
 import android.content.Context
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.ViewParent
+import android.view.*
 import android.widget.Button
-import android.widget.FrameLayout
 import android.widget.LinearLayout
-import android.widget.TextView
 import com.wl.turbidimetric.R
 import com.wl.wllib.DialogUtil
 
@@ -22,7 +17,10 @@ import com.wl.wllib.DialogUtil
 open class BaseDialog(private val context: Context) {
     lateinit var btnConfirm: Button
     lateinit var btnCancel: Button
-    private val dialogUtil: DialogUtil = DialogUtil(context).apply {
+
+    var width:Int = 1200
+    var height:Int = WindowManager.LayoutParams.WRAP_CONTENT
+    protected val dialogUtil: DialogUtil = DialogUtil(context).apply {
         setView(R.layout.dialog_base)
     }
 
@@ -84,7 +82,7 @@ open class BaseDialog(private val context: Context) {
             }
         }
         dialogUtil.setCancelable(isCancelable)
-        dialogUtil.show()
+        dialogUtil.show(width,height)
     }
 
     open fun <T : View> getView(id: Int): T {

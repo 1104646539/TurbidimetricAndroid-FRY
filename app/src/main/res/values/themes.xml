@@ -24,7 +24,13 @@
     <style name="TextTitle" parent="TextHilt">
         <item name="android:textSize">24sp</item>
         <item name="android:textStyle">normal</item>
-        <item name="android:textColor">@color/black</item>
+        <item name="android:textColor">@color/textColor</item>
+    </style>
+
+    <style name="TextItem" parent="TextHilt">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/textColor</item>
     </style>
 
     <style name="BtnBase" parent="Widget.AppCompat.Button.Borderless">
@@ -46,6 +52,10 @@
 
     <style name="BtnPositive" parent="BtnDefault">
         <item name="android:background">@drawable/rip_positive</item>
+    </style>
+
+    <style name="BtnPositive2" parent="BtnDefault">
+        <item name="android:background">@drawable/rip_positive2</item>
     </style>
 
     <style name="EtDefault">

@@ -1,11 +1,16 @@
 package com.wl.turbidimetric.ex
 
+import android.content.res.Resources
 import android.view.View
 import android.widget.Toast
 import com.google.android.material.snackbar.Snackbar
+import com.wl.turbidimetric.App
+import com.wl.turbidimetric.home.HomeViewModel
+import com.wl.turbidimetric.home.HomeViewModel.*
 import com.wl.wllib.ToastUtil
 import java.math.BigDecimal
 import java.util.*
+import javax.inject.Inject
 
 /**
  * 用来将double类型的值四舍五入下保留几位小数
@@ -42,4 +47,30 @@ fun toast(msg: String, duration: Int = Toast.LENGTH_SHORT) {
         ToastUtil.showToastLong(msg)
     else
         ToastUtil.showToast(msg)
+}
+
+fun getResource(): Resources {
+    return App.instance!!.resources
+}
+
+inline fun Array<Array<CuvetteItem>?>.print(): String {
+    val sb = StringBuffer()
+    this.forEachIndexed { i, ts ->
+        ts?.forEachIndexed { j, t ->
+            sb.append("[${t.state},${t.testResult?.id}] ")
+        }
+        sb.append("\n")
+    }
+    return sb.toString();
+}
+
+inline fun Array<Array<SampleItem>?>.print(): String {
+    val sb = StringBuffer()
+    this.forEachIndexed { i, ts ->
+        ts?.forEachIndexed { j, t ->
+            sb.append("[${t.state},${t.testResult?.id}] ")
+        }
+        sb.append("\n")
+    }
+    return sb.toString();
 }

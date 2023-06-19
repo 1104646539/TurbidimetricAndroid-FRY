@@ -1,8 +1,9 @@
 package com.wl.turbidimetric.model
 
+import com.wl.turbidimetric.db.IntArrayConverter
+import io.objectbox.annotation.Convert
 import io.objectbox.annotation.Entity
 import io.objectbox.annotation.Id
-import java.math.BigDecimal
 
 @Entity
 data class ProjectModel(
@@ -19,4 +20,54 @@ data class ProjectModel(
     var fitGoodness: Double = 0.0,
     var createTime: String = "",
     var isSelect: Boolean = false,
-    ) : BaseOBModel(0)
+    var reagentNO: String = "",
+    @Convert(
+        converter = IntArrayConverter::class,
+        dbType = String::class
+    )
+    var reactionValues: IntArray? = intArrayOf()
+) : BaseOBModel(0) {
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is ProjectModel) return false
+
+        if (projectId != other.projectId) return false
+        if (projectName != other.projectName) return false
+        if (projectCode != other.projectCode) return false
+        if (projectLjz != other.projectLjz) return false
+        if (projectUnit != other.projectUnit) return false
+        if (f0 != other.f0) return false
+        if (f1 != other.f1) return false
+        if (f2 != other.f2) return false
+        if (f3 != other.f3) return false
+        if (fitGoodness != other.fitGoodness) return false
+        if (createTime != other.createTime) return false
+        if (isSelect != other.isSelect) return false
+        if (reagentNO != other.reagentNO) return false
+        if (reactionValues != null) {
+            if (other.reactionValues == null) return false
+            if (!reactionValues.contentEquals(other.reactionValues)) return false
+        } else if (other.reactionValues != null) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = projectId.hashCode()
+        result = 31 * result + projectName.hashCode()
+        result = 31 * result + projectCode.hashCode()
+        result = 31 * result + projectLjz
+        result = 31 * result + projectUnit.hashCode()
+        result = 31 * result + f0.hashCode()
+        result = 31 * result + f1.hashCode()
+        result = 31 * result + f2.hashCode()
+        result = 31 * result + f3.hashCode()
+        result = 31 * result + fitGoodness.hashCode()
+        result = 31 * result + createTime.hashCode()
+        result = 31 * result + isSelect.hashCode()
+        result = 31 * result + reagentNO.hashCode()
+        result = 31 * result + (reactionValues?.contentHashCode() ?: 0)
+        return result
+    }
+}

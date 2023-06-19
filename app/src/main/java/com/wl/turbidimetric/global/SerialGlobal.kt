@@ -7,14 +7,14 @@ object SerialGlobal {
     const val CMD_GetMachineState: UByte = 0x01u
 
     /**
-     * 获取采便管架，比色皿架状态
+     * 获取样本架，比色皿架状态
      */
     const val CMD_GetState: UByte = 0x02u
 
     /**
-     * 移动采便管架
+     * 移动样本架
      */
-    const val CMD_MoveShitTubeShelf: UByte = 0x03u
+    const val CMD_MoveSampleShelf: UByte = 0x03u
 
     /**
      * 移动比色皿架
@@ -22,9 +22,9 @@ object SerialGlobal {
     const val CMD_MoveCuvetteShelf: UByte = 0x04u
 
     /**
-     * 移动采便管
+     * 移动样本
      */
-    const val CMD_MoveShitTube: UByte = 0x05u
+    const val CMD_MoveSample: UByte = 0x05u
 
     /**
      * 移动比色皿到加样位
@@ -92,9 +92,9 @@ object SerialGlobal {
     const val CMD_Pierced: UByte = 0x14u
 
     /**
-     * 开门|获取采便管舱门
+     * 开门|获取样本舱门
      */
-    const val CMD_ShitTubeDoor: UByte = 0x0eu
+    const val CMD_SampleDoor: UByte = 0x0eu
 
     /**
      * 开门|获取比色皿舱门
@@ -105,6 +105,10 @@ object SerialGlobal {
      * 获取设置温度
      */
     const val CMD_GetSetTemp:UByte = 0x15u
+    /**
+     * 关机
+     */
+    const val CMD_Shutdown:UByte = 0x16u
 
     /**
      * 响应

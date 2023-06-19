@@ -2,108 +2,148 @@
 <layout xmlns:app="http://schemas.android.com/apk/res-auto">
 
 
-
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/bg_gray"
         android:orientation="vertical"
-        tools:context=".datamanager.DataManagerFragment">
-
-        <include
-            android:id="@+id/header"
-            layout="@layout/datamanager_item_result_header"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toTopOf="@id/rv"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            app:layout_constraintBottom_toTopOf="@id/llBottom"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/header" />
+        android:padding="40dp">
 
         <LinearLayout
-            android:id="@+id/llBottom"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:orientation="horizontal"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/rv">
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_round_white"
+            android:orientation="vertical">
 
-            <Button
-                android:id="@+id/btnDelete"
-                style="@style/BtnPositive"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:minWidth="150dp"
-                android:text="删除" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingLeft="20dp"
+                android:paddingTop="20dp"
+                android:paddingBottom="20dp">
 
-            <Button
-                android:id="@+id/btnClean"
-                style="@style/BtnPositive"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:minWidth="150dp"
-                android:text="清空" />
+                <ImageView
+                    android:layout_width="5dp"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/iv_indicate1" />
 
-            <Button
-                android:id="@+id/btnInsert"
-                style="@style/BtnPositive"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:minWidth="150dp"
-                android:text="添加" />
+                <TextView
+                    style="@style/TextHilt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="12dp"
+                    android:text="数据管理"
+                    android:textStyle="bold" />
+            </LinearLayout>
 
-            <Button
-                android:id="@+id/btnInsert2"
-                style="@style/BtnPositive"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:minWidth="150dp"
-                android:text="添加1000" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_margin="20dp"
+                android:layout_weight="1"
+                android:padding="1dp"
+                android:background="@drawable/bg_rv"
+                android:orientation="vertical">
 
-            <Button
-                android:id="@+id/btnQuery"
-                style="@style/BtnPositive"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:minWidth="150dp"
-                android:text="根据ID正序" />
+                <include
+                    android:id="@+id/header"
+                    layout="@layout/item_datamanager_result_header"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBottom_toTopOf="@id/rv"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-            <Button
-                android:id="@+id/btnQuery2"
-                style="@style/BtnPositive"
-                android:layout_width="wrap_content"
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:layout_constraintBottom_toTopOf="@id/llBottom"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/header" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/llBottom"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:minWidth="150dp"
-                android:text="根据ID倒序" />
-            <Button
-                android:id="@+id/btnPrint"
-                style="@style/BtnPositive"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:minWidth="150dp"
-                android:text="打印" />
+                android:orientation="horizontal"
+                android:padding="10dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/rv">
+
+                <Button
+                    android:id="@+id/btnDelete"
+                    style="@style/BtnPositive"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:minWidth="150dp"
+                    android:text="删除" />
+
+                <Button
+                    android:id="@+id/btnClean"
+                    style="@style/BtnPositive"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:minWidth="150dp"
+                    android:text="清空" />
+
+                <Button
+                    android:id="@+id/btnInsert"
+                    style="@style/BtnPositive"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:minWidth="150dp"
+                    android:text="添加" />
+
+                <Button
+                    android:id="@+id/btnInsert2"
+                    style="@style/BtnPositive"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:minWidth="150dp"
+                    android:text="添加1000" />
+
+                <Button
+                    android:id="@+id/btnQuery"
+                    style="@style/BtnPositive"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:minWidth="150dp"
+                    android:text="根据ID正序" />
+
+                <Button
+                    android:id="@+id/btnQuery2"
+                    style="@style/BtnPositive"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:minWidth="150dp"
+                    android:text="根据ID倒序" />
+
+                <Button
+                    android:id="@+id/btnPrint"
+                    style="@style/BtnPositive"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:minWidth="150dp"
+                    android:text="打印" />
+            </LinearLayout>
+
         </LinearLayout>
-
-
     </LinearLayout>
 </layout>

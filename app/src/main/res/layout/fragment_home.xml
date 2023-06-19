@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
@@ -8,102 +9,362 @@
             type="com.wl.turbidimetric.home.HomeViewModel" />
     </data>
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        tools:context=".datamanager.DataManagerFragment">
+        android:background="@color/bg_gray"
+        android:orientation="horizontal"
+        android:padding="40dp">
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/bg_round_white"
             android:orientation="vertical">
 
-            <EditText
-                android:layout_width="200dp"
+            <LinearLayout
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:inputType="numberDecimal"
-                android:maxLength="1"
-                android:text="@={model.skipCuvetteNum}"
-                android:textSize="20sp" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingLeft="20dp"
+                android:paddingTop="20dp"
+                android:paddingBottom="20dp">
 
-            <TextView
-                android:id="@+id/tvShow"
-                android:textSize="28sp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-            <TextView
-                android:id="@+id/tvTemp"
-                android:textSize="28sp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/iv_indicate1" />
 
-        <Spinner
-            android:id="@+id/spnProject"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <Button
-            style="@style/BtnPositive"
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:onClick="@{()->model.clickStart()}"
-            android:stateListAnimator="@null"
-            android:text="开始" />
-
-        <androidx.core.widget.NestedScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+                <TextView
+                    style="@style/TextHilt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="12dp"
+                    android:text="样本分析"
+                    android:textStyle="bold" />
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/tvMsg"
-                    android:layout_width="match_parent"
+                <com.wl.turbidimetric.view.CuvetteShelfView
+                    android:id="@+id/csv"
+                    android:layout_width="66dp"
                     android:layout_height="wrap_content"
-                    android:text="@{model.testMsg.toString()}"
-                    android:textSize="22sp" />
+                    android:layout_marginLeft="136dp" />
 
-                <Button
-                    android:id="@+id/btnGet"
-                    android:layout_width="match_parent"
-                    android:layout_height="80dp"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginRight="20dp"
-                    android:text="获取" />
+                <com.wl.turbidimetric.view.CuvetteShelfView
+                    android:id="@+id/csv2"
+                    android:layout_width="66dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="7dp" />
 
-                <Button
-                    android:id="@+id/btnGetU"
-                    style="@style/BtnNegative"
-                    android:layout_width="match_parent"
-                    android:layout_height="80dp"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginRight="20dp"
-                    android:stateListAnimator="@null"
-                    android:text="获取u" />
+                <com.wl.turbidimetric.view.CuvetteShelfView
+                    android:id="@+id/csv3"
+                    android:layout_width="66dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="7dp" />
 
-                <Button
-                    android:id="@+id/btnGetU2"
-                    style="@style/BtnPositive"
+                <com.wl.turbidimetric.view.CuvetteShelfView
+                    android:id="@+id/csv4"
+                    android:layout_width="66dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="7dp" />
+
+
+                <com.wl.turbidimetric.view.SampleShelfView
+                    android:id="@+id/ssv"
+                    android:layout_width="66dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="237dp" />
+
+                <com.wl.turbidimetric.view.SampleShelfView
+                    android:id="@+id/ssv2"
+                    android:layout_width="66dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="7dp" />
+
+                <com.wl.turbidimetric.view.SampleShelfView
+                    android:id="@+id/ssv3"
+                    android:layout_width="66dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="7dp" />
+
+                <com.wl.turbidimetric.view.SampleShelfView
+                    android:id="@+id/ssv4"
+                    android:layout_width="66dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="7dp" />
+
+
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="80dp"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginRight="20dp"
-                    android:stateListAnimator="@null"
-                    android:text="获取2" />
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="120dp"
+                    android:gravity="center_vertical"
+                    android:orientation="vertical">
+
+                    <com.wl.turbidimetric.view.DrawableCenterButton
+                        android:id="@+id/btn_debug_dialog"
+                        style="@style/BtnPositive"
+                        android:layout_width="220dp"
+                        android:layout_height="70dp"
+                        android:layout_marginBottom="50dp"
+                        android:drawableLeft="@drawable/icon_btn_analyse"
+                        android:drawablePadding="8dp"
+                        android:gravity="center_vertical"
+                        android:stateListAnimator="@null"
+                        android:text="调试框" />
+
+                    <com.wl.turbidimetric.view.DrawableCenterButton
+                        android:id="@+id/btn_start"
+                        style="@style/BtnPositive"
+                        android:layout_width="220dp"
+                        android:layout_height="70dp"
+                        android:drawableLeft="@drawable/icon_btn_analyse"
+                        android:drawablePadding="8dp"
+                        android:gravity="center_vertical"
+                        android:stateListAnimator="@null"
+                        android:text="分析" />
+
+                    <com.wl.turbidimetric.view.DrawableCenterButton
+                        style="@style/BtnNegative"
+                        android:layout_width="220dp"
+                        android:id="@+id/btn_config"
+                        android:layout_height="70dp"
+                        android:layout_marginTop="50dp"
+                        android:drawableLeft="@drawable/icon_btn_settings"
+                        android:drawablePadding="8dp"
+                        android:stateListAnimator="@null"
+                        android:text="设置" />
+
+
+                </LinearLayout>
             </LinearLayout>
 
-        </androidx.core.widget.NestedScrollView>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="40dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_round_white"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingTop="58dp"
+                android:paddingBottom="58dp">
+
+                <ImageView
+                    android:id="@+id/iv_r1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="46dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/icon_r1_empty" />
+
+                <TextView
+                    style="@style/TextHilt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="18dp"
+                    android:text="试剂R1"
+                    android:textSize="20sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="66dp"
+                android:background="@drawable/bg_round_white"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingTop="58dp"
+                android:paddingBottom="58dp">
+
+                <ImageView
+                    android:id="@+id/iv_r2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="46dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/icon_r2_0" />
+
+                <TextView
+                    style="@style/TextHilt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="18dp"
+                    android:text="试剂R2"
+                    android:textSize="20sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="66dp"
+                android:background="@drawable/bg_round_white"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingTop="58dp"
+                android:paddingBottom="58dp">
+
+                <ImageView
+                    android:id="@+id/iv_cleanout_fluid"
+                    android:layout_width="wrap_content"
+                    android:layout_height="46dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/icon_cleanout_fluid_empty" />
+
+                <TextView
+                    style="@style/TextHilt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="18dp"
+                    android:text="清洗液"
+                    android:textSize="20sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="66dp"
+                android:background="@drawable/bg_round_white"
+                android:gravity="center"
+                android:minHeight="200dp"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="46dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/icon_temp" />
+
+                <TextView
+                    style="@style/TextHilt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:text="温度"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/tv_temp"
+                    style="@style/TextHilt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:text="℃"
+                    android:textColor="@color/themePositiveColor"
+                    android:textSize="20sp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!--        <LinearLayout-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:orientation="vertical"-->
+        <!--            android:visibility="gone">-->
+
+        <!--            <LinearLayout-->
+        <!--                android:layout_width="match_parent"-->
+        <!--                android:layout_height="wrap_content"-->
+        <!--                android:orientation="vertical">-->
+
+        <!--                <EditText-->
+        <!--                    android:layout_width="200dp"-->
+        <!--                    android:layout_height="wrap_content"-->
+        <!--                    android:inputType="numberDecimal"-->
+        <!--                    android:maxLength="1"-->
+        <!--                    android:text="@={model.skipCuvetteNum}"-->
+        <!--                    android:textSize="20sp" />-->
+
+        <!--                <TextView-->
+        <!--                    android:id="@+id/tvShow"-->
+        <!--                    android:layout_width="wrap_content"-->
+        <!--                    android:layout_height="wrap_content"-->
+        <!--                    android:textSize="28sp" />-->
+
+        <!--                <TextView-->
+        <!--                    android:id="@+id/tvTemp"-->
+        <!--                    android:layout_width="wrap_content"-->
+        <!--                    android:layout_height="wrap_content"-->
+        <!--                    android:textSize="28sp" />-->
+        <!--            </LinearLayout>-->
+
+        <!--            <Spinner-->
+        <!--                android:id="@+id/spnProject"-->
+        <!--                android:layout_width="match_parent"-->
+        <!--                android:layout_height="wrap_content" />-->
+
+        <!--            <Button-->
+        <!--                style="@style/BtnPositive"-->
+        <!--                android:layout_width="match_parent"-->
+        <!--                android:layout_height="80dp"-->
+        <!--                android:layout_marginLeft="20dp"-->
+        <!--                android:layout_marginRight="20dp"-->
+        <!--                android:onClick="@{()->model.clickStart()}"-->
+        <!--                android:stateListAnimator="@null"-->
+        <!--                android:text="开始" />-->
+
+        <!--            <androidx.core.widget.NestedScrollView-->
+        <!--                android:layout_width="match_parent"-->
+        <!--                android:layout_height="match_parent">-->
+
+        <!--                <LinearLayout-->
+        <!--                    android:layout_width="match_parent"-->
+        <!--                    android:layout_height="match_parent"-->
+        <!--                    android:orientation="vertical">-->
+
+        <!--                    <TextView-->
+        <!--                        android:id="@+id/tvMsg"-->
+        <!--                        android:layout_width="match_parent"-->
+        <!--                        android:layout_height="wrap_content"-->
+        <!--                        android:text="@{model.testMsg.toString()}"-->
+        <!--                        android:textSize="22sp" />-->
+
+        <!--                    <Button-->
+        <!--                        android:id="@+id/btnGet"-->
+        <!--                        android:layout_width="match_parent"-->
+        <!--                        android:layout_height="80dp"-->
+        <!--                        android:layout_marginLeft="20dp"-->
+        <!--                        android:layout_marginRight="20dp"-->
+        <!--                        android:text="获取" />-->
+
+        <!--                    <Button-->
+        <!--                        android:id="@+id/btnGetU"-->
+        <!--                        style="@style/BtnNegative"-->
+        <!--                        android:layout_width="match_parent"-->
+        <!--                        android:layout_height="80dp"-->
+        <!--                        android:layout_marginLeft="20dp"-->
+        <!--                        android:layout_marginTop="20dp"-->
+        <!--                        android:layout_marginRight="20dp"-->
+        <!--                        android:stateListAnimator="@null"-->
+        <!--                        android:text="获取u" />-->
+
+        <!--                    <Button-->
+        <!--                        android:id="@+id/btnGetU2"-->
+        <!--                        style="@style/BtnPositive"-->
+        <!--                        android:layout_width="match_parent"-->
+        <!--                        android:layout_height="80dp"-->
+        <!--                        android:layout_marginLeft="20dp"-->
+        <!--                        android:layout_marginTop="20dp"-->
+        <!--                        android:layout_marginRight="20dp"-->
+        <!--                        android:stateListAnimator="@null"-->
+        <!--                        android:text="获取2" />-->
+        <!--                </LinearLayout>-->
+
+        <!--            </androidx.core.widget.NestedScrollView>-->
 
 
+        <!--        </LinearLayout>-->
     </LinearLayout>
 </layout>

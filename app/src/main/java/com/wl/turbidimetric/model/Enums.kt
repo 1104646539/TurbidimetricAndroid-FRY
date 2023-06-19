@@ -16,13 +16,21 @@ enum class CuvetteState(state: String) {
 }
 
 /**
- * 采便管当前的状态
+ * 仪器检测模式
  */
-enum class ShitTubeState {
+enum class MachineTestModel {
+    Auto,//全自动模式 。指自动识别样本是否存在，扫码等
+    Manual;//手动模式。指手动输入样本数量
+}
+
+/**
+ * 样本当前的状态
+ */
+enum class SampleState {
     None,//啥也没干
     Exist,//确定存在
     ScanSuccess,//扫码成功
-    ScanFailed,//扫码成功
+    ScanFailed,//扫码失败
     Pierced,//刺破完成
     Sampling,//取样完成
 }

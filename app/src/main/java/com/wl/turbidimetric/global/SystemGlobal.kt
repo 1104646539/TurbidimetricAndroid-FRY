@@ -2,31 +2,63 @@ package com.wl.turbidimetric.global
 
 import androidx.lifecycle.MutableLiveData
 import com.wl.turbidimetric.R
-import com.wl.turbidimetric.model.MachineState
-import com.wl.turbidimetric.model.MatchingArgState
-import com.wl.turbidimetric.model.RepeatabilityState
-import com.wl.turbidimetric.model.TestState
+import com.wl.turbidimetric.ex.getResource
+import com.wl.turbidimetric.model.*
+import com.wl.turbidimetric.view.NavigationView
 import com.wl.wllib.QRCodeUtil
 
 object SystemGlobal {
     var uPath: String? = null
     lateinit var qrCode: QRCodeUtil;
+
+    //检测模式状态
     var testState = TestState.None
+        set(value) {
+            field = value
+            obTestState.postValue(value)
+        }
+
+    //拟合状态
     var matchingTestState = MatchingArgState.None
+        set(value) {
+            field = value
+            obMatchingTestState.postValue(value)
+        }
+
+    //重复性检测状态
     var repeatabilityState = RepeatabilityState.None
+
+    //仪器当前状态,是否自检等
     var machineArgState = MachineState.None
 
-    var isCodeDebug = true;
+    //仪器检测模式
+//    var machineTestModel = MachineTestModel.Auto
 
-    val shitTubeDoorIsOpen = MutableLiveData(false)
-    val cuvetteDoorIsOpen = MutableLiveData(false)
+    var isCodeDebug = false;
 
+    //可监听的检测状态
+    val obTestState = MutableLiveData(TestState.None)
 
-    val icons = mutableListOf(
-        R.drawable.icon_navigation_home,
-        R.drawable.icon_navigation_datamanager,
-        R.drawable.icon_navigation_parameterlist,
-        R.drawable.icon_navigation_settings,
-        R.drawable.icon_navigation_settings,
+    //可监听的拟合状态
+    val obMatchingTestState = MutableLiveData(MatchingArgState.None)
+
+    //首页的导航资源
+    val navItems = mutableListOf(
+        NavigationView.NavItem(
+            R.drawable.icon_analyse,
+            getResource().getString(R.string.nav_analyse)
+        ),
+        NavigationView.NavItem(
+            R.drawable.icon_datamanager,
+            getResource().getString(R.string.nav_datamanager)
+        ),
+        NavigationView.NavItem(
+            R.drawable.icon_matching,
+            getResource().getString(R.string.nav_matching)
+        ),
+        NavigationView.NavItem(
+            R.drawable.icon_settings,
+            getResource().getString(R.string.nav_settings)
+        ),
     )
 }

@@ -9,10 +9,8 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.wl.turbidimetric.R
-import com.wl.turbidimetric.databinding.DatamanagerItemResultBinding
-import com.wl.turbidimetric.ex.scale
+import com.wl.turbidimetric.databinding.ItemDatamanagerResultBinding
 import com.wl.turbidimetric.model.TestResultModel
-import timber.log.Timber
 
 class DataManagerAdapter :
     PagingDataAdapter<TestResultModel, DataManagerAdapter.DataManagerViewHolder>(diffCallback = MyDiff()) {
@@ -35,7 +33,7 @@ class DataManagerAdapter :
     public var onLongClick: ((pos: Long) -> Unit)? = null
 
 
-    class DataManagerViewHolder(val binding: DatamanagerItemResultBinding) :
+    class DataManagerViewHolder(val binding: ItemDatamanagerResultBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bindData(item: TestResultModel?, onLongClick: ((pos: Long) -> Unit)?) {
             binding.setVariable(BR.item, item)
@@ -76,37 +74,41 @@ class DataManagerAdapter :
             val item = getItem(holder.absoluteAdapterPosition)
             holder.bindData(item, onLongClick)
 
-            holder.binding.ivSelect.setOnClickListener {
+            holder.binding.root.setOnClickListener {
                 item?.let { item ->
-                    it?.let { view ->
+                    holder.binding.ivSelect?.let { view ->
                         item.isSelect = !item.isSelect
                         view.isSelected = !view.isSelected
 
-                        if (holder.binding.ivSelect.isSelected) {
-                            holder.binding.root.setBackgroundColor(Color.RED)
+                        if (item.isSelect) {
+                            holder.binding.root.setBackgroundResource(R.drawable.bg_item_select)
                         } else if (holder.absoluteAdapterPosition % 2 == 0) {
-                            holder.binding.root.setBackgroundColor(Color.BLUE)
-                        } else {
                             holder.binding.root.setBackgroundColor(Color.WHITE)
+                        } else {
+                            holder.binding.root.setBackgroundResource(R.drawable.rip_item)
                         }
+
+
                     }
                 }
             }
             holder.binding.ivSelect.isSelected = item?.isSelect ?: false
-            if (holder.binding.ivSelect.isSelected) {
-                holder.binding.root.setBackgroundColor(Color.RED)
-            } else if (holder.absoluteAdapterPosition % 2 == 0) {
-                holder.binding.root.setBackgroundColor(Color.BLUE)
-            } else {
-                holder.binding.root.setBackgroundColor(Color.WHITE)
+            item?.let {
+                if (it.isSelect) {
+                    holder.binding.root.setBackgroundResource(R.drawable.bg_item_select)
+                } else if (holder.absoluteAdapterPosition % 2 == 0) {
+                    holder.binding.root.setBackgroundColor(Color.WHITE)
+                } else {
+                    holder.binding.root.setBackgroundResource(R.drawable.rip_item)
+                }
             }
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DataManagerViewHolder {
-        val binding = DataBindingUtil.inflate<DatamanagerItemResultBinding>(
+        val binding = DataBindingUtil.inflate<ItemDatamanagerResultBinding>(
             LayoutInflater.from(parent.context),
-            R.layout.datamanager_item_result,
+            R.layout.item_datamanager_result,
             parent,
             false
         )

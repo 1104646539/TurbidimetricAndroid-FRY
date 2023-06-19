@@ -8,11 +8,8 @@ import androidx.databinding.library.baseAdapters.BR
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.chad.library.adapter.base.BaseDifferAdapter
-import com.chad.library.adapter.base.BaseQuickAdapter
 import com.wl.turbidimetric.R
-import com.wl.turbidimetric.databinding.DatamanagerItemResultBinding
-import com.wl.turbidimetric.datamanager.DataManagerAdapter
-import com.wl.turbidimetric.ex.scale
+import com.wl.turbidimetric.databinding.ItemDatamanagerResultBinding
 import com.wl.turbidimetric.model.TestResultModel
 
 class TestDataAdapter :
@@ -35,7 +32,7 @@ class TestDataAdapter :
         }
     }
 
-    class TestDataViewHolder(private val binding: DatamanagerItemResultBinding) :
+    class TestDataViewHolder(private val binding: ItemDatamanagerResultBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bindData(item: TestResultModel?, onLongClick: ((pos: Long) -> Unit)?) {
             binding.setVariable(BR.item, item)
@@ -75,9 +72,9 @@ class TestDataAdapter :
         parent: ViewGroup,
         viewType: Int
     ): TestDataViewHolder {
-        val binding = DataBindingUtil.inflate<DatamanagerItemResultBinding>(
+        val binding = DataBindingUtil.inflate<ItemDatamanagerResultBinding>(
             LayoutInflater.from(parent.context),
-            R.layout.datamanager_item_result,
+            R.layout.item_datamanager_result,
             parent,
             false
         )

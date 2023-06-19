@@ -14,7 +14,7 @@ import com.wl.turbidimetric.test.TestDataFragment
 class MainViewPagerAdapter(fragmentActivity: FragmentActivity) :
     FragmentStateAdapter(fragmentActivity) {
     override fun getItemCount(): Int {
-        return SystemGlobal.icons.size
+        return SystemGlobal.navItems.size
     }
 
     override fun createFragment(position: Int): Fragment {

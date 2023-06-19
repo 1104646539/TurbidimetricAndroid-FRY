@@ -17,7 +17,7 @@
             <Button
                 style="@style/BtnPositive"
                 android:layout_width="wrap_content"
-                android:id="@+id/btnMoveShitTubeShelf"
+                android:id="@+id/btnMoveSampleShelf"
                 android:layout_height="wrap_content"
                 android:text="移动采便管架" />
         </LinearLayout>

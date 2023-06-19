@@ -18,7 +18,7 @@ data class ErrorInfo(val errorMsg: String, val motorMsg: String)
 
 /**
  * 获取状态
- * @property shitTubeShelfs IntArray 采便管架状态
+ * @property sampleShelfs IntArray 样本架状态
  * @property cuvetteShelfs IntArray 比色皿架状态
  * @property r1Reagent Boolean r1状态
  * @property r2Reagent Boolean r2状态
@@ -27,7 +27,7 @@ data class ErrorInfo(val errorMsg: String, val motorMsg: String)
  * @constructor
  */
 data class GetStateModel(
-    val shitTubeShelfs: IntArray = IntArray(4),
+    val sampleShelfs: IntArray = IntArray(4),
     val cuvetteShelfs: IntArray = IntArray(4),
     val r1Reagent: Boolean = true,
     val r2Reagent: Boolean = true,
@@ -36,11 +36,11 @@ data class GetStateModel(
 )
 
 /**
- * 移动采便管架
+ * 移动样本架
  * @property v Int
  * @constructor
  */
-data class MoveShitTubeShelfModel(val v: Int = 0)
+data class MoveSampleShelfModel(val v: Int = 0)
 
 /**
  * 移动比色皿架
@@ -50,11 +50,11 @@ data class MoveShitTubeShelfModel(val v: Int = 0)
 data class MoveCuvetteShelfModel(val v: Int = 0)
 
 /**
- * 移动采便管
- * @property exist Boolean 采便管是否存在
+ * 移动样本
+ * @property exist Boolean 样本是否存在
  * @constructor
  */
-data class MoveShitTubeModel(val exist: Boolean = false)
+data class MoveSampleModel(val exist: Boolean = false)
 
 /**
  * 移动比色皿 加样位
@@ -155,11 +155,11 @@ data class TestModel(val value: Int = 0)
 data class CuvetteDoorModel(val isOpen: Boolean = false)
 
 /**
- * 采便管舱门
+ * 样本舱门
  * @property isOpen Boolean 是否开启
  * @constructor
  */
-data class ShitTubeDoorModel(val isOpen: Boolean = false)
+data class SampleDoorModel(val isOpen: Boolean = false)
 
 
 /**

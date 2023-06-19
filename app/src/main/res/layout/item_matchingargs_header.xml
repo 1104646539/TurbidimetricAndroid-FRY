@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+        <variable
+            name="item"
+            type="com.wl.turbidimetric.model.ProjectModel" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:background="@drawable/bg_item"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/ivSelect"
+            style="@style/TextItem"
+            android:layout_width="104dp"
+            android:layout_height="match_parent"
+            android:src="@drawable/select_cb_query_data"
+            android:text="选中" />
+
+        <TextView
+            android:id="@+id/tvID"
+            style="@style/TextItem"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="序号" />
+
+        <TextView
+            android:id="@+id/tvA1"
+            style="@style/TextItem"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="f0" />
+
+        <TextView
+            android:id="@+id/tvA2"
+            style="@style/TextItem"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="f1" />
+
+        <TextView
+            android:id="@+id/tvX0"
+            style="@style/TextItem"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="f2" />
+
+        <TextView
+            android:id="@+id/tvP"
+            style="@style/TextItem"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="f3" />
+
+        <TextView
+            android:id="@+id/tvFitGoodness"
+            style="@style/TextItem"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="拟合度" />
+
+
+        <TextView
+            android:id="@+id/tvTestTime"
+            style="@style/TextItem"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="拟合时间" />
+    </LinearLayout>
+</layout>

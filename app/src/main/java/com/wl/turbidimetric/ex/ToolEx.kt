@@ -3,8 +3,12 @@ package com.wl.turbidimetric.ex
 import android.app.Activity
 import android.content.Intent
 import android.widget.EditText
+import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.global.SystemGlobal
+import com.wl.turbidimetric.model.MachineState
+import com.wl.turbidimetric.model.MachineTestModel
 import com.wl.turbidimetric.model.ProjectModel
+import com.wl.turbidimetric.model.TestState
 import com.wl.turbidimetric.util.CRC
 import com.wl.turbidimetric.util.CurveFitter
 import java.math.BigDecimal
@@ -114,7 +118,7 @@ fun calcAbsorbanceDifferences(
     var absorbances = arrayListOf<BigDecimal>()
     for (i in resultTest1.indices) {
         absorbances.add(
-            calcAbsorbanceDifference(resultTest1[i],resultTest4[i])
+            calcAbsorbanceDifference(resultTest1[i], resultTest4[i])
         )
     }
     return absorbances
@@ -226,9 +230,9 @@ fun EditText.selectionLast() {
     }
 }
 
-fun DoorAllOpen(): Boolean {
-    return (SystemGlobal.cuvetteDoorIsOpen.value == true) && (SystemGlobal.shitTubeDoorIsOpen.value == true)
-}
+//fun DoorAllOpen(): Boolean {
+//    return (SystemGlobal.cuvetteDoorIsOpen.value == true) && (SystemGlobal.sampleDoorIsOpen.value == true)
+//}
 
 /**
  * 计算标准方差
@@ -257,4 +261,29 @@ fun calculateMean(numArray: DoubleArray): Double {
     var sum = numArray.sum()
     val mean = sum / numArray.size
     return mean
+}
+
+/**
+ * 判断是否是在运行中
+ * @return Boolean
+ */
+fun isTestRunning(): Boolean {
+    return TestState.None != SystemGlobal.testState && TestState.TestFinish != SystemGlobal.testState
+}
+
+/**
+ * 是否是自动模式
+ * @return Boolean
+ */
+fun isAuto(machineTestModel: MachineTestModel = MachineTestModel.valueOf(LocalData.CurMachineTestModel)): Boolean {
+    return machineTestModel == MachineTestModel.Auto
+}
+
+/**
+ * 仪器是否可正常运行
+ * @see MachineState
+ * @return Boolean
+ */
+fun machineStateNormal(): Boolean {
+    return SystemGlobal.machineArgState == MachineState.Normal
 }

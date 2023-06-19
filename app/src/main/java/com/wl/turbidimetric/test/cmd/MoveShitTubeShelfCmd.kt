@@ -3,10 +3,10 @@ package com.wl.turbidimetric.test.cmd
 import com.wl.turbidimetric.model.*
 import com.wl.turbidimetric.util.SerialPortUtil
 
-class MoveShitTubeShelfCmd(private val pos: Int) : CmdIF() {
+class MoveSampleShelfCmd(private val pos: Int) : CmdIF() {
     override fun exec() {
         super.exec()
-        SerialPortUtil.Instance.moveShitTubeShelf(pos)
+        SerialPortUtil.Instance.moveSampleShelf(pos)
     }
 
     override fun readDataGetMachineStateModel(reply: ReplyModel<GetMachineStateModel>) {
@@ -17,16 +17,16 @@ class MoveShitTubeShelfCmd(private val pos: Int) : CmdIF() {
         super.readDataGetStateModel(reply)
     }
 
-    override fun readDataMoveShitTubeShelfModel(reply: ReplyModel<MoveShitTubeShelfModel>) {
-        super.readDataMoveShitTubeShelfModel(reply)
+    override fun readDataMoveSampleShelfModel(reply: ReplyModel<MoveSampleShelfModel>) {
+        super.readDataMoveSampleShelfModel(reply)
     }
 
     override fun readDataMoveCuvetteShelfModel(reply: ReplyModel<MoveCuvetteShelfModel>) {
         super.readDataMoveCuvetteShelfModel(reply)
     }
 
-    override fun readDataMoveShitTubeModel(reply: ReplyModel<MoveShitTubeModel>) {
-        super.readDataMoveShitTubeModel(reply)
+    override fun readDataMoveSampleModel(reply: ReplyModel<MoveSampleModel>) {
+        super.readDataMoveSampleModel(reply)
     }
 
     override fun readDataMoveCuvetteDripSampleModel(reply: ReplyModel<MoveCuvetteDripSampleModel>) {
@@ -77,8 +77,8 @@ class MoveShitTubeShelfCmd(private val pos: Int) : CmdIF() {
         super.readDataCuvetteDoorModel(reply)
     }
 
-    override fun readDataShitTubeDoorModel(reply: ReplyModel<ShitTubeDoorModel>) {
-        super.readDataShitTubeDoorModel(reply)
+    override fun readDataSampleDoorModel(reply: ReplyModel<SampleDoorModel>) {
+        super.readDataSampleDoorModel(reply)
     }
 
     override fun readDataPiercedModel(reply: ReplyModel<PiercedModel>) {

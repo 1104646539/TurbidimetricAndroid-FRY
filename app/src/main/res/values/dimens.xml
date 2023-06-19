@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <item name="margin_top" type="dimen">60dp</item>
+    <item name="nav_name_size" type="dimen">18sp</item>
+    <item name="sw_height" type="dimen">30dp</item>
+    <item name="sw_width" type="dimen">60dp</item>
+    <item name="sw_radius" type="dimen">15dp</item>
+    <item name="sw_thumb_frame" type="dimen">2dp</item>
 </resources>

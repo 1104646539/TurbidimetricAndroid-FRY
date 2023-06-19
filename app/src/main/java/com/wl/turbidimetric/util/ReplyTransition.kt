@@ -11,8 +11,8 @@ import com.wl.turbidimetric.model.*
  */
 val Motors = listOf(
     "取样泵",
-    "采便管架X",
-    "采便管架Y",
+    "样本架X",
+    "样本架Y",
     "比色皿架X",
     "比色皿架Y",
     "试剂针X",
@@ -63,7 +63,7 @@ fun transitionGetMachineStateModel(data: UByteArray): ReplyModel<GetMachineState
 }
 
 /**
- * 解析成 获取比色皿架|采便管架|试剂状态|r2量
+ * 解析成 获取比色皿架|样本架|试剂状态|r2量
  * @param data UByteArray
  * @return ReplyModel<Any>
  */
@@ -72,7 +72,7 @@ fun transitionGetStateModel(data: UByteArray): ReplyModel<GetStateModel> {
         SerialGlobal.CMD_GetState,
         data[1].toInt(),
         GetStateModel(
-            shitTubeShelfs = intArrayOf(
+            sampleShelfs = intArrayOf(
                 getStep(data[4], 4),
                 getStep(data[4], 5),
                 getStep(data[4], 6),
@@ -106,28 +106,28 @@ fun transitionMoveCuvetteShelfModel(data: UByteArray): ReplyModel<MoveCuvetteShe
 }
 
 /**
- * 解析成 移动采便管架
+ * 解析成 移动样本架
  * @param data UByteArray
  * @return ReplyModel<Any>
  */
-fun transitionMoveShitTubeShelfModel(data: UByteArray): ReplyModel<MoveShitTubeShelfModel> {
+fun transitionMoveSampleShelfModel(data: UByteArray): ReplyModel<MoveSampleShelfModel> {
     return ReplyModel(
-        SerialGlobal.CMD_MoveShitTubeShelf,
+        SerialGlobal.CMD_MoveSampleShelf,
         data[1].toInt(),
-        MoveShitTubeShelfModel()
+        MoveSampleShelfModel()
     )
 }
 
 /**
- * 解析成 移动采便管
+ * 解析成 移动样本
  * @param data UByteArray
  * @return ReplyModel<Any>
  */
-fun transitionMoveShitTubeModel(data: UByteArray): ReplyModel<MoveShitTubeModel> {
+fun transitionMoveSampleModel(data: UByteArray): ReplyModel<MoveSampleModel> {
     return ReplyModel(
-        SerialGlobal.CMD_MoveShitTube,
+        SerialGlobal.CMD_MoveSample,
         data[1].toInt(),
-        MoveShitTubeModel(getStep(data[5], 0) == 1)
+        MoveSampleModel(getStep(data[5], 0) == 1)
     )
 }
 
@@ -288,15 +288,15 @@ fun transitionCuvetteDoorModel(data: UByteArray): ReplyModel<CuvetteDoorModel> {
 }
 
 /**
- * 解析成 设置|获取采便管舱门状态
+ * 解析成 设置|获取样本舱门状态
  * @param data UByteArray
  * @return ReplyModel<Any>
  */
-fun transitionShitTubeDoorModel(data: UByteArray): ReplyModel<ShitTubeDoorModel> {
+fun transitionSampleDoorModel(data: UByteArray): ReplyModel<SampleDoorModel> {
     return ReplyModel(
-        SerialGlobal.CMD_ShitTubeDoor,
+        SerialGlobal.CMD_SampleDoor,
         data[1].toInt(),
-        ShitTubeDoorModel(isOpen = getStep(data[5], 0) == 1)
+        SampleDoorModel(isOpen = getStep(data[5], 0) == 1)
     )
 }
 

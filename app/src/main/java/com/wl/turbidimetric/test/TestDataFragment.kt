@@ -5,7 +5,7 @@ import androidx.fragment.app.viewModels
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.FragmentTestDataBinding
 import com.wl.turbidimetric.test.cmd.CmdProxy
-import com.wl.turbidimetric.test.cmd.MoveShitTubeShelfCmd
+import com.wl.turbidimetric.test.cmd.MoveSampleShelfCmd
 import com.wl.wwanandroid.base.BaseFragment
 
 class TestDataFragment :
@@ -20,8 +20,8 @@ class TestDataFragment :
     }
 
     override fun init(savedInstanceState: Bundle?) {
-        vd.btnMoveShitTubeShelf.setOnClickListener {
-            proxy.cmd = MoveShitTubeShelfCmd(0)
+        vd.btnMoveSampleShelf.setOnClickListener {
+            proxy.cmd = MoveSampleShelfCmd(0)
             proxy.exec()
         }
     }

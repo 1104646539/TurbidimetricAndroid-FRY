@@ -20,7 +20,7 @@ class CmdProxy() : CmdIF() {
 
     }
 
-    override fun readDataMoveShitTubeShelfModel(reply: ReplyModel<MoveShitTubeShelfModel>) {
+    override fun readDataMoveSampleShelfModel(reply: ReplyModel<MoveSampleShelfModel>) {
         cmd?.finish()
     }
 
@@ -28,7 +28,7 @@ class CmdProxy() : CmdIF() {
 
     }
 
-    override fun readDataMoveShitTubeModel(reply: ReplyModel<MoveShitTubeModel>) {
+    override fun readDataMoveSampleModel(reply: ReplyModel<MoveSampleModel>) {
 
     }
 
@@ -80,7 +80,7 @@ class CmdProxy() : CmdIF() {
 
     }
 
-    override fun readDataShitTubeDoorModel(reply: ReplyModel<ShitTubeDoorModel>) {
+    override fun readDataSampleDoorModel(reply: ReplyModel<SampleDoorModel>) {
 
     }
 

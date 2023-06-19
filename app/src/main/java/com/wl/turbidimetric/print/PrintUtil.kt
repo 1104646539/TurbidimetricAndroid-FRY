@@ -64,7 +64,7 @@ object PrintUtil {
         absorbancys: List<Double>,
         nds: DoubleArray,
         yzs: List<Double>,
-        params: DoubleArray,
+        params: MutableList<Double>,
         quality: Boolean
     ) {
         val msg = getMatchingQualityMsg(
@@ -90,7 +90,7 @@ object PrintUtil {
         absorbancys: MutableList<Double>,
         nds: DoubleArray,
         yzs: MutableList<Double>,
-        params: DoubleArray,
+        params: MutableList<Double>,
         quality: Boolean
     ): String {
 

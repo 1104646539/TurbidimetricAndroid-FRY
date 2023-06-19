@@ -15,19 +15,32 @@ import android.os.storage.StorageVolume
 import android.util.Log
 import androidx.activity.viewModels
 import androidx.documentfile.provider.DocumentFile
+import androidx.lifecycle.lifecycleScope
 import com.wl.turbidimetric.MainViewModel
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.ActivityMainBinding
+import com.wl.turbidimetric.ex.toast
 import com.wl.turbidimetric.global.EventGlobal
 import com.wl.turbidimetric.global.EventMsg
 import com.wl.turbidimetric.global.SystemGlobal
+import com.wl.turbidimetric.model.MachineState
+import com.wl.turbidimetric.model.MatchingArgState
+import com.wl.turbidimetric.model.TestState
 import com.wl.turbidimetric.util.ActivityDataBindingDelegate
 import com.wl.turbidimetric.util.DocumentsUtils
+import com.wl.turbidimetric.util.SerialPortUtil
 import com.wl.turbidimetric.util.StorageUtil
-import com.wl.wllib.*
+import com.wl.turbidimetric.view.HiltDialog
+import com.wl.wllib.QRCodeUsbHid
+import com.wl.wllib.QRCodeUtil
+import com.wl.wllib.UsbFlashDiskUtil
+import com.wl.wllib.UsbToSerialPortUtil
 import com.wl.wwanandroid.base.BaseActivity
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import timber.log.Timber
+import weiqian.hardware.CustomFunctions
 import java.io.File
 import java.lang.reflect.Method
 
@@ -155,48 +168,55 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
      * 初始化导航栏
      */
     private fun initNav() {
-        preload()
 
         vd.vp.adapter = MainViewPagerAdapter(this)
         vd.vp.isUserInputEnabled = false
         vd.vp.offscreenPageLimit = 6
-        vd.rnv.setResIds(R.drawable.icon_logo,vm.ids.value!!.toIntArray())
-        vd.rnv.setRightNavigationSelectedIndexChangeListener { it ->
+        vd.rnv.setResIds(
+            R.drawable.icon_shutdown,
+            vm.navItems,
+            R.drawable.icon_logo
+        )
+        vd.rnv.setNavigationSelectedIndexChangeListener { it ->
             vm.curIndex.value = it
+            Timber.d("nav it=$it")
+        }
+        vd.rnv.setNavigationShutdownListener {
+//            toast("点击关机……")
+            showShutdownDialog()
         }
         vm.curIndex.observe(this) {
             vd.vp.setCurrentItem(it, false)
         }
-        Timber.d("rnv=${vd.vp.id}")
-//        viewModel.curIndex.observe(this) { it ->
-//            if (it == viewModel.prevIndex.value) {
-//                return@observe
-//            }
-//            Log.d(
-//                TAG,
-//                "it=${it} viewModel.prevIndex=${viewModel.prevIndex.value}"
-//            )
-//            val fbt = supportFragmentManager.beginTransaction();
-//            val curF = viewModel.fragments.value!![it]
-//            viewModel.prevIndex.value?.let {
-//                //第一次就不用隐藏了
-//                if (it >= 0) {
-//                    val lastF = viewModel.fragments.value!![viewModel.prevIndex.value!!]
-//                    //隐藏以前的
-//                    fbt.hide(lastF)
-//                }
-//            }
-//            //恢复现在的，如果没添加过就添加
-//            if (!curF.isAdded) {
-//                supportFragmentManager.executePendingTransactions()
-//                fbt.add(R.id.fl_content, curF).show(curF)
-//                fbt.addToBackStack(null)
-//            } else {
-//                fbt.show(curF)
-//            }
-//            viewModel.prevIndex.value = it
-//            fbt.commitAllowingStateLoss()
-//        }
+
+    }
+
+    /**
+     * 关机提示
+     */
+    private fun showShutdownDialog() {
+        if ((TestState.None == SystemGlobal.testState || TestState.None == SystemGlobal.testState)
+            && (MatchingArgState.None == SystemGlobal.matchingTestState || MatchingArgState.Finish == SystemGlobal.matchingTestState)) {
+
+            shutdownDialog.show("确定要关机吗？请确定仪器检测结束。", "关机", { shutdown() }, "取消", { it.dismiss() })
+            return
+        } else {
+            shutdownDialog.show("检测过程中不能关机", "我知道了", { it.dismiss() })
+        }
+
+    }
+
+    val shutdownDialog by lazy {
+        HiltDialog(this)
+    }
+
+    fun shutdown() {
+        shutdownDialog.show("即将关机，请等待……", "我知道了", { it.dismiss() })
+
+        lifecycleScope.launch {
+            delay(3000)
+            SerialPortUtil.Instance.shutdown()
+        }
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -204,8 +224,6 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         Timber.d("onConfigurationChanged")
     }
 
-    private fun preload() {
-    }
 
     private fun test() {
     }

@@ -2,8 +2,11 @@ package com.wl.turbidimetric
 
 import android.app.Application
 import com.wl.turbidimetric.datastore.LocalData
+import com.wl.turbidimetric.datastore.LocalData.CurMachineTestModel
 import com.wl.turbidimetric.datastore.LocalDataGlobal
 import com.wl.turbidimetric.db.DBManager
+import com.wl.turbidimetric.global.SystemGlobal
+import com.wl.turbidimetric.model.MachineTestModel
 import com.wl.turbidimetric.model.ProjectModel
 import com.wl.turbidimetric.util.FileTree
 import com.wl.turbidimetric.util.ScanCodeUtil
@@ -28,9 +31,12 @@ class App : Application() {
 
         //没有项目参数的时候，添加一个默认参数
         if (DBManager.ProjectBox.all.isNullOrEmpty()) {
-            DBManager.ProjectBox.put(ProjectModel())
-            DBManager.ProjectBox.put(ProjectModel())
-            DBManager.ProjectBox.put(ProjectModel())
+            repeat(6) {
+                DBManager.ProjectBox.put(ProjectModel().apply {
+                    reagentNO = it.toString()
+                    reactionValues = intArrayOf(60, 91, 2722, 11722, 27298)
+                })
+            }
         }
     }
 
@@ -41,6 +47,8 @@ class App : Application() {
         if (LocalData.CurrentVersion < packInfo.versionCode) {
             LocalData.CurrentVersion = packInfo.versionCode
         }
+//        SystemGlobal.machineTestModel = MachineTestModel.valueOf(CurMachineTestModel)
+
     }
 
     private fun initDataStore() {

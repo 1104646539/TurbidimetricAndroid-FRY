@@ -17,6 +17,7 @@ abstract class BaseActivity<VM : BaseViewModel, VD : ViewDataBinding> : AppCompa
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         vm.init()
+        vd.root
         EventBus.getDefault().register(this)
         init()
     }
@@ -25,9 +26,11 @@ abstract class BaseActivity<VM : BaseViewModel, VD : ViewDataBinding> : AppCompa
         super.onDestroy()
         EventBus.getDefault().unregister(this)
     }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     open fun onMessageEvent(event: EventMsg<Any>) {
 
     }
+
     abstract fun init()
 }

@@ -40,46 +40,19 @@ object LocalData {
      */
     var SamplingProbeCleaningDuration by IntDataStoreProperty(LocalDataGlobal.Default.SamplingProbeCleaningDuration)
 
+    /**
+     * 当前检测模式 自动 手动
+     */
+    var CurMachineTestModel by StringDataStoreProperty(LocalDataGlobal.Default.MachineTestModelDefault.name)
+    /**
+     * 自动模式下，是否使用样本传感器
+     */
+    var SampleExist by BooleanDataStoreProperty(LocalDataGlobal.Default.SampleExist)
+    /**
+     * 自动模式下，是否使用扫码器
+     */
+    var ScanCode by BooleanDataStoreProperty(LocalDataGlobal.Default.ScanCode)
 
-//    fun getTakeReagentR1(): Int {
-//        return LocalDataGlobal.Key.TakeReagentR1.get(LocalDataGlobal.Default.TakeReagentR1)
-//    }
-//
-//    fun setTakeReagentR1(value: Int) {
-//        LocalDataGlobal.Key.TakeReagentR1.put(value)
-//    }
-//
-//    fun getTakeReagentR2(): Int {
-//        return LocalDataGlobal.Key.TakeReagentR2.get(LocalDataGlobal.Default.TakeReagentR2)
-//    }
-//
-//    fun setTakeReagentR2(value: Int) {
-//        LocalDataGlobal.Key.TakeReagentR2.put(value)
-//    }
-//
-//    fun getSamplingVolume(): Int {
-//        return LocalDataGlobal.Key.SamplingVolume.get(LocalDataGlobal.Default.SamplingVolume)
-//    }
-//
-//    fun setSamplingVolume(value: Int) {
-//        LocalDataGlobal.Key.SamplingVolume.put(value)
-//    }
-//
-//    fun getFirstOpen(): Boolean {
-//        return LocalDataGlobal.Key.FirstOpen.get(LocalDataGlobal.Default.FirstOpen)
-//    }
-//
-//    fun setFirstOpen(value: Boolean) {
-//        LocalDataGlobal.Key.FirstOpen.put(value)
-//    }
-//
-//    fun getDetectionNum(): String {
-//        return LocalDataGlobal.Key.DetectionNum.get(LocalDataGlobal.Default.DetectionNum)
-//    }
-//
-//    fun putDetectionNum(num: String) {
-//        LocalDataGlobal.Key.DetectionNum.put(num)
-//    }
 
     /**
      * 编号自增并保存

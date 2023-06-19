@@ -22,16 +22,16 @@ abstract class CmdIF : Callback2 {
         Timber.d("readDataGetStateModel reply=$reply")
     }
 
-    override fun readDataMoveShitTubeShelfModel(reply: ReplyModel<MoveShitTubeShelfModel>) {
-        Timber.d("readDataMoveShitTubeShelfModel reply=$reply")
+    override fun readDataMoveSampleShelfModel(reply: ReplyModel<MoveSampleShelfModel>) {
+        Timber.d("readDataMoveSampleShelfModel reply=$reply")
     }
 
     override fun readDataMoveCuvetteShelfModel(reply: ReplyModel<MoveCuvetteShelfModel>) {
         Timber.d("readDataMoveCuvetteShelfModel reply=$reply")
     }
 
-    override fun readDataMoveShitTubeModel(reply: ReplyModel<MoveShitTubeModel>) {
-        Timber.d("readDataMoveShitTubeModel reply=$reply")
+    override fun readDataMoveSampleModel(reply: ReplyModel<MoveSampleModel>) {
+        Timber.d("readDataMoveSampleModel reply=$reply")
     }
 
     override fun readDataMoveCuvetteDripSampleModel(reply: ReplyModel<MoveCuvetteDripSampleModel>) {
@@ -82,8 +82,8 @@ abstract class CmdIF : Callback2 {
         Timber.d("readDataCuvetteDoorModel reply=$reply")
     }
 
-    override fun readDataShitTubeDoorModel(reply: ReplyModel<ShitTubeDoorModel>) {
-        Timber.d("readDataShitTubeDoorModel reply=$reply")
+    override fun readDataSampleDoorModel(reply: ReplyModel<SampleDoorModel>) {
+        Timber.d("readDataSampleDoorModel reply=$reply")
     }
 
     override fun readDataPiercedModel(reply: ReplyModel<PiercedModel>) {

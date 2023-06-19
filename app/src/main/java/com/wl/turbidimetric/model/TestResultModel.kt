@@ -14,7 +14,7 @@ data class TestResultModel(
     var gender: String = "",
     var age: String = "",
     /**
-     * 采便管码
+     * 样本码
      */
     var sampleQRCode: String = "",
     /**

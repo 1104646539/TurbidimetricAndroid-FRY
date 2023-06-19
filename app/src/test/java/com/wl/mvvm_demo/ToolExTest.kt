@@ -216,4 +216,26 @@ class ToolExTest {
         println("ncv=$ncv")
     }
 
+    @Test
+    fun intArrayJoinTest() {
+        val tst1 = intArrayOf(100, 200, 300, 400)
+        val str = tst1.joinToString()
+        println("str=$str")
+
+        val newValue = str?.replace(" ", "")
+        val st = newValue!!.split(",").toTypedArray()
+        val res = if (st.isEmpty()) {
+            null
+        } else {
+            val ins = IntArray(st.size)
+            for (i in st.indices) {
+                ins[i] = st[i].toInt()
+            }
+            ins
+        }
+        res?.forEach {
+            println("it=$it")
+        }
+    }
+
 }

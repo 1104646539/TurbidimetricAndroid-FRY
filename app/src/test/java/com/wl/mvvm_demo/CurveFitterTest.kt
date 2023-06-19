@@ -30,6 +30,8 @@ class CurveFitterTest {
         val p4 = 2722.toDouble()
         val p5 = 91.toDouble()
 
+
+
         val m1 = 0.toDouble()
         val m2 = 1000.toDouble()
         val m3 = 500.toDouble()

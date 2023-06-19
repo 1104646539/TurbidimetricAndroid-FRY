@@ -16,6 +16,7 @@
             android:padding="8dp"
             android:text="参数设置"
             android:textSize="26sp" />
+
         <TextView
             android:id="@+id/tvDetectionNumSetting"
             style="@style/TextTitle"
@@ -24,13 +25,32 @@
             android:padding="8dp"
             android:text="编号设置"
             android:textSize="26sp" />
+
+
         <TextView
-            android:id="@+id/tvTestHint"
+            android:id="@+id/tv_machine_test_mode"
             style="@style/TextTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="8dp"
-            android:text="测试提示"
+            android:text="检测模式设置"
+            android:textSize="26sp" />
+
+        <TextView
+            android:id="@+id/tv_repeatability"
+            style="@style/TextTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="重复性测试"
+            android:textSize="26sp" />
+        <TextView
+            android:id="@+id/tv_nav"
+            style="@style/TextTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="隐藏和显示导航栏"
             android:textSize="26sp" />
     </LinearLayout>
 </layout>

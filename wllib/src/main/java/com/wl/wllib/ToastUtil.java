@@ -22,16 +22,13 @@ public class ToastUtil {
     public static void showToast(Context context, String msg, boolean isShort) {
         if (context == null) return;
         if (msg == null) return;
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                if (toast == null) {
-                    toast = Toast.makeText(context, msg, Toast.LENGTH_SHORT);
-                }
-                toast.setText(msg);
-                toast.setDuration(isShort ? Toast.LENGTH_SHORT : Toast.LENGTH_LONG);
-                toast.show();
+        handler.post(() -> {
+            if (toast == null) {
+                toast = Toast.makeText(context, msg, Toast.LENGTH_SHORT);
             }
+            toast.setText(msg);
+            toast.setDuration(isShort ? Toast.LENGTH_SHORT : Toast.LENGTH_LONG);
+            toast.show();
         });
     }
 

@@ -4,13 +4,18 @@ import android.os.Bundle
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
-import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.FragmentMatchingArgsBinding
-import com.wl.turbidimetric.ex.snack
+import com.wl.turbidimetric.ex.*
+import com.wl.turbidimetric.global.SystemGlobal.matchingTestState
+import com.wl.turbidimetric.global.SystemGlobal.obMatchingTestState
+import com.wl.turbidimetric.model.MatchingArgState
+import com.wl.turbidimetric.model.ProjectModel
+import com.wl.turbidimetric.view.CoverProjectDialog
 import com.wl.turbidimetric.view.HiltDialog
 import com.wl.wwanandroid.base.BaseFragment
 import kotlinx.coroutines.flow.collectLatest
@@ -26,6 +31,9 @@ class MatchingArgsFragment :
     override val vm: MatchingArgsViewModel by viewModels {
         MatchingArgsViewModelFactory()
     }
+    val bgGray = getResource().getColor(R.color.bg_gray)
+    val textColor = getResource().getColor(R.color.textColor)
+    val lineColor = getResource().getColor(R.color.themePositiveColor)
 
     companion object {
         @JvmStatic
@@ -44,16 +52,82 @@ class MatchingArgsFragment :
     val adapter: MatchingArgsAdapter by lazy {
         MatchingArgsAdapter()
     }
-
+    /**
+     * 显示调试时详情的对话框
+     */
+    val debugShowDetailsDialog: HiltDialog by lazy {
+        HiltDialog(requireContext()).apply {
+            width = 1500
+        }
+    }
     override fun init(savedInstanceState: Bundle?) {
         listenerDialog()
         listenerView()
+        initView()
+    }
+
+    private fun initView() {
+        val set1 = LineDataSet(arrayListOf(), null)
+        set1.setDrawValues(false)//不绘制值在点上
+        set1.setDrawIcons(false)//不绘制值icon在点上
+        set1.color = lineColor
+        set1.label = ""
+        set1.enableDashedLine(6f, 6f, 0f)//线连成虚线
+        set1.circleColors = listOf(lineColor)
+        set1.circleRadius = 4f //点的半径
+        set1.setDrawCircleHole(false)
+
+        //数据集,一个数据集一条线
+        val data = LineData(set1)
+
+        //横向的轴
+        val xAxis = vd.lcCurve.xAxis
+        xAxis.position = XAxis.XAxisPosition.BOTTOM //数字显示在下方
+        xAxis.gridColor = bgGray
+        xAxis.axisLineColor = bgGray
+        xAxis.textColor = textColor
+
+        //竖轴 L是左边的，R是右边的
+        val yAxisL = vd.lcCurve.axisLeft
+        val yAxisR = vd.lcCurve.axisRight
+        yAxisL.gridColor = bgGray
+        yAxisR.gridColor = bgGray
+
+        yAxisL.zeroLineColor = bgGray
+        yAxisR.zeroLineColor = bgGray
+
+        yAxisL.axisLineColor = bgGray
+        yAxisR.axisLineColor = bgGray
+
+        yAxisL.textColor = textColor
+        yAxisR.textColor = textColor
+
+        yAxisL.setDrawZeroLine(false)
+        yAxisR.setDrawZeroLine(false)
+        //右边的轴不显示值
+        yAxisR.setValueFormatter { value, axis -> "" }
+
+        vd.lcCurve.animateXY(1000, 1000)
+
+        //数据集的文字不显示，不启用
+        vd.lcCurve.description.isEnabled = false
+        //数据集的色块不显示，不启用
+        vd.lcCurve.legend.isEnabled = false
+        //空数据显示文字
+        vd.lcCurve.setNoDataText("无数据")
+        //设置数据，更新
+        vd.lcCurve.data = data
     }
 
     private fun listenerView() {
+        /**
+         * 显示调试的数据
+         */
         vm.testMsg.observe(this) {
             Timber.d("it=$it")
-            vd.tvMsg.text = it
+            if (debugShowDetailsDialog.isShow()) {
+                debugShowDetailsDialog.show(it, "确定", onConfirm = { it.dismiss() })
+            }
         }
 
         vd.rv.layoutManager =
@@ -62,19 +136,14 @@ class MatchingArgsFragment :
 
         lifecycleScope.launch {
             vm.datas.collectLatest {
-                Timber.d("项目更新了")
-                adapter.submitData(it)
+                adapter.submit(it)
+                //默认选择最近一个
+//                if (adapter.selectPos < 0 && adapter.items.isNotEmpty()) {
+                adapter.setSelectIndex(0)
+                adapter.notifyItemChanged(0)
+//                }
             }
         }
-        lifecycleScope.launch {
-            adapter.onPagesUpdatedFlow.collectLatest {
-                if (adapter.selectPos < 0 && adapter.snapshot().size > 0) {
-                    adapter.setSelectIndex(0)
-                    adapter.notifyItemChanged(0)
-                }
-            }
-        }
-
         vm.toastMsg.observe(this) { msg ->
             Timber.d("msg=$msg")
             snack(vd.root, msg)
@@ -82,45 +151,105 @@ class MatchingArgsFragment :
 
         adapter.onSelectChange = { project ->
             Timber.d("选中的=${project}")
+            changeCurve(project)
+        }
 
-            val values = ArrayList<Entry>()
-            val params = mutableListOf(0f, 50f, 200f, 6000f)
-            values.add(Entry(0.0F, 0f))
-            values.add(Entry(1.0F, 50f))
-            values.add(Entry(2.0F, 200f))
-            values.add(Entry(3.0F, 1000f))
-            values.add(Entry(4.0F, 6000f))
+        obMatchingTestState.observe(this) {
+            if (it != MatchingArgState.None && it != MatchingArgState.Finish) {
+                vd.btnStart.setBackgroundResource(R.drawable.rip_positive2)
+                vd.btnStart.text = "正在拟合"
+            } else {
+                vd.btnStart.setBackgroundResource(R.drawable.rip_positive)
+                vd.btnStart.text = "开始拟合"
+            }
+        }
+        vd.btnStart.setOnClickListener {
+            startMatching();
+//            dialog.show("asdfasdfasfasdflkjaaaaaaaaaakjllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllasdffafsdfasf","确定",{},"取消",{})
+        }
+        vd.btnPrint.setOnClickListener {
+            vm.print()
+        }
+        vd.btnDebugDialog.setOnClickListener {
+            debugShowDetailsDialog.show(vm.testMsg.value ?: "", "确定", onConfirm = { it.dismiss() })
+        }
+    }
 
-            val set1 = LineDataSet(values, "")
-            set1.setDrawValues(false)
-            set1.setDrawIcons(false)
-//            set1.setDrawCircleHole(false)
-//            set1.setDrawCircles(false)
-            set1.label = ""
+    val coverProjectDialog: CoverProjectDialog by lazy {
+        CoverProjectDialog(requireContext())
+    }
 
-            val dataSets = java.util.ArrayList<ILineDataSet>()
-            dataSets.add(set1) // add the data sets
+    private fun startMatching() {
+        if (matchingTestState != MatchingArgState.None && matchingTestState != MatchingArgState.Finish) {
+            toast("正在拟合")
+            return
+        }
 
-            val data = LineData(dataSets)
+        showCoverDialog()
+    }
 
-            vd.lcCurve.axisRight.setValueFormatter { value, axis -> "" }
-            vd.lcCurve.description.text = ""
-            vd.lcCurve.xAxis.isEnabled = false
+    private fun showCoverDialog() {
+        if (adapter.items.isNullOrEmpty() || adapter.items.size < 10) {
+            vm.clickStart(null)
+            return
+        }
+        coverProjectDialog.show(adapter.items, onConfirm = { projectModel, baseDialog ->
+            if (projectModel == null) {
+                toast("未选择覆盖的标曲，取消拟合！")
+                matchingTestState == MatchingArgState.None
+            } else {
+                vm.clickStart(projectModel)
+            }
+            baseDialog.dismiss()
+        }, onCancel = {
+            toast("未选择覆盖的标曲，取消拟合！")
+            matchingTestState == MatchingArgState.None
+            it.dismiss()
+        })
+    }
 
-            val yAxis = vd.lcCurve.axisLeft
+    /**
+     * 显示选中标曲的详情
+     * @param project ProjectModel
+     */
+    private fun changeCurve(project: ProjectModel) {
+        val values = ArrayList<Entry>()
 
-//            yAxis.axisMaximum = params.max().toFloat()
-//            yAxis.axisMinimum = params.min().toFloat()
-            yAxis.setDrawZeroLine(true)
+        if (project.reactionValues != null && project.reactionValues!!.isNotEmpty() && project.reactionValues!!.size == 5) {
+            project.reactionValues?.forEachIndexed { i, it ->
+                values.add(Entry(nds[i].toFloat(), it.toFloat()))
+            }
+        } else {
+            return
+        }
 
-            vd.lcCurve.data = data
-            vd.lcCurve.invalidate()
+
+        //方程和拟合度
+        vm.equationText.postValue(
+            "Y=${project.f0.scale(8)}+${project.f1.scale(8)}x+${
+                project.f2.scale(
+                    8
+                )
+            }x²+${project.f3.scale(8)}x³"
+        )
+        vm.fitGoodnessText.postValue("R²=${project.fitGoodness.scale(6)}")
+
+
+        if (vd.lcCurve.data != null &&
+            vd.lcCurve.data.dataSetCount > 0
+        ) {
+            val set1 = vd.lcCurve.data.getDataSetByIndex(0) as LineDataSet
+            set1.values = values
+            vd.lcCurve.data.notifyDataChanged()
+            vd.lcCurve.notifyDataSetChanged()
+
+            vd.lcCurve.animateXY(300, 300)
         }
     }
 
     private fun listenerDialog() {
         /**
-         * 开始检测 比色皿,采便管，试剂不足
+         * 开始检测 比色皿,样本，试剂不足
          */
         vm.getStateNotExistMsg.observe(this) { msg ->
             if (msg.isNotEmpty()) {
@@ -139,9 +268,13 @@ class MatchingArgsFragment :
         }
         vm.matchingFinishMsg.observe(this) {
             if (it.isNotEmpty()) {
+                val msg = it.plus("确定保存该条标曲记录？")
                 dialog.show(
-                    msg = it,
-                    confirmMsg = "我知道了", onConfirm = {
+                    msg = msg,
+                    confirmMsg = "保存", onConfirm = {
+                        vm.saveProject()
+                        it.dismiss()
+                    }, cancelMsg = "取消", onCancel = {
                         it.dismiss()
                     }
                 )

@@ -26,7 +26,7 @@ class RepeatabilityFragment :
     BaseFragment<RepeatabilityViewModel, FragmentRepeatabilityBinding>(R.layout.fragment_repeatability) {
     val items: MutableList<ProjectModel> = mutableListOf()
     lateinit var projectAdapter: HomeProjectAdapter
-    override val vm: RepeatabilityViewModel by viewModels{
+    override val vm: RepeatabilityViewModel by viewModels {
         RepeatabilityViewModelFactory()
     }
 
@@ -45,9 +45,15 @@ class RepeatabilityFragment :
     }
 
     override fun init(savedInstanceState: Bundle?) {
+        vm.listener()
         listenerDialog()
         listenerView()
 
+    }
+
+    override fun onStop() {
+        vm.clearListener()
+        super.onStop()
     }
 
     private fun listenerView() {
@@ -87,7 +93,7 @@ class RepeatabilityFragment :
 
     private fun listenerDialog() {
         /**
-         * 开始检测 比色皿,采便管，试剂不足
+         * 开始检测 比色皿,样本，试剂不足
          */
         vm.getStateNotExistMsg.observe(this) { msg ->
             if (msg.isNotEmpty()) {

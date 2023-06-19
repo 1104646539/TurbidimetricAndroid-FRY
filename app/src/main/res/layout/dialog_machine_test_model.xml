@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="40dp">
+
+
+    <TextView
+        style="@style/TextHilt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="选择检测模式" />
+
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp">
+
+        <RadioButton
+            android:id="@+id/rb_auto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="50dp"
+            android:text="自动模式（自动识别样本）"
+            android:textSize="18sp" />
+
+        <RadioButton
+            android:id="@+id/rb_manual"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="50dp"
+            android:text="手动（手动输入样本数量）"
+            android:textSize="18sp" />
+    </RadioGroup>
+
+    <LinearLayout
+        android:id="@+id/ll_auto"
+        android:layout_width="match_parent"
+        android:layout_marginTop="20dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <CheckBox
+            android:id="@+id/cb_sample"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="50dp"
+            android:text="是否使用样本传感器"
+            android:textSize="18sp" />
+
+        <CheckBox
+            android:id="@+id/cb_scan_code"
+            android:layout_width="wrap_content"
+            android:layout_marginLeft="40dp"
+            android:layout_height="wrap_content"
+            android:minHeight="50dp"
+            android:text="是否开启扫码器"
+            android:textSize="18sp" />
+    </LinearLayout>
+</LinearLayout>

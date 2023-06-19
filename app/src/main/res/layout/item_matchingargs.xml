@@ -10,94 +10,74 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="70dp"
+        android:background="@drawable/bg_item"
+        android:gravity="center_vertical"
         android:orientation="horizontal">
 
         <ImageView
             android:id="@+id/ivSelect"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
             android:src="@drawable/select_cb_query_data" />
 
         <TextView
             android:id="@+id/tvID"
-            android:layout_width="100dp"
+            style="@style/TextItem"
+            android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="ID"
-            android:textSize="18sp" />
-
-        <TextView
-            android:id="@+id/tvProjectName"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="项目名"
-            android:textSize="18sp" />
+            android:text="序号" />
 
         <TextView
             android:id="@+id/tvA1"
-            android:layout_width="100dp"
+            style="@style/TextItem"
+            android:layout_width="120dp"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="f0"
-            android:textSize="18sp" />
+            android:text="f0" />
 
         <TextView
             android:id="@+id/tvA2"
+            style="@style/TextItem"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="f1"
-            android:textSize="18sp" />
+            android:text="f1" />
 
         <TextView
             android:id="@+id/tvX0"
-            android:layout_width="100dp"
+            style="@style/TextItem"
+            android:layout_width="120dp"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="f2"
-            android:textSize="18sp" />
+            android:text="f2" />
 
         <TextView
             android:id="@+id/tvP"
-            android:layout_width="100dp"
+            style="@style/TextItem"
+            android:layout_width="120dp"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="f3"
-            android:textSize="18sp" />
+            android:text="f3" />
 
         <TextView
             android:id="@+id/tvFitGoodness"
-            android:layout_width="80dp"
+            style="@style/TextItem"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="拟合度"
-            android:textSize="18sp" />
+            android:text="拟合度" />
 
-
-        <TextView
-            android:id="@+id/tvLjz"
-            android:layout_width="80dp"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="临界值"
-            android:textSize="18sp" />
-
-        <TextView
-            android:id="@+id/tvUnit"
-            android:layout_width="80dp"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="结果单位"
-            android:textSize="18sp" />
 
         <TextView
             android:id="@+id/tvTestTime"
+            style="@style/TextItem"
             android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="拟合时间"
-            android:textSize="18sp" />
+            android:text="拟合时间" />
     </LinearLayout>
 </layout>

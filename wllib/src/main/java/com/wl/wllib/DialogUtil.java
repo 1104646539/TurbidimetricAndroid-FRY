@@ -17,7 +17,7 @@ public class DialogUtil {
     private Context context;
     private Dialog dialog;
     private View root;
-    private int width = 800;
+    private int width = 1200;
     private int height = WindowManager.LayoutParams.WRAP_CONTENT;
 
     public DialogUtil(Context context) {

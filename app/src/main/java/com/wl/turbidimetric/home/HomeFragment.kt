@@ -4,19 +4,19 @@ import android.app.ProgressDialog
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.util.Log
-import android.view.View
-import android.widget.AdapterView
-import android.widget.AdapterView.OnItemSelectedListener
+import android.view.Gravity
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.FragmentHomeBinding
+import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.ex.*
-import com.wl.turbidimetric.global.SystemGlobal.cuvetteDoorIsOpen
-import com.wl.turbidimetric.global.SystemGlobal.shitTubeDoorIsOpen
+import com.wl.turbidimetric.global.SystemGlobal.obTestState
 import com.wl.turbidimetric.model.ProjectModel
-import com.wl.turbidimetric.util.StorageUtil
+import com.wl.turbidimetric.model.TestState
 import com.wl.turbidimetric.view.HiltDialog
+import com.wl.turbidimetric.view.HomeConfigDialog
+import com.wl.turbidimetric.view.HomeDetailsDialog
 import com.wl.wwanandroid.base.BaseFragment
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -25,6 +25,15 @@ import timber.log.Timber
 
 class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.fragment_home) {
     val TAG = "HomeFragment"
+
+    /**
+     * 最新的项目
+     */
+    val projects: MutableList<ProjectModel> = mutableListOf()
+    private val homeDetailsDialog by lazy {
+        HomeDetailsDialog(requireContext())
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate");
@@ -74,68 +83,103 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 ////            f1.writeText("test")
 //            //写入u盘文件 end
 //        }
-        vd.btnGet.setOnClickListener {
+//        vd.btnGet.setOnClickListener {
+//
+//        }
+//        vd.btnGetU.setOnClickListener {
+////            Timber.d("Key.TakeReagentR2= before}")
+////            val TakeReagentR1 =
+////                LocalDataGlobal.Key.TakeReagentR1.getData(LocalDataGlobal.Default.TakeReagentR1)
+////            Timber.d("Key.TakeReagentR2= after ${TakeReagentR1}")
+//
+////            SerialPortUtil.Instance.test()
+//
+////            lifecycleScope.launch {
+////                ScanCodeUtil.Instance.startScan()
+////                ScanCodeUtil.Instance.onScanResult = null
+////            }
+//
+////            lifecycleScope.launch {
+////                repeat(1000) {
+////                    delay(100)
+////                    SerialPortUtil.Instance.pierced()
+////                }
+////            }
+////            PrintUtil.Instance.test()
+//
+////            PrintUtil.printMatchingQuality(
+////                doubleArrayOf(0.0, 1400.0, 681.0, 174.0, 35.0,500.0,1200.0).toList(),
+////                nds,
+////                doubleArrayOf(0.0, 1000.0, 500.0, 200.0, 48.0,162.0,465.0).toList(),
+////                doubleArrayOf(0.00000001, 2.02354123, 1.21235454, 0.212335412),
+////                true
+////            )
+//        }
 
-        }
-        vd.btnGetU.setOnClickListener {
-//            Timber.d("Key.TakeReagentR2= before}")
-//            val TakeReagentR1 =
-//                LocalDataGlobal.Key.TakeReagentR1.getData(LocalDataGlobal.Default.TakeReagentR1)
-//            Timber.d("Key.TakeReagentR2= after ${TakeReagentR1}")
 
-//            SerialPortUtil.Instance.test()
-
-//            lifecycleScope.launch {
-//                ScanCodeUtil.Instance.startScan()
-//                ScanCodeUtil.Instance.onScanResult = null
-//            }
-
-//            lifecycleScope.launch {
-//                repeat(1000) {
-//                    delay(100)
-//                    SerialPortUtil.Instance.pierced()
-//                }
-//            }
-//            PrintUtil.Instance.test()
-
-//            PrintUtil.printMatchingQuality(
-//                doubleArrayOf(0.0, 1400.0, 681.0, 174.0, 35.0,500.0,1200.0).toList(),
-//                nds,
-//                doubleArrayOf(0.0, 1000.0, 500.0, 200.0, 48.0,162.0,465.0).toList(),
-//                doubleArrayOf(0.00000001, 2.02354123, 1.21235454, 0.212335412),
-//                true
-//            )
-        }
-
-
-        projectAdapter = HomeProjectAdapter(requireContext(), items)
-        vd.spnProject.adapter = projectAdapter
-        projectAdapter.notifyDataSetChanged()
-
+//        projectAdapter = HomeProjectAdapter(requireContext(), items)
+//        vd.spnProject.adapter = projectAdapter
+//        projectAdapter.notifyDataSetChanged()
+//
         vm.viewModelScope.launch {
             vm.projectDatas.collectLatest {
-                items.clear()
-                items.addAll(it)
-                projectAdapter.notifyDataSetChanged()
+                projects.clear()
+                projects.addAll(it)
+
+                if (vm.selectProject == null) {
+                    if (it.isNotEmpty()) {//默认选择第一个
+                        vm.selectProject = it.first()
+                    } else {
+                        vm.selectProject = null
+                    }
+                } else {
+                    if (!projects.contains(vm.selectProject)) {//如果当前选择的标曲不存在就默认选择第一个
+                        vm.selectProject = it.first()
+                    }
+                }
             }
         }
+//
+//        vd.spnProject.onItemSelectedListener = object : OnItemSelectedListener {
+//            override fun onItemSelected(
+//                parent: AdapterView<*>?, view: View?, position: Int, id: Long
+//            ) {
+//                vm.selectProject = items?.get(position)
+//            }
+//
+//            override fun onNothingSelected(parent: AdapterView<*>?) {
+//                vm.selectProject = null
+//            }
+//        }
+//
+//        vm.testMsg.observe(this) {
+//            vd.tvMsg.text = it.toString()
+//            Timber.d("$it")
+//        }
+    }
 
-        vd.spnProject.onItemSelectedListener = object : OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>?, view: View?, position: Int, id: Long
-            ) {
-                vm.selectProject = items?.get(position)
-            }
+    val r2VolumeIds =
+        intArrayOf(
+            R.drawable.icon_r2_0,
+            R.drawable.icon_r2_1,
+            R.drawable.icon_r2_2,
+            R.drawable.icon_r2_3,
+        )
 
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                vm.selectProject = null
-            }
+    /**
+     * 显示调试时详情的对话框
+     */
+    val debugShowDetailsDialog: HiltDialog by lazy {
+        HiltDialog(requireContext()).apply {
+            width = 1500
         }
+    }
 
-        vm.testMsg.observe(this) {
-            vd.tvMsg.text = it.toString()
-            Timber.d("$it")
-        }
+    /**
+     * 显示配置对话框
+     */
+    val homeConfigDialog: HomeConfigDialog by lazy {
+        HomeConfigDialog(requireContext())
     }
 
     private fun listener() {
@@ -143,86 +187,188 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         requireActivity().windowManager.defaultDisplay.getMetrics(dm)
         Timber.d("dm.densityDpi=${dm.densityDpi} ${dm.widthPixels} ${dm.heightPixels} ${dm.scaledDensity}")
         listenerDialog()
+        listenerView()
 
-        cuvetteDoorIsOpen.observe(this) {
-//            if (testState == TestState.TestFinish && (cuvetteDoorIsOpen.value == true) && (shitTubeDoorIsOpen.value == true)) {
-//                vm.showFinishDialog()
-//            }
+    }
 
-            vd.tvShow.text = "采便管舱门状态:${
-                if (shitTubeDoorIsOpen.value == true) {
-                    "已开启"
-                } else {
-                    "已关闭"
-                }
-            }" +
-                    "\t采便管舱门状态${
-                        if (cuvetteDoorIsOpen.value == true) {
-                            "已开启"
-                        } else {
-                            "已关闭"
-                        }
-                    }"
-        }
-        shitTubeDoorIsOpen.observe(this) {
-//            if (testState == TestState.TestFinish && (cuvetteDoorIsOpen.value == true) && (shitTubeDoorIsOpen.value == true)) {
-//                vm.showFinishDialog()
-//            }
-
-            vd.tvShow.text = "采便管舱门状态:${
-                if (shitTubeDoorIsOpen.value == true) {
-                    "已开启"
-                } else {
-                    "已关闭"
-                }
-            }" +
-                    "\t采便管舱门状态${
-                        if (cuvetteDoorIsOpen.value == true) {
-                            "已开启"
-                        } else {
-                            "已关闭"
-                        }
-                    }"
-        }
-
-        vm.r1State.observe(this){
+    private fun listenerView() {
+        vm.r1State.observe(this) {
             Timber.d("r1State=$it")
+
+            vd.ivR1.setImageResource(if (it?.not() == true) R.drawable.icon_r1_empty else R.drawable.icon_r1_full)
         }
-        vm.r2State.observe(this){
+        vm.r2State.observe(this) {
             Timber.d("r2State=$it")
+
         }
-        vm.r2Volume.observe(this){
+        vm.r2Volume.observe(this) {
             Timber.d("r2Volume=$it")
+
+            if ((it ?: 0) in r2VolumeIds.indices) {
+                vd.ivR2.setImageResource(r2VolumeIds[it])
+            } else {
+                vd.ivR2.setImageResource(r2VolumeIds[0])
+            }
         }
-        vm.cleanoutFluidState.observe(this){
+        vm.cleanoutFluidState.observe(this) {
             Timber.d("cleanoutFluidState=$it")
+            vd.ivCleanoutFluid.setImageResource(if (it?.not() == true) R.drawable.icon_cleanout_fluid_empty else R.drawable.icon_cleanout_fluid_full)
         }
-        vm.reactionTemp.observe(this){
-            Timber.d("reactionTemp=$it")
+        vm.reactionTemp.observe(this) {
+            Timber.d("reactionTemp=$it test=${(it?.toString() ?: "0").plus("℃")}")
+            vd.tvTemp.text = (it?.toString() ?: "0").plus("℃")
         }
-        vm.r1Temp.observe(this){
+        vm.r1Temp.observe(this) {
             Timber.d("r1Temp=$it")
-            vd.tvTemp.text = "R1=${vm.r1State.value} R2=${vm.r2State.value} R2量=${vm.r2Volume.value} 清洗液=${vm.cleanoutFluidState.value} 反应槽温度=${vm.reactionTemp.value} R1温度=${vm.r1Temp.value}"
+//            vd.tvTemp.text = "R1=${vm.r1State.value} R2=${vm.r2State.value} R2量=${vm.r2Volume.value} 清洗液=${vm.cleanoutFluidState.value} 反应槽温度=${vm.reactionTemp.value} R1温度=${vm.r1Temp.value}"
         }
+
+        vd.ssv.label = "1"
+        vd.ssv2.label = "2"
+        vd.ssv3.label = "3"
+        vd.ssv4.label = "4"
+        vd.ssv.clickIndex = { it, item ->
+            toast("样本 index=$it item=$item")
+            showDetailsDialog(item)
+        }
+        vd.ssv2.clickIndex = { it, item ->
+            toast("样本 index2=$it item=$item")
+            showDetailsDialog(item)
+        }
+        vd.ssv3.clickIndex = { it, item ->
+            toast("样本 index3=$it item=$item")
+            showDetailsDialog(item)
+        }
+        vd.ssv4.clickIndex = { it, item ->
+            toast("样本 index4=$it item=$item")
+            showDetailsDialog(item)
+        }
+        vm.samplesStates.observe(this) {
+            vd.ssv.sampleStates = it[0]
+            vd.ssv2.sampleStates = it[1]
+            vd.ssv3.sampleStates = it[2]
+            vd.ssv4.sampleStates = it[3]
+        }
+
+        vd.csv.label = "4"
+        vd.csv2.label = "3"
+        vd.csv3.label = "2"
+        vd.csv4.label = "1"
+        vd.csv.clickIndex = { it, item ->
+            toast("比色皿 index=$it item=$item")
+            showDetailsDialog(item)
+        }
+        vd.csv2.clickIndex = { it, item ->
+            toast("比色皿 index2=$it item=$item")
+            showDetailsDialog(item)
+        }
+        vd.csv3.clickIndex = { it, item ->
+            toast("比色皿 index3=$it item=$item")
+            showDetailsDialog(item)
+        }
+        vd.csv4.clickIndex = { it, item ->
+            toast("比色皿 index4=$it item=$item")
+            showDetailsDialog(item)
+        }
+        vm.cuvetteStates.observe(this) {
+            vd.csv.cuvetteStates = it[0]
+            vd.csv2.cuvetteStates = it[1]
+            vd.csv3.cuvetteStates = it[2]
+            vd.csv4.cuvetteStates = it[3]
+        }
+
+        obTestState.observe(this) {
+            if (it != TestState.None && it != TestState.TestFinish) {
+                vd.btnStart.setBackgroundResource(R.drawable.rip_positive2)
+                vd.btnStart.text = "正在分析"
+            } else {
+                vd.btnStart.setBackgroundResource(R.drawable.rip_positive)
+                vd.btnStart.text = "分析"
+            }
+        }
+        vd.btnStart.setOnClickListener {
+            if (vm.selectProject == null) {
+                showConfigDialog()
+                toast("请选择标曲")
+            } else if (!isAuto() && vm.needSamplingNum <= 0) {
+                showConfigDialog()
+                toast("请输入检测数量")
+            } else {
+                vm.clickStart()
+            }
+        }
+        vd.btnDebugDialog.setOnClickListener {
+            debugShowDetailsDialog.show(vm.testMsg.value ?: "", "确定", onConfirm = { it.dismiss() }, gravity = Gravity.LEFT)
+        }
+
+        vd.btnConfig.setOnClickListener {
+            showConfigDialog()
+        }
+
+    }
+
+    /**
+     * 显示配置对话框
+     */
+    private fun showConfigDialog() {
+        Timber.d("showConfigDialog before")
+        homeConfigDialog.show(
+            projects,
+            vm.selectProject,
+            vm.cuvetteStartPos,
+            if (vm.detectionNumInput.isNullOrEmpty()) LocalData.DetectionNum else vm.detectionNumInput,
+            vm.needSamplingNum,
+            { projectModel, skipNum, detectionNum, sampleNum, baseDialog ->
+                if (projectModel == null) {
+                    toast("请选择标曲")
+                } else {
+                    if (isTestRunning()) {
+                        toast("正在检测，请稍后")
+                        return@show
+                    }
+                    //选择的项目变更
+                    vm.changeConfig(projectModel, skipNum, detectionNum, sampleNum)
+                    baseDialog.dismiss()
+                }
+            },
+            {
+                it.dismiss()
+            })
+        Timber.d("showConfigDialog after")
+
+    }
+
+    /**
+     * 显示样本详情
+     * @param item SampleItem?
+     */
+    private fun showDetailsDialog(item: HomeViewModel.SampleItem?) {
+        homeDetailsDialog.show(item)
+    }
+
+    /**
+     * 显示比色皿详情
+     * @param item SampleItem?
+     */
+    private fun showDetailsDialog(item: HomeViewModel.CuvetteItem?) {
+        homeDetailsDialog.show(item)
     }
 
 
-    val items: MutableList<ProjectModel> = mutableListOf()
-    lateinit var projectAdapter: HomeProjectAdapter
     private fun test() {
-        vd.btnGetU2.setOnClickListener {
-//            Log.d(
-//                TAG,
-//                "requireActivity().requestedOrientation=${requireActivity().requestedOrientation}"
-//            )
-//            if (requireActivity().requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
-//                requireActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE); //设置
-//            } else {
-//                requireActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); //设置
-//            }
-            val exist = StorageUtil.isExist()
-            Timber.d("exist=$exist")
-        }
+//        vd.btnGetU2.setOnClickListener {
+////            Log.d(
+////                TAG,
+////                "requireActivity().requestedOrientation=${requireActivity().requestedOrientation}"
+////            )
+////            if (requireActivity().requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
+////                requireActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE); //设置
+////            } else {
+////                requireActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); //设置
+////            }
+//            val exist = StorageUtil.isExist()
+//            Timber.d("exist=$exist")
+//        }
 
     }
 
@@ -270,7 +416,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             }, false)
         }
         /**
-         * 开始检测 比色皿,采便管，试剂不足
+         * 开始检测 比色皿,样本，试剂不足
          */
         vm.getStateNotExistMsg.observe(this) { show ->
             dialog.show(
@@ -290,20 +436,20 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             }
         }
         /**
-         * 正常检测 采便管不足
+         * 正常检测 样本不足
          */
-        vm.dialogTestShitTubeDeficiency.observe(this) {
-            dialog.show(msg = "采便管不足，是否添加？", confirmMsg = "我已添加", onConfirm = {
+        vm.dialogTestSampleDeficiency.observe(this) {
+            dialog.show(msg = "样本不足，是否添加？", confirmMsg = "我已添加", onConfirm = {
                 it.dismiss()
-                vm.dialogTestShitTubeDeficiencyConfirm()
+                vm.dialogTestSampleDeficiencyConfirm()
             }, cancelMsg = "结束检测", onCancel = {
                 it.dismiss()
-                vm.dialogTestShitTubeDeficiencyCancel()
+                vm.dialogTestSampleDeficiencyCancel()
             }, false)
         }
 
         /**
-         * 检测结束 正常采便管取样完成的提示
+         * 检测结束 正常样本取样完成的提示
          */
         vm.dialogTestFinish.observe(this) { show ->
             if (show) {
@@ -313,6 +459,21 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             } else {
                 dialog.dismiss()
             }
+        }
+        /**
+         * 显示调试的数据
+         */
+        vm.testMsg.observe(this) {
+            if (debugShowDetailsDialog.isShow()) {
+                debugShowDetailsDialog.show(it, "确定", onConfirm = { it.dismiss() }, gravity = Gravity.LEFT)
+            }
+        }
+        /**
+         * 显示信息
+         */
+        vm.toastMsg.observe(this) { msg ->
+            Timber.d("msg=$msg")
+            snack(vd.root, msg)
         }
     }
 

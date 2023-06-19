@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.wl.turbidimetric.App
 import com.wl.turbidimetric.ex.dataStore
+import com.wl.turbidimetric.model.MachineTestModel
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
@@ -79,8 +80,11 @@ object LocalDataGlobal {
         val FirstOpen = true
         val DetectionNum = "1"
         val StirDuration = 1000
-        val StirProbeCleaningDuration = 2000
+        val StirProbeCleaningDuration = 1000
         val SamplingProbeCleaningDuration = 1000
+        val MachineTestModelDefault = MachineTestModel.Auto
+        val SampleExist = true
+        val ScanCode = false
     }
 
 

@@ -25,7 +25,34 @@ class ToolExTest {
             CRC16(ubyteArrayOf(0x01u, 0x01u, 0x00u, 0x00u, 0x00u)).toByteArray()
                 .contentEquals(ubyteArrayOf(0x00u, 0x00u).toByteArray())
         )
+        val c1 = crc2(ubyteArrayOf(0x01u, 0x01u, 0x00u, 0x00u, 0x00u))
 
+        println("crc16Test c1=$c1")
+
+        val a: List<Int> = listOf(100, 100)
+        val b: List<Int> = listOf(100, 100)
+
+        println(a == b)
+
+    }
+
+    fun crc2(data: UByteArray): UByteArray {
+//        val polynomial = 0x8005
+        val polynomial = 0x00
+        var crc = 0xFFFF
+        for (b in data) {
+            crc = crc xor (b.toInt() and 0xFF)
+            for (i in 0 until 8) {
+                crc = if (crc and 0x0001 != 0) {
+                    crc shr 1 xor polynomial
+                } else {
+                    crc shr 1
+                }
+            }
+        }
+        val lowByte: UByte = (crc shr 8 and 0xFF).toUByte()
+        val highByte: UByte = (crc and 0xFF).toUByte()
+        return ubyteArrayOf(highByte, lowByte)
     }
 
     @Test

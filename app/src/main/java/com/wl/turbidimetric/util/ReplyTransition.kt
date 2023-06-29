@@ -25,10 +25,15 @@ val Motors = listOf(
     "转盘",
     "请移除样本架和比色皿",
     "舱门未关",
-    "缓冲液不足",
+    "R1试剂不足",
     "清洗液不足",
 )
 
+/**
+ *一次合格的回复格式如下。一共14位，其中6位前缀，1位功能码，1位状态码，4位数据位，2位CRC校验位
+ * 前缀	        功能   状态码    数据位		校验
+ * 6*8bit(0x00)	8bit	8bit	 4*8bit		2*8bit
+ */
 
 /**
  * 解析成 自检
@@ -84,8 +89,8 @@ fun transitionGetStateModel(data: UByteArray): ReplyModel<GetStateModel> {
                 getStep(data[4], 2),
                 getStep(data[4], 3)
             ),
-            r1Reagent = getStep(data[5], 0) == 1,
-            r2Reagent = getStep(data[5], 1) == 1,
+            r1Reagent = getStep(data[5], 1) == 1,
+            r2Reagent = getStep(data[5], 0) == 1,
             cleanoutFluid = getStep(data[5], 2) == 1,
             r2Volume = data[3].toInt()
         )
@@ -192,7 +197,7 @@ fun transitionSamplingProbeCleaningModel(data: UByteArray): ReplyModel<SamplingP
     return ReplyModel(
         SerialGlobal.CMD_SamplingProbeCleaning,
         data[1].toInt(),
-        SamplingProbeCleaningModel()
+        SamplingProbeCleaningModel(cleanoutFluid = getStep(data[5], 0) == 1)
     )
 }
 
@@ -205,7 +210,7 @@ fun transitionStirProbeCleaningModel(data: UByteArray): ReplyModel<StirProbeClea
     return ReplyModel(
         SerialGlobal.CMD_StirProbeCleaning,
         data[1].toInt(),
-        StirProbeCleaningModel()
+        StirProbeCleaningModel(cleanoutFluid = getStep(data[5], 0) == 1)
     )
 }
 
@@ -249,7 +254,7 @@ fun transitionDripReagentModel(data: UByteArray): ReplyModel<DripReagentModel> {
 }
 
 /**
- * 解析成 加试剂
+ * 解析成 取试剂
  * @param data UByteArray
  * @return ReplyModel<Any>
  */
@@ -257,7 +262,7 @@ fun transitionTakeReagentModel(data: UByteArray): ReplyModel<TakeReagentModel> {
     return ReplyModel(
         SerialGlobal.CMD_TakeReagent,
         data[1].toInt(),
-        TakeReagentModel()
+        TakeReagentModel(r1Reagent = getStep(data[4], 0) == 1, r2Volume = data[5].toInt())
     )
 }
 

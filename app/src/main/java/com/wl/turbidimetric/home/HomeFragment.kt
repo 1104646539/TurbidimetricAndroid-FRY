@@ -201,7 +201,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             Timber.d("r2State=$it")
 
         }
-        vm.r2Volume.observe(this) {
+        vm.r2VolumeState.observe(this) {
             Timber.d("r2Volume=$it")
 
             if ((it ?: 0) in r2VolumeIds.indices) {
@@ -271,10 +271,10 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             showDetailsDialog(item)
         }
         vm.cuvetteStates.observe(this) {
-            vd.csv.cuvetteStates = it[0]
-            vd.csv2.cuvetteStates = it[1]
-            vd.csv3.cuvetteStates = it[2]
-            vd.csv4.cuvetteStates = it[3]
+            vd.csv.cuvetteStates = it[3]
+            vd.csv2.cuvetteStates = it[2]
+            vd.csv3.cuvetteStates = it[1]
+            vd.csv4.cuvetteStates = it[0]
         }
 
         obTestState.observe(this) {

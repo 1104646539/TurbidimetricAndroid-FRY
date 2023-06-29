@@ -89,14 +89,14 @@ data class SamplingModel(val v: Int = 0)
  * @property v Int
  * @constructor
  */
-data class SamplingProbeCleaningModel(val v: Int = 0)
+data class SamplingProbeCleaningModel(val cleanoutFluid: Boolean = true)
 
 /**
  * 搅拌针清洗
  * @property v Int
  * @constructor
  */
-data class StirProbeCleaningModel(val v: Int = 0)
+data class StirProbeCleaningModel(val cleanoutFluid: Boolean = true)
 
 /**
  * 加样
@@ -117,7 +117,7 @@ data class DripReagentModel(val v: Int = 0)
  * @property v Int
  * @constructor
  */
-data class TakeReagentModel(val v: Int = 0)
+data class TakeReagentModel(val r1Reagent: Boolean = true, val r2Volume: Int = 0)
 
 /**
  * 搅拌

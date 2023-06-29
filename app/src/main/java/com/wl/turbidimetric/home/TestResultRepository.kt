@@ -11,7 +11,7 @@ import kotlinx.coroutines.Dispatchers
 class TestResultRepository() {
 
     fun datas(condition: Query<TestResultModel>?) = Pager(
-        PagingConfig(pageSize = 100),
+        PagingConfig(pageSize = 500),
         pagingSourceFactory = ObjectBoxDataSource.Factory(
             condition
         )

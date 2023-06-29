@@ -356,7 +356,7 @@ class HomeViewModel(
     /**
      * r1状态
      */
-    val r2Volume = MutableLiveData(0)
+    val r2VolumeState = MutableLiveData(0)
 
     /**
      * 反应槽温度
@@ -378,6 +378,31 @@ class HomeViewModel(
      */
     var samplingNum = 0
 
+    /**
+     * 是否是检测完一排比色皿后，准备检测下一排时却因为清洗液|R1|R2状态不符合时获取的状态
+     */
+    var continueTestGetState = false
+
+    var r1Reagent: Boolean = false
+        set(value) {
+            field = value
+            r1State.postValue(value)
+        }
+    var r2Reagent: Boolean = false
+        set(value) {
+            field = value
+            r2State.postValue(value)
+        }
+    var r2Volume: Int = 0
+        set(value) {
+            field = value
+            r2VolumeState.postValue(value)
+        }
+    var cleanoutFluid: Boolean = false
+        set(value) {
+            field = value
+            cleanoutFluidState.postValue(value)
+        }
 
     /**
      * 测试用的 start
@@ -534,6 +559,8 @@ class HomeViewModel(
      * @param reply ReplyModel<TakeReagentModel>
      */
     override fun readDataTakeReagentModel(reply: ReplyModel<TakeReagentModel>) {
+        r1Reagent = reply.data.r1Reagent
+        r2Volume = reply.data.r2Volume
         if (!runningTest()) return
         if (!machineStateNormal()) return
         Timber.d("接收到 取试剂 reply=$reply")
@@ -557,6 +584,7 @@ class HomeViewModel(
      * @param reply ReplyModel<SamplingProbeCleaningModel>
      */
     override fun readDataSamplingProbeCleaningModelModel(reply: ReplyModel<SamplingProbeCleaningModel>) {
+        cleanoutFluid = reply.data.cleanoutFluid
         if (!runningTest()) return
         if (!machineStateNormal()) return
         Timber.d("接收到 取样针清洗 reply=$reply samplingProbeCleaningRecoverSampling=$samplingProbeCleaningRecoverSampling")
@@ -577,6 +605,7 @@ class HomeViewModel(
      * @param reply ReplyModel<StirProbeCleaningModel>
      */
     override fun readDataStirProbeCleaningModel(reply: ReplyModel<StirProbeCleaningModel>) {
+        cleanoutFluidState.postValue(reply.data.cleanoutFluid)
         if (!runningTest()) return
         if (!machineStateNormal()) return
         Timber.d("接收到 搅拌针清洗 reply=$reply stirProbeCleaningRecoverStir=$stirProbeCleaningRecoverStir")
@@ -654,7 +683,13 @@ class HomeViewModel(
         if (!runningTest()) return
         if (cmd == SerialGlobal.CMD_TakeReagent) {
             Timber.d("报错了，cmd=$cmd state=$state 是取试剂的暂时不管")
-            readDataTakeReagentModel(ReplyModel(SerialGlobal.CMD_TakeReagent,0,TakeReagentModel()))
+            readDataTakeReagentModel(
+                ReplyModel(
+                    SerialGlobal.CMD_TakeReagent,
+                    0,
+                    TakeReagentModel()
+                )
+            )
             return
         }
         machineArgState = MachineState.RunningError
@@ -1096,56 +1131,6 @@ class HomeViewModel(
      * 计算结果
      */
     private fun calcResult() {
-//        if (SystemGlobal.isCodeDebug) {
-//            resultTest1.clear()
-//            resultTest2.clear()
-//            resultTest3.clear()
-//            resultTest4.clear()
-//            resultOriginalTest1.clear()
-//            resultOriginalTest2.clear()
-//            resultOriginalTest3.clear()
-//            resultOriginalTest4.clear()
-//            val size =
-//                if (cuvetteStartPos > 0) 10 - cuvetteStartPos else scanResults.filterNotNull().size
-//            repeat(size) {
-//                resultTest1.add(testValues1[it].toBigDecimal())
-//                resultTest2.add(testValues2[it].toBigDecimal())
-//                resultTest3.add(testValues3[it].toBigDecimal())
-//                resultTest4.add(testValues4[it].toBigDecimal())
-//
-//                resultOriginalTest1.add(testOriginalValues1[it])
-//                resultOriginalTest2.add(testOriginalValues2[it])
-//                resultOriginalTest3.add(testOriginalValues3[it])
-//                resultOriginalTest4.add(testOriginalValues4[it])
-//            }
-//        }
-        //计算吸光度
-//        absorbances = calcAbsorbanceDifferences(resultTest1, resultTest2, resultTest3, resultTest4)
-//        //计算浓度
-//        selectProject?.let { it ->
-//            for (i in absorbances.indices) {
-//                val con = calcCon(absorbances[i], it)
-//                cons.add(con)
-//
-//                resultModels[i]?.absorbances = absorbances[i]
-//                if (SystemGlobal.isCodeDebug) {
-//                    resultModels[i]?.testValue1 = resultTest1[i]
-//                    resultModels[i]?.testValue2 = resultTest2[i]
-//                    resultModels[i]?.testValue3 = resultTest3[i]
-//                    resultModels[i]?.testValue4 = resultTest4[i]
-//                    resultModels[i]?.testOriginalValue1 = resultOriginalTest1[i]
-//                    resultModels[i]?.testOriginalValue2 = resultOriginalTest2[i]
-//                    resultModels[i]?.testOriginalValue3 = resultOriginalTest3[i]
-//                    resultModels[i]?.testOriginalValue4 = resultOriginalTest4[i]
-//                }
-
-//                resultModels[i]?.concentration = con
-//                resultModels[i]?.let {
-//                    testResultRepository.updateTestResult(it)
-//                }
-//            }
-//        }
-
         testMsg.postValue(
             testMsg.value?.plus("这排比色皿检测结束 比色皿位置=$cuvetteShelfPos 样本位置=$sampleShelfPos \n 第一次:$resultTest1 \n 第二次:$resultTest2 \n 第三次:$resultTest3 \n 第四次:$resultTest4 \n  吸光度:$absorbances \n 浓度=$cons \n选择的四参数为${selectProject ?: "未选择"}\n\n")
         )
@@ -1164,13 +1149,72 @@ class HomeViewModel(
         resultOriginalTest2.clear()
         resultOriginalTest3.clear()
         resultOriginalTest4.clear()
+
         cons.clear()
         absorbances.clear()
         cuvetteStartPos = 0
         resultModels.clear()
 
-        continueTestNextCuvette()
 
+        continueTestNextCuvette()
+    }
+
+//    /**
+//     * 检测下一排比色皿前的检测状态
+//     */
+//    private fun checkTestStateInContinueTest(
+//        r2Volume: Int = r2VolumeState.value ?: 0,
+//        r1Reagent: Boolean = r1State.value ?: false,
+//        r2Reagent: Boolean = r2State.value ?: false,
+//        cleanoutFluid: Boolean = cleanoutFluidState.value ?: false,
+//        accord: () -> Unit
+//    ) {
+//        checkTestState(
+//            r2Volume,
+//            r1Reagent,
+//            r2Reagent,
+//            cleanoutFluid,
+//            accord = accord,
+//            discrepancy = { str ->
+//                continueTestGetState = true
+//                getStateNotExistMsg.postValue(str)
+//            })
+//    }
+
+    /**
+     * 在开始检测下一排比色皿之前，检查试剂和清洗液的状态
+     * @param r2Volume Int
+     * @param r1Reagent Boolean
+     * @param r2Reagent Boolean
+     * @param cleanoutFluid Boolean
+     * @param accord Function0<Unit> 符合后执行的命令
+     * @param discrepancy Function1<String, Unit> 不符合后执行的命令
+     */
+    private fun checkTestState(
+        accord: () -> Unit,
+        discrepancy: (String) -> Unit
+    ) {
+        if (!r1Reagent) {
+            Timber.d("没有R1试剂")
+            discrepancy.invoke("R1试剂不足，请添加")
+            return
+        }
+        if (!r2Reagent) {
+            Timber.d("没有R2试剂")
+            discrepancy.invoke("R2试剂不足，请添加")
+            return
+        }
+        if (r2Volume == 0) {
+            Timber.d("没有R2试剂")
+            discrepancy.invoke("R2试剂不足，请添加")
+            return
+        }
+        if (!cleanoutFluid) {
+            Timber.d("没有清洗液")
+            discrepancy.invoke("清洗液不足，请添加")
+            return
+        }
+        accord()
     }
 
     /**
@@ -1199,10 +1243,19 @@ class HomeViewModel(
                     //提示，比色皿不足了
                     dialogTestFinishCuvetteDeficiency.postValue(true)
                 } else {
-                    //还有比色皿。继续移动比色皿，检测
-                    moveCuvetteShelfNext()
-                    //移动样本架
-                    moveSampleShelfNext()
+                    checkTestState(accord = {
+                        //还有比色皿。继续移动比色皿，检测
+                        moveCuvetteShelfNext()
+                       //移动样本架
+                        moveSampleShelfNext()
+                    }, discrepancy = { str ->
+                        continueTestGetState = true
+                        getStateNotExistMsg.postValue(str)
+                    })
+//                    //还有比色皿。继续移动比色皿，检测
+//                    moveCuvetteShelfNext()
+//                    //移动样本架
+//                    moveSampleShelfNext()
                 }
             }
         } else {
@@ -1211,8 +1264,15 @@ class HomeViewModel(
                 dialogTestFinishCuvetteDeficiency.postValue(true)
             } else {
                 //还有比色皿。继续移动比色皿，检测
-                moveSample()
-                moveCuvetteShelfNext()
+                checkTestState(accord = {
+                    moveSample()
+                    moveCuvetteShelfNext()
+                }, discrepancy = { str ->
+                    continueTestGetState = true
+                    getStateNotExistMsg.postValue(str)
+                })
+//                moveSample()
+//                moveCuvetteShelfNext()
             }
         }
     }
@@ -1236,10 +1296,10 @@ class HomeViewModel(
                 }
                 if (cuvettePos >= 3 && lastNeedTest1(cuvettePos - 3)) {
                     Timber.d("重新计算间隔时间  之前 testShelfInterval=$testShelfInterval")
-                    if (!SystemGlobal.isCodeDebug) {
-                        testShelfInterval =
-                            ((10 - (cuvettePos - cuvetteStartPos - 2)) * 10 * 1000).toLong()
-                    }
+//                    if (!SystemGlobal.isCodeDebug) {
+//                        testShelfInterval =
+//                            ((10 - (cuvettePos - cuvetteStartPos - 2)) * 10 * 1000).toLong()
+//                    }
                     Timber.d("重新计算间隔时间 之后 testShelfInterval=$testShelfInterval cuvettePos=$cuvettePos cuvetteStartPos=$cuvetteStartPos")
                     Timber.d("已经检测最后一个了,进行下一个步骤，检测第二次 testShelfInterval=$testShelfInterval")
                     viewModelScope.launch {
@@ -1832,25 +1892,23 @@ class HomeViewModel(
         return needSamplingNum <= samplingNum
     }
 
+
     /**
      * 接收到获取状态
      */
     override fun readDataGetStateModel(reply: ReplyModel<GetStateModel>) {
-        cuvetteShelfStates = reply.data.cuvetteShelfs
-        sampleShelfStates = reply.data.sampleShelfs
-        r1State.postValue(reply.data.r1Reagent)
-        r2State.postValue(reply.data.r2Reagent)
-        r2Volume.postValue(reply.data.r2Volume)
-        cleanoutFluidState.postValue(reply.data.cleanoutFluid)
+        r1Reagent = reply.data.r1Reagent
+        r2Reagent = reply.data.r2Reagent
+        r2Volume = reply.data.r2Volume
+        cleanoutFluid = reply.data.cleanoutFluid
+        Timber.d("接收到 获取状态 reply=$reply continueTestCuvetteState=$continueTestCuvetteState continueTestSampleState=$continueTestSampleState clickStart=$clickStart r1Reagent=$r1Reagent r2Reagent=$r2Reagent cleanoutFluid=$cleanoutFluid continueTestGetState=$continueTestGetState")
         if (!runningTest()) return
         if (!machineStateNormal()) return
-        val r1Reagent = reply.data.r1Reagent
-        val r2Reagent = reply.data.r2Reagent
-        val cleanoutFluid = reply.data.cleanoutFluid
-        Timber.d("接收到 获取状态 reply=$reply continueTestCuvetteState=$continueTestCuvetteState continueTestSampleState=$continueTestSampleState clickStart=$clickStart r1Reagent=$r1Reagent r2Reagent=$r2Reagent cleanoutFluid=$cleanoutFluid")
+//        Timber.d("接收到 获取状态 reply=$reply continueTestCuvetteState=$continueTestCuvetteState continueTestSampleState=$continueTestSampleState clickStart=$clickStart r1Reagent=$r1Reagent r2Reagent=$r2Reagent cleanoutFluid=$cleanoutFluid continueTestGetState=$continueTestGetState")
         //比色皿不足才获取的状态
         //如果还是没有比色皿，继续弹框，如果有就移动比色皿架，继续检测
         if (continueTestCuvetteState) {
+            cuvetteShelfStates = reply.data.cuvetteShelfs
             cuvetteShelfPos = -1
             getInitCuvetteShelfPos()
             if (cuvetteShelfPos == -1) {
@@ -1867,6 +1925,7 @@ class HomeViewModel(
         //样本不足才获取的状态
         //如果还是没有样本，继续弹框，如果有就移动比色皿架，继续检测
         if (continueTestSampleState) {
+            sampleShelfStates = reply.data.sampleShelfs
             sampleShelfPos = -1
             getInitSampleShelfPos()
             if (sampleShelfPos == -1) {
@@ -1879,6 +1938,22 @@ class HomeViewModel(
             moveSampleShelf(sampleShelfPos)
             return
         }
+        //开始下一排时R1|R2试剂不足|清洗液不足 才获取的状态
+        if (continueTestGetState) {
+            continueTestGetState = false
+            //还有比色皿。继续移动比色皿，检测
+            continueTestNextCuvette()
+//            checkTestState(r2Volume, r1Reagent, r2Reagent, cleanoutFluid, accord = {
+//                continueTestNextCuvette()
+//            }, discrepancy = { str ->
+//                continueTestGetState = true
+//                getStateNotExistMsg.postValue(str)
+//            })
+            return
+        }
+        cuvetteShelfStates = reply.data.cuvetteShelfs
+        sampleShelfStates = reply.data.sampleShelfs
+
         //如果是手动开始检测，就进行下一步骤，而且就直接返回
 //        if (clickStart) {
 //            clickStart = false
@@ -1898,35 +1973,15 @@ class HomeViewModel(
             getStateNotExistMsg.postValue("样本不足，请添加")
             return
         }
-        if (!r1Reagent) {
-            Timber.d("没有R1试剂")
-            getStateNotExistMsg.postValue("R1试剂不足，请添加")
-            return
-        }
-        if (!r2Reagent) {
-            Timber.d("没有R2试剂")
-            getStateNotExistMsg.postValue("R2试剂不足，请添加")
-            return
-        }
-        if (!cleanoutFluid) {
-            Timber.d("没有清洗液试剂")
-            getStateNotExistMsg.postValue("清洗液不足，请添加")
-            return
-        }
 
-        //开始检测
-        moveSampleShelf(sampleShelfPos)
-        moveCuvetteShelf(cuvetteShelfPos)
-
-//        //更新跳过的比色皿状态
-//        if (isFirstCuvetteShelf()) {
-//            if (cuvetteStartPos > 0) {
-//                repeat(cuvetteStartPos)
-//                {
-//                    updateCuvetteState(it, CuvetteState.Skip, null, null)
-//                }
-//            }
-//        }
+        checkTestState(accord = {
+            //开始检测
+            moveSampleShelf(sampleShelfPos)
+            moveCuvetteShelf(cuvetteShelfPos)
+        }, discrepancy = { str ->
+            getStateNotExistMsg.postValue(str)
+            return@checkTestState
+        })
     }
 
 
@@ -2136,6 +2191,11 @@ class HomeViewModel(
      */
     fun dialogGetStateNotExistConfirm() {
         Timber.d("dialogGetStateNotExistConfirm 点击我已添加，继续检测")
+//        r1State.postValue(true)
+//        r2State.postValue(true)
+//        cleanoutFluidState.postValue(true)
+//        r2VolumeState.postValue(2)
+
         getState()
     }
 

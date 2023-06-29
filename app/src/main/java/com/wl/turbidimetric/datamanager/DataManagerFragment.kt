@@ -15,6 +15,7 @@ import com.wl.turbidimetric.databinding.FragmentDataManagerBinding
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.db.DBManager
 import com.wl.turbidimetric.ex.toast
+import com.wl.turbidimetric.model.ProjectModel
 import com.wl.turbidimetric.model.TestResultModel
 import com.wl.turbidimetric.model.TestResultModel_
 import com.wl.turbidimetric.print.PrintUtil
@@ -78,27 +79,71 @@ class DataManagerFragment :
             queryData(con)
         }
     }
+    fun test(){
+        for (i in 0..20) {
+            val project = ProjectModel(
+                projectName = "便潜血",
+                projectCode = "FOB2",
+                projectLjz = 100,
+                projectUnit = "ml",
+            )
+            val dr = TestResultModel(
+                testResult = "阳性",
+                concentration = "0".toBigDecimal(),
+                name = "张三${i}",
+                gender = "男",
+                age = "52",
+                detectionNum = LocalData.getDetectionNumInc(),
+            )
+            dr.project.target = project
+            DBManager.TestResultBox.put(dr)
+            Log.d(TAG, "id=${id} dr=${dr}")
+        }
+        for (i in 0..20) {
+            val project = ProjectModel(
+                projectName = "便潜血",
+                projectCode = "FOB2",
+                projectLjz = 100,
+                projectUnit = "ml",
+            )
+            val dr = TestResultModel(
+                testResult = "阴性",
+                concentration = "63".toBigDecimal(),
+                name = "李四${i}",
+                gender = "女",
+                age = "2",
+                detectionNum = LocalData.getDetectionNumInc(),
+            )
+            dr.project.target = project
+            DBManager.TestResultBox.put(dr)
+            Log.d(TAG, "id=${id} dr=${dr}")
+        }
+
+        for (i in 0..20) {
+            val project = ProjectModel(
+                projectName = "转铁",
+                projectCode = "FT",
+                projectLjz = 100,
+                projectUnit = "ml",
+            )
+            val dr = TestResultModel(
+                testResult = "阳性",
+                concentration = "163".toBigDecimal(),
+                name = "",
+                gender = "",
+                age = "",
+                detectionNum = LocalData.getDetectionNumInc(),
+            )
+            dr.project.target = project
+            DBManager.TestResultBox.put(dr)
+            Log.d(TAG, "id=${id} dr=${dr}")
+        }
+    }
 
     private fun listener() {
+        test()
         //        vd.btnInsert.setOnClickListener {
-//            for (i in 0..1000) {
-//                val project = ProjectModel(
-//                    projectName = "便潜血",
-//                    projectCode = "FOB2",
-//                    projectLjz = "52",
-//                    projectUnit = "ml"
-//                )
-//                val dr = TestResultModel(
-//                    testResult = "阴性",
-//                    concentration = "20",
-//                    name = "张三${i}",
-//                    gender = "男",
-//                    age = "52"
-//                )
-//                dr.project.target = project
-//                val id = viewModel.add(dr)
-//                Log.d(TAG, "id=${id} dr=${dr}")
-//            }
+
 //        }
 //
 //        vd.btnQuery.setOnClickListener {

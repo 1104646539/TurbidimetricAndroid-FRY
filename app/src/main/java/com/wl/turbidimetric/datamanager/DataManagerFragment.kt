@@ -5,7 +5,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -14,17 +13,23 @@ import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.FragmentDataManagerBinding
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.db.DBManager
+import com.wl.turbidimetric.ex.toLongString
 import com.wl.turbidimetric.ex.toast
-import com.wl.turbidimetric.model.ProjectModel
 import com.wl.turbidimetric.model.TestResultModel
 import com.wl.turbidimetric.model.TestResultModel_
 import com.wl.turbidimetric.print.PrintUtil
+import com.wl.turbidimetric.util.ExcelUtils
 import com.wl.turbidimetric.view.ResultDetailsDialog
 import com.wl.wwanandroid.base.BaseFragment
 import io.objectbox.query.Query
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.util.*
+
 
 /**
  * 数据管理
@@ -79,66 +84,58 @@ class DataManagerFragment :
             queryData(con)
         }
     }
-    fun test(){
-        for (i in 0..20) {
-            val project = ProjectModel(
-                projectName = "便潜血",
-                projectCode = "FOB2",
-                projectLjz = 100,
-                projectUnit = "ml",
-            )
-            val dr = TestResultModel(
-                testResult = "阳性",
-                concentration = "0".toBigDecimal(),
-                name = "张三${i}",
-                gender = "男",
-                age = "52",
-                detectionNum = LocalData.getDetectionNumInc(),
-            )
-            dr.project.target = project
-            DBManager.TestResultBox.put(dr)
-            Log.d(TAG, "id=${id} dr=${dr}")
-        }
-        for (i in 0..20) {
-            val project = ProjectModel(
-                projectName = "便潜血",
-                projectCode = "FOB2",
-                projectLjz = 100,
-                projectUnit = "ml",
-            )
-            val dr = TestResultModel(
-                testResult = "阴性",
-                concentration = "63".toBigDecimal(),
-                name = "李四${i}",
-                gender = "女",
-                age = "2",
-                detectionNum = LocalData.getDetectionNumInc(),
-            )
-            dr.project.target = project
-            DBManager.TestResultBox.put(dr)
-            Log.d(TAG, "id=${id} dr=${dr}")
-        }
 
-        for (i in 0..20) {
-            val project = ProjectModel(
-                projectName = "转铁",
-                projectCode = "FT",
-                projectLjz = 100,
-                projectUnit = "ml",
-            )
-            val dr = TestResultModel(
-                testResult = "阳性",
-                concentration = "163".toBigDecimal(),
-                name = "",
-                gender = "",
-                age = "",
-                detectionNum = LocalData.getDetectionNumInc(),
-            )
-            dr.project.target = project
-            DBManager.TestResultBox.put(dr)
-            Log.d(TAG, "id=${id} dr=${dr}")
+    fun test() {
+
+
+    }
+
+    private fun createTestData(): List<List<String>> {
+        return mutableListOf<TestResultModel>().apply {
+            for (i in 0..10000) {
+                val dr = TestResultModel(
+                    testResult = "阳性",
+                    concentration = "163".toBigDecimal(),
+                    absorbances = "121120".toBigDecimal(),
+                    name = "",
+                    gender = "",
+                    age = "",
+                    detectionNum = LocalData.getDetectionNumInc(),
+                    testOriginalValue1 = 52111,
+                    testOriginalValue2 = 52112,
+                    testOriginalValue3 = 52113,
+                    testOriginalValue4 = 52114,
+                    testValue1 = "52.31".toBigDecimal(),
+                    testValue2 = "52.32".toBigDecimal(),
+                    testValue3 = "52.33".toBigDecimal(),
+                    testValue4 = "52.34".toBigDecimal(),
+                    testTime = Date().toLongString()
+                )
+                add(dr)
+            }
+        }.map {
+            mutableListOf<String>().apply {
+                add("${it.concentration}")
+                add("${it.testResult}")
+                add("${it.name}")
+                add("${it.gender}")
+                add("${it.age}")
+                add("${it.detectionNum}")
+                add("${it.testOriginalValue1}")
+                add("${it.testOriginalValue2}")
+                add("${it.testOriginalValue3}")
+                add("${it.testOriginalValue4}")
+                add("${it.testValue1}")
+                add("${it.testValue2}")
+                add("${it.testValue3}")
+                add("${it.testValue4}")
+                add("${it.testTime}")
+                add("${it.absorbances}")
+            }
         }
     }
+
+
 
     private fun listener() {
         test()
@@ -172,16 +169,27 @@ class DataManagerFragment :
             if (!results.isNullOrEmpty()) DBManager.TestResultBox.remove(results)
         }
         vd.btnInsert.setOnClickListener {
-            DBManager.TestResultBox.put(TestResultModel(detectionNum = LocalData.getDetectionNumInc()))
+//            DBManager.TestResultBox.put(TestResultModel(detectionNum = LocalData.getDetectionNumInc()))
+
         }
         vd.btnInsert2.setOnClickListener {
-            lifecycleScope.launch {
-                val list = mutableListOf<TestResultModel>()
-                repeat(300) {
-                    list.add(TestResultModel(detectionNum = LocalData.getDetectionNumInc()))
-                }
-                DBManager.TestResultBox.put(list)
-            }
+//            lifecycleScope.launch {
+//                val testDatas = createTestData()
+//                val fileName: String =
+//                    "/sdcard/" + "simpleWrite2 " + System.currentTimeMillis() + ".xlsx"
+//                Timber.d("starttime = ${Date()}")
+//                ExcelUtils.initExcel(fileName, arrayOf())
+//                ExcelUtils.writeObjListToExcel(testDatas, fileName);
+//                Timber.d("endtime = ${Date()}")
+//            }
+
+//            lifecycleScope.launch {
+//                val list = mutableListOf<TestResultModel>()
+//                repeat(300) {
+//                    list.add(TestResultModel(detectionNum = LocalData.getDetectionNumInc()))
+//                }
+//                DBManager.TestResultBox.put(list)
+//            }
         }
 
         vd.btnClean.setOnClickListener {

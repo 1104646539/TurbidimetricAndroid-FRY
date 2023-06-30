@@ -63,6 +63,8 @@ android {
 }
 
 dependencies {
+    implementation files('libs\\poishadow-all.jar')
+    implementation files('libs\\jxl.jar')
     //test
     testImplementation 'org.mockito:mockito-core:4.4.0'
     androidTestImplementation "org.mockito:mockito-android:4.4.0"

@@ -1296,10 +1296,10 @@ class HomeViewModel(
                 }
                 if (cuvettePos >= 3 && lastNeedTest1(cuvettePos - 3)) {
                     Timber.d("重新计算间隔时间  之前 testShelfInterval=$testShelfInterval")
-//                    if (!SystemGlobal.isCodeDebug) {
-//                        testShelfInterval =
-//                            ((10 - (cuvettePos - cuvetteStartPos - 2)) * 10 * 1000).toLong()
-//                    }
+                    if (!SystemGlobal.isCodeDebug) {
+                        testShelfInterval =
+                            ((10 - (cuvettePos - cuvetteStartPos - 2)) * 10 * 1000).toLong()
+                    }
                     Timber.d("重新计算间隔时间 之后 testShelfInterval=$testShelfInterval cuvettePos=$cuvettePos cuvetteStartPos=$cuvetteStartPos")
                     Timber.d("已经检测最后一个了,进行下一个步骤，检测第二次 testShelfInterval=$testShelfInterval")
                     viewModelScope.launch {

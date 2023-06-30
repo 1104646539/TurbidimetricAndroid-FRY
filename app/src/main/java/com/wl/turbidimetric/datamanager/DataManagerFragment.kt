@@ -5,8 +5,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.wl.turbidimetric.R
@@ -83,6 +85,18 @@ class DataManagerFragment :
             ).build()
             queryData(con)
         }
+        lifecycleScope.launch {
+            adapter.loadStateFlow.collectLatest {
+                loadState->
+                if (loadState.source.refresh is LoadState.NotLoading && loadState.append.endOfPaginationReached && adapter.itemCount < 1) {
+                    vd.rv?.isVisible = false
+                    vd.empty?.isVisible = true
+                } else {
+                    vd.rv?.isVisible = true
+                    vd.empty?.isVisible = false
+                }
+            }
+        }
     }
 
     fun test() {
@@ -134,7 +148,6 @@ class DataManagerFragment :
             }
         }
     }
-
 
 
     private fun listener() {
@@ -243,6 +256,7 @@ class DataManagerFragment :
             vm.item(condition).collectLatest {
                 Timber.d("---监听到了变化---condition=$condition")
                 adapter?.submitData(it)
+
 //                withContext(Dispatchers.Main) {
 //                    vd.rv.scrollToPosition(0)
 //                }

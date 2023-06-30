@@ -20,7 +20,7 @@ class DataManagerLoadStateAdapter :
 
     override fun onBindViewHolder(holder: DataManagerFooter, loadState: LoadState) {
         Timber.d("loadState=$loadState" )
-        if (loadState is LoadState.NotLoading && loadState.endOfPaginationReached) {
+        if (loadState is LoadState.NotLoading && loadState.endOfPaginationReached ) {
             //没有下一页
             holder.bd.tvState.text = "没有更多数据了"
             Timber.d("没有更多数据了")
@@ -48,7 +48,7 @@ class DataManagerLoadStateAdapter :
 
     override fun displayLoadStateAsItem(loadState: LoadState): Boolean {
         return loadState is LoadState.Loading ||
-                loadState is LoadState.Error ||
-                (loadState is LoadState.NotLoading && loadState.endOfPaginationReached);
+                loadState is LoadState.Error
+//                ||(loadState is LoadState.NotLoading && loadState.endOfPaginationReached);
     }
 }

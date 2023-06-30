@@ -1,6 +1,7 @@
 package com.wl.turbidimetric.ex
 
 import android.app.Activity
+import android.content.ComponentName
 import android.content.Intent
 import android.widget.EditText
 import com.wl.turbidimetric.datastore.LocalData
@@ -286,4 +287,15 @@ fun isAuto(machineTestModel: MachineTestModel = MachineTestModel.valueOf(LocalDa
  */
 fun machineStateNormal(): Boolean {
     return SystemGlobal.machineArgState == MachineState.Normal
+}
+
+/**
+ * 获取打开桌面的intent
+ * @return Intent
+ */
+fun getLauncher(): Intent {
+    val showIntent = Intent()
+    val cn = ComponentName("com.android.launcher3", "com.android.launcher3.Launcher")
+    showIntent.component = cn
+    return showIntent
 }

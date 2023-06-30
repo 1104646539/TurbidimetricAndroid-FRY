@@ -747,9 +747,9 @@ class HomeViewModel(
 
         //最后一个位置不需要扫码，直接取样
         if (samplePos < sampleMax) {
-            if ((SystemGlobal.isCodeDebug && !sampleExists[samplePos]) || (isAuto() && LocalData.SampleExist && !exist)) {
-                //如果是自动模式并且已开启样本传感器,并且是未识别到样本，才是没有样本
-//            if ((isAuto() && LocalData.SampleExist && !exist)) {
+//            if ((SystemGlobal.isCodeDebug && !sampleExists[samplePos]) || (isAuto() && LocalData.SampleExist && !exist)) {
+            //如果是自动模式并且已开启样本传感器,并且是未识别到样本，才是没有样本
+            if ((isAuto() && LocalData.SampleExist && !exist)) {
                 //没有样本，移动到下一个位置
                 Timber.d("没有样本,移动到下一个位置")
                 scanFinish = true
@@ -1246,7 +1246,7 @@ class HomeViewModel(
                     checkTestState(accord = {
                         //还有比色皿。继续移动比色皿，检测
                         moveCuvetteShelfNext()
-                       //移动样本架
+                        //移动样本架
                         moveSampleShelfNext()
                     }, discrepancy = { str ->
                         continueTestGetState = true
@@ -1593,12 +1593,14 @@ class HomeViewModel(
 
     /**
      * 去下一个步骤 加试剂
+     * 因为跨命令的移动比色皿后重置位置，所以移动前，先把当前位置置为-1，这样移动后记录的位置才是真实的
      */
     private fun stepDripReagent() {
         Timber.d(" ———————— stepDripReagent testState=$testState ————————————————————————————————————————————————————————————————————————————————————————————————=")
         testState = TestState.DripReagent
-        cuvettePos = getNextStepCuvetteStartPos()
-        moveCuvetteDripReagent()
+        cuvettePos = -1
+        val step = getNextStepCuvetteStartPos()
+        moveCuvetteDripReagent(step + 2)
         takeReagent()
     }
 

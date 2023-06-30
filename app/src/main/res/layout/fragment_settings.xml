@@ -52,5 +52,13 @@
             android:padding="8dp"
             android:text="隐藏和显示导航栏"
             android:textSize="26sp" />
+        <TextView
+            android:id="@+id/tv_launcher"
+            style="@style/TextTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="打开桌面"
+            android:textSize="26sp" />
     </LinearLayout>
 </layout>

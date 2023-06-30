@@ -1,15 +1,13 @@
 package com.wl.turbidimetric.settings
 
+import android.content.ComponentName
 import android.content.Intent
 import android.os.Bundle
 import android.widget.EditText
-import android.widget.TextView
-import androidx.core.os.bundleOf
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.FragmentSettingsBinding
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.ex.*
-import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.MachineTestModel
 import com.wl.turbidimetric.test.TestActivity
 import com.wl.turbidimetric.view.BaseDialog
@@ -63,7 +61,15 @@ class SettingsFragment :
         vd.tvNav.setOnClickListener {
             showHideNav()
         }
+        vd.tvLauncher.setOnClickListener {
+            showLauncher()
+        }
     }
+
+    private fun showLauncher() {
+        startActivity(getLauncher())
+    }
+
 
     private fun showHideNav() {
         //设置广播发送隐藏虚拟按键命令
@@ -91,8 +97,7 @@ class SettingsFragment :
      * 显示仪器检测模式对话框
      */
     private fun showMachineTestModelDialog() {
-        machineTestModelDialog.show(
-            MachineTestModel.valueOf(LocalData.CurMachineTestModel),
+        machineTestModelDialog.show(MachineTestModel.valueOf(LocalData.CurMachineTestModel),
             LocalData.SampleExist,
             LocalData.ScanCode,
             { machineTestModel, sampleExist, scanCode, baseDialog ->

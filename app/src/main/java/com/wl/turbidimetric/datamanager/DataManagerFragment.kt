@@ -15,15 +15,22 @@ import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.FragmentDataManagerBinding
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.db.DBManager
+import com.wl.turbidimetric.ex.PD
 import com.wl.turbidimetric.ex.toLongString
 import com.wl.turbidimetric.ex.toast
+import com.wl.turbidimetric.model.ConditionModel
 import com.wl.turbidimetric.model.TestResultModel
 import com.wl.turbidimetric.model.TestResultModel_
 import com.wl.turbidimetric.print.PrintUtil
 import com.wl.turbidimetric.util.ExcelUtils
+import com.wl.turbidimetric.view.ConditionDialog
 import com.wl.turbidimetric.view.ResultDetailsDialog
 import com.wl.wwanandroid.base.BaseFragment
+import io.objectbox.kotlin.equal
+import io.objectbox.kotlin.greaterOrEqual
+import io.objectbox.kotlin.lessOrEqual
 import io.objectbox.query.Query
+import io.objectbox.query.QueryBuilder
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
@@ -50,10 +57,15 @@ class DataManagerFragment :
         DataManagerAdapter()
     }
 
+    /**
+     * 筛选对话框
+     */
+    val conditionDialog by lazy {
+        ConditionDialog(requireContext())
+    }
+
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
         Timber.d("onCreateView")
         return super.onCreateView(inflater, container, savedInstanceState)
@@ -86,8 +98,7 @@ class DataManagerFragment :
             queryData(con)
         }
         lifecycleScope.launch {
-            adapter.loadStateFlow.collectLatest {
-                loadState->
+            adapter.loadStateFlow.collectLatest { loadState ->
                 if (loadState.source.refresh is LoadState.NotLoading && loadState.append.endOfPaginationReached && adapter.itemCount < 1) {
                     vd.rv?.isVisible = false
                     vd.empty?.isVisible = true
@@ -100,34 +111,12 @@ class DataManagerFragment :
     }
 
     fun test() {
-
-
+//        val testdatas = createTestData()
+//        DBManager.TestResultBox.put(testdatas)
     }
 
-    private fun createTestData(): List<List<String>> {
-        return mutableListOf<TestResultModel>().apply {
-            for (i in 0..10000) {
-                val dr = TestResultModel(
-                    testResult = "阳性",
-                    concentration = "163".toBigDecimal(),
-                    absorbances = "121120".toBigDecimal(),
-                    name = "",
-                    gender = "",
-                    age = "",
-                    detectionNum = LocalData.getDetectionNumInc(),
-                    testOriginalValue1 = 52111,
-                    testOriginalValue2 = 52112,
-                    testOriginalValue3 = 52113,
-                    testOriginalValue4 = 52114,
-                    testValue1 = "52.31".toBigDecimal(),
-                    testValue2 = "52.32".toBigDecimal(),
-                    testValue3 = "52.33".toBigDecimal(),
-                    testValue4 = "52.34".toBigDecimal(),
-                    testTime = Date().toLongString()
-                )
-                add(dr)
-            }
-        }.map {
+    private fun createPrintData(): List<List<String>> {
+        return createTestData().map {
             mutableListOf<String>().apply {
                 add("${it.concentration}")
                 add("${it.testResult}")
@@ -145,6 +134,32 @@ class DataManagerFragment :
                 add("${it.testValue4}")
                 add("${it.testTime}")
                 add("${it.absorbances}")
+            }
+        }
+    }
+
+    private fun createTestData(): List<TestResultModel> {
+        return mutableListOf<TestResultModel>().apply {
+            for (i in 0..100) {
+                val dr = TestResultModel(
+                    testResult = (i % 2 == 0).PD("阳性", "阴性"),
+                    concentration = 66 + i,
+                    absorbances = "121120".toBigDecimal(),
+                    name = (i % 2 == 0).PD("张三", "李四"),
+                    gender = "",
+                    age = "",
+                    detectionNum = LocalData.getDetectionNumInc(),
+                    testOriginalValue1 = 52111,
+                    testOriginalValue2 = 52112,
+                    testOriginalValue3 = 52113,
+                    testOriginalValue4 = 52114,
+                    testValue1 = "52.31".toBigDecimal(),
+                    testValue2 = "52.32".toBigDecimal(),
+                    testValue3 = "52.33".toBigDecimal(),
+                    testValue4 = "52.34".toBigDecimal(),
+                    testTime = Date().toLongString()
+                )
+                add(dr)
             }
         }
     }
@@ -204,7 +219,9 @@ class DataManagerFragment :
 //                DBManager.TestResultBox.put(list)
 //            }
         }
-
+        vd.btnCondition.setOnClickListener {
+            showConditionDialog()
+        }
         vd.btnClean.setOnClickListener {
             DBManager.TestResultBox.removeAll()
         }
@@ -249,6 +266,23 @@ class DataManagerFragment :
 
     }
 
+    /**
+     * 显示筛选对话框
+     */
+    private fun showConditionDialog() {
+        conditionDialog.show({ conditionModel ->
+            lifecycleScope.launch {
+                queryData(conditionModel.buildQuery())
+            }
+            conditionDialog.dismiss()
+            Timber.d("conditionModel=$conditionModel")
+
+        }, {
+            conditionDialog.dismiss()
+        }, true)
+
+    }
+
     var datasJob: Job? = null
     private suspend fun queryData(condition: Query<TestResultModel>) {
         datasJob?.cancelAndJoin()
@@ -262,6 +296,39 @@ class DataManagerFragment :
                 }
             }
         }
+    }
+
+    private fun ConditionModel.buildQuery(): Query<TestResultModel> {
+        val condition: QueryBuilder<TestResultModel> = DBManager.TestResultBox.query().orderDesc(
+            TestResultModel_.id
+        )
+
+        if (name.isNotEmpty()) {
+            condition.equal(TestResultModel_.name, name, QueryBuilder.StringOrder.CASE_INSENSITIVE)
+        }
+        if (qrcode.isNotEmpty()) {
+            condition.equal(
+                TestResultModel_.sampleQRCode,
+                qrcode,
+                QueryBuilder.StringOrder.CASE_INSENSITIVE
+            )
+        }
+        if (conMin != 0) {
+            condition.greaterOrEqual(TestResultModel_.concentration, conMin.toLong())
+        }
+        if (conMax != 0) {
+            condition.lessOrEqual(TestResultModel_.concentration, conMax.toLong())
+        }
+
+        if (results.isNotEmpty()) {
+            condition.`in`(
+                TestResultModel_.testResult,
+                results,
+                QueryBuilder.StringOrder.CASE_INSENSITIVE
+            )
+        }
+
+        return condition.build()
     }
 
     private val resultDialog by lazy {

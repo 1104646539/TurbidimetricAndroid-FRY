@@ -16,16 +16,18 @@ import com.wl.wllib.DialogUtil
  */
 open class BaseDialog(private val context: Context) {
     lateinit var btnConfirm: Button
+    lateinit var btnConfirm2: Button
     lateinit var btnCancel: Button
 
-    var width:Int = 1200
-    var height:Int = WindowManager.LayoutParams.WRAP_CONTENT
+    var width: Int = 1200
+    var height: Int = WindowManager.LayoutParams.WRAP_CONTENT
     protected val dialogUtil: DialogUtil = DialogUtil(context).apply {
         setView(R.layout.dialog_base)
     }
 
     init {
         btnConfirm = getView<Button>(R.id.btn_confirm)
+        btnConfirm2 = getView<Button>(R.id.btn_confirm2)
         btnCancel = getView<Button>(R.id.btn_cancel)
     }
 
@@ -70,6 +72,7 @@ open class BaseDialog(private val context: Context) {
                 }
             }
         }
+
         btnCancel.let {
             if (cancelMsg.isNullOrEmpty() || onCancel == null) {
                 dialogUtil.getView(R.id.btn_cancel).visibility = View.GONE
@@ -82,9 +85,31 @@ open class BaseDialog(private val context: Context) {
             }
         }
         dialogUtil.setCancelable(isCancelable)
-        dialogUtil.show(width,height)
+        dialogUtil.show(width, height)
     }
 
+    open fun show2(
+        confirmMsg: String = "",
+        onConfirm: onClick? = null,
+        confirmMsg2: String = "",
+        onConfirm2: onClick? = null,
+        cancelMsg: String = "",
+        onCancel: onClick? = null,
+        isCancelable: Boolean = true
+    ) {
+        btnConfirm2.let {
+            if (confirmMsg2.isNullOrEmpty() || onConfirm2 == null) {
+                it.visibility = View.GONE
+            } else {
+                it.visibility = View.VISIBLE
+                it.text = confirmMsg2
+                it.setOnClickListener {
+                    onConfirm2?.invoke(this)
+                }
+            }
+        }
+        show(confirmMsg,onConfirm,cancelMsg,onCancel,isCancelable)
+    }
     open fun <T : View> getView(id: Int): T {
         return getDialogUtil().getView(id) as T
     }

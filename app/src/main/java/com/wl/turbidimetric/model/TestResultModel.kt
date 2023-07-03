@@ -37,8 +37,7 @@ data class TestResultModel(
     /**
      * 浓度
      */
-    @Convert(dbType = String::class, converter = BigDecimalConverter::class)
-    var concentration: BigDecimal = BigDecimal("0.0"),
+    var concentration: Int = 0,
     /**
      * 第一次检测值
      */

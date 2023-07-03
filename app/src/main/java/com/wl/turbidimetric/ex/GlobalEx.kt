@@ -74,3 +74,24 @@ inline fun Array<Array<SampleItem>?>.print(): String {
     }
     return sb.toString();
 }
+
+/**
+ * 当true时返回第一个参数，false返回第二个参数
+ * @receiver Boolean
+ * @param t1 Function0<T>
+ * @param t2 Function0<T>
+ * @return T
+ */
+fun <T> Boolean.PD(t1: () -> T, t2: () -> T): T {
+    return if (this) t1() else t2()
+}
+/**
+ * 当true时返回第一个参数，false返回第二个参数
+ * @receiver Boolean
+ * @param t1 Function0<T>
+ * @param t2 Function0<T>
+ * @return T
+ */
+fun <T> Boolean.PD(t1: T, t2: T): T {
+    return this.PD({ t1 }, { t2 })
+}

@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "2:2105184471347257659",
-      "lastPropertyId": "23:7258462941602574188",
+      "lastPropertyId": "24:6518610918625927652",
       "name": "ProjectModel",
       "properties": [
         {
@@ -72,6 +72,11 @@
         {
           "id": "22:5703989787387575960",
           "name": "reagentNO",
+          "type": 9
+        },
+        {
+          "id": "24:6518610918625927652",
+          "name": "reactionValues",
           "type": 9
         }
       ],

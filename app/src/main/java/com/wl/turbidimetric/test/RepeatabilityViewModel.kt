@@ -604,7 +604,7 @@ class RepeatabilityViewModel(val projectRepository: ProjectRepository) : BaseVie
         } else {
             //如果没有结束，移动比色皿，判断是否需要加试剂
             moveCuvetteDripReagent()
-            if (cuvetteNeedDripReagent(cuvettePos) ) {
+            if (cuvetteNeedDripReagent(cuvettePos)) {
                 takeReagent()
             }
         }
@@ -772,13 +772,12 @@ class RepeatabilityViewModel(val projectRepository: ProjectRepository) : BaseVie
 
         result = calcAbsorbanceDifferences(resultTest1, resultTest2, resultTest3, resultTest4)
 
-        //计算吸光度
-        val cons = mutableListOf<Double>()
+        val cons = mutableListOf<Int>()
         //计算浓度
         selectProject?.let { it ->
             for (i in result.indices) {
                 val con = calcCon(result[i], it)
-                cons.add(con.setScale(2, RoundingMode.HALF_UP).toDouble())
+                cons.add(con)
             }
         }
 
@@ -797,9 +796,9 @@ class RepeatabilityViewModel(val projectRepository: ProjectRepository) : BaseVie
 //                471.0,
 //            )
 //        )
-
-        val sd = calculateSD(cons.toDoubleArray())
-        val mean = calculateMean(cons.toDoubleArray())
+        val temp2 = cons.toIntArray().map { it.toDouble() }.toDoubleArray()
+        val sd = calculateSD(temp2)
+        val mean = calculateMean(temp2)
         val cv = sd / mean
 
         val pi = NumberFormat.getPercentInstance()

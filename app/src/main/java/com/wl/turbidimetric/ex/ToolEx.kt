@@ -193,7 +193,7 @@ fun matchingArg(absorbances: List<Double>): CurveFitter {
  * @param absorbance Double
  * @param project 四参数
  */
-fun calcCon(absorbance: BigDecimal, project: ProjectModel): BigDecimal {
+fun calcCon(absorbance: BigDecimal, project: ProjectModel): Int {
     val f0 = project.f0;
     val f1 = project.f1;
     val f2 = project.f2;
@@ -207,7 +207,7 @@ fun calcCon(absorbance: BigDecimal, project: ProjectModel): BigDecimal {
         absorbance.multiply(10000.toBigDecimal()).toDouble()
     )
 
-    return con.toBigDecimal().setScale(0, RoundingMode.HALF_UP)
+    return con.toInt()
 }
 
 /**

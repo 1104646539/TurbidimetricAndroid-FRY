@@ -82,7 +82,7 @@ class HomeViewModel(
     /**
      * 浓度
      */
-    private var cons = arrayListOf<BigDecimal>()
+    private var cons = arrayListOf<Int>()
 
     /**
      * 自检中对话框
@@ -1112,7 +1112,7 @@ class HomeViewModel(
                 absorbances.add(abs)
                 selectProject?.let { project ->
                     var con = calcCon(abs, project)
-                    con = if (con.toDouble() < 0.0) BigDecimal("0") else con
+                    con = if (con.toDouble() < 0.0) 0 else con
                     cons.add(con)
                     resultModels[pos]?.absorbances = abs
                     resultModels[pos]?.concentration = con

@@ -257,9 +257,9 @@ class DataManagerFragment :
                 Timber.d("---监听到了变化---condition=$condition")
                 adapter?.submitData(it)
 
-//                withContext(Dispatchers.Main) {
-//                    vd.rv.scrollToPosition(0)
-//                }
+                withContext(Dispatchers.Main) {
+                    vd.rv.scrollToPosition(0)
+                }
             }
         }
     }

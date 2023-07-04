@@ -41,6 +41,14 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
     }
 
     /**
+     * 序号是否可输入
+     */
+    val reagentNoEnable = MutableLiveData(true)
+    /**
+     * 是否质控是否可输入
+     */
+    val qualityEnable = MutableLiveData(true)
+    /**
      * 四次检测的吸光度值
      */
     private var resultTest1 = arrayListOf<BigDecimal>()

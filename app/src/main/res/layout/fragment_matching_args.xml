@@ -123,6 +123,7 @@
                         android:paddingLeft="10dp"
                         android:text="@={model.reagentNOStr}"
                         android:textColor="@color/textColor"
+                        android:enabled="@{model.reagentNoEnable}"
                         android:textSize="18sp"
                         tools:ignore="SpeakableTextPresentCheck" />
                 </LinearLayout>
@@ -159,6 +160,7 @@
                             android:layout_width="300dp"
                             android:layout_height="match_parent"
                             android:checked="@={model.quality}"
+                            android:enabled="@{model.qualityEnable}"
                             android:onCheckedChanged="@{()->model.quality}"
                             android:switchMinWidth="56dp"
                             android:thumb="@drawable/selector_switch_thumb"

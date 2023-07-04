@@ -168,9 +168,13 @@ class MatchingArgsFragment :
             if (it != MatchingArgState.None && it != MatchingArgState.Finish) {
                 vd.btnStart.setBackgroundResource(R.drawable.rip_positive2)
                 vd.btnStart.text = "正在拟合"
+                vm.qualityEnable.postValue(false)
+                vm.reagentNoEnable.postValue(false)
             } else {
                 vd.btnStart.setBackgroundResource(R.drawable.rip_positive)
                 vd.btnStart.text = "开始拟合"
+                vm.qualityEnable.postValue(true)
+                vm.reagentNoEnable.postValue(true)
             }
         }
         vd.btnStart.setOnClickListener {

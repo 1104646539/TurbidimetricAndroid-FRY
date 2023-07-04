@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +31,10 @@ public class ExcelUtils {
     public final static String UTF8_ENCODING = "UTF-8";
     public final static String GBK_ENCODING = "GBK";
 
+
+    static {
+        format();
+    }
 
     /**
      * 单元格的格式设置 字体大小 颜色 对齐方式、背景颜色等...
@@ -62,57 +67,33 @@ public class ExcelUtils {
         }
     }
 
-    /**
-     * 初始化Excel
-     *
-     * @param fileName
-     * @param colName
-     * @param
-     */
-    public static void initExcel(String fileName, String[] colName) {
-        format();
-        WritableWorkbook workbook = null;
-        try {
-            File file = new File(fileName);
-            if (!file.exists()) {
-                file.createNewFile();
-            }
-            workbook = Workbook.createWorkbook(file);
-            WritableSheet sheet = workbook.createSheet("数据表", 0);
-            //创建标题栏
-            sheet.addCell((WritableCell) new Label(0, 0, fileName, arial14format));
-            for (int col = 0; col < colName.length; col++) {
-                sheet.addCell(new Label(col, 0, colName[col], arial10format));
-            }
-            sheet.setRowView(0, 340); //设置行高
-            workbook.write();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (workbook != null) {
-                try {
-                    workbook.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
 
     @SuppressWarnings("unchecked")
-    public static <T> boolean writeObjListToExcel(List<T> objList, String fileName) {
-        int count = objList == null ? 0 : objList.size();
-        if (count > 0) {
-            WritableWorkbook writebook = null;
-            InputStream in = null;
-            try {
-                WorkbookSettings setEncode = new WorkbookSettings();
-                setEncode.setEncoding(UTF8_ENCODING);
-                in = new FileInputStream(new File(fileName));
-                Workbook workbook = Workbook.getWorkbook(in);
-                writebook = Workbook.createWorkbook(new File(fileName), workbook);
-                WritableSheet sheet = writebook.getSheet(0);
+    public static <T> boolean writeObjListToExcel(List<String> titles, List<T> objList, OutputStream os) {
+//        format();
+        //标题
+        WritableWorkbook workbook = null;
+        WritableSheet sheet = null;
+        try {
+//                File file = new File(fileName);
+//                if (!file.exists()) {
+//                    file.createNewFile();
+//                }
+            workbook = Workbook.createWorkbook(os);
+            sheet = workbook.createSheet("数据表", 0);
+            if (!titles.isEmpty()) {
+                //创建标题栏
+//                sheet.addCell((WritableCell) new Label(0, 0, "数据表", arial14format));
+                for (int col = 0; col < titles.size(); col++) {
+                    sheet.addCell(new Label(col, 0, titles.get(col), arial10format));
+                }
+                sheet.setRowView(0, 340); //设置行高
+//                workbook.write();
+            }
 
+            //内容
+            int count = objList == null ? 0 : objList.size();
+            if (count > 0) {
                 for (int j = 0; j < count; j++) {
                     ArrayList<String> list = (ArrayList<String>) objList.get(j);
                     for (int i = 0; i < list.size(); i++) {
@@ -126,25 +107,19 @@ public class ExcelUtils {
                     sheet.setRowView(j + 1, 350); //设置行高
                 }
 
-                writebook.write();
+                workbook.write();
+                os.flush();
                 return true;
-            } catch (Exception e) {
-                e.printStackTrace();
-                return false;
-            } finally {
-                if (writebook != null) {
-                    try {
-                        writebook.close();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-                if (in != null) {
-                    try {
-                        in.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (workbook != null) {
+                try {
+                    workbook.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         }

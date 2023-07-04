@@ -32,7 +32,7 @@
 
                     <ImageView
                         android:layout_width="5dp"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:scaleType="centerCrop"
                         android:src="@drawable/iv_indicate1" />
 
@@ -62,6 +62,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="20dp"
                         android:minWidth="150dp"
+                        android:paddingTop="5dp"
+                        android:paddingBottom="5dp"
                         android:text="数据筛选" />
 
                 </LinearLayout>
@@ -156,23 +158,6 @@
                     android:minWidth="150dp"
                     android:text="添加1000" />
 
-                <Button
-                    android:id="@+id/btnQuery"
-                    style="@style/BtnPositive"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="20dp"
-                    android:minWidth="150dp"
-                    android:text="根据ID正序" />
-
-                <Button
-                    android:id="@+id/btnQuery2"
-                    style="@style/BtnPositive"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="20dp"
-                    android:minWidth="150dp"
-                    android:text="根据ID倒序" />
 
                 <Button
                     android:id="@+id/btnPrint"
@@ -182,6 +167,16 @@
                     android:layout_marginLeft="20dp"
                     android:minWidth="150dp"
                     android:text="打印" />
+
+                <Button
+                    android:id="@+id/btnExportExcel"
+                    style="@style/BtnPositive"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:minWidth="150dp"
+                    android:text="导出Excel"
+                    android:textAllCaps="false" />
             </LinearLayout>
 
         </LinearLayout>

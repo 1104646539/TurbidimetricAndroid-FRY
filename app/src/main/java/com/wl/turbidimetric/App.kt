@@ -31,7 +31,7 @@ class App : Application() {
 
         //没有项目参数的时候，添加一个默认参数
         if (DBManager.ProjectBox.all.isNullOrEmpty()) {
-            repeat(6) {
+            repeat(1) {
                 DBManager.ProjectBox.put(ProjectModel().apply {
                     reagentNO = it.toString()
                     reactionValues = intArrayOf(60, 91, 2722, 11722, 27298)

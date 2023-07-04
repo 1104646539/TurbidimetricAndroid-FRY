@@ -12,6 +12,7 @@ import android.os.Message
 import android.os.Parcelable
 import android.os.storage.StorageManager
 import android.os.storage.StorageVolume
+import android.preference.PreferenceManager
 import android.util.Log
 import androidx.activity.viewModels
 import androidx.documentfile.provider.DocumentFile
@@ -19,11 +20,9 @@ import androidx.lifecycle.lifecycleScope
 import com.wl.turbidimetric.MainViewModel
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.ActivityMainBinding
-import com.wl.turbidimetric.ex.toast
 import com.wl.turbidimetric.global.EventGlobal
 import com.wl.turbidimetric.global.EventMsg
 import com.wl.turbidimetric.global.SystemGlobal
-import com.wl.turbidimetric.model.MachineState
 import com.wl.turbidimetric.model.MatchingArgState
 import com.wl.turbidimetric.model.TestState
 import com.wl.turbidimetric.util.ActivityDataBindingDelegate
@@ -40,9 +39,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import timber.log.Timber
-import weiqian.hardware.CustomFunctions
 import java.io.File
+import java.io.FileNotFoundException
+import java.io.IOException
+import java.io.OutputStream
 import java.lang.reflect.Method
+import java.nio.charset.StandardCharsets
 
 class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     val TAG = "MainActivity"
@@ -87,7 +89,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
 //            //有权限
 //            val root = File(SystemGlobal.uPath)
 //            for (f in root.list()) {
-//                Log.d(TAG, "f=${f}")
+//                Timber.d( "f=${f}")
 //            }
 //        }
 
@@ -100,7 +102,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
             val sm = getSystemService(
                 StorageManager::class.java
             )
-            val volume: StorageVolume? = sm.getStorageVolume(File(SystemGlobal.uPath))
+            val volume: StorageVolume? = sm.getStorageVolume(File(StorageUtil.curPath))
             if (volume != null) {
                 intent = volume.createAccessIntent(null)
             }
@@ -112,15 +114,25 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         startActivityForResult(intent, DocumentsUtils.OPEN_DOCUMENT_TREE_CODE)
     }
 
+    override fun onResume() {
+        super.onResume()
+        //授权后重新获取
+
+        //授权后重新获取
+        val context: Context = this
+        DocumentsUtils.`as` = PreferenceManager.getDefaultSharedPreferences(context)
+            .getString(StorageUtil.curPath, null)
+
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
             DocumentsUtils.OPEN_DOCUMENT_TREE_CODE -> if (data != null && data.data != null) {
                 val uri = data.data
-                DocumentsUtils.saveTreeUri(this, SystemGlobal.uPath, uri)
-                Log.i(
-                    ContentValues.TAG,
-                    "DocumentsUtils.OPEN_DOCUMENT_TREE_CODE ： $uri"
-                )
+                DocumentsUtils.saveTreeUri(this, StorageUtil.curPath, uri)
+                StorageUtil.startInit(this) {
+                    Timber.d("onActivityResult=$it")
+                }
             }
         }
         super.onActivityResult(requestCode, resultCode, data)
@@ -157,7 +169,9 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         usbManager = getSystemService(Context.USB_SERVICE) as UsbManager
         listener()
         getAllDeviceRegister()
-        StorageUtil.startInit(this)
+        StorageUtil.startInit(this) {
+            showOpenDocumentTree()
+        }
         initNav()
 
 
@@ -183,7 +197,38 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         }
         vd.rnv.setNavigationShutdownListener {
 //            toast("点击关机……")
-            showShutdownDialog()
+//            showShutdownDialog()
+            //读写sd卡/u盘测试,
+
+            //读写sd卡/u盘测试,
+            val root = File(StorageUtil.curPath)
+
+            val documentFile = DocumentsUtils.getDocumentFile(root, true, this)
+            if (DocumentsUtils.isOnExtSdCard(root, this)) {
+                if (documentFile != null) {
+                    Log.i(ContentValues.TAG, "get document file:" + documentFile.canWrite())
+                    documentFile.createDirectory("creat3")
+                    val newfile = documentFile.createFile("txt", "222333.txt")
+                    var excelOutputStream: OutputStream? = null
+                    try {
+                        excelOutputStream =
+                            this.getContentResolver().openOutputStream(newfile!!.uri)
+                        excelOutputStream?.write("test".toByteArray(StandardCharsets.UTF_8))
+                        excelOutputStream?.flush()
+                    } catch (e: FileNotFoundException) {
+                        e.printStackTrace()
+                    } catch (e: IOException) {
+                        e.printStackTrace()
+                    } finally {
+                        try {
+                            excelOutputStream!!.close()
+                        } catch (e: IOException) {
+                            e.printStackTrace()
+                        }
+                    }
+                    Log.i(ContentValues.TAG, "creat3")
+                }
+            }
         }
         vm.curIndex.observe(this) {
             vd.vp.setCurrentItem(it, false)
@@ -196,7 +241,8 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
      */
     private fun showShutdownDialog() {
         if ((TestState.None == SystemGlobal.testState || TestState.None == SystemGlobal.testState)
-            && (MatchingArgState.None == SystemGlobal.matchingTestState || MatchingArgState.Finish == SystemGlobal.matchingTestState)) {
+            && (MatchingArgState.None == SystemGlobal.matchingTestState || MatchingArgState.Finish == SystemGlobal.matchingTestState)
+        ) {
 
             shutdownDialog.show("确定要关机吗？请确定仪器检测结束。", "关机", { shutdown() }, "取消", { it.dismiss() })
             return
@@ -226,9 +272,18 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
 
 
     private fun test() {
-        System.setProperty("org.apache.poi.javax.xml.stream.XMLInputFactory", "com.fasterxml.aalto.stax.InputFactoryImpl");
-        System.setProperty("org.apache.poi.javax.xml.stream.XMLOutputFactory", "com.fasterxml.aalto.stax.OutputFactoryImpl");
-        System.setProperty("org.apache.poi.javax.xml.stream.XMLEventFactory", "com.fasterxml.aalto.stax.EventFactoryImpl");
+        System.setProperty(
+            "org.apache.poi.javax.xml.stream.XMLInputFactory",
+            "com.fasterxml.aalto.stax.InputFactoryImpl"
+        );
+        System.setProperty(
+            "org.apache.poi.javax.xml.stream.XMLOutputFactory",
+            "com.fasterxml.aalto.stax.OutputFactoryImpl"
+        );
+        System.setProperty(
+            "org.apache.poi.javax.xml.stream.XMLEventFactory",
+            "com.fasterxml.aalto.stax.EventFactoryImpl"
+        );
     }
 
     private fun getAllDeviceRegister() {
@@ -287,18 +342,21 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         override fun onReceive(context: Context?, intent: Intent?) {
             val action = intent!!.action
             val path = intent.data?.path
-            StorageUtil.startInit(context!!)
+            StorageUtil.startInit(context!!) {
+                showOpenDocumentTree()
+            }
+
 //            var temp =DocumentFile.fromTreeUri(context!!,Uri.parse(path!!))
-//            Log.d(TAG, "temp=$temp path=${path}")
+//            Timber.d( "temp=$temp path=${path}")
 //            SystemGlobal.uPath = path
 //            StorageUtil.setCurPath(path)
-            Log.d(TAG, "action=$action path=${path}")
+            Timber.d("action=$action path=${path}")
 
             if (action.equals(Intent.ACTION_MEDIA_REMOVED)) {
-                Log.d(TAG, "u盘 已移除action=$action")
+                Timber.d("u盘 已移除action=$action")
                 //  snack(viewDataBinding.root,"u盘已移除")
             } else if (action.equals(Intent.ACTION_MEDIA_MOUNTED)) {
-                Log.d(TAG, "u盘 已插入action=$action")
+                Timber.d("u盘 已插入action=$action")
                 mHandler.sendEmptyMessage(handler_init_upan)
                 // snack(viewDataBinding.root,"u盘已插入")
             }
@@ -307,14 +365,14 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     val mUsbReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             val action = intent!!.action
-            Log.d(TAG, "action=$action")
+            Timber.d("action=$action")
 
             if (action.equals(UsbManager.ACTION_USB_DEVICE_DETACHED)) {
-                Log.d(TAG, "设备 拔出 action=$action")
+                Timber.d(TAG, "设备 拔出 action=$action")
             } else if (action.equals(UsbManager.ACTION_USB_DEVICE_ATTACHED)) {
-                Log.d(TAG, "设备 插入 action=$action")
+                Timber.d("设备 插入 action=$action")
             } else if (action.equals(ACTION_USB_PERMISSION)) {
-                Log.d(TAG, "usb action=$action")
+                Timber.d("usb action=$action")
                 val device =
                     intent.getParcelableExtra<Parcelable>(UsbManager.EXTRA_DEVICE) as UsbDevice?
                 if (device != null) {

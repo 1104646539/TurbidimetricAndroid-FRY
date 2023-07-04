@@ -2,12 +2,14 @@ package com.wl.mvvm_demo
 
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.ex.*
+import com.wl.turbidimetric.model.ProjectModel
 import com.wl.turbidimetric.util.CurveFitter
 import org.junit.Assert
 import org.junit.Test
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.NumberFormat
+import java.util.*
 import kotlin.math.log10
 import kotlin.math.pow
 import kotlin.math.sqrt
@@ -180,11 +182,11 @@ class ToolExTest {
 
     @Test
     fun newCalcBigD() {
-        val a1 = -0.00283;
-        val a2 = 9.07;
-        val x0 = 34909;
-        val p = 0.82816;
-        val absorbance = 0.1
+        val a1 = 9.702673786;
+        val a2 = 0.7425860767;
+        val x0 = -4.513632E-4;
+        val p = 1.406E-7;
+        val absorbance = 0.2253
         var d1 = a2 - absorbance
         var d2 = p
         if (d1 == 0.0 || d2 == 0.0) {
@@ -197,21 +199,55 @@ class ToolExTest {
         var con1: Double = x0 * temp12
         println("newCalcBigD con1=$con1 d1=$d1 d2=$d2 temp11=$temp11 temp12=$temp12")
 
-        var dividend1 = BigDecimal(a2)
-            .subtract(BigDecimal(absorbance)).setScale(10, BigDecimal.ROUND_HALF_UP)
-        var dividend2 = p
-        if (dividend1.compareTo(BigDecimal(0)) == 0 || dividend2 == 0.0) {
-            println("newCalcBigD dividend1==0||dividend2==0 dividend1=$dividend1 dividend2=$dividend2")
-            return
+//        val a1 = -0.00283;
+//        val a2 = 9.07;
+//        val x0 = 34909;
+//        val p = 0.82816;
+//        val absorbance = 0.1
+//        var d1 = a2 - absorbance
+//        var d2 = p
+//        if (d1 == 0.0 || d2 == 0.0) {
+//            println("newCalcBigD dividend1==0||dividend2==0 d1=$d1 d2=$d2")
+//            return
+//        }
+//        var temp11 = (a2 - a1) / d1 - 1
+//        var temp12 = temp11.pow(1 / d2).scale(10)
+////        var con1: Double = x0 * ((a2 - a1) / (a2 - absorbance) - 1).pow(1 / p).scale(5)
+//        var con1: Double = x0 * temp12
+//        println("newCalcBigD con1=$con1 d1=$d1 d2=$d2 temp11=$temp11 temp12=$temp12")
+
+//        var dividend1 = BigDecimal(a2)
+//            .subtract(BigDecimal(absorbance)).setScale(10, BigDecimal.ROUND_HALF_UP)
+//        var dividend2 = p
+//        if (dividend1.compareTo(BigDecimal(0)) == 0 || dividend2 == 0.0) {
+//            println("newCalcBigD dividend1==0||dividend2==0 dividend1=$dividend1 dividend2=$dividend2")
+//            return
+//        }
+//        val temp21 = BigDecimal(a2).subtract(BigDecimal(a1)).divide(
+//            dividend1, 10, BigDecimal.ROUND_HALF_UP
+//        ).subtract(BigDecimal(1))
+//
+//        val temp22 = temp21.toDouble().pow((1 / dividend2)).scale(10)
+//        val con2 = (x0 * temp22)
+//
+//        println("newCalcBigD con2=$con2 dividend1=$dividend1 dividend2=$dividend2 temp21=$temp21 temp22=$temp22")
+    }
+
+    @Test
+    fun testCon() {
+        val pm = ProjectModel().apply {
+            reagentNO = "5452"
+            reactionValues = intArrayOf(60, 91, 2722, 11722, 27298)
+            f0 = 9.702673786
+            f1 = 0.7425860767
+            f2 = -4.513632E-4
+            f3 = 1.406E-7
+            projectLjz = 100
+            fitGoodness = 0.9998
+            createTime = Date().toLongString()
         }
-        val temp21 = BigDecimal(a2).subtract(BigDecimal(a1)).divide(
-            dividend1, 10, BigDecimal.ROUND_HALF_UP
-        ).subtract(BigDecimal(1))
-
-        val temp22 = temp21.toDouble().pow((1 / dividend2)).scale(10)
-        val con2 = (x0 * temp22)
-
-        println("newCalcBigD con2=$con2 dividend1=$dividend1 dividend2=$dividend2 temp21=$temp21 temp22=$temp22")
+        val con1 = calcCon(BigDecimal(0.27858), pm)
+        println("con1=$con1")
     }
 
     @Test

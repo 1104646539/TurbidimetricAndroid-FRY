@@ -15,7 +15,7 @@ import kotlin.math.abs
  * @constructor
  */
 object PrintUtil {
-    private val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("COM3", 9600)
+    private val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("COM2", 9600)
 
     init {
         serialPort.open()
@@ -43,11 +43,14 @@ object PrintUtil {
         sb.append("\n")
 
 
-        sb.append("编号:${result.detectionNum?:""}\n")
-        sb.append("吸光度:${result.absorbances?.setScale(5,RoundingMode.HALF_UP)?:""}\n")
-        sb.append("浓度:${result.concentration?:""}\n")
-        sb.append("检测时间:${result.testTime?:""}\n")
+        sb.append("编号:${result.detectionNum ?: ""}\n")
+        sb.append("吸光度:${result.absorbances?.setScale(5, RoundingMode.HALF_UP) ?: ""}\n")
+        sb.append("浓度:${result.concentration ?: ""}\n")
+        sb.append("检测时间:${result.testTime ?: ""}\n")
 
+        sb.append("\n")
+        sb.append("\n")
+        sb.append("\n")
         sb.append("\n")
         sb.append("\n")
         sb.append("\n")

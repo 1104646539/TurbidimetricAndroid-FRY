@@ -23,6 +23,7 @@ import com.wl.turbidimetric.model.TestResultModel
 import com.wl.turbidimetric.model.TestResultModel_
 import com.wl.turbidimetric.print.PrintUtil
 import com.wl.turbidimetric.util.ExcelUtils
+import com.wl.turbidimetric.util.ExportExcelUtil
 import com.wl.turbidimetric.view.ConditionDialog
 import com.wl.turbidimetric.view.ResultDetailsDialog
 import com.wl.wwanandroid.base.BaseFragment
@@ -225,21 +226,8 @@ class DataManagerFragment :
         vd.btnClean.setOnClickListener {
             DBManager.TestResultBox.removeAll()
         }
-        vd.btnQuery.setOnClickListener {
-            lifecycleScope.launch {
-                val condition: Query<TestResultModel> = DBManager.TestResultBox.query().order(
-                    TestResultModel_.id
-                ).build()
-                queryData(condition)
-            }
-        }
-        vd.btnQuery2.setOnClickListener {
-            lifecycleScope.launch {
-                val condition: Query<TestResultModel> = DBManager.TestResultBox.query().orderDesc(
-                    TestResultModel_.id
-                ).build()
-                queryData(condition)
-            }
+        vd.btnExportExcel.setOnClickListener {
+            exportExcel()
         }
 
 //        adapter.stateRestorationPolicy =
@@ -264,6 +252,35 @@ class DataManagerFragment :
             PrintUtil.printTest(results)
         }
 
+    }
+
+    /**
+     * 验证 导出数据到Excel
+     */
+    private fun exportExcelVerify() {
+        val selectData = getSelectData()
+        if (selectData.isNullOrEmpty()) {
+            toast("请选择数据")
+            return
+        }
+        selectData?.let {
+            exportExcel()
+        }
+    }
+
+    /**
+     * 导出数据到Excel
+     */
+    private fun exportExcel() {
+        lifecycleScope.launch {
+            getSelectData()?.let {
+                ExportExcelUtil.printExcel(it, { toast("成功$it") }, { toast("$it") })
+            }
+        }
+    }
+
+    private fun getSelectData(): List<TestResultModel>? {
+        return adapter.snapshot().filter { it?.isSelect ?: false }.map { it!! }
     }
 
     /**

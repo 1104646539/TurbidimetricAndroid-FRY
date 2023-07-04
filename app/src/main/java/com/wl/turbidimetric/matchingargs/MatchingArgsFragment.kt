@@ -10,6 +10,7 @@ import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.FragmentMatchingArgsBinding
+import com.wl.turbidimetric.db.DBManager
 import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.SystemGlobal.matchingTestState
 import com.wl.turbidimetric.global.SystemGlobal.obMatchingTestState
@@ -21,6 +22,7 @@ import com.wl.wwanandroid.base.BaseFragment
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.util.Date
 
 /**
  * 拟合参数
@@ -52,6 +54,7 @@ class MatchingArgsFragment :
     val adapter: MatchingArgsAdapter by lazy {
         MatchingArgsAdapter()
     }
+
     /**
      * 显示调试时详情的对话框
      */
@@ -60,6 +63,7 @@ class MatchingArgsFragment :
             width = 1500
         }
     }
+
     override fun init(savedInstanceState: Bundle?) {
         listenerDialog()
         listenerView()
@@ -117,6 +121,12 @@ class MatchingArgsFragment :
         vd.lcCurve.setNoDataText("无数据")
         //设置数据，更新
         vd.lcCurve.data = data
+
+        test()
+    }
+
+    private fun test() {
+
     }
 
     private fun listenerView() {
@@ -170,6 +180,21 @@ class MatchingArgsFragment :
         vd.btnPrint.setOnClickListener {
             vm.print()
         }
+
+        vd.btnDebug2.setOnClickListener {
+            DBManager.ProjectBox.put(ProjectModel().apply {
+                reagentNO = "5452"
+                reactionValues = intArrayOf(60, 91, 2722, 11722, 27298)
+                f0 = 9.702673786
+                f1 = 0.7425860767
+                f2 = -4.513632E-4
+                f3 = 1.406E-7
+                projectLjz = 100
+                fitGoodness = 0.9998
+                createTime = Date().toLongString()
+            })
+        }
+
         vd.btnDebugDialog.setOnClickListener {
             debugShowDetailsDialog.show(vm.testMsg.value ?: "", "确定", onConfirm = { it.dismiss() })
         }
@@ -268,16 +293,17 @@ class MatchingArgsFragment :
         }
         vm.matchingFinishMsg.observe(this) {
             if (it.isNotEmpty()) {
-                val msg = it.plus("确定保存该条标曲记录？")
-                dialog.show(
-                    msg = msg,
-                    confirmMsg = "保存", onConfirm = {
-                        vm.saveProject()
-                        it.dismiss()
-                    }, cancelMsg = "取消", onCancel = {
-                        it.dismiss()
-                    }
-                )
+                vm.saveProject()
+//                val msg = it.plus("确定保存该条标曲记录？")
+//                dialog.show(
+//                    msg = msg,
+//                    confirmMsg = "保存", onConfirm = {
+//                        vm.saveProject()
+//                        it.dismiss()
+//                    }, cancelMsg = "取消", onCancel = {
+//                        it.dismiss()
+//                    }
+//                )
             }
         }
     }

@@ -48,13 +48,16 @@ class HomeConfigDialog(val context: Context) : BaseDialog(context) {
     }
 
     fun show(
+        selectProjectEnable:Boolean,
+        editDetectionNumEnable:Boolean,
+        skipCuvetteEnable:Boolean,
         projectModels: MutableList<ProjectModel>,
         projectModel: ProjectModel?,
         skipNum: Int,
         detectionNum: String,
         sampleNum: Int,
         onConfirm: ((ProjectModel?, Int, String, Int, BaseDialog) -> Unit)? = null,
-        onCancel: onClick
+        onCancel: onClick,
     ) {
 
         super.show(
@@ -76,6 +79,10 @@ class HomeConfigDialog(val context: Context) : BaseDialog(context) {
         etSkipNum.selectionLast()
         etDetectionNum.selectionLast()
         etSampleNum.selectionLast()
+
+        etSkipNum.isEnabled = skipCuvetteEnable
+        spnProject.isEnabled = selectProjectEnable
+        etDetectionNum.isEnabled = editDetectionNumEnable
 
         val selectedIndex = projectModels.indexOf(projectModel)
         spnProject.setSelection(selectedIndex)

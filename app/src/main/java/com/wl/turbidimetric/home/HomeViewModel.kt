@@ -114,6 +114,21 @@ class HomeViewModel(
      */
     val getStateNotExistMsg = MutableLiveData("")
 
+    /**
+     * 选择项目是否可用
+     */
+    val selectProjectEnable = MutableLiveData(true)
+
+    /**
+     * 跳过比色皿是否可用
+     */
+    val skipCuvetteEnable = MutableLiveData(true)
+
+    /**
+     * 编辑编号是否可用
+     */
+    val editDetectionNumEnable = MutableLiveData(true)
+
     /**样本架状态 1有 0无 顺序是从中间往旁边
      *
      */
@@ -2335,6 +2350,16 @@ class HomeViewModel(
         detectionNumInput = detectionNum
         cuvetteStartPos = skipNum
         needSamplingNum = sampleNum
+    }
+
+    /**
+     * 控制开始检测时按钮不可用
+     * @param enable Boolean
+     */
+    fun enableView(enable: Boolean) {
+        selectProjectEnable.postValue(enable)
+        editDetectionNumEnable.postValue(enable)
+        skipCuvetteEnable.postValue(enable)
     }
 
     data class CuvetteItem(

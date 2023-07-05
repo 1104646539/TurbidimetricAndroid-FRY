@@ -281,9 +281,11 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             if (it != TestState.None && it != TestState.TestFinish) {
                 vd.btnStart.setBackgroundResource(R.drawable.rip_positive2)
                 vd.btnStart.text = "正在分析"
+                vm.enableView(false)
             } else {
                 vd.btnStart.setBackgroundResource(R.drawable.rip_positive)
                 vd.btnStart.text = "分析"
+                vm.enableView(true)
             }
         }
         vd.btnStart.setOnClickListener {
@@ -298,7 +300,12 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             }
         }
         vd.btnDebugDialog.setOnClickListener {
-            debugShowDetailsDialog.show(vm.testMsg.value ?: "", "确定", onConfirm = { it.dismiss() }, gravity = Gravity.LEFT)
+            debugShowDetailsDialog.show(
+                vm.testMsg.value ?: "",
+                "确定",
+                onConfirm = { it.dismiss() },
+                gravity = Gravity.LEFT
+            )
         }
 
         vd.btnConfig.setOnClickListener {
@@ -313,6 +320,9 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
     private fun showConfigDialog() {
         Timber.d("showConfigDialog before")
         homeConfigDialog.show(
+            vm.selectProjectEnable.value ?: true,
+            vm.editDetectionNumEnable.value ?: true,
+            vm.skipCuvetteEnable.value ?: true,
             projects,
             vm.selectProject,
             vm.cuvetteStartPos,
@@ -465,7 +475,12 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
          */
         vm.testMsg.observe(this) {
             if (debugShowDetailsDialog.isShow()) {
-                debugShowDetailsDialog.show(it, "确定", onConfirm = { it.dismiss() }, gravity = Gravity.LEFT)
+                debugShowDetailsDialog.show(
+                    it,
+                    "确定",
+                    onConfirm = { it.dismiss() },
+                    gravity = Gravity.LEFT
+                )
             }
         }
         /**

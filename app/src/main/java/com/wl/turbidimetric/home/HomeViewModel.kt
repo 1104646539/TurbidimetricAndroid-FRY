@@ -409,16 +409,7 @@ class HomeViewModel(
      */
     //检测的值
     private val testValues1 = doubleArrayOf(
-        0.5441,
-        0.5555,
-        0.2525,
-        0.22492,
-        0.46042,
-        0.24542,
-        0.66332,
-        0.74412,
-        0.0122,
-        0.12142
+        0.5441, 0.5555, 0.2525, 0.22492, 0.46042, 0.24542, 0.66332, 0.74412, 0.0122, 0.12142
     )
     private val testValues2 = doubleArrayOf(0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3)
     private val testValues3 = doubleArrayOf(0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3)
@@ -685,9 +676,7 @@ class HomeViewModel(
             Timber.d("报错了，cmd=$cmd state=$state 是取试剂的暂时不管")
             readDataTakeReagentModel(
                 ReplyModel(
-                    SerialGlobal.CMD_TakeReagent,
-                    0,
-                    TakeReagentModel()
+                    SerialGlobal.CMD_TakeReagent, 0, TakeReagentModel()
                 )
             )
             return
@@ -777,50 +766,6 @@ class HomeViewModel(
             nextStepDripReagent()
         }
     }
-//    /**
-//     * 接收到移动样本
-//     */
-//    override fun readDataMoveSampleModel(reply: ReplyModel<MoveSampleModel>) {
-//        if (!runningTest()) return
-//        if (!machineStateNormal()) return
-//        Timber.d("接收到 移动样本 reply=$reply cuvettePos=$cuvettePos lastCuvetteShelfPos=$lastCuvetteShelfPos cuvetteShelfPos=$cuvetteShelfPos samplePos=$samplePos samplingProbeCleaningFinish=$samplingProbeCleaningFinish")
-//        sampleMoveFinish = true
-//        samplingFinish = false
-//        dripSampleFinish = false
-//        scanFinish = false
-//
-//        var exist = reply.data.exist
-//
-//        //最后一个位置不需要扫码，直接取样
-//        if (samplePos < sampleMax) {
-//            if ((SystemGlobal.isCodeDebug && !sampleExists[samplePos]) || (!SystemGlobal.isCodeDebug && !exist)) {
-//                //没有样本，移动到下一个位置
-//                Timber.d("没有样本,移动到下一个位置")
-//                scanFinish = true
-//                scanResults.add(null)
-//                Timber.d("scanResults=$scanResults")
-//                nextStepDripReagent()
-//            } else {
-//                //有样本
-//                Timber.d("有样本")
-//                updateSampleState(samplePos, SampleState.Exist)
-//                startScan(samplePos)
-//            }
-//        }
-//        //判断是否需要取样。取样位和扫码位差一个位置
-//        if (sampleNeedSampling(samplePos - 1)) {
-//            //注：如果上次取样针清洗未结束，就等待清洗结束后再加样,否则直接加样
-//            if (samplingProbeCleaningFinish) {
-//                sampling()
-//            } else {
-//                samplingProbeCleaningRecoverSampling = true
-//            }
-//        } else if (samplePos == sampleMax && sampleMoveFinish) {
-//            //加入sampleMoveFinish的判断是为了防止在上面的nextStepDripReagent()之前samplePos=sampleMax-1，而移动了样本后，导致samplePos == sampleMax从而发生同时移动样本和比色皿的问题
-//            //最后一个样本，并且不需要取样时，下一步
-//            nextStepDripReagent()
-//        }
-//    }
 
     /**
      * 判断当前位置是否需要取样，只有扫码成功了的样本才需要取样
@@ -1191,8 +1136,7 @@ class HomeViewModel(
      * @param discrepancy Function1<String, Unit> 不符合后执行的命令
      */
     private fun checkTestState(
-        accord: () -> Unit,
-        discrepancy: (String) -> Unit
+        accord: () -> Unit, discrepancy: (String) -> Unit
     ) {
         if (!r1Reagent) {
             Timber.d("没有R1试剂")
@@ -1325,30 +1269,39 @@ class HomeViewModel(
     private fun stepTest(state: TestState) {
         Timber.d(" ———————— stepTest state=$state  cuvettePos=$cuvettePos————————————————————————————————————————————————————————————————————————————————————————————————=")
         testState = state
+        //获取跳过的步数
+        val needMoveStep = getFirstCuvetteStartPos();
         //切换到TestState.Test2时，当前下位机的比色皿位置cuvettePos == 0，则不需要计算需要回退多少格，直接往前移动
         if (state == TestState.Test2) {
-            cuvettePos = getNextStepCuvetteStartPos()
-            moveCuvetteTest()
+            Timber.d("stepTest cuvettePos=$cuvettePos needMoveStep=$needMoveStep")
+            if (needMoveStep > -1) {//需要跳过
+                cuvettePos = -1
+                moveCuvetteTest(needMoveStep + 2)
+            } else {//不需要跳过
+                cuvettePos = getNextStepCuvetteStartPos()
+                Timber.d("stepTest cuvettePos=$cuvettePos needMoveStep=$needMoveStep")
+                moveCuvetteTest()
+            }
         } else {
             //当切换状态时，当前下位机的比色皿位置 cuvettePos != 0，则需要计算需要回退多少格才回到可使用的第一个比色皿的位置
             //直接移动到可使用的第一个比色皿的位置
             //如果 nextStartPos > -1 说明这一排比色皿有跳过的 ，那么就直接移动到可使用的第一个比色皿的位置
-            val nextStartPos = getNextStepCuvetteStartPos()
-            val moveStep =
-                if (nextStartPos > -1) -(mCuvetteStates[cuvetteShelfPos]!!.size - (nextStartPos + 2)) else -cuvettePos
-            if (nextStartPos > -1) {
-                //更新跳过的比色皿状态
+            Timber.d("stepTest cuvettePos=$cuvettePos needMoveStep=$needMoveStep moveStep=${-(mCuvetteStates[cuvetteShelfPos]!!.size - needMoveStep)} $cuvetteStartPos")
+            if (needMoveStep > -1) {
                 if (isFirstCuvetteShelf()) {
                     if (cuvetteStartPos > 0) {
-                        repeat(cuvetteStartPos)
-                        {
+                        repeat(cuvetteStartPos) {
                             updateCuvetteState(it, CuvetteState.Skip, null, null)
                         }
                     }
                 }
+                moveCuvetteTest(-(mCuvetteStates[cuvetteShelfPos]!!.size - needMoveStep - 2))
+            } else {
+                val nextStartPos = getNextStepCuvetteStartPos()
+                val moveStep =
+                    if (nextStartPos > -1) -(mCuvetteStates[cuvetteShelfPos]!!.size - (nextStartPos + 2)) else -cuvettePos
+                moveCuvetteTest(moveStep)
             }
-            Timber.d("cuvettePos= $cuvettePos nextStartPos=$nextStartPos moveStep=$moveStep")
-            moveCuvetteTest(moveStep)
         }
     }
 
@@ -1461,16 +1414,10 @@ class HomeViewModel(
         dripSampleFinish = true
         val result = createResultModel(scanResults[samplePos - 1])
         updateCuvetteState(
-            cuvettePos,
-            CuvetteState.DripSample,
-            result,
-            "${sampleShelfPos + 1}- $samplePos"
+            cuvettePos, CuvetteState.DripSample, result, "${sampleShelfPos + 1}- $samplePos"
         )
         updateSampleState(
-            samplePos - 1,
-            null,
-            result,
-            "${cuvetteShelfPos + 1}- ${cuvettePos + 1}"
+            samplePos - 1, null, result, "${cuvetteShelfPos + 1}- ${cuvettePos + 1}"
         )
         samplingProbeCleaning()
 
@@ -1527,8 +1474,7 @@ class HomeViewModel(
                 samplePos - 1
             ) && samplingFinish && dripSampleFinish) || (!sampleNeedSampling(
                 samplePos - 1
-            )))
-            || samplePos == 0
+            ))) || samplePos == 0
         ) {
             //是否是最后一个比色皿的位置，但是样本又不能是第一个，因为第一个样本代表还没取样
             if (lastCuvettePos(cuvettePos) && samplePos > 0) {
@@ -1728,7 +1674,7 @@ class HomeViewModel(
 
         if (testState != TestState.TestFinish) {
             val needMoveStep = getFirstCuvetteStartPos();
-            if (needMoveStep > 0) {
+            if (needMoveStep > -1) {
                 moveCuvetteDripSample(needMoveStep + 2)
             } else {
                 moveCuvetteDripSample()
@@ -2383,10 +2329,7 @@ class HomeViewModel(
      * @param sampleNum Int
      */
     fun changeConfig(
-        projectModel: ProjectModel,
-        skipNum: Int,
-        detectionNum: String,
-        sampleNum: Int
+        projectModel: ProjectModel, skipNum: Int, detectionNum: String, sampleNum: Int
     ) {
         selectProject = projectModel
         detectionNumInput = detectionNum
@@ -2395,15 +2338,11 @@ class HomeViewModel(
     }
 
     data class CuvetteItem(
-        var state: CuvetteState,
-        var testResult: TestResultModel? = null,
-        var sampleID: String? = ""
+        var state: CuvetteState, var testResult: TestResultModel? = null, var sampleID: String? = ""
     )
 
     data class SampleItem(
-        var state: SampleState,
-        var testResult: TestResultModel? = null,
-        var cuvetteID: String? = ""
+        var state: SampleState, var testResult: TestResultModel? = null, var cuvetteID: String? = ""
     )
 }
 

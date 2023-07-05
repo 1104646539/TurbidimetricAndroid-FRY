@@ -321,10 +321,10 @@ class DataManagerFragment :
         )
 
         if (name.isNotEmpty()) {
-            condition.equal(TestResultModel_.name, name, QueryBuilder.StringOrder.CASE_INSENSITIVE)
+            condition.contains(TestResultModel_.name, name, QueryBuilder.StringOrder.CASE_INSENSITIVE)
         }
         if (qrcode.isNotEmpty()) {
-            condition.equal(
+            condition.contains(
                 TestResultModel_.sampleQRCode,
                 qrcode,
                 QueryBuilder.StringOrder.CASE_INSENSITIVE

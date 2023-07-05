@@ -105,8 +105,8 @@ class ConditionDialog(val context: Context) : BaseDialog(context) {
 
     private fun getCondition(): ConditionModel {
         return ConditionModel(
-            name = etName.text.toString().isNullOrEmpty().PD(etName.text.toString(), ""),
-            qrcode = etQRCode.text.toString().isNullOrEmpty().PD(etQRCode.text.toString(), ""),
+            name = etName.text.toString().isNotEmpty().PD(etName.text.toString(), ""),
+            qrcode = etQRCode.text.toString().isNotEmpty().PD(etQRCode.text.toString(), ""),
             conMin = etConMin.text.toString().toIntOrNull() ?: 0,
             conMax = etConMax.text.toString().toIntOrNull() ?: 0,
             results = if (resultAdapter.getSelectItemsValue() == null) arrayOf() else resultAdapter.getSelectItemsValue()!!

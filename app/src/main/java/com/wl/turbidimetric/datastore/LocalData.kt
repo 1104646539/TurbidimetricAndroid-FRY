@@ -44,14 +44,21 @@ object LocalData {
      * 当前检测模式 自动 手动
      */
     var CurMachineTestModel by StringDataStoreProperty(LocalDataGlobal.Default.MachineTestModelDefault.name)
+
     /**
      * 自动模式下，是否使用样本传感器
      */
     var SampleExist by BooleanDataStoreProperty(LocalDataGlobal.Default.SampleExist)
+
     /**
      * 自动模式下，是否使用扫码器
      */
     var ScanCode by BooleanDataStoreProperty(LocalDataGlobal.Default.ScanCode)
+
+    /**
+     * 检测时，选择的检测项目的ID
+     */
+    var SelectProjectID by LongDataStoreProperty(LocalDataGlobal.Default.SelectProjectID)
 
 
     /**

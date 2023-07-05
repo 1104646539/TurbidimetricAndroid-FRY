@@ -69,93 +69,14 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         listener()
 
         vm.goGetMachineState()
-//        vd.btnGet.setOnClickListener {
-////            viewModelScope.launch {
-////                Timber.d("2 Key.TakeReagentR2= before}")
-////                val d =
-////                    LocalDataGlobal.Key.TakeReagentR1.getData(LocalDataGlobal.Default.TakeReagentR1)
-////                val TakeReagentR1 = LocalDataGlobal.Key.TakeReagentR1.putData(d + 1)
-////                Timber.d("2 Key.TakeReagentR2= after ${TakeReagentR1}")
-////            }
-//            //写入u盘文件 start
-////            val root = File(SystemGlobal.uPath)
-////            val f1 = File(root, "kk.txt")
-////            f1.writeText("test")
-//            //写入u盘文件 end
-//        }
-//        vd.btnGet.setOnClickListener {
-//
-//        }
-//        vd.btnGetU.setOnClickListener {
-////            Timber.d("Key.TakeReagentR2= before}")
-////            val TakeReagentR1 =
-////                LocalDataGlobal.Key.TakeReagentR1.getData(LocalDataGlobal.Default.TakeReagentR1)
-////            Timber.d("Key.TakeReagentR2= after ${TakeReagentR1}")
-//
-////            SerialPortUtil.Instance.test()
-//
-////            lifecycleScope.launch {
-////                ScanCodeUtil.Instance.startScan()
-////                ScanCodeUtil.Instance.onScanResult = null
-////            }
-//
-////            lifecycleScope.launch {
-////                repeat(1000) {
-////                    delay(100)
-////                    SerialPortUtil.Instance.pierced()
-////                }
-////            }
-////            PrintUtil.Instance.test()
-//
-////            PrintUtil.printMatchingQuality(
-////                doubleArrayOf(0.0, 1400.0, 681.0, 174.0, 35.0,500.0,1200.0).toList(),
-////                nds,
-////                doubleArrayOf(0.0, 1000.0, 500.0, 200.0, 48.0,162.0,465.0).toList(),
-////                doubleArrayOf(0.00000001, 2.02354123, 1.21235454, 0.212335412),
-////                true
-////            )
-//        }
-
-
-//        projectAdapter = HomeProjectAdapter(requireContext(), items)
-//        vd.spnProject.adapter = projectAdapter
-//        projectAdapter.notifyDataSetChanged()
-//
         vm.viewModelScope.launch {
             vm.projectDatas.collectLatest {
                 projects.clear()
                 projects.addAll(it)
 
-                if (vm.selectProject == null) {
-                    if (it.isNotEmpty()) {//默认选择第一个
-                        vm.selectProject = it.first()
-                    } else {
-                        vm.selectProject = null
-                    }
-                } else {
-                    if (!projects.contains(vm.selectProject)) {//如果当前选择的标曲不存在就默认选择第一个
-                        vm.selectProject = it.first()
-                    }
-                }
+                vm.recoverSelectProject(projects)
             }
         }
-//
-//        vd.spnProject.onItemSelectedListener = object : OnItemSelectedListener {
-//            override fun onItemSelected(
-//                parent: AdapterView<*>?, view: View?, position: Int, id: Long
-//            ) {
-//                vm.selectProject = items?.get(position)
-//            }
-//
-//            override fun onNothingSelected(parent: AdapterView<*>?) {
-//                vm.selectProject = null
-//            }
-//        }
-//
-//        vm.testMsg.observe(this) {
-//            vd.tvMsg.text = it.toString()
-//            Timber.d("$it")
-//        }
     }
 
     val r2VolumeIds =
@@ -383,6 +304,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
     }
 
     private fun listenerDialog() {
+
         /**
          * 自检中
          */

@@ -85,6 +85,7 @@ object LocalDataGlobal {
         val MachineTestModelDefault = MachineTestModel.Auto
         val SampleExist = true
         val ScanCode = false
+        val SelectProjectID = 0L
     }
 
 

@@ -487,6 +487,10 @@ class HomeViewModel(
             toastMsg.postValue("正在进行重复性检测，请勿操作！")
             return
         }
+        if (selectProject == null) {
+            toastMsg.postValue("未选择检测标曲")
+            return
+        }
         clickStart = true
         initState()
         getState()
@@ -503,7 +507,6 @@ class HomeViewModel(
             LocalData.DetectionNum = detectionNumInput
             detectionNumInput = ""
         }
-
 
         mSamplesStates = initSampleStates()
         mCuvetteStates = initCuvetteStates()
@@ -2350,6 +2353,10 @@ class HomeViewModel(
         detectionNumInput = detectionNum
         cuvetteStartPos = skipNum
         needSamplingNum = sampleNum
+
+        selectProject?.let {
+            LocalData.SelectProjectID = it.projectId
+        }
     }
 
     /**
@@ -2360,6 +2367,25 @@ class HomeViewModel(
         selectProjectEnable.postValue(enable)
         editDetectionNumEnable.postValue(enable)
         skipCuvetteEnable.postValue(enable)
+    }
+
+    /**
+     * 恢复上次选择的项目
+     */
+    fun recoverSelectProject(projects: MutableList<ProjectModel>) {
+        val selectId = LocalData.SelectProjectID
+        if (projects.isNotEmpty()) {
+            if (selectId > 0) {
+                val fps = projects.filter { it.projectId == selectId }
+                if (fps.isNotEmpty()) {
+                    selectProject = fps.first()
+                } else {
+                    selectProject = projects.first()
+                }
+            } else {
+                selectProject = projects.first()
+            }
+        }
     }
 
     data class CuvetteItem(

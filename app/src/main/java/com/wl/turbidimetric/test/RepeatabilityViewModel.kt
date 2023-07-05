@@ -775,6 +775,7 @@ class RepeatabilityViewModel(
         repeatabilityState = RepeatabilityState.Finish
         moveCuvetteShelf(-1)
         moveSampleShelf(-1)
+        samplingProbeCleaning()
     }
 
     /**

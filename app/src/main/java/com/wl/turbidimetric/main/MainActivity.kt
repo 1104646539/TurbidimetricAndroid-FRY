@@ -197,38 +197,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         }
         vd.rnv.setNavigationShutdownListener {
 //            toast("点击关机……")
-//            showShutdownDialog()
-            //读写sd卡/u盘测试,
-
-            //读写sd卡/u盘测试,
-            val root = File(StorageUtil.curPath)
-
-            val documentFile = DocumentsUtils.getDocumentFile(root, true, this)
-            if (DocumentsUtils.isOnExtSdCard(root, this)) {
-                if (documentFile != null) {
-                    Log.i(ContentValues.TAG, "get document file:" + documentFile.canWrite())
-                    documentFile.createDirectory("creat3")
-                    val newfile = documentFile.createFile("txt", "222333.txt")
-                    var excelOutputStream: OutputStream? = null
-                    try {
-                        excelOutputStream =
-                            this.getContentResolver().openOutputStream(newfile!!.uri)
-                        excelOutputStream?.write("test".toByteArray(StandardCharsets.UTF_8))
-                        excelOutputStream?.flush()
-                    } catch (e: FileNotFoundException) {
-                        e.printStackTrace()
-                    } catch (e: IOException) {
-                        e.printStackTrace()
-                    } finally {
-                        try {
-                            excelOutputStream!!.close()
-                        } catch (e: IOException) {
-                            e.printStackTrace()
-                        }
-                    }
-                    Log.i(ContentValues.TAG, "creat3")
-                }
-            }
+            showShutdownDialog()
         }
         vm.curIndex.observe(this) {
             vd.vp.setCurrentItem(it, false)

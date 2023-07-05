@@ -1,21 +1,25 @@
 package com.wl.turbidimetric.test
 
+import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
+import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.global.SystemGlobal.matchingTestState
 import com.wl.turbidimetric.global.SystemGlobal.repeatabilityState
 import com.wl.turbidimetric.global.SystemGlobal.testState
 import com.wl.turbidimetric.home.ProjectRepository
+import com.wl.turbidimetric.home.TestResultRepository
 import com.wl.turbidimetric.model.*
 import com.wl.turbidimetric.util.Callback2
 import com.wl.turbidimetric.util.SerialPortUtil
 import com.wl.wwanandroid.base.BaseViewModel
 import io.objectbox.kotlin.flow
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -23,6 +27,7 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.Format
 import java.text.NumberFormat
+import java.util.Date
 import kotlin.math.absoluteValue
 import kotlin.math.pow
 import kotlin.math.sqrt
@@ -32,7 +37,10 @@ import kotlin.math.sqrt
  *
  * @property quality Boolean
  */
-class RepeatabilityViewModel(val projectRepository: ProjectRepository) : BaseViewModel(),
+class RepeatabilityViewModel(
+    val projectRepository: ProjectRepository,
+    val testResultRepository: TestResultRepository
+) : BaseViewModel(),
     Callback2 {
 
     init {
@@ -64,6 +72,11 @@ class RepeatabilityViewModel(val projectRepository: ProjectRepository) : BaseVie
     private var resultOriginalTest2 = arrayListOf<Int>()
     private var resultOriginalTest3 = arrayListOf<Int>()
     private var resultOriginalTest4 = arrayListOf<Int>()
+
+    /**
+     * 浓度
+     */
+    var cons = mutableListOf<Int>()
 
     /**
      * 吸光度
@@ -211,6 +224,7 @@ class RepeatabilityViewModel(val projectRepository: ProjectRepository) : BaseVie
      */
     var testPosInterval: Long = 1000 * 10;
 
+
     /**
      * 测试用的 start
      */
@@ -239,6 +253,7 @@ class RepeatabilityViewModel(val projectRepository: ProjectRepository) : BaseVie
 
     //测试用 每个比色皿之间的检测间隔
     val testP: Long = 1000
+
 
     /**
      * 测试用的 end
@@ -311,6 +326,42 @@ class RepeatabilityViewModel(val projectRepository: ProjectRepository) : BaseVie
         initState()
         repeatabilityState = RepeatabilityState.GetState;
         getState()
+    }
+
+    /**
+     * 添加检测数据到数据管理
+     */
+    fun clickMoveToRepository() {
+        if (result.size != 0) {
+            toast("未检测")
+            return
+        }
+        viewModelScope.launch {
+            result.forEachIndexed { index, item ->
+                testResultRepository.addTestResult(
+                    TestResultModel(
+                        detectionNum = LocalData.getDetectionNumInc(),
+                        concentration = cons[index],
+                        absorbances = item,
+                        testTime = Date().toLongString(),
+                        testValue1 = resultTest1[index],
+                        testValue2 = resultTest2[index],
+                        testValue3 = resultTest3[index],
+                        testValue4 = resultTest4[index],
+                        testOriginalValue1 = testOriginalValues1[index],
+                        testOriginalValue2 = testOriginalValues2[index],
+                        testOriginalValue3 = testOriginalValues3[index],
+                        testOriginalValue4 = testOriginalValues4[index],
+                    ).apply {
+                        project.target = selectProject
+                    }
+                )
+            }
+            with(Dispatchers.Main) {
+                toast("转移完成，请勿多次点击")
+            }
+        }
+
     }
 
     private fun initState() {
@@ -772,7 +823,7 @@ class RepeatabilityViewModel(val projectRepository: ProjectRepository) : BaseVie
 
         result = calcAbsorbanceDifferences(resultTest1, resultTest2, resultTest3, resultTest4)
 
-        val cons = mutableListOf<Int>()
+        cons.clear()
         //计算浓度
         selectProject?.let { it ->
             for (i in result.indices) {
@@ -1270,11 +1321,14 @@ class RepeatabilityViewModel(val projectRepository: ProjectRepository) : BaseVie
     }
 }
 
-class RepeatabilityViewModelFactory(private val projectRepository: ProjectRepository = ProjectRepository()) :
+class RepeatabilityViewModelFactory(
+    private val projectRepository: ProjectRepository = ProjectRepository(),
+    private val testResultRepository: TestResultRepository = TestResultRepository()
+) :
     ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(RepeatabilityViewModel::class.java)) {
-            return RepeatabilityViewModel(projectRepository) as T
+            return RepeatabilityViewModel(projectRepository, testResultRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

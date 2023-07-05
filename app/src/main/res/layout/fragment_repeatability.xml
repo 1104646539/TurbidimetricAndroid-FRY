@@ -33,11 +33,19 @@
 
             <Button
                 style="@style/BtnPositive"
-                android:layout_marginTop="20dp"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
+                android:layout_marginTop="20dp"
                 android:onClick="@{()->model.clickStart()}"
                 android:text="开始重复性测试" />
+
+            <Button
+                style="@style/BtnPositive"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginTop="20dp"
+                android:onClick="@{()->model.clickMoveToRepository()}"
+                android:text="一件转移数据到数据管理" />
 
             <TextView
                 android:id="@+id/tvMsg"

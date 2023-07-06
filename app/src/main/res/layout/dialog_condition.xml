@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
+    android:gravity="center_vertical"
     android:orientation="vertical"
     android:padding="15dp">
 
@@ -22,7 +22,7 @@
             style="@style/EtDefault"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:minWidth="200dp" />
+            android:minWidth="220dp" />
 
         <TextView
             style="@style/TextHilt"
@@ -36,7 +36,7 @@
             style="@style/EtDefault"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:minWidth="200dp" />
+            android:minWidth="220dp" />
 
     </LinearLayout>
 
@@ -56,9 +56,9 @@
             android:id="@+id/et_con_min"
             style="@style/EtDefault"
             android:layout_width="wrap_content"
-            android:inputType="numberSigned"
             android:layout_height="wrap_content"
-            android:minWidth="200dp" />
+            android:inputType="numberSigned"
+            android:minWidth="220dp" />
 
         <TextView
             style="@style/TextHilt"
@@ -71,9 +71,9 @@
             android:id="@+id/et_con_max"
             style="@style/EtDefault"
             android:layout_width="wrap_content"
-            android:inputType="numberSigned"
             android:layout_height="wrap_content"
-            android:minWidth="200dp" />
+            android:inputType="numberSigned"
+            android:minWidth="220dp" />
     </LinearLayout>
 
     <LinearLayout
@@ -89,7 +89,7 @@
             android:text="检测结果:" />
 
         <RelativeLayout
-            android:layout_width="420dp"
+            android:layout_width="450dp"
             android:layout_height="match_parent">
 
             <Spinner
@@ -97,7 +97,7 @@
                 style="@style/EtDefault"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:minWidth="300dp" />
+                android:minWidth="360dp" />
 
             <TextView
                 android:id="@+id/tv_spn_results"
@@ -109,4 +109,41 @@
                 android:textColor="@color/textGray" />
         </RelativeLayout>
     </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal">
+
+        <TextView
+            style="@style/TextHilt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="检测时间:" />
+
+        <TextView
+            android:id="@+id/tv_testtime_min"
+            style="@style/EtDefault"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="numberSigned"
+            android:minWidth="240dp" />
+
+        <TextView
+            style="@style/TextHilt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:text="至:" />
+
+        <TextView
+            android:id="@+id/tv_testtime_max"
+            style="@style/EtDefault"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="numberSigned"
+            android:minWidth="240dp" />
+    </LinearLayout>
+
 </LinearLayout>

@@ -42,6 +42,7 @@ fun Date.toString(format: SimpleDateFormat): String {
 fun Long.toDate(): Date {
     return Date(this)
 }
+
 /**
  * 超长字符串转时间
  * yyyy-MM-dd HH:mm:ss SSS to Date
@@ -51,6 +52,7 @@ fun Long.toDate(): Date {
 fun String.bigLongStrToDate(): Date {
     return strToDate(DateFormatBigLong)
 }
+
 /**
  * 长字符串转时间
  * yyyy-MM-dd HH:mm:ss to Date
@@ -60,6 +62,7 @@ fun String.bigLongStrToDate(): Date {
 fun String.longStrToDate(): Date {
     return strToDate(DateFormatLong)
 }
+
 /**
  * 字符串转时间
  * str to Date
@@ -68,4 +71,23 @@ fun String.longStrToDate(): Date {
  */
 fun String.strToDate(format: SimpleDateFormat): Date {
     return format.parse(this)
+}
+/**
+ * 字符串转时间戳
+ * str to Date
+ * @receiver Long
+ * @return Date
+ */
+fun String.strToLong(format: SimpleDateFormat= DateFormatLong): Long {
+    return format.parse(this).time
+}
+
+/**
+ * 时间戳转字符串
+ * @receiver Long
+ * @param format SimpleDateFormat
+ * @return String
+ */
+fun Long.longToStr(format: SimpleDateFormat = DateFormatLong): String {
+    return Date(this).toString(format)
 }

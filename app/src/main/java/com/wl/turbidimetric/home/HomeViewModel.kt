@@ -914,7 +914,7 @@ class HomeViewModel(
     private fun createResultModel(str: String?): TestResultModel {
         val resultModel = TestResultModel(
             sampleQRCode = str ?: "",
-            createTime = Date().toLongString(),
+            createTime = Date().time,
             detectionNum = LocalData.getDetectionNumInc()
         )
 
@@ -1068,7 +1068,7 @@ class HomeViewModel(
                 }
                 resultModels[pos]?.testValue4 = resultTest4[pos]
                 resultModels[pos]?.testOriginalValue4 = resultOriginalTest4[pos]
-                resultModels[pos]?.testTime = Date().toLongString()
+                resultModels[pos]?.testTime = Date().time
 
                 //计算单个结果浓度
                 val abs = calcAbsorbanceDifference(resultTest1[pos], resultTest4[pos])

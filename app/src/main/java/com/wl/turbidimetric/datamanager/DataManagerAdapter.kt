@@ -10,6 +10,9 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.ItemDatamanagerResultBinding
+import com.wl.turbidimetric.ex.longToStr
+import com.wl.turbidimetric.ex.toDate
+import com.wl.turbidimetric.ex.toLongString
 import com.wl.turbidimetric.model.TestResultModel
 
 class DataManagerAdapter :
@@ -45,7 +48,7 @@ class DataManagerAdapter :
             binding.tvAbsorbances.text = item?.absorbances?.toString() ?: "-"
             binding.tvResult.text = item?.testResult ?: "-"
             binding.tvConcentration.text = item?.concentration?.toString() ?: "-"
-            binding.tvTestTime.text = item?.testTime ?: "-"
+            binding.tvTestTime.text = item?.testTime?.longToStr() ?: "-"
             binding.tvTestValue1.text = item?.testValue1?.toString() ?: "-"
             binding.tvTestValue2.text = item?.testValue2?.toString() ?: "-"
             binding.tvTestValue3.text = item?.testValue3?.toString() ?: "-"

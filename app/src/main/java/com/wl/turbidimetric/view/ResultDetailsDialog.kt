@@ -4,6 +4,7 @@ import android.content.Context
 import android.widget.Button
 import android.widget.TextView
 import com.wl.turbidimetric.R
+import com.wl.turbidimetric.ex.longToStr
 import com.wl.turbidimetric.ex.scale
 import com.wl.turbidimetric.model.TestResultModel
 
@@ -50,7 +51,7 @@ class ResultDetailsDialog(val context: Context) : BaseDialog(context) {
         super.show("确定", {}, "取消", { dismiss() }, true)
         tvID.text = result.id.toString()
         tvDetectionNum.text = result.detectionNum
-        tvTestTime.text = result.testTime
+        tvTestTime.text = result.testTime.longToStr()
 
         etName.text = result.name
         etGender.text = result.gender

@@ -45,7 +45,7 @@
                 android:layout_height="60dp"
                 android:layout_marginTop="20dp"
                 android:onClick="@{()->model.clickMoveToRepository()}"
-                android:text="一件转移数据到数据管理" />
+                android:text="一键转移数据到数据管理" />
 
             <TextView
                 android:id="@+id/tvMsg"

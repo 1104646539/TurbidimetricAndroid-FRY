@@ -332,7 +332,7 @@ class RepeatabilityViewModel(
      * 添加检测数据到数据管理
      */
     fun clickMoveToRepository() {
-        if (result.size != 0) {
+        if (result.isEmpty()) {
             toast("未检测")
             return
         }
@@ -343,7 +343,7 @@ class RepeatabilityViewModel(
                         detectionNum = LocalData.getDetectionNumInc(),
                         concentration = cons[index],
                         absorbances = item,
-                        testTime = Date().toLongString(),
+                        testTime = Date().time,
                         testValue1 = resultTest1[index],
                         testValue2 = resultTest2[index],
                         testValue3 = resultTest3[index],

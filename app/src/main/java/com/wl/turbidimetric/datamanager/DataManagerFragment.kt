@@ -1,10 +1,12 @@
 package com.wl.turbidimetric.datamanager
 
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -22,22 +24,15 @@ import com.wl.turbidimetric.model.ConditionModel
 import com.wl.turbidimetric.model.TestResultModel
 import com.wl.turbidimetric.model.TestResultModel_
 import com.wl.turbidimetric.print.PrintUtil
-import com.wl.turbidimetric.util.ExcelUtils
 import com.wl.turbidimetric.util.ExportExcelUtil
 import com.wl.turbidimetric.view.ConditionDialog
 import com.wl.turbidimetric.view.ResultDetailsDialog
 import com.wl.wwanandroid.base.BaseFragment
-import io.objectbox.kotlin.equal
-import io.objectbox.kotlin.greaterOrEqual
-import io.objectbox.kotlin.lessOrEqual
 import io.objectbox.query.Query
 import io.objectbox.query.QueryBuilder
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
 import java.util.*
 
 
@@ -158,7 +153,7 @@ class DataManagerFragment :
                     testValue2 = "52.32".toBigDecimal(),
                     testValue3 = "52.33".toBigDecimal(),
                     testValue4 = "52.34".toBigDecimal(),
-                    testTime = Date().toLongString()
+                    testTime = Date().time
                 )
                 add(dr)
             }
@@ -336,6 +331,13 @@ class DataManagerFragment :
         if (conMax != 0) {
             condition.lessOrEqual(TestResultModel_.concentration, conMax.toLong())
         }
+        if (testTimeMin != 0L) {
+            condition.greaterOrEqual(TestResultModel_.testTime, testTimeMin)
+        }
+        if (testTimeMax != 0L) {
+            condition.lessOrEqual(TestResultModel_.testTime, testTimeMax)
+        }
+
 
         if (results.isNotEmpty()) {
             condition.`in`(

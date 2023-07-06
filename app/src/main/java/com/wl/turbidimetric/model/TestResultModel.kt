@@ -77,11 +77,11 @@ data class TestResultModel(
     /**
      * 创建时间
      */
-    var createTime: String = "",
+    var createTime: Long = 0,
     /**
      * 检测时间 第四次
      */
-    var testTime: String = "",
+    var testTime: Long = 0,
 ) : BaseOBModel(0) {
 
     lateinit var project: ToOne<ProjectModel>

@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.ComponentName
 import android.content.Intent
 import android.widget.EditText
+import com.wl.turbidimetric.R
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.MachineState
@@ -133,6 +134,20 @@ fun calcAbsorbanceDifferences(
  */
 fun calcAbsorbanceDifference(resultTest1: BigDecimal, resultTest4: BigDecimal): BigDecimal {
     return resultTest4 - resultTest1
+}
+
+/**
+ * 根据浓度值和临界值计算阴阳性
+ * @param con Int
+ * @param ljz Int
+ * @return String
+ */
+fun calcShowTestResult(con: Int, ljz: Int): String {
+    return if (con >= ljz) {
+        getResource().getString(R.string.result_positive)
+    } else {
+        getResource().getString(R.string.result_negative)
+    }
 }
 
 /**

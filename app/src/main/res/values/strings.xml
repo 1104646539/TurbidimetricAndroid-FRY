@@ -6,7 +6,8 @@
     <string name="nav_settings">参数设置</string>
     <string name="nav_repeatability">重复性</string>
     <string name="nav_shutdown">关机</string>
-
+    <string name="result_negative">阴性</string>
+    <string name="result_positive">阳性</string>
 
     <string-array name="results">
         <item>阴性</item>

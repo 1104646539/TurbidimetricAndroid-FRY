@@ -1082,6 +1082,10 @@ class HomeViewModel(
                     cons.add(con)
                     resultModels[pos]?.absorbances = abs
                     resultModels[pos]?.concentration = con
+                    resultModels[pos]?.testResult = calcShowTestResult(
+                        con,
+                        resultModels[pos]?.project?.target?.projectLjz ?: 100
+                    )
                 }
             }
             else -> {}
@@ -1623,7 +1627,7 @@ class HomeViewModel(
     override fun readDataMoveCuvetteDripReagentModel(reply: ReplyModel<MoveCuvetteDripReagentModel>) {
         if (!runningTest()) return
         if (!machineStateNormal()) return
-        Timber.d("接收到 移动比色皿 加试剂位 reply=$reply cuvettePos=$cuvettePos stirProbeCleaningFinish=$stirProbeCleaningFinish stirProbeCleaningRecoverStir=$stirProbeCleaningRecoverStir takeReagentFinish=$takeReagentFinish" )
+        Timber.d("接收到 移动比色皿 加试剂位 reply=$reply cuvettePos=$cuvettePos stirProbeCleaningFinish=$stirProbeCleaningFinish stirProbeCleaningRecoverStir=$stirProbeCleaningRecoverStir takeReagentFinish=$takeReagentFinish")
         cuvetteMoveFinish = true
         goDripReagent()
 

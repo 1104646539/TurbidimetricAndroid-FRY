@@ -45,7 +45,8 @@ object PrintUtil {
 
         sb.append("编号:${result.detectionNum ?: ""}\n")
         sb.append("吸光度:${result.absorbances?.setScale(5, RoundingMode.HALF_UP) ?: ""}\n")
-        sb.append("浓度:${result.concentration ?: ""}\n")
+        sb.append("浓度:${result.concentration ?: ""} ${result.project.target.projectUnit}\n")
+        sb.append("检测结果:${result.testResult ?: ""}\n")
         sb.append("检测时间:${result.testTime ?: ""}\n")
 
         sb.append("\n")

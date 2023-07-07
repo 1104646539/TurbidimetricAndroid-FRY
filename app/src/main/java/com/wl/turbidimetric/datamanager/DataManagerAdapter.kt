@@ -48,7 +48,8 @@ class DataManagerAdapter :
             binding.tvAbsorbances.text = item?.absorbances?.toString() ?: "-"
             binding.tvResult.text = item?.testResult ?: "-"
             binding.tvConcentration.text = item?.concentration?.toString() ?: "-"
-            binding.tvTestTime.text = item?.testTime?.longToStr() ?: "-"
+            binding.tvTestTime.text =
+                if (item?.testTime == 0L) "-" else item?.testTime?.longToStr() ?: "-"
             binding.tvTestValue1.text = item?.testValue1?.toString() ?: "-"
             binding.tvTestValue2.text = item?.testValue2?.toString() ?: "-"
             binding.tvTestValue3.text = item?.testValue3?.toString() ?: "-"

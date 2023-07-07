@@ -534,8 +534,8 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
     }
 
     private fun openAllDoor() {
-//        openSampleDoor()
-//        openCuvetteDoor()
+        openSampleDoor()
+        openCuvetteDoor()
     }
 
     /**

@@ -1623,7 +1623,7 @@ class HomeViewModel(
     override fun readDataMoveCuvetteDripReagentModel(reply: ReplyModel<MoveCuvetteDripReagentModel>) {
         if (!runningTest()) return
         if (!machineStateNormal()) return
-        Timber.d("接收到 移动比色皿 加试剂位 reply=$reply cuvettePos=$cuvettePos stirProbeCleaningFinish=$stirProbeCleaningFinish stirProbeCleaningRecoverStir=$stirProbeCleaningRecoverStir")
+        Timber.d("接收到 移动比色皿 加试剂位 reply=$reply cuvettePos=$cuvettePos stirProbeCleaningFinish=$stirProbeCleaningFinish stirProbeCleaningRecoverStir=$stirProbeCleaningRecoverStir takeReagentFinish=$takeReagentFinish" )
         cuvetteMoveFinish = true
         goDripReagent()
 
@@ -1631,7 +1631,7 @@ class HomeViewModel(
 
         goTest()
 
-        if (dripReagentFinish && stirFinish && testFinish) {//如果这一步，没有进行加样|搅拌|检测。又有需要加样|搅拌|检测的比色皿。说明还没到位置，继续移动
+        if (takeReagentFinish && dripReagentFinish && stirFinish && testFinish) {//如果这一步，没有进行加样|搅拌|检测。又有需要加样|搅拌|检测的比色皿。说明还没到位置，继续移动
             if (mCuvetteStates[cuvetteShelfPos]?.filter { it.state == CuvetteState.DripReagent || it.state == CuvetteState.Stir }
                     ?.isNotEmpty() == true) {
                 moveCuvetteDripReagent()
@@ -1760,8 +1760,8 @@ class HomeViewModel(
     }
 
     private fun openAllDoor() {
-//        openSampleDoor()
-//        openCuvetteDoor()
+        openSampleDoor()
+        openCuvetteDoor()
     }
 
     /**

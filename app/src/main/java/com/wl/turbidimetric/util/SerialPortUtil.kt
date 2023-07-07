@@ -550,15 +550,20 @@ class SerialPortUtil(val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("Co
      */
     fun takeReagent() {
 //        Timber.d("发送 取试剂")
-        writeAsync(
-            createCmd(
-                SerialGlobal.CMD_TakeReagent,
-                data1 = (LocalData.TakeReagentR2 shr 8).toUByte(),
-                data2 = LocalData.TakeReagentR2.toUByte(),
-                data3 = (LocalData.TakeReagentR1 shr 8).toUByte(),
-                data4 = LocalData.TakeReagentR1.toUByte()
+        GlobalScope.launch {
+            if (SystemGlobal.isCodeDebug) {
+                delay(1000)
+            }
+            writeAsync(
+                createCmd(
+                    SerialGlobal.CMD_TakeReagent,
+                    data1 = (LocalData.TakeReagentR2 shr 8).toUByte(),
+                    data2 = LocalData.TakeReagentR2.toUByte(),
+                    data3 = (LocalData.TakeReagentR1 shr 8).toUByte(),
+                    data4 = LocalData.TakeReagentR1.toUByte()
+                )
             )
-        )
+        }
     }
 
     /**

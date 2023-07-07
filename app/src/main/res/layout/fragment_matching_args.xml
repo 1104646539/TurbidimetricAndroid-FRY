@@ -237,14 +237,14 @@
                         android:stateListAnimator="@null"
                         android:text="调试框" />
 
-                    <Button
-                        android:id="@+id/btn_debug2"
-                        style="@style/BtnPositive"
-                        android:layout_width="wrap_content"
-                        android:layout_height="60dp"
-                        android:layout_marginLeft="30dp"
-                        android:stateListAnimator="@null"
-                        android:text="添加参数" />
+<!--                    <Button-->
+<!--                        android:id="@+id/btn_debug2"-->
+<!--                        style="@style/BtnPositive"-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="60dp"-->
+<!--                        android:layout_marginLeft="30dp"-->
+<!--                        android:stateListAnimator="@null"-->
+<!--                        android:text="添加参数" />-->
                 </LinearLayout>
             </LinearLayout>
 

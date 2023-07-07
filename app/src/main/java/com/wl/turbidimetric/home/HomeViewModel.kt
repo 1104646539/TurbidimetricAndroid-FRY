@@ -443,7 +443,8 @@ class HomeViewModel(
 //  val tempSampleState = intArrayOf(1, 0, 1, 0, 1, 0, 0, 0, 0, 1)
 
     //测试用，样本是否存在
-    val sampleExists = mutableListOf(true, true, true, true, true, true, true, true, true, true)
+    val sampleExists =
+        mutableListOf(true, true, true, true, true, true, true, true, true, true)
 
     //测试用 每排之间的检测间隔
     val testS: Long = 100;
@@ -510,6 +511,8 @@ class HomeViewModel(
 
         mSamplesStates = initSampleStates()
         mCuvetteStates = initCuvetteStates()
+        cuvetteStates.postValue(mCuvetteStates)
+        samplesStates.postValue(mSamplesStates)
 
         Timber.d("跳过 $cuvetteStartPos 个比色皿")
 
@@ -754,9 +757,9 @@ class HomeViewModel(
 
         //最后一个位置不需要扫码，直接取样
         if (samplePos < sampleMax) {
-//            if ((SystemGlobal.isCodeDebug && !sampleExists[samplePos]) || (isAuto() && LocalData.SampleExist && !exist)) {
-            //如果是自动模式并且已开启样本传感器,并且是未识别到样本，才是没有样本
-            if ((isAuto() && LocalData.SampleExist && !exist)) {
+            if ((SystemGlobal.isCodeDebug && !sampleExists[samplePos]) || (isAuto() && LocalData.SampleExist && !exist)) {
+                //如果是自动模式并且已开启样本传感器,并且是未识别到样本，才是没有样本
+//            if ((isAuto() && LocalData.SampleExist && !exist)) {
                 //没有样本，移动到下一个位置
                 Timber.d("没有样本,移动到下一个位置")
                 scanFinish = true
@@ -1301,10 +1304,8 @@ class HomeViewModel(
                 moveCuvetteTest()
             }
         } else {
-            //当切换状态时，当前下位机的比色皿位置 cuvettePos != 0，则需要计算需要回退多少格才回到可使用的第一个比色皿的位置
-            //直接移动到可使用的第一个比色皿的位置
-            //如果 nextStartPos > -1 说明这一排比色皿有跳过的 ，那么就直接移动到可使用的第一个比色皿的位置
-            Timber.d("stepTest cuvettePos=$cuvettePos needMoveStep=$needMoveStep moveStep=${-(mCuvetteStates[cuvetteShelfPos]!!.size - needMoveStep)} $cuvetteStartPos")
+            //如果 nextStartPos > -1 代表要跳过，更新比色皿状态
+            Timber.d("stepTest cuvettePos=$cuvettePos needMoveStep=$needMoveStep $cuvetteStartPos")
             if (needMoveStep > -1) {
                 if (isFirstCuvetteShelf()) {
                     if (cuvetteStartPos > 0) {
@@ -1313,13 +1314,13 @@ class HomeViewModel(
                         }
                     }
                 }
-                moveCuvetteTest(-(mCuvetteStates[cuvetteShelfPos]!!.size - needMoveStep - 2))
-            } else {
-                val nextStartPos = getNextStepCuvetteStartPos()
-                val moveStep =
-                    if (nextStartPos > -1) -(mCuvetteStates[cuvetteShelfPos]!!.size - (nextStartPos + 2)) else -cuvettePos
-                moveCuvetteTest(moveStep)
             }
+            //获取第一个需要检测的下标，计算当前位置到该位置的下标
+            val prevState =
+                if (state == TestState.Test3) CuvetteState.Test2 else CuvetteState.Test3
+            val firstIndex =
+                mCuvetteStates[cuvetteShelfPos]!!.indexOfFirst { it.state == prevState }
+            moveCuvetteTest(firstIndex - cuvettePos)
         }
     }
 
@@ -1629,6 +1630,13 @@ class HomeViewModel(
         goStir()
 
         goTest()
+
+        if (dripReagentFinish && stirFinish && testFinish) {//如果这一步，没有进行加样|搅拌|检测。又有需要加样|搅拌|检测的比色皿。说明还没到位置，继续移动
+            if (mCuvetteStates[cuvetteShelfPos]?.filter { it.state == CuvetteState.DripReagent || it.state == CuvetteState.Stir }
+                    ?.isNotEmpty() == true) {
+                moveCuvetteDripReagent()
+            }
+        }
 
         /**
          * 此步骤用于在跳过9个比色皿 && 正在跳过的这一排 && 在cuvettePos == 10时， 直接移动比色皿

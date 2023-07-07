@@ -34,7 +34,7 @@ object SystemGlobal {
     //仪器检测模式
 //    var machineTestModel = MachineTestModel.Auto
 
-    var isCodeDebug = false;
+    var isCodeDebug = true;
 
     //可监听的检测状态
     val obTestState = MutableLiveData(TestState.None)

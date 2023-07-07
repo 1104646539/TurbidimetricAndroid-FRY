@@ -185,19 +185,19 @@ class MatchingArgsFragment :
             vm.print()
         }
 
-        vd.btnDebug2.setOnClickListener {
-            DBManager.ProjectBox.put(ProjectModel().apply {
-                reagentNO = "5452"
-                reactionValues = intArrayOf(60, 91, 2722, 11722, 27298)
-                f0 = 9.702673786
-                f1 = 0.7425860767
-                f2 = -4.513632E-4
-                f3 = 1.406E-7
-                projectLjz = 100
-                fitGoodness = 0.9998
-                createTime = Date().toLongString()
-            })
-        }
+//        vd.btnDebug2.setOnClickListener {
+//            DBManager.ProjectBox.put(ProjectModel().apply {
+//                reagentNO = "5452"
+//                reactionValues = intArrayOf(60, 91, 2722, 11722, 27298)
+//                f0 = 9.702673786
+//                f1 = 0.7425860767
+//                f2 = -4.513632E-4
+//                f3 = 1.406E-7
+//                projectLjz = 100
+//                fitGoodness = 0.9998
+//                createTime = Date().toLongString()
+//            })
+//        }
 
         vd.btnDebugDialog.setOnClickListener {
             debugShowDetailsDialog.show(vm.testMsg.value ?: "", "确定", onConfirm = { it.dismiss() })

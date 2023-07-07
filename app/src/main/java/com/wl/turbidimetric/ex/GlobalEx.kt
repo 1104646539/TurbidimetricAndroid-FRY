@@ -1,5 +1,7 @@
 package com.wl.turbidimetric.ex
 
+import android.app.Activity
+import android.content.Intent
 import android.content.res.Resources
 import android.view.View
 import android.widget.Toast
@@ -85,6 +87,7 @@ inline fun Array<Array<SampleItem>?>.print(): String {
 fun <T> Boolean.PD(t1: () -> T, t2: () -> T): T {
     return if (this) t1() else t2()
 }
+
 /**
  * 当true时返回第一个参数，false返回第二个参数
  * @receiver Boolean
@@ -94,4 +97,21 @@ fun <T> Boolean.PD(t1: () -> T, t2: () -> T): T {
  */
 fun <T> Boolean.PD(t1: T, t2: T): T {
     return this.PD({ t1 }, { t2 })
+}
+
+/**
+ * 显示和隐藏导航栏
+ * @receiver Activity
+ * @param showNav Boolean
+ */
+fun Activity.showHideNav(showNav: Boolean) {
+    //设置广播发送隐藏虚拟按键命令
+    val showIntent = Intent()
+    showIntent.action = "com.android.intent.action.NAVBAR_SHOW"
+    if (showNav) {
+        showIntent.putExtra("cmd", "show")
+    } else {
+        showIntent.putExtra("cmd", "hide")
+    }
+    sendOrderedBroadcast(showIntent, null)
 }

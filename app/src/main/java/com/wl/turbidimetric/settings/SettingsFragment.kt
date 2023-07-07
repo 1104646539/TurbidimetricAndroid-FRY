@@ -1,5 +1,6 @@
 package com.wl.turbidimetric.settings
 
+import android.app.Activity
 import android.content.ComponentName
 import android.content.Intent
 import android.os.Bundle
@@ -63,6 +64,7 @@ class SettingsFragment :
         }
         vd.tvLauncher.setOnClickListener {
             showLauncher()
+            showHideNav()
         }
     }
 
@@ -70,21 +72,25 @@ class SettingsFragment :
         startActivity(getLauncher())
     }
 
-
+    /**
+     * 显示和隐藏导航栏
+     * @param showNav Boolean
+     */
     private fun showHideNav() {
         //设置广播发送隐藏虚拟按键命令
-        val showIntent = Intent()
-        showIntent.action = "com.android.intent.action.NAVBAR_SHOW"
         if (show) {
-            showIntent.putExtra("cmd", "hide")
+            requireActivity().showHideNav(false)
             show = false;
         } else {
-            showIntent.putExtra("cmd", "show")
+            requireActivity().showHideNav(true)
             show = true;
         }
-        requireActivity().sendOrderedBroadcast(showIntent, null)
     }
 
+
+    /**
+     * 进入重复性测试
+     */
     private fun showRepeatability() {
         startActivity(
             Intent(requireContext(), TestActivity::class.java).putExtra(

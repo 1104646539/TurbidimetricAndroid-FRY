@@ -109,6 +109,9 @@ class DataManagerFragment :
                 }
             }
         }
+        adapter.onSelectChange = { pos, selected ->
+
+        }
     }
 
     fun test() {
@@ -254,11 +257,13 @@ class DataManagerFragment :
     }
 
     private fun getSelectData(): List<TestResultModel>? {
-        val all = adapter.snapshot().map { it!! }
-        val select = all.filter { it?.isSelect ?: false }
+//        val all = adapter.snapshot().map { it!! }
+//        val select = all.filter { it?.isSelect ?: false }
+//
+//        Timber.d("all=${all.size} select=${select.size}")
+//        return select
 
-        Timber.d("all=${all.size} select=${select.size}")
-        return select
+        return adapter.getSelectedItems()
     }
 
     /**

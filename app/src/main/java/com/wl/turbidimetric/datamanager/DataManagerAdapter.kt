@@ -34,6 +34,7 @@ class DataManagerAdapter :
     }
 
     public var onLongClick: ((pos: Long) -> Unit)? = null
+    public var onSelectChange: ((pos: Int, selected: Boolean) -> Unit)? = null
 
 
     class DataManagerViewHolder(val binding: ItemDatamanagerResultBinding) :
@@ -69,8 +70,21 @@ class DataManagerAdapter :
         }
     }
 
+
     override fun getItemViewType(position: Int): Int {
         return position
+    }
+
+    fun getSelectedItems(): List<TestResultModel> {
+        val items = mutableListOf<TestResultModel>().apply {
+            for (i in 0 until itemCount) {
+                val item =getItem(i)!!
+                if (item.isSelect) {
+                    add(item)
+                }
+            }
+        }
+        return items
     }
 
     override fun onBindViewHolder(holder: DataManagerViewHolder, position: Int) {
@@ -96,6 +110,11 @@ class DataManagerAdapter :
                     }
                 }
             }
+//            holder.binding.root.setOnClickListener {
+//                item?.let { item ->
+//                    onSelectChange?.invoke(holder.absoluteAdapterPosition, !item.isSelect)
+//                }
+//            }
             holder.binding.ivSelect.isSelected = item?.isSelect ?: false
             item?.let {
                 if (it.isSelect) {

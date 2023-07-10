@@ -136,6 +136,7 @@
                     style="@style/BtnPositive"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:visibility="gone"
                     android:layout_marginLeft="20dp"
                     android:minWidth="150dp"
                     android:text="清空" />
@@ -145,6 +146,7 @@
                     style="@style/BtnPositive"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:visibility="gone"
                     android:layout_marginLeft="20dp"
                     android:minWidth="150dp"
                     android:text="添加" />
@@ -152,6 +154,7 @@
                 <Button
                     android:id="@+id/btnInsert2"
                     style="@style/BtnPositive"
+                    android:visibility="gone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="20dp"

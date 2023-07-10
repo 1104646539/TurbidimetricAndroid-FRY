@@ -1,12 +1,10 @@
 package com.wl.turbidimetric.datamanager
 
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -18,7 +16,6 @@ import com.wl.turbidimetric.databinding.FragmentDataManagerBinding
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.db.DBManager
 import com.wl.turbidimetric.ex.PD
-import com.wl.turbidimetric.ex.toLongString
 import com.wl.turbidimetric.ex.toast
 import com.wl.turbidimetric.model.ConditionModel
 import com.wl.turbidimetric.model.TestResultModel
@@ -26,6 +23,7 @@ import com.wl.turbidimetric.model.TestResultModel_
 import com.wl.turbidimetric.print.PrintUtil
 import com.wl.turbidimetric.util.ExportExcelUtil
 import com.wl.turbidimetric.view.ConditionDialog
+import com.wl.turbidimetric.view.HiltDialog
 import com.wl.turbidimetric.view.ResultDetailsDialog
 import com.wl.wwanandroid.base.BaseFragment
 import io.objectbox.query.Query
@@ -58,6 +56,13 @@ class DataManagerFragment :
      */
     val conditionDialog by lazy {
         ConditionDialog(requireContext())
+    }
+
+    /**
+     * 删除对话框
+     */
+    val deleteDialog by lazy {
+        HiltDialog(requireContext())
     }
 
     override fun onCreateView(
@@ -163,70 +168,36 @@ class DataManagerFragment :
 
     private fun listener() {
         test()
-        //        vd.btnInsert.setOnClickListener {
 
-//        }
-//
-//        vd.btnQuery.setOnClickListener {
-//
-//            Log.d(TAG, "size1= ${adapter.snapshot().items.size} ")
-//        }
-//
-//        vd.btnChange.setOnClickListener {
-//            val row = vd.etRow.text.toString().toInt()
-//            val drw = adapter.snapshot().items[row].copy()
-//            drw.testResult = "修改过"
-//            drw.project.target?.projectName += "修改过"
-//            drw.project.target?.let {
-//                DBManager.projectBox.put(it)
-//            }
-//            val result = viewModel.update(drw)
-//            Log.d(TAG, "row= ${row} result=${result}")
-//        }
 
         vd.btnDelete.setOnClickListener {
-//            val row = vd.etRow.text.toString().toInt()
-//            val result = viewModel.remove(adapter.snapshot().items[row])
-//            Log.d(TAG, "row= ${row} result=${result}")
-//            val result = adapter.snapshot().items[5]
-            val results = adapter.snapshot().filter { it?.isSelect ?: false }
-            if (!results.isNullOrEmpty()) DBManager.TestResultBox.remove(results)
+            vm.showDeleteDialog.postValue(true)
+        }
+
+        vm.showDeleteDialog.observe(this) {
+            if (it) {
+                deleteDialog.show("确定要删除数据吗?", "确定", {
+                    val results = getSelectData()
+                    it.dismiss()
+                    if (!results.isNullOrEmpty()) {
+                        vm.clickDeleteDialogConfirm(results)
+                    }
+                }, "取消", {
+                    it.dismiss()
+                }, false)
+            }
         }
         vd.btnInsert.setOnClickListener {
-//            DBManager.TestResultBox.put(TestResultModel(detectionNum = LocalData.getDetectionNumInc()))
 
         }
-        vd.btnInsert2.setOnClickListener {
-//            lifecycleScope.launch {
-//                val testDatas = createTestData()
-//                val fileName: String =
-//                    "/sdcard/" + "simpleWrite2 " + System.currentTimeMillis() + ".xlsx"
-//                Timber.d("starttime = ${Date()}")
-//                ExcelUtils.initExcel(fileName, arrayOf())
-//                ExcelUtils.writeObjListToExcel(testDatas, fileName);
-//                Timber.d("endtime = ${Date()}")
-//            }
 
-//            lifecycleScope.launch {
-//                val list = mutableListOf<TestResultModel>()
-//                repeat(300) {
-//                    list.add(TestResultModel(detectionNum = LocalData.getDetectionNumInc()))
-//                }
-//                DBManager.TestResultBox.put(list)
-//            }
-        }
         vd.btnCondition.setOnClickListener {
             showConditionDialog()
         }
-        vd.btnClean.setOnClickListener {
-            DBManager.TestResultBox.removeAll()
-        }
+
         vd.btnExportExcel.setOnClickListener {
             exportExcel()
         }
-
-//        adapter.stateRestorationPolicy =
-//            RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
 
         adapter.onLongClick = { id ->
             if (id > 0) {
@@ -316,7 +287,11 @@ class DataManagerFragment :
         )
 
         if (name.isNotEmpty()) {
-            condition.contains(TestResultModel_.name, name, QueryBuilder.StringOrder.CASE_INSENSITIVE)
+            condition.contains(
+                TestResultModel_.name,
+                name,
+                QueryBuilder.StringOrder.CASE_INSENSITIVE
+            )
         }
         if (qrcode.isNotEmpty()) {
             condition.contains(

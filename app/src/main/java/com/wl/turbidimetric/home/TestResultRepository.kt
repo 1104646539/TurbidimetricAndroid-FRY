@@ -26,8 +26,8 @@ class TestResultRepository() {
         return DBManager.TestResultBox.put(testResultModel)
     }
 
-    fun removeTestResult(testResultModel: TestResultModel): Boolean {
-        return DBManager.TestResultBox.remove(testResultModel)
+    fun removeTestResult(testResults: List<TestResultModel>) {
+         DBManager.TestResultBox.remove(testResults)
     }
 
 }

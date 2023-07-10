@@ -1,5 +1,6 @@
 package com.wl.turbidimetric.datamanager
 
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -17,6 +18,11 @@ class DataManagerViewModel(
     private val projectRepository: ProjectRepository = ProjectRepository(),
     private val testResultRepository: TestResultRepository = TestResultRepository()
 ) : BaseViewModel() {
+    /**
+     * 显示删除提示对话框
+     */
+    val showDeleteDialog = MutableLiveData(false)
+
 
     public fun item(condition: Query<TestResultModel>?): Flow<PagingData<TestResultModel>> {
         return testResultRepository.datas(condition).cachedIn(viewModelScope)
@@ -30,10 +36,13 @@ class DataManagerViewModel(
         return testResultRepository.addTestResult(testResult)
     }
 
-    fun remove(testResult: TestResultModel): Boolean {
-        return testResultRepository.removeTestResult(testResult)
+    fun remove(testResults: List<TestResultModel>) {
+        testResultRepository.removeTestResult(testResults)
     }
 
+    fun clickDeleteDialogConfirm(results: List<TestResultModel>) {
+        remove(results)
+    }
 
 }
 

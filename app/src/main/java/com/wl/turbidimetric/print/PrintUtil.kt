@@ -1,5 +1,6 @@
 package com.wl.turbidimetric.print
 
+import com.wl.turbidimetric.ex.longToStr
 import com.wl.turbidimetric.ex.scale
 import com.wl.turbidimetric.model.TestResultModel
 import com.wl.turbidimetric.util.BaseSerialPortUtil
@@ -38,16 +39,21 @@ object PrintUtil {
     private fun getTestResultMsg(result: TestResultModel): String {
 
         val sb = StringBuilder()
-        sb.append("\n")
-        sb.append("\n")
-        sb.append("\n")
 
+        sb.append("\n")
+        sb.append("\n")
+        sb.append("粪便隐血定量检测报告".fix(17))
+        sb.append("\n")
 
         sb.append("编号:${result.detectionNum ?: ""}\n")
-        sb.append("吸光度:${result.absorbances?.setScale(5, RoundingMode.HALF_UP) ?: ""}\n")
-        sb.append("浓度:${result.concentration ?: ""} ${result.project.target.projectUnit}\n")
-        sb.append("检测结果:${result.testResult ?: ""}\n")
-        sb.append("检测时间:${result.testTime ?: ""}\n")
+        sb.append("条码:${result.sampleQRCode ?: ""}\n")
+        sb.append("姓名:${result.name ?: ""}\n")
+        sb.append("性别:${result.gender ?: ""}\n")
+        sb.append("年龄:${result.age ?: ""}\n")
+//        sb.append("吸光度:${result.absorbances?.setScale(5, RoundingMode.HALF_UP) ?: ""}\n")
+        sb.append("血红蛋白浓度值:${result.concentration ?: ""} ${result.project.target?.projectUnit ?: ""}\n")
+        sb.append("检测结论:${result.testResult ?: ""}\n")
+        sb.append("检测日期:${result.testTime.longToStr() ?: ""}\n")
 
         sb.append("\n")
         sb.append("\n")
@@ -161,6 +167,19 @@ object PrintUtil {
         } else {
             val sb = StringBuilder()
             repeat(length - this.length) {
+                sb.append(" ")
+            }
+            sb.append(this)
+            sb.toString()
+        }
+    }
+
+    private fun String.fixMin(length: Int): String {
+        return if (this.length > length) {
+            this
+        } else {
+            val sb = StringBuilder()
+            repeat((length - this.length) / 2) {
                 sb.append(" ")
             }
             sb.append(this)

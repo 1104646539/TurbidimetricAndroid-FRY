@@ -118,11 +118,15 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         super.onResume()
         //授权后重新获取
 
-        //授权后重新获取
         val context: Context = this
         DocumentsUtils.`as` = PreferenceManager.getDefaultSharedPreferences(context)
             .getString(StorageUtil.curPath, null)
 
+    }
+
+    override fun onBackPressed() {
+//        super.onBackPressed()
+        moveTaskToBack(true)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -138,23 +142,23 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         super.onActivityResult(requestCode, resultCode, data)
 
 
-        //授权一次后重启开机不用再次授权
-        if (resultCode != Activity.RESULT_OK) return
-        val treeUri = data!!.data
-        val pickedDir = DocumentFile.fromTreeUri(
-            this,
-            treeUri!!
-        )
-        grantUriPermission(
-            packageName,
-            treeUri,
-            Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-        )
-        contentResolver.takePersistableUriPermission(
-            treeUri,
-            Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-        )
-        val YourAudioFile = pickedDir!!.findFile("YourAudioFileNameGoesHere")
+//        //授权一次后重启开机不用再次授权
+//        if (resultCode != Activity.RESULT_OK) return
+//        val treeUri = data!!.data
+//        val pickedDir = DocumentFile.fromTreeUri(
+//            this,
+//            treeUri!!
+//        )
+//        grantUriPermission(
+//            packageName,
+//            treeUri,
+//            Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+//        )
+//        contentResolver.takePersistableUriPermission(
+//            treeUri,
+//            Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+//        )
+//        val YourAudioFile = pickedDir!!.findFile("YourAudioFileNameGoesHere")
     }
 
     private fun initQrCode() {

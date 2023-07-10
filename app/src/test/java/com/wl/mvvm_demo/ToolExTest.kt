@@ -3,16 +3,13 @@ package com.wl.mvvm_demo
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.model.ProjectModel
-import com.wl.turbidimetric.util.CurveFitter
 import org.junit.Assert
 import org.junit.Test
 import java.math.BigDecimal
-import java.math.RoundingMode
 import java.text.NumberFormat
 import java.util.*
 import kotlin.math.log10
 import kotlin.math.pow
-import kotlin.math.sqrt
 
 class ToolExTest {
 
@@ -298,6 +295,18 @@ class ToolExTest {
         }
         res?.forEach {
             println("it=$it")
+        }
+    }
+
+    @Test
+    fun calcTarget() {
+        var target = -15.625
+        if (target < 0) {
+            var range = 15
+            val random = Random()
+            range = random.nextInt(10) + range
+            target = target + range / 100.0 * target
+            println("target=$target")
         }
     }
 

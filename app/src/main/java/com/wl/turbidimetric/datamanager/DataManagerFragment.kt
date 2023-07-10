@@ -214,10 +214,18 @@ class DataManagerFragment :
         }
 
         vd.btnPrint.setOnClickListener {
-            val results = adapter.snapshot().filter { it?.isSelect ?: false }
-            PrintUtil.printTest(results)
+            print()
         }
 
+    }
+
+    private fun print() {
+        val results = getSelectData()
+        if (results.isNullOrEmpty()) {
+            toast("请选择数据")
+            return
+        }
+        PrintUtil.printTest(results)
     }
 
     /**
@@ -246,7 +254,11 @@ class DataManagerFragment :
     }
 
     private fun getSelectData(): List<TestResultModel>? {
-        return adapter.snapshot().filter { it?.isSelect ?: false }.map { it!! }
+        val all = adapter.snapshot().map { it!! }
+        val select = all.filter { it?.isSelect ?: false }
+
+        Timber.d("all=${all.size} select=${select.size}")
+        return select
     }
 
     /**

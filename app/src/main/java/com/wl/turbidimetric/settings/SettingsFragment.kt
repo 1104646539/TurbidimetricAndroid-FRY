@@ -64,7 +64,7 @@ class SettingsFragment :
         }
         vd.tvLauncher.setOnClickListener {
             showLauncher()
-            showHideNav()
+            requireActivity().showHideNav(true)
         }
     }
 

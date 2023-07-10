@@ -918,8 +918,10 @@ class HomeViewModel(
         val resultModel = TestResultModel(
             sampleQRCode = str ?: "",
             createTime = Date().time,
-            detectionNum = LocalData.getDetectionNumInc()
-        )
+            detectionNum = LocalData.getDetectionNumInc(),
+        ).apply {
+            project.target = selectProject
+        }
 
         resultModels.add(resultModel)
         return resultModel
@@ -1072,11 +1074,11 @@ class HomeViewModel(
                 resultModels[pos]?.testValue4 = resultTest4[pos]
                 resultModels[pos]?.testOriginalValue4 = resultOriginalTest4[pos]
                 resultModels[pos]?.testTime = Date().time
-
                 //计算单个结果浓度
                 val abs = calcAbsorbanceDifference(resultTest1[pos], resultTest4[pos])
                 absorbances.add(abs)
                 selectProject?.let { project ->
+//                    resultModels[pos]?.project?.target = project
                     var con = calcCon(abs, project)
                     con = if (con.toDouble() < 0.0) 0 else con
                     cons.add(con)

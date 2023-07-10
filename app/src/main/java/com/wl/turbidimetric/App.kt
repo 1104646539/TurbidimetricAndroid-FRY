@@ -34,7 +34,6 @@ class App : Application() {
             repeat(1) {
                 DBManager.ProjectBox.put(ProjectModel().apply {
                     reagentNO = it.toString()
-                    reactionValues = intArrayOf(60, 91, 2722, 11722, 27298)
                 })
             }
         }

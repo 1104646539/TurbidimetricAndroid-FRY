@@ -8,6 +8,31 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <androidx.cardview.widget.CardView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="30dp"
+            android:visibility="gone"
+            android:minWidth="100dp"
+            android:minHeight="100dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/icon_temp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="参数设置" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
         <TextView
             android:id="@+id/tvParamsSetting"
             style="@style/TextTitle"
@@ -44,6 +69,7 @@
             android:padding="8dp"
             android:text="重复性测试"
             android:textSize="26sp" />
+
         <TextView
             android:id="@+id/tv_nav"
             style="@style/TextTitle"
@@ -52,6 +78,7 @@
             android:padding="8dp"
             android:text="隐藏和显示导航栏"
             android:textSize="26sp" />
+
         <TextView
             android:id="@+id/tv_launcher"
             style="@style/TextTitle"

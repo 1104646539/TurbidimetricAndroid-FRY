@@ -42,7 +42,9 @@ object PrintUtil {
 
         sb.append("\n")
         sb.append("\n")
-        sb.append("粪便隐血定量检测报告".fix(17))
+        sb.append("粪便隐血定量检测报告".fixMin(25))
+        sb.append("\n")
+        sb.append("\n")
         sb.append("\n")
 
         sb.append("编号:${result.detectionNum ?: ""}\n")
@@ -51,7 +53,7 @@ object PrintUtil {
         sb.append("性别:${result.gender ?: ""}\n")
         sb.append("年龄:${result.age ?: ""}\n")
 //        sb.append("吸光度:${result.absorbances?.setScale(5, RoundingMode.HALF_UP) ?: ""}\n")
-        sb.append("血红蛋白浓度值:${result.concentration ?: ""} ${result.project.target?.projectUnit ?: ""}\n")
+        sb.append("浓度值:${result.concentration ?: ""} ${result.project.target?.projectUnit ?: ""}\n")
         sb.append("检测结论:${result.testResult ?: ""}\n")
         sb.append("检测日期:${result.testTime.longToStr() ?: ""}\n")
 

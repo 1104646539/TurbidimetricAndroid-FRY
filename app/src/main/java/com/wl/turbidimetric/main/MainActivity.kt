@@ -20,6 +20,7 @@ import androidx.lifecycle.lifecycleScope
 import com.wl.turbidimetric.MainViewModel
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.ActivityMainBinding
+import com.wl.turbidimetric.ex.showHideNav
 import com.wl.turbidimetric.global.EventGlobal
 import com.wl.turbidimetric.global.EventMsg
 import com.wl.turbidimetric.global.SystemGlobal
@@ -95,6 +96,10 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
 
     }
 
+    override fun onStart() {
+        super.onStart()
+        showHideNav(false)
+    }
     private fun showOpenDocumentTree() {
         Log.e("showOpenDocumentTree", "start check sd card...")
         var intent: Intent? = null
@@ -177,7 +182,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
             showOpenDocumentTree()
         }
         initNav()
-
+        showHideNav(false)
 
         test()
     }

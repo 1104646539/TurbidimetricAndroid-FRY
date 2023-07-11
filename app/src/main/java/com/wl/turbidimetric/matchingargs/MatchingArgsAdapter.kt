@@ -19,21 +19,7 @@ class MatchingArgsAdapter() :
     RecyclerView.Adapter<MatchingArgsAdapter.MatchingArgsViewHolder>() {
     var onSelectChange: ((ProjectModel) -> Unit)? = null
 
-    //    class MyDiff : DiffUtil.ItemCallback<ProjectModel>() {
-//        override fun areItemsTheSame(
-//            oldItem: ProjectModel,
-//            newItem: ProjectModel
-//        ): Boolean {
-//            return oldItem == newItem;
-//        }
-//
-//        override fun areContentsTheSame(
-//            oldItem: ProjectModel,
-//            newItem: ProjectModel
-//        ): Boolean {
-//            return oldItem == newItem;
-//        }
-//    }
+
     val items: MutableList<ProjectModel> = mutableListOf()
     fun submit(items: MutableList<ProjectModel>) {
         this.items.clear()

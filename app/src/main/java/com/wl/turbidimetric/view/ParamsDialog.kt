@@ -8,6 +8,16 @@ import com.wl.turbidimetric.ex.isNum
 import com.wl.turbidimetric.ex.selectionLast
 import com.wl.turbidimetric.ex.toast
 
+/**
+ * 参数设置对话框
+ * @property context Context
+ * @property etTakeR1 EditText
+ * @property etTakeR2 EditText
+ * @property etSampling EditText
+ * @property etSamplingProbeCleaningTime EditText
+ * @property etStirProbeCleaningTime EditText
+ * @constructor
+ */
 class ParamsDialog(val context: Context) : BaseDialog(context) {
     val etTakeR1: EditText
     val etTakeR2: EditText

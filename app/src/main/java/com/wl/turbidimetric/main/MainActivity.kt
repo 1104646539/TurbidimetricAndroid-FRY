@@ -70,29 +70,14 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
                     initQrCode()
                 }
                 handler_init_upan -> {
-                    initUpan()
+
                 }
             }
         }
     }
 
 
-    private fun initUpan() {
-//        if (DocumentsUtils.checkWritableRootPath(
-//                this,
-//                SystemGlobal.uPath
-//            )
-//        ) {   //检查sd卡/u盘路径是否有 权限 没有显示dialog
-//            showOpenDocumentTree()
-//        } else {
-//            //有权限
-//            val root = File(SystemGlobal.uPath)
-//            for (f in root.list()) {
-//                Timber.d( "f=${f}")
-//            }
-//        }
 
-    }
 
     override fun onStart() {
         super.onStart()

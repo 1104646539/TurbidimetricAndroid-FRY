@@ -13,6 +13,9 @@ import com.wl.turbidimetric.home.HomeViewModel
 import com.wl.turbidimetric.model.SampleState
 import kotlin.math.abs
 
+/**
+ * 首页样本框
+ */
 class SampleShelfView :
     View {
     constructor(context: Context) : this(context, null)

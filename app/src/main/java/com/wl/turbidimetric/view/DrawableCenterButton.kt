@@ -4,6 +4,11 @@ import android.content.Context
 import android.graphics.Canvas
 import android.util.AttributeSet
 
+/**
+ * 按钮
+ * 文字和图片居中
+ * @constructor
+ */
 open class DrawableCenterButton(context: Context, attrs: AttributeSet?) :
     androidx.appcompat.widget.AppCompatButton(context, attrs) {
 
@@ -31,33 +36,5 @@ open class DrawableCenterButton(context: Context, attrs: AttributeSet?) :
         canvas.translate(dx, 0f) // 往右移动
         return canvas
     }
-//    @Override
-//    override fun onDraw(canvas: Canvas) {
-//
-//        val drawables = getCompoundDrawables();
-//
-//        if (drawables != null) {
-//
-//            val drawableLeft = drawables[0];
-//
-//            if (drawableLeft != null) {
-//
-//                val textWidth = getPaint().measureText(getText().toString());
-//
-//                val drawablePadding = getCompoundDrawablePadding();
-//
-//                val drawableWidth = drawableLeft.getIntrinsicWidth();
-//
-//                val bodyWidth = textWidth + drawableWidth + drawablePadding;
-//
-//                canvas.translate((getWidth() - bodyWidth) / 2, 0F);
-//
-//            }
-//
-//        }
-//
-//        super.onDraw(canvas);
-//
-//    }
 
 }

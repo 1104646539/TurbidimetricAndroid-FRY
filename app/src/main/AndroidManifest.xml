@@ -27,17 +27,21 @@
             android:configChanges="orientation|keyboardHidden|keyboard"
             android:exported="true"
             android:windowSoftInputMode="adjustPan|stateAlwaysHidden"></activity>
+
+        <!--        android:windowSoftInputMode="adjustPan|stateAlwaysHidden|adjustNothing"-->
+        <!--        android:configChanges="orientation|keyboardHidden|keyboard"-->
+
         <activity
             android:name=".main.MainActivity"
             android:configChanges="orientation|keyboardHidden|keyboard"
-            android:exported="true"
-            android:windowSoftInputMode="adjustPan|stateAlwaysHidden|adjustNothing">
+            android:windowSoftInputMode="adjustPan|stateAlwaysHidden|adjustNothing"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.HOME" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.MONKEY" />
+<!--                <category android:name="android.intent.category.HOME" />-->
+<!--                <category android:name="android.intent.category.DEFAULT" />-->
+<!--                <category android:name="android.intent.category.MONKEY" />-->
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

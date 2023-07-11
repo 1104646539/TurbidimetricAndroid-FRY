@@ -1,5 +1,6 @@
 package com.wl.turbidimetric.view;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -17,6 +18,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.wl.turbidimetric.R;
@@ -48,7 +50,7 @@ public class NavigationView extends View {
 
     List<NavItem> navItems;
     //当前选中的下标
-    public int selectIndex ;
+    public int selectIndex;
     //背景颜色
     private int colorBg = getResources().getColor(R.color.white);
     //背景颜色
@@ -232,11 +234,30 @@ public class NavigationView extends View {
     }
 
     private void selectIndexChange(int index) {
+        float top = 0;
+        if (selectIndex < 0) {
+            top = rects[0].top;
+        } else {
+            top = rects[selectIndex].top;
+        }
+        ValueAnimator animator = ValueAnimator.ofFloat(top, rects[index].top);
+        animator.setDuration(3000);
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(@NonNull ValueAnimator animation) {
+                selectTop = (float) animation.getAnimatedValue();
+                postInvalidate();
+            }
+        });
+        animator.start();
+
         selectIndex = index;
         if (navigationSelectedIndexChangeListener != null) {
             navigationSelectedIndexChangeListener.onSelectedIndexChange(selectIndex);
         }
-        postInvalidate();
+//        postInvalidate();
+
+
     }
 
     NavigationSelectedIndexChangeListener navigationSelectedIndexChangeListener;
@@ -312,25 +333,32 @@ public class NavigationView extends View {
 //        return names == null || names.length == 0;
 //    }
 
+    RectF rectFSelect = new RectF(0, 0, 0, 0);
+    float selectTop = 0;
+    int iconPadding = 14;
+
     /**
      * 绘制被选中的背景
      *
      * @param canvas
      */
     private void drawSelectedBg(Canvas canvas) {
-        int iconPadding = 14;
-        selectedPath.reset();
-        selectedPath.moveTo(0, rects[selectIndex].top - iconPadding);
-
-        selectedPath.lineTo(width, rects[selectIndex].top - iconPadding);
-
-        selectedPath.lineTo(width, rects[selectIndex].bottom + iconPadding + nameHeight);
-
-        selectedPath.lineTo(0, rects[selectIndex].bottom + iconPadding + nameHeight);
-
-        selectedPath.close();
-
-        canvas.drawPath(selectedPath, paintSelectedBg);
+//        int iconPadding = 14;
+//        selectedPath.reset();
+//        selectedPath.moveTo(0, rects[selectIndex].top - iconPadding);
+//
+//        selectedPath.lineTo(width, rects[selectIndex].top - iconPadding);
+//
+//        selectedPath.lineTo(width, rects[selectIndex].bottom + iconPadding + nameHeight);
+//
+//        selectedPath.lineTo(0, rects[selectIndex].bottom + iconPadding + nameHeight);
+//
+//        selectedPath.close();
+//
+//        canvas.drawPath(selectedPath, paintSelectedBg);
+        rectFSelect.top = selectTop;
+        rectFSelect.bottom = rectFSelect.top + iconPadding + nameHeight;
+        canvas.drawRect(rectFSelect, paintSelectedBg);
     }
 
     /**
@@ -355,6 +383,7 @@ public class NavigationView extends View {
         height = getMeasuredHeight();
         setMeasuredDimension(width, height);
         Timber.d("onMeasure height=" + height + " width=" + width + "selectIndex=" + selectIndex);
+        rectFSelect = new RectF(0, 0, width, 0);
 
         initRect();
     }
@@ -402,7 +431,9 @@ public class NavigationView extends View {
 
             rectBitmapRange[i] = new Rect(0, 0, bitmaps[i].getWidth(), bitmaps[i].getHeight());
         }
-
+        if (selectIndex < 0) {
+            selectTop = rects[0].top;
+        }
 //        selectIndex = 0;
     }
 

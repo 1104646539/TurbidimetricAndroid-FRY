@@ -6,10 +6,7 @@ import android.content.*
 import android.content.res.Configuration
 import android.hardware.usb.UsbDevice
 import android.hardware.usb.UsbManager
-import android.os.Build
-import android.os.Handler
-import android.os.Message
-import android.os.Parcelable
+import android.os.*
 import android.os.storage.StorageManager
 import android.os.storage.StorageVolume
 import android.preference.PreferenceManager
@@ -78,6 +75,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
             }
         }
     }
+
 
     private fun initUpan() {
 //        if (DocumentsUtils.checkWritableRootPath(

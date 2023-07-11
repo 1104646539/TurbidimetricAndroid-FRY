@@ -54,5 +54,37 @@
         android:numeric="decimal"
         android:textSize="24sp" />
 
+    <TextView
+        style="@style/TextTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:text="取样针清洗时间(ms)" />
+
+    <EditText
+        android:id="@+id/et_sampling_probe_cleaning_time"
+        style="@style/EtDefault"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="numberDecimal"
+        android:numeric="decimal"
+        android:textSize="24sp" />
+
+    <TextView
+        style="@style/TextTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:text="搅拌针清洗时间(ms)" />
+
+    <EditText
+        android:id="@+id/et_stir_probe_cleaning_time"
+        style="@style/EtDefault"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="numberDecimal"
+        android:numeric="decimal"
+        android:textSize="24sp" />
+
 
 </LinearLayout>

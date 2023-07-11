@@ -11,10 +11,7 @@ import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.model.MachineTestModel
 import com.wl.turbidimetric.test.TestActivity
-import com.wl.turbidimetric.view.BaseDialog
-import com.wl.turbidimetric.view.HiltDialog
-import com.wl.turbidimetric.view.MachineTestModelDialog
-import com.wl.turbidimetric.view.OneEditDialog
+import com.wl.turbidimetric.view.*
 import com.wl.wwanandroid.base.BaseFragment
 import com.wl.wwanandroid.base.BaseViewModel
 import timber.log.Timber
@@ -33,6 +30,10 @@ class SettingsFragment :
 
     val machineTestModelDialog by lazy {
         MachineTestModelDialog(requireContext())
+    }
+
+    val paramsDialog by lazy {
+        ParamsDialog(requireContext())
     }
 
     override fun initViewModel() {
@@ -147,50 +148,30 @@ class SettingsFragment :
         }, true)
     }
 
+
     /**
      * 显示参数设置
      */
     private fun showParamsSettingDialog() {
-        val etTakeR1 = paramsDialog.getView<EditText>(R.id.et_take_r1)
-        val etTakeR2 = paramsDialog.getView<EditText>(R.id.et_take_r2)
-        val etSampling = paramsDialog.getView<EditText>(R.id.et_sampling)
-        paramsDialog.show("确定", l@{
-            val takeR1 = etTakeR1.text.toString()
-            val takeR2 = etTakeR2.text.toString()
-            val sampling = etSampling.text.toString()
-
-            if (takeR1.trim().isNullOrEmpty() || takeR2.trim().isNullOrEmpty() || sampling.trim()
-                    .isNullOrEmpty()
-            ) {
-                toast("请输入数字")
-                return@l
-            }
-            if (!takeR1.isNum() || !takeR2.isNum() || !sampling.isNum()) {
-                toast("请输入数字")
-                return@l
-            }
-
-            LocalData.TakeReagentR1 = takeR1.toInt()
-            LocalData.TakeReagentR2 = takeR2.toInt()
-            LocalData.SamplingVolume = sampling.toInt()
-            it.dismiss()
-        }, "取消", {
-            it.dismiss()
-        })
-
-        etTakeR1.setText(LocalData.TakeReagentR1.toString())
-        etTakeR1.selectionLast()
-        etTakeR2.setText(LocalData.TakeReagentR2.toString())
-        etTakeR2.selectionLast()
-        etSampling.setText(LocalData.SamplingVolume.toString())
-        etSampling.selectionLast()
+        paramsDialog.show(
+            LocalData.TakeReagentR1,
+            LocalData.TakeReagentR2,
+            LocalData.SamplingVolume,
+            LocalData.SamplingProbeCleaningDuration,
+            LocalData.StirProbeCleaningDuration,
+            { takeR1: Int, takeR2: Int, samplingVolume: Int, samplingProbeCleaningDuration: Int, stirProbeCleaningDuration: Int, baseDialog: BaseDialog ->
+                LocalData.TakeReagentR1 = takeR1
+                LocalData.TakeReagentR2 = takeR2
+                LocalData.SamplingVolume = samplingVolume
+                LocalData.SamplingProbeCleaningDuration = samplingProbeCleaningDuration
+                LocalData.StirProbeCleaningDuration = stirProbeCleaningDuration
+                baseDialog.dismiss()
+            },
+            {
+                it.dismiss()
+            })
     }
 
-    val paramsDialog by lazy {
-        BaseDialog(requireContext()).apply {
-            addView(R.layout.dialog_params_settings)
-        }
-    }
     val testHiltDialog by lazy {
         HiltDialog(requireContext())
     }

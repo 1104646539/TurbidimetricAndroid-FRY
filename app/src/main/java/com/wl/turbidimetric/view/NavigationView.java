@@ -1,6 +1,7 @@
 package com.wl.turbidimetric.view;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -8,14 +9,21 @@ import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
+import androidx.annotation.Nullable;
+
 import com.wl.turbidimetric.R;
 
 import java.util.List;
+
+import timber.log.Timber;
 
 /**
  * 导航栏
@@ -40,7 +48,7 @@ public class NavigationView extends View {
 
     List<NavItem> navItems;
     //当前选中的下标
-    public int selectIndex = 0;
+    public int selectIndex ;
     //背景颜色
     private int colorBg = getResources().getColor(R.color.white);
     //背景颜色
@@ -70,6 +78,35 @@ public class NavigationView extends View {
         init();
     }
 
+    @Nullable
+    @Override
+    protected Parcelable onSaveInstanceState() {
+        Timber.d("onSaveInstanceState selectIndex=" + selectIndex);
+        Parcelable superData = super.onSaveInstanceState();
+        SavedState savedState = new SavedState(superData);
+        savedState.selectedIndex = selectIndex;
+        return savedState;
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Parcelable state) {
+        SavedState savedState = (SavedState) state;
+        Timber.d("onRestoreInstanceState selectIndex=" + selectIndex);
+        super.onRestoreInstanceState(savedState.getSuperState());
+        selectIndex = savedState.selectedIndex;
+    }
+
+    @Override
+    public void onScreenStateChanged(int screenState) {
+        super.onScreenStateChanged(screenState);
+        Timber.d("onScreenStateChanged selectIndex=" + selectIndex);
+    }
+
+    @Override
+    protected void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        Timber.d("onConfigurationChanged selectIndex=" + selectIndex + " newConfig=" + newConfig);
+    }
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -144,7 +181,7 @@ public class NavigationView extends View {
         this.icon_shutdown_id = shutdownId;
         this.navItems = navItems;
         this.icon_logo_id = logoId;
-        selectIndex = -1;
+//        selectIndex = -1;
     }
 
 
@@ -317,8 +354,7 @@ public class NavigationView extends View {
         width = getMeasuredWidth();
         height = getMeasuredHeight();
         setMeasuredDimension(width, height);
-        Log.d(TAG, "onMeasure height=" + height + " width=" + width);
-        Log.d(TAG, "onMeasure selectIndex="+selectIndex);
+        Timber.d("onMeasure height=" + height + " width=" + width + "selectIndex=" + selectIndex);
 
         initRect();
     }
@@ -367,7 +403,7 @@ public class NavigationView extends View {
             rectBitmapRange[i] = new Rect(0, 0, bitmaps[i].getWidth(), bitmaps[i].getHeight());
         }
 
-        selectIndex = 0;
+//        selectIndex = 0;
     }
 
     //关机按钮背景
@@ -466,5 +502,35 @@ public class NavigationView extends View {
         public void setNavName(String navName) {
             this.navName = navName;
         }
+    }
+
+    static class SavedState extends BaseSavedState {
+        int selectedIndex;
+
+        public SavedState(Parcel source) {
+            super(source);
+            selectedIndex = source.readInt();
+        }
+
+        public SavedState(Parcelable superState) {
+            super(superState);
+        }
+
+        @Override
+        public void writeToParcel(Parcel out, int flags) {
+            super.writeToParcel(out, flags);
+            out.writeInt(selectedIndex);
+        }
+
+        public static final Parcelable.Creator<SavedState> CREATOR
+                = new Parcelable.Creator<SavedState>() {
+            public SavedState createFromParcel(Parcel in) {
+                return new SavedState(in);
+            }
+
+            public SavedState[] newArray(int size) {
+                return new SavedState[size];
+            }
+        };
     }
 }

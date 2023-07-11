@@ -46,7 +46,8 @@ public class NavigationView extends View {
     private int icon_logo_id;
     //关机资源id
     private int icon_shutdown_id;
-
+    //移动动画的持续时间
+    private int moveAnimDuration = 100;
 
     List<NavItem> navItems;
     //当前选中的下标
@@ -60,12 +61,55 @@ public class NavigationView extends View {
     //文字颜色
     private int colorName = getResources().getColor(R.color.textColor);
 
+    //选中的区域
+    RectF rectFSelect = new RectF(0, 0, 0, 0);
+    //选中的区域的top，随动画更新
+    float selectTop = 0;
+    //icon的上下边距
+    int iconPadding = 14;
+
+
     private Path bgPath;
-    private Path selectedPath;
     private Paint paintBg;
     private Paint paintShutdownBg;
     private Paint paintSelectedBg;
     private Paint paintName;
+
+    //关机按钮背景
+    private RectF rectShutdownBg;
+    //背景的宽、高、圆角大小
+    private int shutdownBgWidth = 156;
+    private int shutdownBgHeight = 128;
+    private int round = 8;
+    //按钮的文字高度，宽度
+    private int shutdownNameHeight = 15;
+    private float shutdownTextWidth = 0;
+    private String shutdownText = getResources().getString(R.string.nav_shutdown);
+    //关机按钮的bitmap,绘制区域等
+    private Bitmap bitmapShutdown;
+    private RectF rectShutdown;
+    private Rect rectShutdownRange;
+
+    int clickX;
+    int clickY;
+
+    //导航按钮的bitmap,绘制区域等
+    Bitmap[] bitmaps;
+    RectF[] rects;
+    Rect[] rectBitmapRange;
+    //被选中的导航背景区域
+    RectF[] rectBgs;
+
+    int navIconWidth = 80;
+    int navIconHeight = 80;
+
+    //logo的bitmap,绘制区域等
+    Bitmap bitmapLogo;
+    RectF rectLogo;
+    Rect rectLogoRange;
+
+    //标题的宽度
+    private float[] nameWidths;
 
     public NavigationView(Context context) {
         this(context, null);
@@ -83,7 +127,6 @@ public class NavigationView extends View {
     @Nullable
     @Override
     protected Parcelable onSaveInstanceState() {
-        Timber.d("onSaveInstanceState selectIndex=" + selectIndex);
         Parcelable superData = super.onSaveInstanceState();
         SavedState savedState = new SavedState(superData);
         savedState.selectedIndex = selectIndex;
@@ -93,22 +136,10 @@ public class NavigationView extends View {
     @Override
     protected void onRestoreInstanceState(Parcelable state) {
         SavedState savedState = (SavedState) state;
-        Timber.d("onRestoreInstanceState selectIndex=" + selectIndex);
         super.onRestoreInstanceState(savedState.getSuperState());
         selectIndex = savedState.selectedIndex;
     }
 
-    @Override
-    public void onScreenStateChanged(int screenState) {
-        super.onScreenStateChanged(screenState);
-        Timber.d("onScreenStateChanged selectIndex=" + selectIndex);
-    }
-
-    @Override
-    protected void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        Timber.d("onConfigurationChanged selectIndex=" + selectIndex + " newConfig=" + newConfig);
-    }
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -175,7 +206,6 @@ public class NavigationView extends View {
         setKeepScreenOn(true);
         setFocusableInTouchMode(true);
         bgPath = new Path();
-        selectedPath = new Path();
     }
 
 
@@ -186,9 +216,6 @@ public class NavigationView extends View {
 //        selectIndex = -1;
     }
 
-
-    int clickX;
-    int clickY;
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -207,9 +234,6 @@ public class NavigationView extends View {
                 if (Math.abs(event.getY() - clickY) > 10) {
                     return super.onTouchEvent(event);
                 }
-//                if (navResIsNull()) {
-//                    return super.onTouchEvent(event);
-//                }
                 //判断坐标在哪个icon里
                 for (int i = 0; i < rectBgs.length; i++) {
                     boolean isClick = rectBgs[i].contains(clickX, clickY);
@@ -234,20 +258,12 @@ public class NavigationView extends View {
     }
 
     private void selectIndexChange(int index) {
-        float top = 0;
-        if (selectIndex < 0) {
-            top = rects[0].top;
-        } else {
-            top = rects[selectIndex].top;
-        }
+        float top = rects[selectIndex].top;
         ValueAnimator animator = ValueAnimator.ofFloat(top, rects[index].top);
-        animator.setDuration(3000);
-        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(@NonNull ValueAnimator animation) {
-                selectTop = (float) animation.getAnimatedValue();
-                postInvalidate();
-            }
+        animator.setDuration(moveAnimDuration);
+        animator.addUpdateListener(animation -> {
+            selectTop = (float) animation.getAnimatedValue();
+            postInvalidate();
         });
         animator.start();
 
@@ -255,9 +271,6 @@ public class NavigationView extends View {
         if (navigationSelectedIndexChangeListener != null) {
             navigationSelectedIndexChangeListener.onSelectedIndexChange(selectIndex);
         }
-//        postInvalidate();
-
-
     }
 
     NavigationSelectedIndexChangeListener navigationSelectedIndexChangeListener;
@@ -317,9 +330,6 @@ public class NavigationView extends View {
         }
     }
 
-//    private boolean navResIsNull() {
-//        return resIds == null || resIds.length == 0;
-//    }
 
     private boolean logoResIsNull() {
         return icon_logo_id == 0;
@@ -329,35 +339,14 @@ public class NavigationView extends View {
         return icon_shutdown_id == 0;
     }
 
-//    private boolean namesIsNull() {
-//        return names == null || names.length == 0;
-//    }
-
-    RectF rectFSelect = new RectF(0, 0, 0, 0);
-    float selectTop = 0;
-    int iconPadding = 14;
-
     /**
      * 绘制被选中的背景
      *
      * @param canvas
      */
     private void drawSelectedBg(Canvas canvas) {
-//        int iconPadding = 14;
-//        selectedPath.reset();
-//        selectedPath.moveTo(0, rects[selectIndex].top - iconPadding);
-//
-//        selectedPath.lineTo(width, rects[selectIndex].top - iconPadding);
-//
-//        selectedPath.lineTo(width, rects[selectIndex].bottom + iconPadding + nameHeight);
-//
-//        selectedPath.lineTo(0, rects[selectIndex].bottom + iconPadding + nameHeight);
-//
-//        selectedPath.close();
-//
-//        canvas.drawPath(selectedPath, paintSelectedBg);
-        rectFSelect.top = selectTop;
-        rectFSelect.bottom = rectFSelect.top + iconPadding + nameHeight;
+        rectFSelect.top = selectTop - iconPadding;
+        rectFSelect.bottom = rectFSelect.top + rects[0].height() + iconPadding + iconPadding + nameHeight;
         canvas.drawRect(rectFSelect, paintSelectedBg);
     }
 
@@ -398,15 +387,6 @@ public class NavigationView extends View {
         initShutdown();
     }
 
-    //导航按钮的bitmap,绘制区域等
-    Bitmap[] bitmaps;
-    RectF[] rects;
-    Rect[] rectBitmapRange;
-    //被选中的导航背景区域
-    RectF[] rectBgs;
-
-    int navIconWidth = 80;
-    int navIconHeight = 80;
 
     /**
      * 初始化图标的位置，根据图标自身的大小，左右居中
@@ -431,26 +411,10 @@ public class NavigationView extends View {
 
             rectBitmapRange[i] = new Rect(0, 0, bitmaps[i].getWidth(), bitmaps[i].getHeight());
         }
-        if (selectIndex < 0) {
+        if (selectIndex <= 0) {
             selectTop = rects[0].top;
         }
-//        selectIndex = 0;
     }
-
-    //关机按钮背景
-    RectF rectShutdownBg;
-    //背景的宽、高、圆角大小
-    int shutdownBgWidth = 156;
-    int shutdownBgHeight = 128;
-    int round = 8;
-    //按钮的文字高度，宽度
-    int shutdownNameHeight = 15;
-    float shutdownTextWidth = 0;
-    String shutdownText = getResources().getString(R.string.nav_shutdown);
-    //关机按钮的bitmap,绘制区域等
-    Bitmap bitmapShutdown;
-    RectF rectShutdown;
-    Rect rectShutdownRange;
 
     /**
      * 初始化绘制关机按钮需要的信息
@@ -476,10 +440,6 @@ public class NavigationView extends View {
         rectShutdownBg.bottom = rectShutdownBg.top + shutdownBgHeight;
     }
 
-    //logo的bitmap,绘制区域等
-    Bitmap bitmapLogo;
-    RectF rectLogo;
-    Rect rectLogoRange;
 
     /**
      * 初始化绘制logo需要的图片等信息
@@ -497,7 +457,6 @@ public class NavigationView extends View {
         rectLogoRange = new Rect(0, 0, bitmapLogo.getWidth(), bitmapLogo.getHeight());
     }
 
-    private float[] nameWidths;
 
     /**
      * 初始化绘制导航文字的信息

@@ -67,6 +67,7 @@ class SettingsFragment :
             showLauncher()
             requireActivity().showHideNav(true)
         }
+        vd.tvSoftVersion.text = "上位机版本:${requireContext().packageName} 发布版本:1"
     }
 
     private fun showLauncher() {

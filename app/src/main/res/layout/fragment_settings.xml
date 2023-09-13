@@ -87,5 +87,15 @@
             android:padding="8dp"
             android:text="打开桌面"
             android:textSize="26sp" />
+
+        <TextView
+            android:id="@+id/tv_soft_version"
+            style="@style/TextTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="软件版本"
+            android:textSize="26sp" />
+
     </LinearLayout>
 </layout>

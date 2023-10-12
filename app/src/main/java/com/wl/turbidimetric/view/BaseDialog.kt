@@ -5,7 +5,6 @@ import android.view.*
 import android.widget.Button
 import android.widget.LinearLayout
 import com.wl.turbidimetric.R
-import com.wl.wllib.DialogUtil
 
 /**
  * 基础的dialog
@@ -15,20 +14,22 @@ import com.wl.wllib.DialogUtil
  * @constructor
  */
 open class BaseDialog(private val context: Context) {
-    lateinit var btnConfirm: Button
-    lateinit var btnConfirm2: Button
-    lateinit var btnCancel: Button
+    var btnConfirm: Button
+    var btnConfirm2: Button
+    var btnCancel: Button
 
-    var width: Int = 1200
+    var width: Int = WindowManager.LayoutParams.WRAP_CONTENT
     var height: Int = WindowManager.LayoutParams.WRAP_CONTENT
-    protected val dialogUtil: DialogUtil = DialogUtil(context).apply {
+    protected val dialogUtil: DialogUtil = DialogUtil(
+        context
+    ).apply {
         setView(R.layout.dialog_base)
     }
 
     init {
-        btnConfirm = getView<Button>(R.id.btn_confirm)
-        btnConfirm2 = getView<Button>(R.id.btn_confirm2)
-        btnCancel = getView<Button>(R.id.btn_cancel)
+        btnConfirm = getView(R.id.btn_confirm)
+        btnConfirm2 = getView(R.id.btn_confirm2)
+        btnCancel = getView(R.id.btn_cancel)
     }
 
     @JvmName("getDialogUtil1")

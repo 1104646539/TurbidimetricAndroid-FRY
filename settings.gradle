@@ -18,10 +18,12 @@
 //}
 rootProject.name = "turbidimetric"
 include ':app'
-include ':wllib'
-include ':objectbox-java'
-include ':objectbox-java-api'
+//include ':wllib'
+//include ':objectbox-java'
+//include ':objectbox-java-api'
 include ':MPChartLib'
-include ':WheelPicker'
-include ':Common'
-include ':WheelView'
+//include ':WheelPicker'
+//include ':Common'
+//include ':WheelView'
+include ':wllib'
+include ':weiqianwllib'

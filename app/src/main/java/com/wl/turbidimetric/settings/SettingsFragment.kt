@@ -12,10 +12,10 @@ import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.model.MachineTestModel
 import com.wl.turbidimetric.test.TestActivity
 import com.wl.turbidimetric.view.*
+import com.wl.weiqianwllib.OrderUtil
 import com.wl.wwanandroid.base.BaseFragment
 import com.wl.wwanandroid.base.BaseViewModel
-import timber.log.Timber
-
+import com.wl.wllib.LogToFile.i
 class SettingsFragment :
     BaseFragment<BaseViewModel, FragmentSettingsBinding>(R.layout.fragment_settings) {
     val TAG = "SettingsFragment"
@@ -65,9 +65,9 @@ class SettingsFragment :
         }
         vd.tvLauncher.setOnClickListener {
             showLauncher()
-            requireActivity().showHideNav(true)
+            OrderUtil.showHideNav(requireActivity(),true)
         }
-        vd.tvSoftVersion.text = "上位机版本:${requireContext().packageName} 发布版本:1"
+        vd.tvSoftVersion.text = "上位机版本:${getPackageInfo(requireContext())?.versionName} 发布版本:1"
     }
 
     private fun showLauncher() {
@@ -81,10 +81,10 @@ class SettingsFragment :
     private fun showHideNav() {
         //设置广播发送隐藏虚拟按键命令
         if (show) {
-            requireActivity().showHideNav(false)
+            OrderUtil.showHideNav(requireActivity(),false)
             show = false;
         } else {
-            requireActivity().showHideNav(true)
+            OrderUtil.showHideNav(requireActivity(),true)
             show = true;
         }
     }
@@ -119,7 +119,7 @@ class SettingsFragment :
                     LocalData.SampleExist = sampleExist
                     LocalData.ScanCode = scanCode
                 }
-                Timber.d("machineTestModel=$machineTestModel sampleExist=$sampleExist scanCode=$scanCode")
+                i("machineTestModel=$machineTestModel sampleExist=$sampleExist scanCode=$scanCode")
                 baseDialog?.dismiss()
             },
             {

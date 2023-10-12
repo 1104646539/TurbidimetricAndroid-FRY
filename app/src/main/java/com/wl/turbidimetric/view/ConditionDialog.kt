@@ -14,6 +14,9 @@ import com.wl.turbidimetric.R
 import com.wl.turbidimetric.datamanager.SelectQueryAdapter
 import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.model.ConditionModel
+import com.wl.wllib.longStrToDate
+import com.wl.wllib.longStrToLong
+import com.wl.wllib.toLongTimeStr
 import java.util.*
 
 /**
@@ -106,7 +109,7 @@ class ConditionDialog(val context: Context) : BaseDialog(context) {
             calendar.set(Calendar.HOUR_OF_DAY, hour)
             calendar.set(Calendar.MINUTE, minute)
             calendar.set(Calendar.SECOND, second)
-            onDateSet(calendar.time.toLongString(), calendar.time.time)
+            onDateSet(calendar.time.toLongTimeStr(), calendar.time.time)
 //            var text = "$year-$month-$day $hour:$minute:$second"
 //            text += if (wheelLayout.timeWheelLayout.isAnteMeridiem) " 上午" else " 下午"
 //            toast(text)
@@ -164,7 +167,7 @@ class ConditionDialog(val context: Context) : BaseDialog(context) {
      */
     private fun verify(): Boolean {
         if (testTimeMin.isNotEmpty() && testTimeMax.isNotEmpty()) {
-            if (testTimeMin.strToLong() > testTimeMax.strToLong()) {
+            if (testTimeMin.longStrToLong() > testTimeMax.longStrToLong()) {
                 toast("检测时间最大值不能小于最小值")
                 return false
             }
@@ -191,8 +194,8 @@ class ConditionDialog(val context: Context) : BaseDialog(context) {
     private fun getCondition(): ConditionModel {
         val name = etName.text.toString().ifEmpty { "" }
         val qrcode = etQRCode.text.toString().ifEmpty { "" }
-        val testTimeMax = if (testTimeMax.isEmpty()) 0 else testTimeMax.strToLong()
-        val testTimeMin = if (testTimeMin.isEmpty()) 0 else testTimeMin.strToLong()
+        val testTimeMax = if (testTimeMax.isEmpty()) 0 else testTimeMax.longStrToLong()
+        val testTimeMin = if (testTimeMin.isEmpty()) 0 else testTimeMin.longStrToLong()
 
         return ConditionModel(
             name = name,

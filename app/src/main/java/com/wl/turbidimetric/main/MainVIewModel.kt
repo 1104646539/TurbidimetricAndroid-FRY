@@ -1,4 +1,4 @@
-package com.wl.turbidimetric
+package com.wl.turbidimetric.main
 
 import android.content.res.Resources
 import androidx.fragment.app.Fragment

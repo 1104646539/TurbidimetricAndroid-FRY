@@ -2,7 +2,6 @@ package com.wl.turbidimetric.view;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -10,23 +9,20 @@ import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
-import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.wl.turbidimetric.R;
 
 import java.util.List;
 
-import timber.log.Timber;
-
+import com.wl.wllib.LogToFile;
+import com.wl.wllib.LogToFile.*;
 /**
  * 导航栏
  */
@@ -371,7 +367,7 @@ public class NavigationView extends View {
         width = getMeasuredWidth();
         height = getMeasuredHeight();
         setMeasuredDimension(width, height);
-        Timber.d("onMeasure height=" + height + " width=" + width + "selectIndex=" + selectIndex);
+        LogToFile.i("onMeasure height=" + height + " width=" + width + "selectIndex=" + selectIndex);
         rectFSelect = new RectF(0, 0, width, 0);
 
         initRect();

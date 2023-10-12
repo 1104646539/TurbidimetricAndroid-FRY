@@ -2,7 +2,10 @@ package com.wl.turbidimetric.ex
 
 import android.app.Activity
 import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
 import android.widget.EditText
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.datastore.LocalData
@@ -11,7 +14,6 @@ import com.wl.turbidimetric.model.MachineState
 import com.wl.turbidimetric.model.MachineTestModel
 import com.wl.turbidimetric.model.ProjectModel
 import com.wl.turbidimetric.model.TestState
-import com.wl.turbidimetric.util.CRC
 import com.wl.turbidimetric.util.CurveFitter
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -30,26 +32,6 @@ val nds = doubleArrayOf(
     1000.0,
 //    0.0, 1000.0, 500.0, 200.0, 50.0
 )
-
-/**
- * CRC16 验证
- * 输入需要CRC的数组，返回CRC结果
- */
-fun CRC16(ba: UByteArray): UByteArray {
-    return CRC.CRC16(ba)
-}
-
-/**
- * 验证CRC
- * 输入包含CRC的数组，返回CRC结果
- */
-fun VerifyCrc(ba: UByteArray): Boolean {
-
-    val data = ba.copyOfRange(0, ba.size - 2)
-    val crc = ba.copyOfRange(ba.size - 2, ba.size)
-    val re = CRC16(data)
-    return crc.contentEquals(re)
-}
 
 /**
  * 返回ubyte的每一位的值
@@ -313,4 +295,21 @@ fun getLauncher(): Intent {
     val cn = ComponentName("com.android.launcher3", "com.android.launcher3.Launcher")
     showIntent.component = cn
     return showIntent
+}
+
+/**
+ * 获取上位机版本
+ *
+ * @return
+ */
+fun getPackageInfo(context: Context): PackageInfo? {
+    var packageInfo: PackageInfo? = null
+    try {
+        packageInfo = context
+            .packageManager
+            .getPackageInfo(context.packageName, 0)
+    } catch (e: PackageManager.NameNotFoundException) {
+        e.printStackTrace()
+    }
+    return packageInfo
 }

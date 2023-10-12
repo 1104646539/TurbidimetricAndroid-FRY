@@ -5,12 +5,8 @@ import com.wl.turbidimetric.R
 import com.wl.turbidimetric.ex.getResource
 import com.wl.turbidimetric.model.*
 import com.wl.turbidimetric.view.NavigationView
-import com.wl.wllib.QRCodeUtil
 
 object SystemGlobal {
-    var uPath: String? = null
-    lateinit var qrCode: QRCodeUtil;
-
     //检测模式状态
     var testState = TestState.None
         set(value) {

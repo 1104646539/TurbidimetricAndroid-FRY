@@ -10,7 +10,6 @@ import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.FragmentMatchingArgsBinding
-import com.wl.turbidimetric.db.DBManager
 import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.SystemGlobal.matchingTestState
 import com.wl.turbidimetric.global.SystemGlobal.obMatchingTestState
@@ -21,9 +20,7 @@ import com.wl.turbidimetric.view.HiltDialog
 import com.wl.wwanandroid.base.BaseFragment
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import timber.log.Timber
-import java.util.Date
-
+import com.wl.wllib.LogToFile.i
 /**
  * 拟合参数
  * @property viewModel MatchingArgsViewModel
@@ -134,7 +131,7 @@ class MatchingArgsFragment :
          * 显示调试的数据
          */
         vm.testMsg.observe(this) {
-            Timber.d("it=$it")
+            i("it=$it")
             if (debugShowDetailsDialog.isShow()) {
                 debugShowDetailsDialog.show(it, "确定", onConfirm = { it.dismiss() })
             }
@@ -155,12 +152,12 @@ class MatchingArgsFragment :
             }
         }
         vm.toastMsg.observe(this) { msg ->
-            Timber.d("msg=$msg")
+            i("msg=$msg")
             snack(vd.root, msg)
         }
 
         adapter.onSelectChange = { project ->
-            Timber.d("选中的=${project}")
+            i("选中的=${project}")
             changeCurve(project)
         }
 

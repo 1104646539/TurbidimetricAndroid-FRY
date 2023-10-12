@@ -10,10 +10,9 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.ItemDatamanagerResultBinding
-import com.wl.turbidimetric.ex.longToStr
-import com.wl.turbidimetric.ex.toDate
-import com.wl.turbidimetric.ex.toLongString
 import com.wl.turbidimetric.model.TestResultModel
+import com.wl.wllib.toLongTimeStr
+import com.wl.wllib.toTimeStr
 
 class DataManagerAdapter :
     PagingDataAdapter<TestResultModel, DataManagerAdapter.DataManagerViewHolder>(diffCallback = MyDiff()) {
@@ -50,7 +49,7 @@ class DataManagerAdapter :
             binding.tvResult.text = item?.testResult ?: "-"
             binding.tvConcentration.text = item?.concentration?.toString() ?: "-"
             binding.tvTestTime.text =
-                if (item?.testTime == 0L) "-" else item?.testTime?.longToStr() ?: "-"
+                if (item?.testTime == 0L) "-" else item?.testTime?.toTimeStr() ?: "-"
             binding.tvTestValue1.text = item?.testValue1?.toString() ?: "-"
             binding.tvTestValue2.text = item?.testValue2?.toString() ?: "-"
             binding.tvTestValue3.text = item?.testValue3?.toString() ?: "-"

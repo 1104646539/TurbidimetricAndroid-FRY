@@ -270,7 +270,7 @@ class SampleShelfView :
 
         setMeasuredDimension(measuredWidth, height.toInt())
 
-//        Timber.d("w=$measuredWidth h=$height")
+//        i("w=$measuredWidth h=$height")
         initConfig()
     }
 }

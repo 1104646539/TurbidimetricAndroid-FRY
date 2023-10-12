@@ -1,15 +1,14 @@
 package com.wl.turbidimetric.test
 
-import com.wl.turbidimetric.ex.CRC16
 import com.wl.turbidimetric.ex.toHex
 import com.wl.turbidimetric.global.SerialGlobal
+import com.wl.wllib.CRC.CRC16
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import timber.log.Timber
 import java.util.concurrent.LinkedBlockingQueue
-
+import com.wl.wllib.LogToFile.i
 /**
  * 仅测试回复用
  */
@@ -68,7 +67,7 @@ object TestSerialPort {
         }
         val crc = CRC16(reply)
         reply = reply.plus(crc)
-        Timber.d("回复 ${reply.toHex()}")
+        i("回复 ${reply.toHex()}")
 //        block(reply)
         results.add(reply)
     }

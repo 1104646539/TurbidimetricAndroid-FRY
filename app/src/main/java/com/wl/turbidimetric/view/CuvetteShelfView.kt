@@ -11,12 +11,8 @@ import android.view.View
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.home.HomeViewModel
 import com.wl.turbidimetric.model.CuvetteState
-import com.wl.turbidimetric.model.SampleState
-import com.wl.turbidimetric.model.TestResultModel
-import io.objectbox.annotation.Index
-import timber.log.Timber
 import kotlin.math.abs
-
+import com.wl.wllib.LogToFile.i
 class CuvetteShelfView :
     View {
     constructor(context: Context) : this(context, null)
@@ -124,7 +120,7 @@ class CuvetteShelfView :
         var top = labelSpace * 2 + labelHeight
         var y = top + circleTopSpace
         sampleRects = arrayOfNulls(size)
-//        Timber.d("cuvetteStates=${cuvetteStates}")
+//        i("cuvetteStates=${cuvetteStates}")
         cuvetteStates?.let { sts ->
             repeat(sts.size) {
                 sampleRects[it] =
@@ -284,7 +280,7 @@ class CuvetteShelfView :
 
         setMeasuredDimension(measuredWidth, height.toInt())
 
-//        Timber.d("w=$measuredWidth h=$height")
+//        i("w=$measuredWidth h=$height")
         initConfig()
     }
 }

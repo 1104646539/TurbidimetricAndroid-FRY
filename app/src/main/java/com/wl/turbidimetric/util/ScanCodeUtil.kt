@@ -1,25 +1,17 @@
 package com.wl.turbidimetric.util
 
-import com.wl.turbidimetric.ex.toBigLongString
+import com.wl.weiqianwllib.serialport.BaseSerialPort
+import com.wl.weiqianwllib.serialport.WQSerialGlobal
+import com.wl.wllib.toLongTimeStr
 import kotlinx.coroutines.*
-import timber.log.Timber
-import java.util.Date
-
+import java.util.*
+import com.wl.wllib.LogToFile.i
 /**
  * 扫描条形码类
  * 劳易测 CR100
  */
-class ScanCodeUtil private constructor(
-    private val serialPort: BaseSerialPortUtil = BaseSerialPortUtil(
-//        "/dev/ttyS3",
-        "Com3",
-        9600
-    )
-) {
-    companion object {
-        val Instance: ScanCodeUtil = ScanCodeUtil()
-    }
-
+object ScanCodeUtil {
+    private val serialPort: BaseSerialPort = BaseSerialPort()
     /**
      * 开始扫码的命令
      */
@@ -54,7 +46,9 @@ class ScanCodeUtil private constructor(
      * 停止扫码的任务
      */
     private var canScanJob: Job? = null
-
+    init {
+        open()
+    }
     /**
      * 扫码返回的内容是
      * 0x02,内容..., 0x0D, 0x0A
@@ -62,18 +56,19 @@ class ScanCodeUtil private constructor(
      * 0x02, 0x3F, 0x0D 0x0A
      */
     fun open() {
-        serialPort.open()
+        serialPort.openSerial(WQSerialGlobal.COM3, 9600, 8)
+
         GlobalScope.launch {
             while (true) {
                 delay(100)
                 val size = serialPort.read(temp)
                 if (size > 0) {
                     val temp = temp.copyOf(size).toList()
-                    Timber.d("temp=$temp")
+                    i("temp=$temp")
                     if (isScan && temp.size > 3) {
                         if (temp.first() == 2.toByte() && temp[temp.lastIndex - 1] == 13.toByte() && temp.last() == 10.toByte()) {
                             val result = temp.subList(1, temp.lastIndex - 1)
-                            Timber.d("result=$result")
+                            i("result=$result")
                             canScanJob?.cancelAndJoin()
                             withContext(Dispatchers.Main) {
                                 if (isScan) {
@@ -93,7 +88,7 @@ class ScanCodeUtil private constructor(
      * 开始扫码
      */
     suspend fun startScan() {
-        Timber.d("开始扫码:${Date().toBigLongString()}")
+        i("开始扫码:${Date().toLongTimeStr()}")
         serialPort.write(startScan)
         isScan = true
         withContext(Dispatchers.IO) {
@@ -108,7 +103,7 @@ class ScanCodeUtil private constructor(
      * 结束扫码
      */
     private suspend fun stopScan() {
-        Timber.d("结束扫码:${Date().toBigLongString()}")
+        i("结束扫码:${Date().toLongTimeStr()}")
         serialPort.write(stopScan)
         withContext(Dispatchers.Main) {
             if (isScan) {

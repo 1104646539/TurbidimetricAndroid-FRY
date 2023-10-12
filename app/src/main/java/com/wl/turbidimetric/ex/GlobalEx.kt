@@ -45,10 +45,7 @@ fun snack(view: View, msg: String) {
  */
 fun toast(msg: String, duration: Int = Toast.LENGTH_SHORT) {
     if (msg.isNullOrEmpty()) return
-    if (duration == Toast.LENGTH_LONG)
-        ToastUtil.showToastLong(msg)
-    else
-        ToastUtil.showToast(msg)
+    ToastUtil.showToast(msg, Toast.LENGTH_SHORT)
 }
 
 fun getResource(): Resources {
@@ -97,21 +94,4 @@ fun <T> Boolean.PD(t1: () -> T, t2: () -> T): T {
  */
 fun <T> Boolean.PD(t1: T, t2: T): T {
     return this.PD({ t1 }, { t2 })
-}
-
-/**
- * 显示和隐藏导航栏
- * @receiver Activity
- * @param showNav Boolean
- */
-fun Activity.showHideNav(showNav: Boolean) {
-    //设置广播发送隐藏虚拟按键命令
-    val showIntent = Intent()
-    showIntent.action = "com.android.intent.action.NAVBAR_SHOW"
-    if (showNav) {
-        showIntent.putExtra("cmd", "show")
-    } else {
-        showIntent.putExtra("cmd", "hide")
-    }
-    sendOrderedBroadcast(showIntent, null)
 }

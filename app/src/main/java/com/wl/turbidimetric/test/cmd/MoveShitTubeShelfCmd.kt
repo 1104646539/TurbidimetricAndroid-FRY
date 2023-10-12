@@ -6,7 +6,7 @@ import com.wl.turbidimetric.util.SerialPortUtil
 class MoveSampleShelfCmd(private val pos: Int) : CmdIF() {
     override fun exec() {
         super.exec()
-        SerialPortUtil.Instance.moveSampleShelf(pos)
+        SerialPortUtil.moveSampleShelf(pos)
     }
 
     override fun readDataGetMachineStateModel(reply: ReplyModel<GetMachineStateModel>) {

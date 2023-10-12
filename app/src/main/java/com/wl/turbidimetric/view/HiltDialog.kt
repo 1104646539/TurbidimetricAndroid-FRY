@@ -3,11 +3,9 @@ package com.wl.turbidimetric.view
 import android.content.Context
 import android.view.Gravity
 import android.view.View
-import android.view.ViewGroup
 import android.view.ViewGroup.MarginLayoutParams
 import android.widget.TextView
 import com.wl.turbidimetric.R
-import com.wl.wllib.DialogUtil
 
 /**
  * 用来显示提示的对话框
@@ -25,9 +23,10 @@ open class HiltDialog(private val context: Context) : BaseDialog(context) {
             )
         }
         addView(R.layout.dialog_hint)
-        getDialogUtil().getView(R.id.iv_icon).visibility = View.VISIBLE
+        getDialogUtil().getView(R.id.iv_icon).visibility = View.GONE
         width = 800
     }
+
 
     open fun show(
         msg: String = "",

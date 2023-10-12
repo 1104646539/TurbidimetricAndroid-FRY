@@ -1,4 +1,4 @@
-package com.wl.wllib;
+package com.wl.turbidimetric.view;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -9,6 +9,9 @@ import android.view.WindowManager;
 
 import androidx.annotation.IdRes;
 import androidx.annotation.LayoutRes;
+
+import com.wl.turbidimetric.R;
+
 
 /**
  * 标准的对话框
@@ -51,12 +54,6 @@ public class DialogUtil {
     public DialogUtil setView(@LayoutRes int layoutId) {
         root = LayoutInflater.from(context).inflate(layoutId, null, false);
         dialog.setContentView(root);
-//        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-//            @Override
-//            public void onCancel(DialogInterface dialogInterface) {
-//                dialog.dismiss();
-//            }
-//        });
         return this;
     }
 

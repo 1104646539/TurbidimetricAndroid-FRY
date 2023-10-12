@@ -2,17 +2,9 @@ package com.wl.turbidimetric
 
 import android.app.Application
 import com.wl.turbidimetric.datastore.LocalData
-import com.wl.turbidimetric.datastore.LocalData.CurMachineTestModel
-import com.wl.turbidimetric.datastore.LocalDataGlobal
 import com.wl.turbidimetric.db.DBManager
-import com.wl.turbidimetric.global.SystemGlobal
-import com.wl.turbidimetric.model.MachineTestModel
 import com.wl.turbidimetric.model.ProjectModel
-import com.wl.turbidimetric.util.FileTree
-import com.wl.turbidimetric.util.ScanCodeUtil
-import com.wl.turbidimetric.util.SerialPortUtil
 import com.wl.wllib.ToastUtil
-import timber.log.Timber
 
 
 class App : Application() {
@@ -23,11 +15,9 @@ class App : Application() {
         ToastUtil.init(this)
         initData()
         DBManager.init(this)
-        SerialPortUtil.Instance.open()
-        ScanCodeUtil.Instance.open()
-        Timber.plant(FileTree.instance)
+//        Timber.plant(FileTree.instance)
         initDataStore();
-
+//        LogToFile.init()
 
         //没有项目参数的时候，添加一个默认参数
         if (DBManager.ProjectBox.all.isNullOrEmpty()) {

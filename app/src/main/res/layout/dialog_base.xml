@@ -6,7 +6,6 @@
     android:gravity="center_horizontal"
     android:orientation="vertical">
 
-
     <LinearLayout
         android:id="@+id/root"
         android:layout_width="wrap_content"
@@ -23,7 +22,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="-60dp"
             android:src="@drawable/icon_dialog_hint"
-            android:visibility="gone" />
+            android:visibility="visible" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -46,13 +45,13 @@
                 android:id="@+id/btn_confirm2"
                 style="@style/BtnPositive"
                 android:layout_width="wrap_content"
-                android:visibility="gone"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="40dp"
                 android:layout_marginRight="40dp"
                 android:layout_weight="1"
                 android:stateListAnimator="@null"
-                android:text="清空" />
+                android:text="清空"
+                android:visibility="gone" />
 
             <Button
                 android:id="@+id/btn_cancel"

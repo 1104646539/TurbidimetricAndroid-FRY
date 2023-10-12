@@ -1,25 +1,27 @@
 package com.wl.turbidimetric.print
 
-import com.wl.turbidimetric.ex.longToStr
 import com.wl.turbidimetric.ex.scale
 import com.wl.turbidimetric.model.TestResultModel
-import com.wl.turbidimetric.util.BaseSerialPortUtil
-import com.wl.turbidimetric.util.CurveFitter
-import timber.log.Timber
-import java.math.RoundingMode
+import com.wl.turbidimetric.print.PrintUtil.serialPort
+import com.wl.weiqianwllib.serialport.BaseSerialPort
+import com.wl.weiqianwllib.serialport.WQSerialGlobal
+import com.wl.wllib.toTimeStr
 import java.nio.charset.Charset
-import kotlin.math.abs
-
+import com.wl.wllib.LogToFile.i
 /**
  * 热敏打印
  * @property serialPort BaseSerialPortUtil
  * @constructor
  */
 object PrintUtil {
-    private val serialPort: BaseSerialPortUtil = BaseSerialPortUtil("COM2", 9600)
+    private val serialPort: BaseSerialPort = BaseSerialPort()
 
     init {
-        serialPort.open()
+        open()
+    }
+
+    private fun open() {
+        serialPort.openSerial(WQSerialGlobal.COM2, 9600, 8)
     }
 
 
@@ -55,7 +57,7 @@ object PrintUtil {
 //        sb.append("吸光度:${result.absorbances?.setScale(5, RoundingMode.HALF_UP) ?: ""}\n")
         sb.append("浓度值:${result.concentration ?: ""} ${result.project.target?.projectUnit ?: ""}\n")
         sb.append("检测结论:${result.testResult ?: ""}\n")
-        sb.append("检测日期:${result.testTime.longToStr() ?: ""}\n")
+        sb.append("检测日期:${result.testTime.toTimeStr() ?: ""}\n")
 
         sb.append("\n")
         sb.append("\n")
@@ -68,7 +70,7 @@ object PrintUtil {
     }
 
     fun send(msg: String) {
-        Timber.d("$msg")
+        i("$msg")
         serialPort.write(msg.toByteArray(Charset.forName("GB2312")))
     }
 

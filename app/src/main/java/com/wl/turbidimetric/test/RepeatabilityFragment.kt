@@ -5,9 +5,7 @@ import android.view.View
 import android.widget.AdapterView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.wl.turbidimetric.R
-import com.wl.turbidimetric.databinding.FragmentMatchingArgsBinding
 import com.wl.turbidimetric.databinding.FragmentRepeatabilityBinding
 import com.wl.turbidimetric.ex.snack
 import com.wl.turbidimetric.home.HomeProjectAdapter
@@ -16,8 +14,7 @@ import com.wl.turbidimetric.view.HiltDialog
 import com.wl.wwanandroid.base.BaseFragment
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import timber.log.Timber
-
+import com.wl.wllib.LogToFile.i
 /**
  * 拟合参数
  * @property viewModel MatchingArgsViewModel
@@ -58,11 +55,11 @@ class RepeatabilityFragment :
 
     private fun listenerView() {
         vm.testMsg.observe(this) {
-            Timber.d("it=$it")
+            i("it=$it")
             vd.tvMsg.text = it
         }
         vm.toastMsg.observe(this) { msg ->
-            Timber.d("msg=$msg")
+            i("msg=$msg")
             snack(vd.root, msg)
         }
 

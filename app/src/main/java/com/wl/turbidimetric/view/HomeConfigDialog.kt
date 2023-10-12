@@ -6,7 +6,6 @@ import android.view.WindowManager
 import android.widget.AdapterView
 import android.widget.EditText
 import android.widget.Spinner
-import android.widget.TextView
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.ex.isAuto
@@ -14,8 +13,7 @@ import com.wl.turbidimetric.ex.selectionLast
 import com.wl.turbidimetric.ex.toast
 import com.wl.turbidimetric.home.HomeProjectAdapter
 import com.wl.turbidimetric.model.ProjectModel
-import timber.log.Timber
-
+import com.wl.wllib.LogToFile.i
 /**
  * 首页设置检测参数对话框
  * @property context Context

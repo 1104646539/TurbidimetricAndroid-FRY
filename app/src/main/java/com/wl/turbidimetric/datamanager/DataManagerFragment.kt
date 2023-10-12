@@ -21,16 +21,16 @@ import com.wl.turbidimetric.model.ConditionModel
 import com.wl.turbidimetric.model.TestResultModel
 import com.wl.turbidimetric.model.TestResultModel_
 import com.wl.turbidimetric.print.PrintUtil
-import com.wl.turbidimetric.util.ExportExcelUtil
+import com.wl.turbidimetric.util.ExportExcelHelper
 import com.wl.turbidimetric.view.ConditionDialog
 import com.wl.turbidimetric.view.HiltDialog
 import com.wl.turbidimetric.view.ResultDetailsDialog
+import com.wl.wllib.LogToFile.i
 import com.wl.wwanandroid.base.BaseFragment
 import io.objectbox.query.Query
 import io.objectbox.query.QueryBuilder
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
-import timber.log.Timber
 import java.util.*
 
 
@@ -40,7 +40,7 @@ import java.util.*
 class DataManagerFragment :
     BaseFragment<DataManagerViewModel, FragmentDataManagerBinding>(R.layout.fragment_data_manager) {
     init {
-        Timber.d("init create")
+        i("init create")
     }
 
     override val vm: DataManagerViewModel by viewModels {
@@ -68,12 +68,12 @@ class DataManagerFragment :
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
-        Timber.d("onCreateView")
+        i("onCreateView")
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
     override fun init(savedInstanceState: Bundle?) {
-        Timber.d("init")
+        i("init")
         listener()
         initView()
 
@@ -250,8 +250,8 @@ class DataManagerFragment :
      */
     private fun exportExcel() {
         lifecycleScope.launch {
-            getSelectData()?.let {
-                ExportExcelUtil.printExcel(it, { toast("成功$it") }, { toast("$it") })
+            getSelectData()?.let { it ->
+                ExportExcelHelper.export(requireContext(),it, { toast("成功$it") }, { toast(it) })
             }
         }
     }
@@ -260,7 +260,7 @@ class DataManagerFragment :
 //        val all = adapter.snapshot().map { it!! }
 //        val select = all.filter { it?.isSelect ?: false }
 //
-//        Timber.d("all=${all.size} select=${select.size}")
+//        i("all=${all.size} select=${select.size}")
 //        return select
 
         return adapter.getSelectedItems()
@@ -275,7 +275,7 @@ class DataManagerFragment :
                 queryData(conditionModel.buildQuery())
             }
             conditionDialog.dismiss()
-            Timber.d("conditionModel=$conditionModel")
+            i("conditionModel=$conditionModel")
 
         }, {
             conditionDialog.dismiss()
@@ -288,7 +288,7 @@ class DataManagerFragment :
         datasJob?.cancelAndJoin()
         datasJob = lifecycleScope.launch {
             vm.item(condition).collectLatest {
-                Timber.d("---监听到了变化---condition=$condition")
+                i("---监听到了变化---condition=$condition")
                 adapter?.submitData(it)
 
                 withContext(Dispatchers.Main) {

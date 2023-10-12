@@ -1,11 +1,9 @@
 package com.wl.turbidimetric.test
 
-import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.paging.cachedIn
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.SystemGlobal
@@ -22,16 +20,11 @@ import io.objectbox.kotlin.flow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.math.BigDecimal
-import java.math.RoundingMode
-import java.text.Format
 import java.text.NumberFormat
-import java.util.Date
+import java.util.*
 import kotlin.math.absoluteValue
-import kotlin.math.pow
-import kotlin.math.sqrt
-
+import com.wl.wllib.LogToFile.i
 /**
  * 重复性测试
  *
@@ -48,13 +41,13 @@ class RepeatabilityViewModel(
     }
 
     fun listener() {
-        SerialPortUtil.Instance.callback.add(this)
-        Timber.d("SerialPortUtil.Instance.callback listener")
+        SerialPortUtil.callback.add(this)
+        i("SerialPortUtil.callback listener")
     }
 
     fun clearListener() {
-        SerialPortUtil.Instance.callback.remove(this)
-        Timber.d("SerialPortUtil.Instance.callback onCleared")
+        SerialPortUtil.callback.remove(this)
+        i("SerialPortUtil.callback onCleared")
     }
 
     /**
@@ -271,7 +264,7 @@ class RepeatabilityViewModel(
      */
     private fun updateCuvetteState(pos: Int, state: CuvetteState) {
         cuvetteStates[pos] = state
-        Timber.d("updateCuvetteState pos=$pos state=$state cuvetteStates=$cuvetteStates")
+        i("updateCuvetteState pos=$pos state=$state cuvetteStates=$cuvetteStates")
     }
 
     /**
@@ -294,7 +287,7 @@ class RepeatabilityViewModel(
     override fun readDataStateFailed(cmd: UByte, state: UByte) {
         if (!runningRepeatability()) return
         SystemGlobal.machineArgState = MachineState.RunningError
-        Timber.d("报错了，cmd=$cmd state=$state")
+        i("报错了，cmd=$cmd state=$state")
         testMsg.postValue("报错了，cmd=$cmd state=$state")
     }
 
@@ -394,7 +387,7 @@ class RepeatabilityViewModel(
      */
     override fun readDataGetMachineStateModel(reply: ReplyModel<GetMachineStateModel>) {
         if (!runningRepeatability()) return
-//        Timber.d("接收到 样本舱门状态 reply=$reply")
+//        i("接收到 样本舱门状态 reply=$reply")
     }
 
     /**
@@ -404,7 +397,7 @@ class RepeatabilityViewModel(
     override fun readDataGetStateModel(reply: ReplyModel<GetStateModel>) {
         if (!runningRepeatability()) return
         if (!machineStateNormal()) return
-        Timber.d("接收到 获取状态 reply=$reply")
+        i("接收到 获取状态 reply=$reply")
         cuvetteShelfStates = reply.data.cuvetteShelfs
         sampleShelfStates = reply.data.sampleShelfs
         val r1Reagent = reply.data.r1Reagent
@@ -413,29 +406,29 @@ class RepeatabilityViewModel(
 
         getInitialPos()
 
-        Timber.d("cuvetteShelfPos=${cuvetteShelfPos} sampleShelfPos=${sampleShelfPos}")
+        i("cuvetteShelfPos=${cuvetteShelfPos} sampleShelfPos=${sampleShelfPos}")
         if (cuvetteShelfPos == -1) {
-            Timber.d("没有比色皿架")
+            i("没有比色皿架")
             getStateNotExistMsg.postValue("比色皿不足，请添加")
             return
         }
         if (sampleShelfPos == -1) {
-            Timber.d("没有样本架")
+            i("没有样本架")
             getStateNotExistMsg.postValue("样本不足，请添加")
             return
         }
         if (!r1Reagent) {
-            Timber.d("没有R1试剂")
+            i("没有R1试剂")
             getStateNotExistMsg.postValue("R1试剂不足，请添加")
             return
         }
         if (!r2Reagent) {
-            Timber.d("没有R2试剂")
+            i("没有R2试剂")
             getStateNotExistMsg.postValue("R2试剂不足，请添加")
             return
         }
         if (!cleanoutFluid) {
-            Timber.d("没有清洗液试剂")
+            i("没有清洗液试剂")
             getStateNotExistMsg.postValue("清洗液不足，请添加")
             return
         }
@@ -466,7 +459,7 @@ class RepeatabilityViewModel(
                 lastSampleShelfPos = i
             }
         }
-        Timber.d("getInitSampleShelfPos sampleShelfPos=$sampleShelfPos lastSampleShelfPos=$lastSampleShelfPos")
+        i("getInitSampleShelfPos sampleShelfPos=$sampleShelfPos lastSampleShelfPos=$lastSampleShelfPos")
     }
 
     /**
@@ -481,7 +474,7 @@ class RepeatabilityViewModel(
                 lastCuvetteShelfPos = i
             }
         }
-        Timber.d("getInitCuvetteShelfPos cuvetteShelfPos=$cuvetteShelfPos lastCuvetteShelfPos=$lastCuvetteShelfPos")
+        i("getInitCuvetteShelfPos cuvetteShelfPos=$cuvetteShelfPos lastCuvetteShelfPos=$lastCuvetteShelfPos")
     }
 
     /**
@@ -498,7 +491,7 @@ class RepeatabilityViewModel(
         }
         if (!runningRepeatability()) return
         if (!machineStateNormal()) return
-        Timber.d("接收到 移动比色皿架 reply=$reply")
+        i("接收到 移动比色皿架 reply=$reply")
         cuvettePos = 0
         when (repeatabilityState) {
             RepeatabilityState.MoveSample -> {
@@ -526,24 +519,24 @@ class RepeatabilityViewModel(
      * 发送 开样本仓门
      */
     private fun openSampleDoor() {
-        Timber.d("发送 开样本仓门")
-        SerialPortUtil.Instance.openSampleDoor()
+        i("发送 开样本仓门")
+        SerialPortUtil.openSampleDoor()
     }
 
     /**
      * 发送 开比色皿仓门
      */
     private fun openCuvetteDoor() {
-        Timber.d("发送 开比色皿仓门")
-        SerialPortUtil.Instance.openCuvetteDoor()
+        i("发送 开比色皿仓门")
+        SerialPortUtil.openCuvetteDoor()
     }
 
     /**
      * 获取样本仓门状态
      */
     private fun getSampleDoor() {
-        Timber.d("发送 获取样本仓门状态")
-        SerialPortUtil.Instance.getSampleDoorState()
+        i("发送 获取样本仓门状态")
+        SerialPortUtil.getSampleDoorState()
     }
 
     private fun isMatchingFinish(): Boolean {
@@ -558,7 +551,7 @@ class RepeatabilityViewModel(
     override fun readDataMoveSampleModel(reply: ReplyModel<MoveSampleModel>) {
         if (!runningRepeatability()) return
         if (!machineStateNormal()) return
-        Timber.d("接收到 移动样本 reply=$reply samplePos=$samplePos repeatabilityState=$repeatabilityState sampleStep=$sampleStep")
+        i("接收到 移动样本 reply=$reply samplePos=$samplePos repeatabilityState=$repeatabilityState sampleStep=$sampleStep")
         sampleMoveFinish = true
 
         when (repeatabilityState) {
@@ -581,7 +574,7 @@ class RepeatabilityViewModel(
     override fun readDataMoveCuvetteDripSampleModel(reply: ReplyModel<MoveCuvetteDripSampleModel>) {
         if (!runningRepeatability()) return
         if (!machineStateNormal()) return
-        Timber.d("接收到 移动比色皿到加样位 reply=$reply cuvetteStates=$cuvetteStates")
+        i("接收到 移动比色皿到加样位 reply=$reply cuvetteStates=$cuvetteStates")
 
         cuvetteMoveFinish = true
 
@@ -604,7 +597,7 @@ class RepeatabilityViewModel(
     override fun readDataMoveCuvetteDripReagentModel(reply: ReplyModel<MoveCuvetteDripReagentModel>) {
         if (!runningRepeatability()) return
         if (!machineStateNormal()) return
-        Timber.d("接收到 移动比色皿到加试剂位 reply=$reply cuvetteStates=$cuvetteStates")
+        i("接收到 移动比色皿到加试剂位 reply=$reply cuvetteStates=$cuvetteStates")
 
         cuvetteMoveFinish = true
 
@@ -633,7 +626,7 @@ class RepeatabilityViewModel(
      * 如果未结束，则继续移动比色皿，检测
      */
     private fun dripReagentAndStirAndTestFinish() {
-        Timber.d("dripReagentAndStirAndTestFinish dripReagentFinish=$dripReagentFinish cuvettePos=$cuvettePos ")
+        i("dripReagentAndStirAndTestFinish dripReagentFinish=$dripReagentFinish cuvettePos=$cuvettePos ")
         if ((cuvetteNeedDripReagent(cuvettePos) && !dripReagentFinish)) {
             return
         }
@@ -666,7 +659,7 @@ class RepeatabilityViewModel(
      * @param reply ReplyModel<MoveSampleShelfModel>
      */
     override fun readDataMoveSampleShelfModel(reply: ReplyModel<MoveSampleShelfModel>) {
-        Timber.d("接收到 移动样本架 reply=$reply repeatabilityState=$repeatabilityState")
+        i("接收到 移动样本架 reply=$reply repeatabilityState=$repeatabilityState")
         if (repeatabilityState == RepeatabilityState.Finish) {
             sampleShelfMoveFinish = true
             if (isMatchingFinish()) {
@@ -691,7 +684,7 @@ class RepeatabilityViewModel(
     override fun readDataTestModel(reply: ReplyModel<TestModel>) {
         if (!runningRepeatability()) return
         if (!machineStateNormal()) return
-        Timber.d("接收到 检测 reply=$reply cuvettePos=$cuvettePos repeatabilityState=$repeatabilityState 检测值=${reply.data.value}")
+        i("接收到 检测 reply=$reply cuvettePos=$cuvettePos repeatabilityState=$repeatabilityState 检测值=${reply.data.value}")
 
         calcTestResult(reply.data.value)
     }
@@ -820,7 +813,7 @@ class RepeatabilityViewModel(
             }
 
         }
-        Timber.d("开始计算重复性 $resultTest1 $resultTest2 $resultTest3 $resultTest4")
+        i("开始计算重复性 $resultTest1 $resultTest2 $resultTest3 $resultTest4")
 
         result = calcAbsorbanceDifferences(resultTest1, resultTest2, resultTest3, resultTest4)
 
@@ -893,7 +886,7 @@ class RepeatabilityViewModel(
     override fun readDataStirModel(reply: ReplyModel<StirModel>) {
         if (!runningRepeatability()) return
         if (!machineStateNormal()) return
-        Timber.d("接收到 搅拌 reply=$reply cuvettePos=$cuvettePos")
+        i("接收到 搅拌 reply=$reply cuvettePos=$cuvettePos")
 
         stirFinish = true
         updateCuvetteState(cuvettePos - 2, CuvetteState.Stir)
@@ -907,7 +900,7 @@ class RepeatabilityViewModel(
     override fun readDataDripReagentModel(reply: ReplyModel<DripReagentModel>) {
         if (!runningRepeatability()) return
         if (!machineStateNormal()) return
-        Timber.d("接收到 加试剂 reply=$reply cuvettePos=$cuvettePos")
+        i("接收到 加试剂 reply=$reply cuvettePos=$cuvettePos")
         dripReagentFinish = true
         takeReagentFinish = false
         updateCuvetteState(cuvettePos, CuvetteState.DripReagent)
@@ -922,7 +915,7 @@ class RepeatabilityViewModel(
     override fun readDataDripSampleModel(reply: ReplyModel<DripSampleModel>) {
         if (!runningRepeatability()) return
         if (!machineStateNormal()) return
-        Timber.d("接收到 加样 reply=$reply cuvettePos=$cuvettePos repeatabilityState=$repeatabilityState sampleStep=$sampleStep samplePos=$samplePos")
+        i("接收到 加样 reply=$reply cuvettePos=$cuvettePos repeatabilityState=$repeatabilityState sampleStep=$sampleStep samplePos=$samplePos")
 
         dripSamplingFinish = true
 
@@ -949,7 +942,7 @@ class RepeatabilityViewModel(
             else -> {}
         }
 
-        Timber.d("加样 cuvetteStates=$cuvetteStates")
+        i("加样 cuvetteStates=$cuvetteStates")
     }
 
     /**
@@ -959,7 +952,7 @@ class RepeatabilityViewModel(
     override fun readDataSamplingModel(reply: ReplyModel<SamplingModel>) {
         if (!runningRepeatability()) return
         if (!machineStateNormal()) return
-        Timber.d("接收到 取样 reply=$reply repeatabilityState=$repeatabilityState sampleStep=$sampleStep samplePos=$samplePos")
+        i("接收到 取样 reply=$reply repeatabilityState=$repeatabilityState sampleStep=$sampleStep samplePos=$samplePos")
 
         samplingFinish = true
 
@@ -1007,7 +1000,7 @@ class RepeatabilityViewModel(
     override fun readDataMoveCuvetteTestModel(reply: ReplyModel<MoveCuvetteTestModel>) {
         if (!runningRepeatability()) return
         if (!machineStateNormal()) return
-        Timber.d("接收到 移动比色皿到检测位 reply=$reply cuvetteStates=$cuvetteStates repeatabilityState=$repeatabilityState")
+        i("接收到 移动比色皿到检测位 reply=$reply cuvetteStates=$cuvetteStates repeatabilityState=$repeatabilityState")
 
         when (repeatabilityState) {
             RepeatabilityState.Test2,
@@ -1026,7 +1019,7 @@ class RepeatabilityViewModel(
     override fun readDataTakeReagentModel(reply: ReplyModel<TakeReagentModel>) {
         if (!runningRepeatability()) return
         if (!machineStateNormal()) return
-        Timber.d("接收到 取试剂 reply=$reply")
+        i("接收到 取试剂 reply=$reply")
         takeReagentFinish = true
 
         //取完试剂判断是否移动比色皿完成，完成就直接取样
@@ -1042,7 +1035,7 @@ class RepeatabilityViewModel(
     override fun readDataSamplingProbeCleaningModelModel(reply: ReplyModel<SamplingProbeCleaningModel>) {
         if (!runningRepeatability()) return
         if (!machineStateNormal()) return
-        Timber.d("接收到 取样针清洗 reply=$reply samplePos=$samplePos sampleStep=$sampleStep")
+        i("接收到 取样针清洗 reply=$reply samplePos=$samplePos sampleStep=$sampleStep")
         if (repeatabilityState == RepeatabilityState.MoveSample) {//加已混匀的样本的清洗
             if ((sampleStep == 9)) {
                 //开始加试剂的步骤
@@ -1068,7 +1061,7 @@ class RepeatabilityViewModel(
     override fun readDataStirProbeCleaningModel(reply: ReplyModel<StirProbeCleaningModel>) {
         if (!runningRepeatability()) return
         if (!machineStateNormal()) return
-        Timber.d("接收到 搅拌针清洗 reply=$reply")
+        i("接收到 搅拌针清洗 reply=$reply")
         stirProbeCleaningFinish = true
         dripReagentAndStirAndTestFinish()
     }
@@ -1081,7 +1074,7 @@ class RepeatabilityViewModel(
     override fun readDataPiercedModel(reply: ReplyModel<PiercedModel>) {
         if (!runningRepeatability()) return
         if (!machineStateNormal()) return
-        Timber.d("接收到 刺破 reply=$reply")
+        i("接收到 刺破 reply=$reply")
     }
 
     /**
@@ -1091,7 +1084,7 @@ class RepeatabilityViewModel(
     override fun readDataGetVersionModel(reply: ReplyModel<GetVersionModel>) {
         if (!runningRepeatability()) return
         if (!machineStateNormal()) return
-        Timber.d("接收到 获取版本号 reply=$reply")
+        i("接收到 获取版本号 reply=$reply")
     }
 
     override fun readDataTempModel(reply: ReplyModel<TempModel>) {
@@ -1105,7 +1098,7 @@ class RepeatabilityViewModel(
      * @param reply ReplyModel<SampleDoorModel>
      */
     override fun readDataSampleDoorModel(reply: ReplyModel<SampleDoorModel>) {
-//        Timber.d("接收到 样本门状态 reply=$reply")
+//        i("接收到 样本门状态 reply=$reply")
 //        sampleDoorLocked = reply.data.isOpen
 //        sampleDoorLockedLD.postValue(reply.data.isOpen)
 //        //拟合完成后的开门，不成功代表有故障
@@ -1113,7 +1106,7 @@ class RepeatabilityViewModel(
 //            if (cuvetteDoorLocked && sampleDoorLocked) {
 //                showMatchingDialog()
 //            } else if (!sampleDoorLocked) {
-//                Timber.d("样本门打开失败")
+//                i("样本门打开失败")
 //                testMsg.postValue("样本门打开失败")
 //            }
 //        }
@@ -1131,7 +1124,7 @@ class RepeatabilityViewModel(
      * @param reply ReplyModel<CuvetteDoorModel>
      */
     override fun readDataCuvetteDoorModel(reply: ReplyModel<CuvetteDoorModel>) {
-//        Timber.d("接收到 比色皿门状态 reply=$reply")
+//        i("接收到 比色皿门状态 reply=$reply")
 //        cuvetteDoorLocked = reply.data.isOpen
 //        cuvetteDoorLockedLD.postValue(reply.data.isOpen)
 //        if (repeatabilityState == RepeatabilityState.Finish && cuvetteDoorLocked && sampleDoorLocked) {
@@ -1153,8 +1146,8 @@ class RepeatabilityViewModel(
      * 获取样本架，比色皿架状态，试剂，清洗液状态
      */
     private fun getState() {
-        Timber.d("发送 获取样本架，比色皿架状态，试剂，清洗液状态")
-        SerialPortUtil.Instance.getState()
+        i("发送 获取样本架，比色皿架状态，试剂，清洗液状态")
+        SerialPortUtil.getState()
     }
 
 
@@ -1163,9 +1156,9 @@ class RepeatabilityViewModel(
      * @param pos Int
      */
     private fun moveSampleShelf(pos: Int) {
-        Timber.d("发送 移动样本架 pos=$pos")
+        i("发送 移动样本架 pos=$pos")
         sampleShelfMoveFinish = false
-        SerialPortUtil.Instance.moveSampleShelf(pos + 1)
+        SerialPortUtil.moveSampleShelf(pos + 1)
     }
 
     /**
@@ -1173,9 +1166,9 @@ class RepeatabilityViewModel(
      * @param pos Int
      */
     private fun moveCuvetteShelf(pos: Int) {
-        Timber.d("发送 移动比色皿架 pos=$pos")
+        i("发送 移动比色皿架 pos=$pos")
         cuvetteShelfMoveFinish = false
-        SerialPortUtil.Instance.moveCuvetteShelf(pos + 1)
+        SerialPortUtil.moveCuvetteShelf(pos + 1)
     }
 
     /**
@@ -1183,93 +1176,93 @@ class RepeatabilityViewModel(
      * @param step Int
      */
     private fun moveSample(step: Int = 1) {
-        Timber.d("发送 移动样本 step=$step")
+        i("发送 移动样本 step=$step")
         sampleMoveFinish = false
         samplePos += step
-        SerialPortUtil.Instance.moveSample(step > 0, step.absoluteValue)
+        SerialPortUtil.moveSample(step > 0, step.absoluteValue)
     }
 
     /**
      * 移动比色皿到 加样位
      */
     private fun moveCuvetteDripSample(step: Int = 1) {
-        Timber.d("发送 移动比色皿到 加样位 step=$step")
+        i("发送 移动比色皿到 加样位 step=$step")
         cuvetteMoveFinish = false
         cuvettePos += step
-        SerialPortUtil.Instance.moveCuvetteDripSample(step > 0, step.absoluteValue)
+        SerialPortUtil.moveCuvetteDripSample(step > 0, step.absoluteValue)
     }
 
     /**
      * 移动比色皿到 滴试剂位
      */
     private fun moveCuvetteDripReagent(step: Int = 1) {
-        Timber.d("发送 移动比色皿到 滴试剂位 step=$step")
+        i("发送 移动比色皿到 滴试剂位 step=$step")
         cuvetteMoveFinish = false
         cuvettePos += step
-        SerialPortUtil.Instance.moveCuvetteDripReagent(step > 0, step.absoluteValue)
+        SerialPortUtil.moveCuvetteDripReagent(step > 0, step.absoluteValue)
     }
 
     /**
      * 移动比色皿到 检测位
      */
     private fun moveCuvetteTest(step: Int = 1) {
-        Timber.d("发送 移动比色皿到 检测位 repeatabilityState=$repeatabilityState step=$step")
+        i("发送 移动比色皿到 检测位 repeatabilityState=$repeatabilityState step=$step")
         cuvettePos += step
-        SerialPortUtil.Instance.moveCuvetteTest(step > 0, step.absoluteValue)
+        SerialPortUtil.moveCuvetteTest(step > 0, step.absoluteValue)
     }
 
     /**
      * 取样
      */
     private fun sampling(volume: Int) {
-        Timber.d("发送 取样 volume=$volume")
+        i("发送 取样 volume=$volume")
         samplingFinish = false
-        SerialPortUtil.Instance.sampling(volume, squeezing = false)
+        SerialPortUtil.sampling(volume, squeezing = false)
     }
 
     /**
      * 取试剂
      */
     private fun takeReagent() {
-        Timber.d("发送 取试剂")
+        i("发送 取试剂")
         takeReagentFinish = false
-        SerialPortUtil.Instance.takeReagent()
+        SerialPortUtil.takeReagent()
     }
 
     /**
      * 取样针清洗
      */
     private fun samplingProbeCleaning() {
-        Timber.d("发送 取样针清洗")
-        SerialPortUtil.Instance.samplingProbeCleaning()
+        i("发送 取样针清洗")
+        SerialPortUtil.samplingProbeCleaning()
     }
 
     /**
      * 搅拌
      */
     private fun stir() {
-        Timber.d("发送 搅拌 cuvettePos=$cuvettePos")
+        i("发送 搅拌 cuvettePos=$cuvettePos")
         stirFinish = false
         stirProbeCleaningFinish = false
-        SerialPortUtil.Instance.stir()
+        SerialPortUtil.stir()
     }
 
     /**
      * 搅拌针清洗
      */
     private fun stirProbeCleaning() {
-        Timber.d("发送 搅拌针清洗 cuvettePos=$cuvettePos")
+        i("发送 搅拌针清洗 cuvettePos=$cuvettePos")
         stirProbeCleaningFinish = false
-        SerialPortUtil.Instance.stirProbeCleaning()
+        SerialPortUtil.stirProbeCleaning()
     }
 
     /**
      * 加样
      */
     private fun dripSample(autoBlending: Boolean = false, inplace: Boolean = true, volume: Int) {
-        Timber.d("发送 加样 volume=$volume")
+        i("发送 加样 volume=$volume")
         dripSamplingFinish = false
-        SerialPortUtil.Instance.dripSample(
+        SerialPortUtil.dripSample(
             autoBlending = autoBlending,
             inplace = inplace,
             volume = volume
@@ -1280,18 +1273,18 @@ class RepeatabilityViewModel(
      * 加试剂
      */
     private fun dripReagent() {
-        Timber.d("发送 加试剂 cuvettePos=$cuvettePos")
+        i("发送 加试剂 cuvettePos=$cuvettePos")
         dripReagentFinish = false
-        SerialPortUtil.Instance.dripReagent()
+        SerialPortUtil.dripReagent()
     }
 
     /**
      * 检测
      */
     private fun test() {
-        Timber.d("发送 检测 cuvettePos=$cuvettePos")
+        i("发送 检测 cuvettePos=$cuvettePos")
         testFinish = false
-        SerialPortUtil.Instance.test()
+        SerialPortUtil.test()
     }
 
     /**
@@ -1300,7 +1293,7 @@ class RepeatabilityViewModel(
      * 点击我已添加，继续检测
      */
     fun dialogGetStateNotExistConfirm() {
-        Timber.d("dialogGetStateNotExistConfirm 点击我已添加，继续检测")
+        i("dialogGetStateNotExistConfirm 点击我已添加，继续检测")
         getState()
     }
 
@@ -1310,7 +1303,7 @@ class RepeatabilityViewModel(
      * 点击结束检测
      */
     fun dialogGetStateNotExistCancel() {
-        Timber.d("dialogGetStateNotExistCancel 点击结束检测")
+        i("dialogGetStateNotExistCancel 点击结束检测")
 
     }
 

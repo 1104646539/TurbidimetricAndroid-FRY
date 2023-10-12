@@ -20,13 +20,11 @@ import com.wl.turbidimetric.util.SerialPortUtil
 import com.wl.wwanandroid.base.BaseViewModel
 import io.objectbox.kotlin.flow
 import kotlinx.coroutines.*
-import timber.log.Timber
 import java.math.BigDecimal
 import java.util.*
 import kotlin.concurrent.timer
 import kotlin.math.absoluteValue
-
-
+import com.wl.wllib.LogToFile.i
 class HomeViewModel(
     private val projectRepository: ProjectRepository,
     private val testResultRepository: TestResultRepository
@@ -47,8 +45,8 @@ class HomeViewModel(
 
 
     private fun listener() {
-        SerialPortUtil.Instance.callback.add(this)
-        ScanCodeUtil.Instance.onScanResult = this
+        SerialPortUtil.callback.add(this)
+        ScanCodeUtil.onScanResult = this
 
         listenerTempState()
     }
@@ -458,7 +456,7 @@ class HomeViewModel(
     private fun listenerTempState() {
         viewModelScope.launch {
             timer("", true, Date(), 30000) {
-                SerialPortUtil.Instance.getTemp()
+                SerialPortUtil.getTemp()
             }
         }
     }
@@ -514,7 +512,7 @@ class HomeViewModel(
         cuvetteStates.postValue(mCuvetteStates)
         samplesStates.postValue(mSamplesStates)
 
-        Timber.d("跳过 $cuvetteStartPos 个比色皿")
+        i("跳过 $cuvetteStartPos 个比色皿")
 
         if (SystemGlobal.isCodeDebug) {
             testShelfInterval = testS;
@@ -575,7 +573,7 @@ class HomeViewModel(
         r2Volume = reply.data.r2Volume
         if (!runningTest()) return
         if (!machineStateNormal()) return
-        Timber.d("接收到 取试剂 reply=$reply")
+        i("接收到 取试剂 reply=$reply")
         takeReagentFinish = true
         goDripReagent()
     }
@@ -585,7 +583,7 @@ class HomeViewModel(
      * 去加试剂
      */
     private fun goDripReagent() {
-        Timber.d("goDripReagent cuvettePos=$cuvettePos takeReagentFinish=$takeReagentFinish cuvetteMoveFinish=$cuvetteMoveFinish")
+        i("goDripReagent cuvettePos=$cuvettePos takeReagentFinish=$takeReagentFinish cuvetteMoveFinish=$cuvetteMoveFinish")
         if (cuvettePos < 10 && cuvetteNeedDripReagent(cuvettePos) && takeReagentFinish && cuvetteMoveFinish) {
             dripReagent()
         }
@@ -599,7 +597,7 @@ class HomeViewModel(
         cleanoutFluid = reply.data.cleanoutFluid
         if (!runningTest()) return
         if (!machineStateNormal()) return
-        Timber.d("接收到 取样针清洗 reply=$reply samplingProbeCleaningRecoverSampling=$samplingProbeCleaningRecoverSampling")
+        i("接收到 取样针清洗 reply=$reply samplingProbeCleaningRecoverSampling=$samplingProbeCleaningRecoverSampling")
         samplingProbeCleaningFinish = true
 
         //恢复取样
@@ -620,7 +618,7 @@ class HomeViewModel(
         cleanoutFluidState.postValue(reply.data.cleanoutFluid)
         if (!runningTest()) return
         if (!machineStateNormal()) return
-        Timber.d("接收到 搅拌针清洗 reply=$reply stirProbeCleaningRecoverStir=$stirProbeCleaningRecoverStir")
+        i("接收到 搅拌针清洗 reply=$reply stirProbeCleaningRecoverStir=$stirProbeCleaningRecoverStir")
         stirProbeCleaningFinish = true
         nextDripReagent()
 
@@ -638,7 +636,7 @@ class HomeViewModel(
     override fun readDataPiercedModel(reply: ReplyModel<PiercedModel>) {
         if (!runningTest()) return
         if (!machineStateNormal()) return
-        Timber.d("接收到 刺破 reply=$reply samplePos=$samplePos")
+        i("接收到 刺破 reply=$reply samplePos=$samplePos")
         piercedFinish = true
         updateSampleState(samplePos, SampleState.Pierced)
         //当不需要取样时，直接下一步
@@ -654,7 +652,7 @@ class HomeViewModel(
      * 去加样
      */
     private fun goDripSample() {
-        Timber.d("sampleMoveFinish=$sampleMoveFinish samplingFinish=$samplingFinish cuvetteMoveFinish=$cuvetteMoveFinish")
+        i("sampleMoveFinish=$sampleMoveFinish samplingFinish=$samplingFinish cuvetteMoveFinish=$cuvetteMoveFinish")
         if (samplePos > 0 && sampleMoveFinish && samplingFinish && cuvetteMoveFinish && sampleNeedDripSampling(
                 samplePos - 1
             )
@@ -671,7 +669,7 @@ class HomeViewModel(
     override fun readDataGetVersionModel(reply: ReplyModel<GetVersionModel>) {
         if (!runningTest()) return
         if (!machineStateNormal()) return
-        Timber.d("接收到 获取版本号 reply=$reply")
+        i("接收到 获取版本号 reply=$reply")
 
     }
 
@@ -680,7 +678,7 @@ class HomeViewModel(
      * @param reply ReplyModel<TempModel>
      */
     override fun readDataTempModel(reply: ReplyModel<TempModel>) {
-        Timber.d("接收到 获取设置温度 reply=$reply")
+        i("接收到 获取设置温度 reply=$reply")
 
         reactionTemp.postValue(reply.data.reactionTemp / 10.0)
         r1Temp.postValue(reply.data.r1Temp / 10.0)
@@ -694,7 +692,7 @@ class HomeViewModel(
     override fun readDataStateFailed(cmd: UByte, state: UByte) {
         if (!runningTest()) return
         if (cmd == SerialGlobal.CMD_TakeReagent) {
-            Timber.d("报错了，cmd=$cmd state=$state 是取试剂的暂时不管")
+            i("报错了，cmd=$cmd state=$state 是取试剂的暂时不管")
             readDataTakeReagentModel(
                 ReplyModel(
                     SerialGlobal.CMD_TakeReagent, 0, TakeReagentModel()
@@ -703,7 +701,7 @@ class HomeViewModel(
             return
         }
         machineArgState = MachineState.RunningError
-        Timber.d("报错了，cmd=$cmd state=$state")
+        i("报错了，cmd=$cmd state=$state")
         testMsg.postValue("报错了，cmd=$cmd state=$state")
     }
 
@@ -712,7 +710,7 @@ class HomeViewModel(
      * @param reply ReplyModel<SampleDoorModel>
      */
     override fun readDataSampleDoorModel(reply: ReplyModel<SampleDoorModel>) {
-        Timber.d("接收到 样本门状态 reply=$reply")
+        i("接收到 样本门状态 reply=$reply")
 //        sampleDoorIsOpen.postValue(reply.data.isOpen)
 
 //        sampleDoorLocked = reply.data.isOpen
@@ -730,7 +728,7 @@ class HomeViewModel(
      * @param reply ReplyModel<CuvetteDoorModel>
      */
     override fun readDataCuvetteDoorModel(reply: ReplyModel<CuvetteDoorModel>) {
-        Timber.d("接收到 比色皿门状态 reply=$reply")
+        i("接收到 比色皿门状态 reply=$reply")
 //        cuvetteDoorIsOpen.postValue(reply.data.isOpen)
 //        cuvetteDoorLocked = reply.data.isOpen
 //        cuvetteDoorLockedLD.postValue(reply.data.isOpen)
@@ -747,7 +745,7 @@ class HomeViewModel(
     override fun readDataMoveSampleModel(reply: ReplyModel<MoveSampleModel>) {
         if (!runningTest()) return
         if (!machineStateNormal()) return
-        Timber.d("接收到 移动样本 reply=$reply cuvettePos=$cuvettePos lastCuvetteShelfPos=$lastCuvetteShelfPos cuvetteShelfPos=$cuvetteShelfPos samplePos=$samplePos samplingProbeCleaningFinish=$samplingProbeCleaningFinish")
+        i("接收到 移动样本 reply=$reply cuvettePos=$cuvettePos lastCuvetteShelfPos=$lastCuvetteShelfPos cuvetteShelfPos=$cuvetteShelfPos samplePos=$samplePos samplingProbeCleaningFinish=$samplingProbeCleaningFinish")
         sampleMoveFinish = true
         samplingFinish = false
         dripSampleFinish = false
@@ -761,14 +759,14 @@ class HomeViewModel(
                 //如果是自动模式并且已开启样本传感器,并且是未识别到样本，才是没有样本
 //            if ((isAuto() && LocalData.SampleExist && !exist)) {
                 //没有样本，移动到下一个位置
-                Timber.d("没有样本,移动到下一个位置")
+                i("没有样本,移动到下一个位置")
                 scanFinish = true
                 scanResults.add(null)
-                Timber.d("scanResults=$scanResults")
+                i("scanResults=$scanResults")
                 nextStepDripReagent()
             } else {
                 //有样本
-                Timber.d("有样本")
+                i("有样本")
                 updateSampleState(samplePos, SampleState.Exist)
                 startScan(samplePos)
             }
@@ -832,8 +830,8 @@ class HomeViewModel(
             mSamplesStates[sampleShelfPos]!![samplePos].cuvetteID = cuvettePos
         }
         samplesStates.postValue(mSamplesStates)
-        Timber.d("updateSampleState samplePos=${samplePos} sampleShelfPos=$sampleShelfPos")
-        Timber.d("updateSampleState samplesState=${mSamplesStates.print()}")
+        i("updateSampleState samplePos=${samplePos} sampleShelfPos=$sampleShelfPos")
+        i("updateSampleState samplesState=${mSamplesStates.print()}")
     }
 
     /**
@@ -854,8 +852,8 @@ class HomeViewModel(
         testResult?.let { mCuvetteStates[cuvetteShelfPos]!![cuvettePos].testResult = testResult }
         samplePos?.let { mCuvetteStates[cuvetteShelfPos]!![cuvettePos].sampleID = samplePos }
         cuvetteStates.postValue(mCuvetteStates)
-        Timber.d("updateCuvetteState  cuvetteShelfPos=$cuvetteShelfPos")
-        Timber.d("updateCuvetteState cuvetteStates=${mCuvetteStates.print()}")
+        i("updateCuvetteState  cuvetteShelfPos=$cuvetteShelfPos")
+        i("updateCuvetteState cuvetteStates=${mCuvetteStates.print()}")
     }
 
     /**
@@ -867,7 +865,7 @@ class HomeViewModel(
 
         if (!SystemGlobal.isCodeDebug && (isAuto() && LocalData.ScanCode)) {
             viewModelScope.launch {
-                ScanCodeUtil.Instance.startScan()
+                ScanCodeUtil.startScan()
             }
         } else {
             //如果是测试用的。。。或者是自动模式，但是未开启扫码、或者是手动模式时。走扫码成功路线
@@ -883,19 +881,19 @@ class HomeViewModel(
      * 扫码成功
      */
     override fun scanSuccess(str: String) {
-        Timber.d("扫码成功 str=$str")
+        i("扫码成功 str=$str")
         updateSampleState(samplePos, SampleState.ScanSuccess)
         scanFinish = true
         pierced()
         scanResults.add(str ?: "")
-        Timber.d("scanResults=$scanResults")
+        i("scanResults=$scanResults")
     }
 
     /**
      * 扫码失败
      */
     override fun scanFailed() {
-        Timber.d("扫码失败")
+        i("扫码失败")
         updateSampleState(samplePos, SampleState.ScanFailed)
         scanFinish = true
         piercedFinish = true
@@ -906,7 +904,7 @@ class HomeViewModel(
         }
         nextStepDripReagent()
         scanResults.add(null)
-        Timber.d("scanResults=$scanResults")
+        i("scanResults=$scanResults")
     }
 
 
@@ -931,9 +929,9 @@ class HomeViewModel(
      * 刺破
      */
     private fun pierced() {
-        Timber.d("发送 刺破")
+        i("发送 刺破")
         piercedFinish = false
-        SerialPortUtil.Instance.pierced()
+        SerialPortUtil.pierced()
     }
 
 
@@ -943,7 +941,7 @@ class HomeViewModel(
     override fun readDataTestModel(reply: ReplyModel<TestModel>) {
         if (!runningTest()) return
         if (!machineStateNormal()) return
-        Timber.d("接收到 检测完成 reply=$reply cuvettePos=$cuvettePos testState=$testState")
+        i("接收到 检测完成 reply=$reply cuvettePos=$cuvettePos testState=$testState")
         testFinish = true
 
         calcTestResult(reply.data.value)
@@ -1019,7 +1017,7 @@ class HomeViewModel(
      */
     private fun updateTestResultModel(value: Int, index: Int, state: CuvetteState) {
         var pos = index
-        Timber.d("updateTestResultModel pos=$pos resultModels=$resultModels")
+        i("updateTestResultModel pos=$pos resultModels=$resultModels")
         if (cuvetteStartPos > 0 && isFirstCuvetteShelf()) {
             pos -= cuvetteStartPos
         }
@@ -1095,7 +1093,7 @@ class HomeViewModel(
         resultModels[pos]?.let {
             testResultRepository.updateTestResult(it)
         }
-        Timber.d("updateTestResultModel resultModels=$resultModels")
+        i("updateTestResultModel resultModels=$resultModels")
     }
 
 
@@ -1108,9 +1106,9 @@ class HomeViewModel(
         )
 
         resultModels.forEach {
-            Timber.d("resultModel=$it")
+            i("resultModel=$it")
         }
-        Timber.d("这排比色皿检测结束")
+        i("这排比色皿检测结束")
 
         resultTest1.clear()
         resultTest2.clear()
@@ -1166,22 +1164,22 @@ class HomeViewModel(
         accord: () -> Unit, discrepancy: (String) -> Unit
     ) {
         if (!r1Reagent) {
-            Timber.d("没有R1试剂")
+            i("没有R1试剂")
             discrepancy.invoke("R1试剂不足，请添加")
             return
         }
         if (!r2Reagent) {
-            Timber.d("没有R2试剂")
+            i("没有R2试剂")
             discrepancy.invoke("R2试剂不足，请添加")
             return
         }
         if (r2Volume == 0) {
-            Timber.d("没有R2试剂")
+            i("没有R2试剂")
             discrepancy.invoke("R2试剂不足，请添加")
             return
         }
         if (!cleanoutFluid) {
-            Timber.d("没有清洗液")
+            i("没有清洗液")
             discrepancy.invoke("清洗液不足，请添加")
             return
         }
@@ -1198,7 +1196,7 @@ class HomeViewModel(
 
 //        if ((isAuto() && lastSamplePos(samplePos)) || !isAuto()) {//这排最后一个样本
 //            if (!isAuto() && manualModelSamplingFinish()) {
-//                Timber.d("手动模式，样本加样完成！")
+//                i("手动模式，样本加样完成！")
 //                stepDripReagent()
 //            }
 
@@ -1253,26 +1251,26 @@ class HomeViewModel(
      */
     private fun nextDripReagent() {
         if (testState != TestState.DripReagent) return;
-        Timber.d("nextDripReagent cuvettePos=$cuvettePos dripReagentFinish=$dripReagentFinish testFinish=$testFinish stirFinish=$stirFinish stirProbeCleaningFinish=$stirProbeCleaningFinish takeReagentFinish=$takeReagentFinish cuvetteMoveFinish=$cuvetteMoveFinish");
+        i("nextDripReagent cuvettePos=$cuvettePos dripReagentFinish=$dripReagentFinish testFinish=$testFinish stirFinish=$stirFinish stirProbeCleaningFinish=$stirProbeCleaningFinish takeReagentFinish=$takeReagentFinish cuvetteMoveFinish=$cuvetteMoveFinish");
         if (cuvettePos < 13) {
             //当取试剂完成，检测完成，搅拌完成，加试剂完成，移动比色皿完成时，
             //去取试剂，移动比色皿
             if (dripReagentFinish && testFinish && stirFinish && takeReagentFinish && cuvetteMoveFinish && stirProbeCleaningFinish) {
 //                //是否是最后一个需要加试剂的比色皿了
                 if (lastNeedDripReagent(cuvettePos)) {
-                    Timber.d("加试剂完成")
+                    i("加试剂完成")
                 } else {
                     //取试剂，移动比色皿
                     takeReagent()
                 }
                 if (cuvettePos >= 3 && lastNeedTest1(cuvettePos - 3)) {
-                    Timber.d("重新计算间隔时间  之前 testShelfInterval=$testShelfInterval")
+                    i("重新计算间隔时间  之前 testShelfInterval=$testShelfInterval")
                     if (!SystemGlobal.isCodeDebug) {
                         testShelfInterval =
                             ((10 - (cuvettePos - cuvetteStartPos - 2)) * 10 * 1000).toLong()
                     }
-                    Timber.d("重新计算间隔时间 之后 testShelfInterval=$testShelfInterval cuvettePos=$cuvettePos cuvetteStartPos=$cuvetteStartPos")
-                    Timber.d("已经检测最后一个了,进行下一个步骤，检测第二次 testShelfInterval=$testShelfInterval")
+                    i("重新计算间隔时间 之后 testShelfInterval=$testShelfInterval cuvettePos=$cuvettePos cuvetteStartPos=$cuvetteStartPos")
+                    i("已经检测最后一个了,进行下一个步骤，检测第二次 testShelfInterval=$testShelfInterval")
                     viewModelScope.launch {
                         delay(testShelfInterval)
                         stepTest(TestState.Test2)
@@ -1283,7 +1281,7 @@ class HomeViewModel(
                 }
             }
         } else {
-            Timber.d("cuvettePos >= 13 $cuvettePos")
+            i("cuvettePos >= 13 $cuvettePos")
         }
     }
 
@@ -1294,24 +1292,24 @@ class HomeViewModel(
      * @param state TestState 要切换到的状态
      */
     private fun stepTest(state: TestState) {
-        Timber.d(" ———————— stepTest state=$state  cuvettePos=$cuvettePos————————————————————————————————————————————————————————————————————————————————————————————————=")
+        i(" ———————— stepTest state=$state  cuvettePos=$cuvettePos————————————————————————————————————————————————————————————————————————————————————————————————=")
         testState = state
         //获取跳过的步数
         val needMoveStep = getFirstCuvetteStartPos();
         //切换到TestState.Test2时，当前下位机的比色皿位置cuvettePos == 0，则不需要计算需要回退多少格，直接往前移动
         if (state == TestState.Test2) {
-            Timber.d("stepTest cuvettePos=$cuvettePos needMoveStep=$needMoveStep")
+            i("stepTest cuvettePos=$cuvettePos needMoveStep=$needMoveStep")
             if (needMoveStep > -1) {//需要跳过
                 cuvettePos = -1
                 moveCuvetteTest(needMoveStep + 2)
             } else {//不需要跳过
                 cuvettePos = getNextStepCuvetteStartPos()
-                Timber.d("stepTest cuvettePos=$cuvettePos needMoveStep=$needMoveStep")
+                i("stepTest cuvettePos=$cuvettePos needMoveStep=$needMoveStep")
                 moveCuvetteTest()
             }
         } else {
             //如果 nextStartPos > -1 代表要跳过，更新比色皿状态
-            Timber.d("stepTest cuvettePos=$cuvettePos needMoveStep=$needMoveStep $cuvetteStartPos")
+            i("stepTest cuvettePos=$cuvettePos needMoveStep=$needMoveStep $cuvetteStartPos")
             if (needMoveStep > -1) {
                 if (isFirstCuvetteShelf()) {
                     if (cuvetteStartPos > 0) {
@@ -1384,7 +1382,7 @@ class HomeViewModel(
     override fun readDataStirModel(reply: ReplyModel<StirModel>) {
         if (!runningTest()) return
         if (!machineStateNormal()) return
-        Timber.d("接收到 搅拌 reply=$reply cuvettePos=$cuvettePos")
+        i("接收到 搅拌 reply=$reply cuvettePos=$cuvettePos")
         stirFinish = true
         updateCuvetteState(cuvettePos - 2, CuvetteState.Stir)
         stirProbeCleaning()
@@ -1397,7 +1395,7 @@ class HomeViewModel(
     override fun readDataDripReagentModel(reply: ReplyModel<DripReagentModel>) {
         if (!runningTest()) return
         if (!machineStateNormal()) return
-        Timber.d("接收到 加试剂 reply=$reply cuvettePos=$cuvettePos")
+        i("接收到 加试剂 reply=$reply cuvettePos=$cuvettePos")
         dripReagentFinish = true
         updateCuvetteState(cuvettePos, CuvetteState.DripReagent)
         nextDripReagent()
@@ -1434,7 +1432,7 @@ class HomeViewModel(
     override fun readDataDripSampleModel(reply: ReplyModel<DripSampleModel>) {
         if (!runningTest()) return
         if (!machineStateNormal()) return
-        Timber.d("接收到 加样 reply=$reply cuvettePos=$cuvettePos samplePos=$samplePos")
+        i("接收到 加样 reply=$reply cuvettePos=$cuvettePos samplePos=$samplePos")
 
         dripSampleFinish = true
         val result = createResultModel(scanResults[samplePos - 1])
@@ -1493,7 +1491,7 @@ class HomeViewModel(
 
     private fun nextStepDripReagent() {
 
-        Timber.d("piercedFinish=$piercedFinish scanFinish=$scanFinish samplingFinish=$samplingFinish dripSampleFinish=$dripSampleFinish cuvettePos=$cuvettePos samplePos=$samplePos")
+        i("piercedFinish=$piercedFinish scanFinish=$scanFinish samplingFinish=$samplingFinish dripSampleFinish=$dripSampleFinish cuvettePos=$cuvettePos samplePos=$samplePos")
         //(刺破结果 && (扫码结束 || 不需要扫码) && (需要取样 && 取样结束 && 加样结束) || 不需要加样)
         if ((piercedFinish && (scanFinish || lastSamplePos(samplePos)) && (sampleNeedSampling(
                 samplePos - 1
@@ -1504,7 +1502,7 @@ class HomeViewModel(
             //是否是最后一个比色皿的位置，但是样本又不能是第一个，因为第一个样本代表还没取样
             if (lastCuvettePos(cuvettePos) && samplePos > 0) {
                 //这排最后一个比色皿，需要去下一个步骤，加试剂
-                Timber.d("这排最后一个比色皿，需要去下一个步骤，加试剂")
+                i("这排最后一个比色皿，需要去下一个步骤，加试剂")
                 stepDripReagent()
             }
 //            else if (!isAuto()) {//手动模式
@@ -1514,40 +1512,40 @@ class HomeViewModel(
 //                } else if (lastSamplePos(samplePos)) {//
 //                    if (lastSampleShelf(sampleShelfPos)) {//最后一排
 //                        //已经加完了最后一个样本了，加样结束，去下一个步骤，加试剂
-//                        Timber.d("样本加样完成！")
+//                        i("样本加样完成！")
 //                        if (shelfNeedDripReagent()) {
 //                            stepDripReagent()
 //                        } else {
-//                            Timber.d("不需要加试剂,检测结束！")
+//                            i("不需要加试剂,检测结束！")
 //                            testFinishAction()
 //                        }
 //                    } else {
 //                        //这排样本已经取完样了，移动到下一排接着取样
-//                        Timber.d("这排样本已经取完样了，移动到下一排接着取样")
+//                        i("这排样本已经取完样了，移动到下一排接着取样")
 //                        moveNextSampleAndCuvette()
 //                    }
 //                }
 //            }
             else if ((isAuto() && lastSamplePos(samplePos)) || !isAuto()) {//这排最后一个样本
                 if (!isAuto() && manualModelSamplingFinish()) {
-                    Timber.d("手动模式，样本加样完成！")
+                    i("手动模式，样本加样完成！")
                     stepDripReagent()
                 } else if (lastSampleShelf(sampleShelfPos)) {//最后一排
                     //已经加完了最后一个样本了，加样结束，去下一个步骤，加试剂
-                    Timber.d("样本加样完成！")
+                    i("样本加样完成！")
                     if (shelfNeedDripReagent()) {
                         stepDripReagent()
                     } else {
-                        Timber.d("不需要加试剂,检测结束！")
+                        i("不需要加试剂,检测结束！")
                         testFinishAction()
                     }
                 } else {
                     //这排样本已经取完样了，移动到下一排接着取样
-                    Timber.d("这排样本已经取完样了，移动到下一排接着取样")
+                    i("这排样本已经取完样了，移动到下一排接着取样")
                     moveNextSampleAndCuvette()
                 }
             } else {
-                Timber.d("比色皿和样本都还有，继续")
+                i("比色皿和样本都还有，继续")
                 //比色皿和样本都还有，继续
                 moveNextSampleAndCuvette()
             }
@@ -1567,7 +1565,7 @@ class HomeViewModel(
      * 因为跨命令的移动比色皿后重置位置，所以移动前，先把当前位置置为-1，这样移动后记录的位置才是真实的
      */
     private fun stepDripReagent() {
-        Timber.d(" ———————— stepDripReagent testState=$testState ————————————————————————————————————————————————————————————————————————————————————————————————=")
+        i(" ———————— stepDripReagent testState=$testState ————————————————————————————————————————————————————————————————————————————————————————————————=")
         testState = TestState.DripReagent
         cuvettePos = -1
         val step = getNextStepCuvetteStartPos()
@@ -1582,7 +1580,7 @@ class HomeViewModel(
      * @return Boolean
      */
     private fun cuvetteNeedMove(cuvettePos: Int): Boolean {
-        Timber.d("cuvetteNeedMove cuvetteShelfPos=$cuvetteShelfPos cuvettePos=$cuvettePos")
+        i("cuvetteNeedMove cuvetteShelfPos=$cuvetteShelfPos cuvettePos=$cuvettePos")
         return cuvettePos >= 0 && (mCuvetteStates[cuvetteShelfPos]!![cuvettePos].state == CuvetteState.DripSample || mCuvetteStates[cuvetteShelfPos]!![cuvettePos].state == CuvetteState.Skip)
     }
 
@@ -1593,7 +1591,7 @@ class HomeViewModel(
     override fun readDataSamplingModel(reply: ReplyModel<SamplingModel>) {
         if (!runningTest()) return
         if (!machineStateNormal()) return
-        Timber.d("接收到 取样 reply=$reply cuvettePos=$cuvettePos samplePos=$samplePos cuvetteShelfPos=$cuvetteShelfPos sampleShelfPos=$sampleShelfPos")
+        i("接收到 取样 reply=$reply cuvettePos=$cuvettePos samplePos=$samplePos cuvetteShelfPos=$cuvetteShelfPos sampleShelfPos=$sampleShelfPos")
         samplingFinish = true
         samplingNum++
         updateSampleState(samplePos - 1, SampleState.Sampling)
@@ -1605,7 +1603,7 @@ class HomeViewModel(
      */
     private fun sampleDeficiencyShowHint() {
         if (samplePos == sampleMax && sampleShelfPos == lastSampleShelfPos) {
-            Timber.d("sampleDeficiencyShowHint 样本不足")
+            i("sampleDeficiencyShowHint 样本不足")
             sampleShelfPos = -1
             showTestSampleDeficiencyDialog()
         }
@@ -1617,7 +1615,7 @@ class HomeViewModel(
     override fun readDataMoveCuvetteTestModel(reply: ReplyModel<MoveCuvetteTestModel>) {
         if (!runningTest()) return;
         if (!machineStateNormal()) return
-        Timber.d("接收到 移动比色皿 检测位 reply=$reply")
+        i("接收到 移动比色皿 检测位 reply=$reply")
         cuvetteMoveFinish = true
 
         test()
@@ -1629,7 +1627,7 @@ class HomeViewModel(
     override fun readDataMoveCuvetteDripReagentModel(reply: ReplyModel<MoveCuvetteDripReagentModel>) {
         if (!runningTest()) return
         if (!machineStateNormal()) return
-        Timber.d("接收到 移动比色皿 加试剂位 reply=$reply cuvettePos=$cuvettePos stirProbeCleaningFinish=$stirProbeCleaningFinish stirProbeCleaningRecoverStir=$stirProbeCleaningRecoverStir takeReagentFinish=$takeReagentFinish")
+        i("接收到 移动比色皿 加试剂位 reply=$reply cuvettePos=$cuvettePos stirProbeCleaningFinish=$stirProbeCleaningFinish stirProbeCleaningRecoverStir=$stirProbeCleaningRecoverStir takeReagentFinish=$takeReagentFinish")
         cuvetteMoveFinish = true
         goDripReagent()
 
@@ -1683,7 +1681,7 @@ class HomeViewModel(
     override fun readDataMoveCuvetteDripSampleModel(reply: ReplyModel<MoveCuvetteDripSampleModel>) {
         if (!runningTest()) return
         if (!machineStateNormal()) return
-        Timber.d("接收到 移动比色皿 加样位 reply=$reply cuvetteStartPos=$cuvetteStartPos cuvettePos=$cuvettePos samplingFinish=$samplingFinish")
+        i("接收到 移动比色皿 加样位 reply=$reply cuvetteStartPos=$cuvetteStartPos cuvettePos=$cuvettePos samplingFinish=$samplingFinish")
         cuvetteMoveFinish = true
         goDripSample()
     }
@@ -1701,7 +1699,7 @@ class HomeViewModel(
         }
         if (!runningTest()) return
         if (!machineStateNormal()) return
-        Timber.d("接收到 移动比色皿架 reply=$reply cuvetteShelfPos=$cuvetteShelfPos cuvetteStartPos=$cuvetteStartPos")
+        i("接收到 移动比色皿架 reply=$reply cuvetteShelfPos=$cuvetteShelfPos cuvetteStartPos=$cuvetteStartPos")
         cuvetteShelfMoveFinish = true
 
         if (testState != TestState.TestFinish) {
@@ -1745,7 +1743,7 @@ class HomeViewModel(
      * 接收到移动样本架
      */
     override fun readDataMoveSampleShelfModel(reply: ReplyModel<MoveSampleShelfModel>) {
-        Timber.d("接收到移动样本架 reply=$reply sampleShelfPos=$sampleShelfPos $testState")
+        i("接收到移动样本架 reply=$reply sampleShelfPos=$sampleShelfPos $testState")
         if (testState == TestState.TestFinish) {
             sampleShelfMoveFinish = true
             if (isTestFinish()) {
@@ -1774,16 +1772,16 @@ class HomeViewModel(
      * 发送 开样本仓门
      */
     private fun openSampleDoor() {
-        Timber.d("发送 开样本仓门")
-        SerialPortUtil.Instance.openSampleDoor()
+        i("发送 开样本仓门")
+        SerialPortUtil.openSampleDoor()
     }
 
     /**
      * 发送 开比色皿仓门
      */
     private fun openCuvetteDoor() {
-        Timber.d("发送 开比色皿仓门")
-        SerialPortUtil.Instance.openCuvetteDoor()
+        i("发送 开比色皿仓门")
+        SerialPortUtil.openCuvetteDoor()
     }
 
     /**
@@ -1811,7 +1809,7 @@ class HomeViewModel(
     private fun moveSampleShelfNext() {
         if (lastSampleShelfPos == sampleShelfPos) {
             //已经是最后一排了，结束检测
-            Timber.d("样本取样结束")
+            i("样本取样结束")
             showTestSampleDeficiencyDialog()
             return
         }
@@ -1826,7 +1824,7 @@ class HomeViewModel(
         }
 
         moveSampleShelf(sampleShelfPos)
-        Timber.d("moveSampleShelfNext sampleShelfPos=$sampleShelfPos oldPos=$oldPos")
+        i("moveSampleShelfNext sampleShelfPos=$sampleShelfPos oldPos=$oldPos")
     }
 
     /**
@@ -1842,12 +1840,12 @@ class HomeViewModel(
      * @param reply ReplyModel<GetMachineStateModel>
      */
     override fun readDataGetMachineStateModel(reply: ReplyModel<GetMachineStateModel>) {
-        Timber.d("接收到 自检 reply=$reply")
+        i("接收到 自检 reply=$reply")
         dialogGetMachine.postValue(false)
         val errorInfo = reply.data.errorInfo
         testState = TestState.None
         if (errorInfo.isNullOrEmpty()) {
-            Timber.d("自检完成")
+            i("自检完成")
             machineArgState = MachineState.Normal
             //自检成功后获取一下r1,r2，清洗液状态
             getState()
@@ -1859,7 +1857,7 @@ class HomeViewModel(
                 sb.append(error.motorMsg)
                 sb.append("\n")
             }
-            Timber.d("自检失败，错误信息=${sb}")
+            i("自检失败，错误信息=${sb}")
             getMachineFailedMsg.postValue(sb.toString())
         }
     }
@@ -1881,10 +1879,10 @@ class HomeViewModel(
         r2Reagent = reply.data.r2Reagent
         r2Volume = reply.data.r2Volume
         cleanoutFluid = reply.data.cleanoutFluid
-        Timber.d("接收到 获取状态 reply=$reply continueTestCuvetteState=$continueTestCuvetteState continueTestSampleState=$continueTestSampleState clickStart=$clickStart r1Reagent=$r1Reagent r2Reagent=$r2Reagent cleanoutFluid=$cleanoutFluid continueTestGetState=$continueTestGetState")
+        i("接收到 获取状态 reply=$reply continueTestCuvetteState=$continueTestCuvetteState continueTestSampleState=$continueTestSampleState clickStart=$clickStart r1Reagent=$r1Reagent r2Reagent=$r2Reagent cleanoutFluid=$cleanoutFluid continueTestGetState=$continueTestGetState")
         if (!runningTest()) return
         if (!machineStateNormal()) return
-//        Timber.d("接收到 获取状态 reply=$reply continueTestCuvetteState=$continueTestCuvetteState continueTestSampleState=$continueTestSampleState clickStart=$clickStart r1Reagent=$r1Reagent r2Reagent=$r2Reagent cleanoutFluid=$cleanoutFluid continueTestGetState=$continueTestGetState")
+//        i("接收到 获取状态 reply=$reply continueTestCuvetteState=$continueTestCuvetteState continueTestSampleState=$continueTestSampleState clickStart=$clickStart r1Reagent=$r1Reagent r2Reagent=$r2Reagent cleanoutFluid=$cleanoutFluid continueTestGetState=$continueTestGetState")
         //比色皿不足才获取的状态
         //如果还是没有比色皿，继续弹框，如果有就移动比色皿架，继续检测
         if (continueTestCuvetteState) {
@@ -1892,7 +1890,7 @@ class HomeViewModel(
             cuvetteShelfPos = -1
             getInitCuvetteShelfPos()
             if (cuvetteShelfPos == -1) {
-                Timber.d("没有比色皿架")
+                i("没有比色皿架")
                 cuvetteDeficiency = true
                 moveCuvetteShelfNext()
                 return
@@ -1909,7 +1907,7 @@ class HomeViewModel(
             sampleShelfPos = -1
             getInitSampleShelfPos()
             if (sampleShelfPos == -1) {
-                Timber.d("没有样本架")
+                i("没有样本架")
                 sampleDeficiency = true
                 showTestSampleDeficiencyDialog()
                 return
@@ -1942,14 +1940,14 @@ class HomeViewModel(
 //        }
 
         getInitialPos()
-        Timber.d("cuvetteShelfPos=${cuvetteShelfPos} sampleShelfPos=${sampleShelfPos}")
+        i("cuvetteShelfPos=${cuvetteShelfPos} sampleShelfPos=${sampleShelfPos}")
         if (cuvetteShelfPos == -1) {
-            Timber.d("没有比色皿架")
+            i("没有比色皿架")
             getStateNotExistMsg.postValue("比色皿不足，请添加")
             return
         }
         if (sampleShelfPos == -1) {
-            Timber.d("没有样本架")
+            i("没有样本架")
             getStateNotExistMsg.postValue("样本不足，请添加")
             return
         }
@@ -1970,7 +1968,7 @@ class HomeViewModel(
      */
     private fun moveCuvetteShelfNext() {
         if (cuvetteShelfPos == lastCuvetteShelfPos) {
-            Timber.d("已经是最后一排比色皿了")
+            i("已经是最后一排比色皿了")
             cuvetteDeficiency = true
             cuvetteShelfPos = -1
             moveCuvetteShelf(cuvetteShelfPos)
@@ -2024,7 +2022,7 @@ class HomeViewModel(
         }
         mSamplesStates = arrays
         samplesStates.postValue(mSamplesStates)
-        Timber.d("getInitSampleShelfPos sampleShelfPos=$sampleShelfPos lastSampleShelfPos=$lastSampleShelfPos")
+        i("getInitSampleShelfPos sampleShelfPos=$sampleShelfPos lastSampleShelfPos=$lastSampleShelfPos")
     }
 
     /**
@@ -2056,7 +2054,7 @@ class HomeViewModel(
         }
         mCuvetteStates = arrays
         cuvetteStates.postValue(mCuvetteStates)
-        Timber.d("getInitCuvetteShelfPos cuvetteShelfPos=$cuvetteShelfPos lastCuvetteShelfPos=$lastCuvetteShelfPos")
+        i("getInitCuvetteShelfPos cuvetteShelfPos=$cuvetteShelfPos lastCuvetteShelfPos=$lastCuvetteShelfPos")
     }
 
     /**
@@ -2107,7 +2105,7 @@ class HomeViewModel(
      * 点击重新自检
      */
     fun dialogGetMachineFailedConfirm() {
-        Timber.d("dialogGetMachineFailedConfirm 点击重新自检")
+        i("dialogGetMachineFailedConfirm 点击重新自检")
         goGetMachineState()
     }
 
@@ -2117,7 +2115,7 @@ class HomeViewModel(
      * 点击我知道了
      */
     fun dialogGetMachineFailedCancel() {
-        Timber.d("dialogGetMachineFailedCancel 点击我知道了")
+        i("dialogGetMachineFailedCancel 点击我知道了")
     }
 
 
@@ -2127,7 +2125,7 @@ class HomeViewModel(
      * 点击继续检测
      */
     fun dialogTestFinishCuvetteDeficiencyConfirm() {
-        Timber.d("dialogTestFinishCuvetteDeficiencyConfirm 点击继续检测")
+        i("dialogTestFinishCuvetteDeficiencyConfirm 点击继续检测")
         continueTestCuvetteState = true
         getState()
     }
@@ -2138,7 +2136,7 @@ class HomeViewModel(
      * 点击结束检测
      */
     fun dialogTestFinishCuvetteDeficiencyCancel() {
-        Timber.d("dialogTestFinishCuvetteDeficiencyCancel 点击结束检测")
+        i("dialogTestFinishCuvetteDeficiencyCancel 点击结束检测")
 
         testFinishAction();
     }
@@ -2149,7 +2147,7 @@ class HomeViewModel(
      * 点击我已添加
      */
     fun dialogTestSampleDeficiencyConfirm() {
-        Timber.d("dialogDripSampleSampleDeficiencyConfirm 点击我已添加")
+        i("dialogDripSampleSampleDeficiencyConfirm 点击我已添加")
         continueTestSampleState = true
         getState()
     }
@@ -2160,7 +2158,7 @@ class HomeViewModel(
      * 点击结束检测
      */
     fun dialogTestSampleDeficiencyCancel() {
-        Timber.d("dialogDripSampleSampleDeficiencyCancel 点击结束检测")
+        i("dialogDripSampleSampleDeficiencyCancel 点击结束检测")
         testFinishAction();
     }
 
@@ -2170,7 +2168,7 @@ class HomeViewModel(
      * 点击我已添加，继续检测
      */
     fun dialogGetStateNotExistConfirm() {
-        Timber.d("dialogGetStateNotExistConfirm 点击我已添加，继续检测")
+        i("dialogGetStateNotExistConfirm 点击我已添加，继续检测")
 //        r1State.postValue(true)
 //        r2State.postValue(true)
 //        cleanoutFluidState.postValue(true)
@@ -2185,7 +2183,7 @@ class HomeViewModel(
      * 点击结束检测
      */
     fun dialogGetStateNotExistCancel() {
-        Timber.d("dialogGetStateNotExistCancel 点击结束检测")
+        i("dialogGetStateNotExistCancel 点击结束检测")
         testFinishAction();
     }
 
@@ -2194,16 +2192,16 @@ class HomeViewModel(
      */
 
     private fun getState() {
-        Timber.d("发送 获取状态")
-        SerialPortUtil.Instance.getState()
+        i("发送 获取状态")
+        SerialPortUtil.getState()
     }
 
     /**
      * 自检
      */
     private fun getMachineState() {
-        Timber.d("发送 自检")
-        SerialPortUtil.Instance.getMachineState()
+        i("发送 自检")
+        SerialPortUtil.getMachineState()
     }
 
     /**
@@ -2211,9 +2209,9 @@ class HomeViewModel(
      * @param pos Int
      */
     private fun moveSampleShelf(pos: Int) {
-        Timber.d("发送 移动样本架 pos=$pos ")
+        i("发送 移动样本架 pos=$pos ")
         sampleShelfMoveFinish = false
-        SerialPortUtil.Instance.moveSampleShelf(pos + 1)
+        SerialPortUtil.moveSampleShelf(pos + 1)
     }
 
     /**
@@ -2221,9 +2219,9 @@ class HomeViewModel(
      * @param pos Int
      */
     private fun moveCuvetteShelf(pos: Int) {
-        Timber.d("发送 移动比色皿架 pos=$pos ")
+        i("发送 移动比色皿架 pos=$pos ")
         cuvetteShelfMoveFinish = false
-        SerialPortUtil.Instance.moveCuvetteShelf(pos + 1)
+        SerialPortUtil.moveCuvetteShelf(pos + 1)
     }
 
     /**
@@ -2231,30 +2229,30 @@ class HomeViewModel(
      * @param step Int
      */
     private fun moveSample(step: Int = 1) {
-        Timber.d("发送 移动样本 step=$step samplePos=$samplePos")
+        i("发送 移动样本 step=$step samplePos=$samplePos")
         sampleMoveFinish = false
         samplePos += step;
-        SerialPortUtil.Instance.moveSample(step > 0, step.absoluteValue)
+        SerialPortUtil.moveSample(step > 0, step.absoluteValue)
     }
 
     /**
      * 移动比色皿到 滴样位
      */
     private fun moveCuvetteDripSample(step: Int = 1) {
-        Timber.d("发送 移动比色皿到 加样位 step=$step cuvettePos=$cuvettePos")
+        i("发送 移动比色皿到 加样位 step=$step cuvettePos=$cuvettePos")
         cuvetteMoveFinish = false
         cuvettePos += step
-        SerialPortUtil.Instance.moveCuvetteDripSample(step > 0, step.absoluteValue)
+        SerialPortUtil.moveCuvetteDripSample(step > 0, step.absoluteValue)
     }
 
     /**
      * 移动比色皿到 加试剂位
      */
     private fun moveCuvetteDripReagent(step: Int = 1) {
-        Timber.d("发送 移动比色皿到 加试剂位 step=$step")
+        i("发送 移动比色皿到 加试剂位 step=$step")
         cuvetteMoveFinish = false
         cuvettePos += step
-        SerialPortUtil.Instance.moveCuvetteDripReagent(step > 0, step.absoluteValue)
+        SerialPortUtil.moveCuvetteDripReagent(step > 0, step.absoluteValue)
     }
 
 
@@ -2262,84 +2260,84 @@ class HomeViewModel(
      * 移动比色皿到 检测位
      */
     private fun moveCuvetteTest(step: Int = 1) {
-        Timber.d("发送 移动比色皿到 检测位 testState=$testState step=$step")
+        i("发送 移动比色皿到 检测位 testState=$testState step=$step")
         cuvettePos += step
         testFinish = false
         testing = true
-        SerialPortUtil.Instance.moveCuvetteTest(step > 0, step.absoluteValue)
+        SerialPortUtil.moveCuvetteTest(step > 0, step.absoluteValue)
     }
 
     /**
      * 取样
      */
     private fun sampling() {
-        Timber.d("发送 取样")
+        i("发送 取样")
         samplingFinish = false
         dripSampleFinish = false
-        SerialPortUtil.Instance.sampling()
+        SerialPortUtil.sampling()
     }
 
     /**
      * 取试剂
      */
     private fun takeReagent() {
-        Timber.d("发送 取试剂")
+        i("发送 取试剂")
         takeReagentFinish = false
-        SerialPortUtil.Instance.takeReagent()
+        SerialPortUtil.takeReagent()
     }
 
     /**
      * 取样针清洗
      */
     private fun samplingProbeCleaning() {
-        Timber.d("发送 取样针清洗")
+        i("发送 取样针清洗")
         samplingProbeCleaningFinish = false
-        SerialPortUtil.Instance.samplingProbeCleaning()
+        SerialPortUtil.samplingProbeCleaning()
     }
 
     /**
      * 搅拌
      */
     private fun stir() {
-        Timber.d("发送 搅拌")
+        i("发送 搅拌")
         stirFinish = false
-        SerialPortUtil.Instance.stir()
+        SerialPortUtil.stir()
     }
 
     /**
      * 搅拌针清洗
      */
     private fun stirProbeCleaning() {
-        Timber.d("发送 搅拌针清洗")
+        i("发送 搅拌针清洗")
         stirProbeCleaningFinish = false
-        SerialPortUtil.Instance.stirProbeCleaning()
+        SerialPortUtil.stirProbeCleaning()
     }
 
     /**
      * 加样
      */
     private fun dripSample() {
-        Timber.d("发送 加样")
+        i("发送 加样")
         dripSampleFinish = false
-        SerialPortUtil.Instance.dripSample()
+        SerialPortUtil.dripSample()
     }
 
     /**
      * 加试剂
      */
     private fun dripReagent() {
-        Timber.d("发送 加试剂")
+        i("发送 加试剂")
         dripReagentFinish = false
-        SerialPortUtil.Instance.dripReagent()
+        SerialPortUtil.dripReagent()
     }
 
     /**
      * 检测
      */
     private fun test() {
-        Timber.d("发送 检测 $cuvettePos")
+        i("发送 检测 $cuvettePos")
         testFinish = false
-        SerialPortUtil.Instance.test()
+        SerialPortUtil.test()
     }
 
     /**

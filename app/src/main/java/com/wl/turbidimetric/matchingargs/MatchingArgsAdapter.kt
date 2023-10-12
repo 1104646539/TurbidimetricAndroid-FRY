@@ -5,16 +5,12 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.library.baseAdapters.BR
-import androidx.paging.PagingDataAdapter
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.ItemMatchingargsBinding
-import com.wl.turbidimetric.datamanager.DataManagerAdapter
 import com.wl.turbidimetric.ex.scale
 import com.wl.turbidimetric.model.ProjectModel
-import timber.log.Timber
-
+import com.wl.wllib.LogToFile.i
 class MatchingArgsAdapter() :
     RecyclerView.Adapter<MatchingArgsAdapter.MatchingArgsViewHolder>() {
     var onSelectChange: ((ProjectModel) -> Unit)? = null
@@ -47,12 +43,12 @@ class MatchingArgsAdapter() :
     override fun onBindViewHolder(holder: MatchingArgsViewHolder, position: Int) {
         if (holder is MatchingArgsViewHolder) {
             val item = items[holder.absoluteAdapterPosition]
-//            Timber.d("holder.absoluteAdapterPosition=${holder.absoluteAdapterPosition} item=$item")
+//            i("holder.absoluteAdapterPosition=${holder.absoluteAdapterPosition} item=$item")
             holder.bindData(item)
 
             holder.binding.root.setOnClickListener {
                 val item = items[holder.absoluteAdapterPosition]
-                Timber.d("holder.absoluteAdapterPosition2=${holder.absoluteAdapterPosition} bindingAdapterPosition=${holder.bindingAdapterPosition} oldPosition=${holder.oldPosition} adapterPosition=${holder.adapterPosition} layoutPosition=${holder.layoutPosition}")
+                i("holder.absoluteAdapterPosition2=${holder.absoluteAdapterPosition} bindingAdapterPosition=${holder.bindingAdapterPosition} oldPosition=${holder.oldPosition} adapterPosition=${holder.adapterPosition} layoutPosition=${holder.layoutPosition}")
                 item?.let { item ->
                     it?.let { view ->
                         if (item.isSelect) {

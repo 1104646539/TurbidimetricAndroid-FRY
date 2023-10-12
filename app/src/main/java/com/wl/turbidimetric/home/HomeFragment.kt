@@ -14,15 +14,14 @@ import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.SystemGlobal.obTestState
 import com.wl.turbidimetric.model.ProjectModel
 import com.wl.turbidimetric.model.TestState
+import com.wl.turbidimetric.util.ScanCodeUtil
 import com.wl.turbidimetric.view.HiltDialog
 import com.wl.turbidimetric.view.HomeConfigDialog
 import com.wl.turbidimetric.view.HomeDetailsDialog
 import com.wl.wwanandroid.base.BaseFragment
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import timber.log.Timber
-
-
+import com.wl.wllib.LogToFile.i
 class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.fragment_home) {
     val TAG = "HomeFragment"
 
@@ -65,6 +64,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 
 
     override fun init(savedInstanceState: Bundle?) {
+        ScanCodeUtil.open()
         test()
         listener()
 
@@ -106,7 +106,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
     private fun listener() {
         val dm = DisplayMetrics()
         requireActivity().windowManager.defaultDisplay.getMetrics(dm)
-        Timber.d("dm.densityDpi=${dm.densityDpi} ${dm.widthPixels} ${dm.heightPixels} ${dm.scaledDensity}")
+        i("dm.densityDpi=${dm.densityDpi} ${dm.widthPixels} ${dm.heightPixels} ${dm.scaledDensity}")
         listenerDialog()
         listenerView()
 
@@ -114,16 +114,16 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 
     private fun listenerView() {
         vm.r1State.observe(this) {
-            Timber.d("r1State=$it")
+            i("r1State=$it")
 
             vd.ivR1.setImageResource(if (it?.not() == true) R.drawable.icon_r1_empty else R.drawable.icon_r1_full)
         }
         vm.r2State.observe(this) {
-            Timber.d("r2State=$it")
+            i("r2State=$it")
 
         }
         vm.r2VolumeState.observe(this) {
-            Timber.d("r2Volume=$it")
+            i("r2Volume=$it")
 
             if ((it ?: 0) in r2VolumeIds.indices) {
                 vd.ivR2.setImageResource(r2VolumeIds[it])
@@ -132,15 +132,15 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             }
         }
         vm.cleanoutFluidState.observe(this) {
-            Timber.d("cleanoutFluidState=$it")
+            i("cleanoutFluidState=$it")
             vd.ivCleanoutFluid.setImageResource(if (it?.not() == true) R.drawable.icon_cleanout_fluid_empty else R.drawable.icon_cleanout_fluid_full)
         }
         vm.reactionTemp.observe(this) {
-            Timber.d("reactionTemp=$it test=${(it?.toString() ?: "0").plus("℃")}")
+            i("reactionTemp=$it test=${(it?.toString() ?: "0").plus("℃")}")
             vd.tvTemp.text = (it?.toString() ?: "0").plus("℃")
         }
         vm.r1Temp.observe(this) {
-            Timber.d("r1Temp=$it")
+            i("r1Temp=$it")
 //            vd.tvTemp.text = "R1=${vm.r1State.value} R2=${vm.r2State.value} R2量=${vm.r2Volume.value} 清洗液=${vm.cleanoutFluidState.value} 反应槽温度=${vm.reactionTemp.value} R1温度=${vm.r1Temp.value}"
         }
 
@@ -239,7 +239,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
      * 显示配置对话框
      */
     private fun showConfigDialog() {
-        Timber.d("showConfigDialog before")
+        i("showConfigDialog before")
         homeConfigDialog.show(
             vm.selectProjectEnable.value ?: true,
             vm.editDetectionNumEnable.value ?: true,
@@ -265,7 +265,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             {
                 it.dismiss()
             })
-        Timber.d("showConfigDialog after")
+        i("showConfigDialog after")
 
     }
 
@@ -298,7 +298,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 ////                requireActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); //设置
 ////            }
 //            val exist = StorageUtil.isExist()
-//            Timber.d("exist=$exist")
+//            i("exist=$exist")
 //        }
 
     }
@@ -409,7 +409,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
          * 显示信息
          */
         vm.toastMsg.observe(this) { msg ->
-            Timber.d("msg=$msg")
+            i("msg=$msg")
             snack(vd.root, msg)
         }
     }

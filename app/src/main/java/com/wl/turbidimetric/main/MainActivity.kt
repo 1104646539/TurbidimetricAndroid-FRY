@@ -7,11 +7,16 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.Configuration
 import android.hardware.usb.UsbManager
+import android.os.Bundle
+import android.os.Debug
 import android.os.Handler
 import android.os.Message
 import android.util.Log
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.ActivityMainBinding
 import com.wl.turbidimetric.global.EventGlobal
@@ -27,6 +32,7 @@ import com.wl.weiqianwllib.upan.StorageUtil
 import com.wl.weiqianwllib.upan.StorageUtil.OPEN_DOCUMENT_TREE_CODE
 import com.wl.wllib.LogToFile.i
 import com.wl.wllib.ktxRunOnBgCache
+import com.wl.wllib.ktxRunOnUi
 import com.wl.wwanandroid.base.BaseActivity
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -93,8 +99,13 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     override fun init() {
         supportActionBar?.hide()
         listener()
-        initNav()
-//        showHideNav(false)
+//        lifecycleScope.launch {
+//            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED){
+                initNav()
+//            }
+//        }
+
+
         test()
     }
 
@@ -122,7 +133,6 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         vm.curIndex.observe(this) {
             vd.vp.setCurrentItem(it, false)
         }
-
     }
 
     /**
@@ -153,12 +163,6 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
             SerialPortUtil.shutdown()
         }
     }
-
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        i("onConfigurationChanged")
-    }
-
 
     private fun test() {
 

@@ -7,7 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -65,19 +67,10 @@ class DataManagerFragment :
         HiltDialog(requireContext())
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? {
-        i("onCreateView")
-        return super.onCreateView(inflater, container, savedInstanceState)
-    }
-
     override fun init(savedInstanceState: Bundle?) {
-        i("init")
-        listener()
         initView()
-
-
+        listener()
+        test()
     }
 
     private fun initView() {
@@ -92,26 +85,7 @@ class DataManagerFragment :
 
         val loadStateAdapter = adapter.withLoadStateFooter(DataManagerLoadStateAdapter())
         vd.rv.adapter = loadStateAdapter
-        lifecycleScope.launch {
-            val con: Query<TestResultModel> = DBManager.TestResultBox.query().orderDesc(
-                TestResultModel_.id
-            ).build()
-            queryData(con)
-        }
-        lifecycleScope.launch {
-            adapter.loadStateFlow.collectLatest { loadState ->
-                if (loadState.source.refresh is LoadState.NotLoading && loadState.append.endOfPaginationReached && adapter.itemCount < 1) {
-                    vd.rv?.isVisible = false
-                    vd.empty?.isVisible = true
-                } else {
-                    vd.rv?.isVisible = true
-                    vd.empty?.isVisible = false
-                }
-            }
-        }
-        adapter.onSelectChange = { pos, selected ->
 
-        }
     }
 
     fun test() {
@@ -170,26 +144,12 @@ class DataManagerFragment :
 
 
     private fun listener() {
-        test()
+        listenerView()
+        listenerData()
+    }
 
+    private fun listenerView() {
 
-        vd.btnDelete.setOnClickListener {
-            vm.showDeleteDialog.postValue(true)
-        }
-
-        vm.showDeleteDialog.observe(this) {
-            if (it) {
-                deleteDialog.show("确定要删除数据吗?", "确定", {
-                    val results = getSelectData()
-                    it.dismiss()
-                    if (!results.isNullOrEmpty()) {
-                        vm.clickDeleteDialogConfirm(results)
-                    }
-                }, "取消", {
-                    it.dismiss()
-                }, false)
-            }
-        }
         vd.btnInsert.setOnClickListener {
 
         }
@@ -219,7 +179,50 @@ class DataManagerFragment :
         vd.btnPrint.setOnClickListener {
             print()
         }
+        adapter.onSelectChange = { pos, selected ->
 
+        }
+    }
+
+    private fun listenerData() {
+        vd.btnDelete.setOnClickListener {
+            vm.showDeleteDialog.postValue(true)
+        }
+
+        vm.showDeleteDialog.observe(this) {
+            if (it) {
+                deleteDialog.show("确定要删除数据吗?", "确定", {
+                    val results = getSelectData()
+                    it.dismiss()
+                    if (!results.isNullOrEmpty()) {
+                        vm.clickDeleteDialogConfirm(results)
+                    }
+                }, "取消", {
+                    it.dismiss()
+                }, false)
+            }
+        }
+        lifecycleScope.launch(Dispatchers.IO) {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                val con: Query<TestResultModel> = DBManager.TestResultBox.query().orderDesc(
+                    TestResultModel_.id
+                ).build()
+                queryData(con)
+            }
+        }
+        lifecycleScope.launch {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                adapter.loadStateFlow.collectLatest { loadState ->
+                    if (loadState.source.refresh is LoadState.NotLoading && loadState.append.endOfPaginationReached && adapter.itemCount < 1) {
+                        vd.rv?.isVisible = false
+                        vd.empty?.isVisible = true
+                    } else {
+                        vd.rv?.isVisible = true
+                        vd.empty?.isVisible = false
+                    }
+                }
+            }
+        }
     }
 
     private fun print() {
@@ -251,7 +254,7 @@ class DataManagerFragment :
     private fun exportExcel() {
         lifecycleScope.launch {
             getSelectData()?.let { it ->
-                ExportExcelHelper.export(requireContext(),it, { toast("成功$it") }, { toast(it) })
+                ExportExcelHelper.export(requireContext(), it, { toast("成功$it") }, { toast(it) })
             }
         }
     }
@@ -291,9 +294,9 @@ class DataManagerFragment :
                 i("---监听到了变化---condition=$condition")
                 adapter?.submitData(it)
 
-                withContext(Dispatchers.Main) {
-                    vd.rv.scrollToPosition(0)
-                }
+//                withContext(Dispatchers.Main) {
+//                    vd.rv.scrollToPosition(0)
+//                }
             }
         }
     }

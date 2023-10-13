@@ -11,6 +11,9 @@ import androidx.annotation.IdRes;
 import androidx.annotation.LayoutRes;
 
 import com.wl.turbidimetric.R;
+import com.wl.wllib.DateExKt;
+import com.wl.wllib.DateUtil;
+import com.wl.wllib.LogToFile;
 
 
 /**
@@ -85,7 +88,6 @@ public class DialogUtil {
 
     public DialogUtil show(int width, int height) {
         dialog.show();
-
         WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
         params.width = width;
         params.height = height;

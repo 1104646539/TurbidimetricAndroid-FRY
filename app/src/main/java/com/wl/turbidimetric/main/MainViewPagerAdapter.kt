@@ -10,6 +10,7 @@ import com.wl.turbidimetric.matchingargs.MatchingArgsFragment
 import com.wl.turbidimetric.settings.SettingsFragment
 import com.wl.turbidimetric.test.RepeatabilityFragment
 import com.wl.turbidimetric.test.TestDataFragment
+import com.wl.turbidimetric.test.TestFragment
 
 class MainViewPagerAdapter(fragmentActivity: FragmentActivity) :
     FragmentStateAdapter(fragmentActivity) {

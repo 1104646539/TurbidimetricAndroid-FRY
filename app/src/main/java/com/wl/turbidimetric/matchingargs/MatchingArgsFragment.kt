@@ -2,7 +2,9 @@ package com.wl.turbidimetric.matchingargs
 
 import android.os.Bundle
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
@@ -21,6 +23,7 @@ import com.wl.wwanandroid.base.BaseFragment
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import com.wl.wllib.LogToFile.i
+
 /**
  * 拟合参数
  * @property viewModel MatchingArgsViewModel
@@ -30,9 +33,9 @@ class MatchingArgsFragment :
     override val vm: MatchingArgsViewModel by viewModels {
         MatchingArgsViewModelFactory()
     }
-    val bgGray = getResource().getColor(R.color.bg_gray)
-    val textColor = getResource().getColor(R.color.textColor)
-    val lineColor = getResource().getColor(R.color.themePositiveColor)
+    private val bgGray = getResource().getColor(R.color.bg_gray)
+    private val textColor = getResource().getColor(R.color.textColor)
+    private val lineColor = getResource().getColor(R.color.themePositiveColor)
 
     companion object {
         @JvmStatic
@@ -48,23 +51,32 @@ class MatchingArgsFragment :
         vd.model = vm
     }
 
-    val adapter: MatchingArgsAdapter by lazy {
+    private val adapter: MatchingArgsAdapter by lazy {
         MatchingArgsAdapter()
     }
 
     /**
      * 显示调试时详情的对话框
      */
-    val debugShowDetailsDialog: HiltDialog by lazy {
+    private val debugShowDetailsDialog: HiltDialog by lazy {
         HiltDialog(requireContext()).apply {
             width = 1500
         }
     }
 
     override fun init(savedInstanceState: Bundle?) {
+        lifecycleScope.launch {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                initView()
+                listener()
+            }
+        }
+
+    }
+
+    private fun listener() {
         listenerDialog()
         listenerView()
-        initView()
     }
 
     private fun initView() {
@@ -164,12 +176,12 @@ class MatchingArgsFragment :
         obMatchingTestState.observe(this) {
             if (it != MatchingArgState.None && it != MatchingArgState.Finish) {
                 vd.btnStart.setBackgroundResource(R.drawable.rip_positive2)
-                vd.btnStart.text = "正在拟合"
+                vd.btnStart.setText("正在拟合")
                 vm.qualityEnable.postValue(false)
                 vm.reagentNoEnable.postValue(false)
             } else {
                 vd.btnStart.setBackgroundResource(R.drawable.rip_positive)
-                vd.btnStart.text = "开始拟合"
+                vd.btnStart.setText("开始拟合")
                 vm.qualityEnable.postValue(true)
                 vm.reagentNoEnable.postValue(true)
             }

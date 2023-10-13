@@ -119,11 +119,11 @@
                         android:layout_height="48dp"
                         android:layout_marginLeft="14dp"
                         android:background="@drawable/bg_et_gray"
+                        android:enabled="@{model.reagentNoEnable}"
                         android:inputType="number"
                         android:paddingLeft="10dp"
                         android:text="@={model.reagentNOStr}"
                         android:textColor="@color/textColor"
-                        android:enabled="@{model.reagentNoEnable}"
                         android:textSize="18sp"
                         tools:ignore="SpeakableTextPresentCheck" />
                 </LinearLayout>
@@ -204,22 +204,24 @@
                     android:gravity="center_horizontal"
                     android:orientation="horizontal">
 
-                    <com.wl.turbidimetric.view.DrawableCenterButton
+                    <com.wl.turbidimetric.view.TextImageButton
                         android:id="@+id/btn_print"
                         style="@style/BtnNegative"
                         android:layout_width="180dp"
-                        android:layout_height="60dp"
-                        android:drawableLeft="@drawable/icon_btn_print"
-                        android:text="打印" />
+                        android:layout_height="70dp"
+                        android:src="@drawable/icon_btn_print"
+                        android:text="打印"
+                        android:textColor="@color/white" />
 
-                    <Button
+                    <com.wl.turbidimetric.view.TextImageButton
                         android:id="@+id/btn_start"
-                        style="@style/BtnPositive"
+                        style="@style/BtnNegative"
                         android:layout_width="180dp"
-                        android:layout_height="60dp"
+                        android:layout_height="70dp"
                         android:layout_marginLeft="40dp"
                         android:src="@drawable/icon_btn_print"
-                        android:text="开始拟合" />
+                        android:text="开始拟合"
+                        android:textColor="@color/white" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -229,22 +231,23 @@
                     android:gravity="center"
                     android:orientation="horizontal">
 
-                    <Button
+                    <com.wl.turbidimetric.view.TextImageButton
                         android:id="@+id/btn_debug_dialog"
-                        style="@style/BtnPositive"
-                        android:layout_width="wrap_content"
-                        android:layout_height="60dp"
-                        android:stateListAnimator="@null"
-                        android:text="调试框" />
+                        style="@style/BtnNegative"
+                        android:layout_width="180dp"
+                        android:layout_height="70dp"
+                        android:src="@drawable/icon_btn_print"
+                        android:text="调试框"
+                        android:textColor="@color/white" />
 
-<!--                    <Button-->
-<!--                        android:id="@+id/btn_debug2"-->
-<!--                        style="@style/BtnPositive"-->
-<!--                        android:layout_width="wrap_content"-->
-<!--                        android:layout_height="60dp"-->
-<!--                        android:layout_marginLeft="30dp"-->
-<!--                        android:stateListAnimator="@null"-->
-<!--                        android:text="添加参数" />-->
+                    <!--                    <Button-->
+                    <!--                        android:id="@+id/btn_debug2"-->
+                    <!--                        style="@style/BtnPositive"-->
+                    <!--                        android:layout_width="wrap_content"-->
+                    <!--                        android:layout_height="60dp"-->
+                    <!--                        android:layout_marginLeft="30dp"-->
+                    <!--                        android:stateListAnimator="@null"-->
+                    <!--                        android:text="添加参数" />-->
                 </LinearLayout>
             </LinearLayout>
 

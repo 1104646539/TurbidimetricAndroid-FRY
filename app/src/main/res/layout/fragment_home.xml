@@ -109,40 +109,35 @@
                     android:gravity="center_vertical"
                     android:orientation="vertical">
 
-                    <com.wl.turbidimetric.view.DrawableCenterButton
+                    <com.wl.turbidimetric.view.TextImageButton
                         android:id="@+id/btn_debug_dialog"
                         style="@style/BtnPositive"
                         android:layout_width="220dp"
                         android:layout_height="70dp"
-                        android:layout_marginBottom="50dp"
-                        android:drawableLeft="@drawable/icon_btn_analyse"
-                        android:drawablePadding="8dp"
-                        android:gravity="center_vertical"
-                        android:stateListAnimator="@null"
-                        android:text="调试框" />
+                        android:layout_marginTop="50dp"
+                        android:src="@drawable/icon_btn_analyse"
+                        android:text="调试框"
+                        android:textColor="@color/white" />
 
-                    <com.wl.turbidimetric.view.DrawableCenterButton
+                    <com.wl.turbidimetric.view.TextImageButton
                         android:id="@+id/btn_start"
                         style="@style/BtnPositive"
                         android:layout_width="220dp"
                         android:layout_height="70dp"
-                        android:drawableLeft="@drawable/icon_btn_analyse"
-                        android:drawablePadding="8dp"
-                        android:gravity="center_vertical"
-                        android:stateListAnimator="@null"
-                        android:text="分析" />
+                        android:layout_marginTop="50dp"
+                        android:src="@drawable/icon_btn_analyse"
+                        android:text="分析"
+                        android:textColor="@color/white" />
 
-                    <com.wl.turbidimetric.view.DrawableCenterButton
+                    <com.wl.turbidimetric.view.TextImageButton
+                        android:id="@+id/btn_config"
                         style="@style/BtnNegative"
                         android:layout_width="220dp"
-                        android:id="@+id/btn_config"
                         android:layout_height="70dp"
                         android:layout_marginTop="50dp"
-                        android:drawableLeft="@drawable/icon_btn_settings"
-                        android:drawablePadding="8dp"
-                        android:stateListAnimator="@null"
-                        android:text="设置" />
-
+                        android:src="@drawable/icon_btn_settings"
+                        android:text="设置"
+                        android:textColor="@color/white" />
 
                 </LinearLayout>
             </LinearLayout>

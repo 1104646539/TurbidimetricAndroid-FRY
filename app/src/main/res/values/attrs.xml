@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="TextImageButton">
+        <attr name="android:textColor" format="color"></attr>
+        <attr name="android:textSize" format="dimension"></attr>
+        <attr name="android:src" format="reference"></attr>
+        <attr name="android:text" format="string"></attr>
+    </declare-styleable>
+</resources>

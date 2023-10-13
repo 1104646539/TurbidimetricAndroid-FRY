@@ -61,6 +61,8 @@ android {
     }
     packagingOptions {
         exclude 'META-INF/INDEX.LIST'
+        exclude 'classes.dex'
+//        exclude '**.**'
     }
     kotlinOptions {
         jvmTarget = '1.8'

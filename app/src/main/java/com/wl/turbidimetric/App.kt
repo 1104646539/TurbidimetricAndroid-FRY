@@ -1,30 +1,38 @@
 package com.wl.turbidimetric
 
 import android.app.Application
+import android.content.Context
+import android.os.Debug
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.db.DBManager
 import com.wl.turbidimetric.model.ProjectModel
+import com.wl.wllib.LogToFile
 import com.wl.wllib.ToastUtil
+import com.wl.wllib.ktxRunOnBgCache
 
 
 class App : Application() {
+    override fun attachBaseContext(base: Context?) {
+        super.attachBaseContext(base)
+    }
+
     override fun onCreate() {
         super.onCreate()
         instance = this
-//        MMKV.initialize(this)
-        ToastUtil.init(this)
-        initData()
-        DBManager.init(this)
-//        Timber.plant(FileTree.instance)
-        initDataStore();
-//        LogToFile.init()
-
-        //没有项目参数的时候，添加一个默认参数
-        if (DBManager.ProjectBox.all.isNullOrEmpty()) {
-            repeat(1) {
-                DBManager.ProjectBox.put(ProjectModel().apply {
-                    reagentNO = it.toString()
-                })
+//        ToastUtil.init(this)
+//        initData()
+        ktxRunOnBgCache {
+            DBManager.init(this)
+//        initDataStore();
+            LogToFile.init()
+//
+            //没有项目参数的时候，添加一个默认参数
+            if (DBManager.ProjectBox.all.isNullOrEmpty()) {
+                repeat(1) {
+                    DBManager.ProjectBox.put(ProjectModel().apply {
+                        reagentNO = it.toString()
+                    })
+                }
             }
         }
     }

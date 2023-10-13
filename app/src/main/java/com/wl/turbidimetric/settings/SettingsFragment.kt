@@ -16,10 +16,11 @@ import com.wl.weiqianwllib.OrderUtil
 import com.wl.wwanandroid.base.BaseFragment
 import com.wl.wwanandroid.base.BaseViewModel
 import com.wl.wllib.LogToFile.i
+
 class SettingsFragment :
     BaseFragment<BaseViewModel, FragmentSettingsBinding>(R.layout.fragment_settings) {
-    val TAG = "SettingsFragment"
-    var show = false
+    private val TAG = "SettingsFragment"
+    private  var show = false
 
     companion object {
         @JvmStatic
@@ -28,11 +29,11 @@ class SettingsFragment :
 
     override val vm: BaseViewModel by lazy { BaseViewModel() }
 
-    val machineTestModelDialog by lazy {
+   private val machineTestModelDialog by lazy {
         MachineTestModelDialog(requireContext())
     }
 
-    val paramsDialog by lazy {
+    private val paramsDialog by lazy {
         ParamsDialog(requireContext())
     }
 
@@ -41,10 +42,20 @@ class SettingsFragment :
     }
 
     override fun init(savedInstanceState: Bundle?) {
+        initView()
         listener()
     }
 
+    private fun initView() {
+
+
+    }
+
     private fun listener() {
+        listenerView()
+    }
+
+    private fun listenerView() {
         vd.tvParamsSetting.setOnClickListener {
             showParamsSettingDialog()
 
@@ -65,9 +76,10 @@ class SettingsFragment :
         }
         vd.tvLauncher.setOnClickListener {
             showLauncher()
-            OrderUtil.showHideNav(requireActivity(),true)
+            OrderUtil.showHideNav(requireActivity(), true)
         }
         vd.tvSoftVersion.text = "上位机版本:${getPackageInfo(requireContext())?.versionName} 发布版本:1"
+
     }
 
     private fun showLauncher() {
@@ -81,10 +93,10 @@ class SettingsFragment :
     private fun showHideNav() {
         //设置广播发送隐藏虚拟按键命令
         if (show) {
-            OrderUtil.showHideNav(requireActivity(),false)
+            OrderUtil.showHideNav(requireActivity(), false)
             show = false;
         } else {
-            OrderUtil.showHideNav(requireActivity(),true)
+            OrderUtil.showHideNav(requireActivity(), true)
             show = true;
         }
     }

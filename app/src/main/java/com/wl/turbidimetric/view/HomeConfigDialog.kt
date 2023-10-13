@@ -44,7 +44,6 @@ class HomeConfigDialog(val context: Context) : BaseDialog(context) {
         spnProject.adapter = projectAdapter
         dialogUtil.setWidthHeight(1400, WindowManager.LayoutParams.WRAP_CONTENT)
     }
-
     fun show(
         selectProjectEnable:Boolean,
         editDetectionNumEnable:Boolean,

@@ -23,6 +23,7 @@ import java.util.List;
 
 import com.wl.wllib.LogToFile;
 import com.wl.wllib.LogToFile.*;
+
 /**
  * 导航栏
  */
@@ -154,6 +155,8 @@ public class NavigationView extends View {
      * @param canvas
      */
     private void drawSomething(Canvas canvas) {
+        if (navItems == null) return;
+        if (rects == null) return;
         drawBg(canvas);
         drawSelectedBg(canvas);
         drawShutdown(canvas);
@@ -388,6 +391,7 @@ public class NavigationView extends View {
      * 初始化图标的位置，根据图标自身的大小，左右居中
      */
     private void initBitmapRect() {
+        if (navItems == null) return;
         rects = new RectF[navItems.size()];
         bitmaps = new Bitmap[navItems.size()];
         rectBitmapRange = new Rect[navItems.size()];
@@ -458,6 +462,7 @@ public class NavigationView extends View {
      * 初始化绘制导航文字的信息
      */
     private void initNames() {
+        if (navItems == null) return;
         nameWidths = new float[navItems.size()];
         for (int i = 0; i < navItems.size(); i++) {
             nameWidths[i] = paintName.measureText(navItems.get(i).navName);

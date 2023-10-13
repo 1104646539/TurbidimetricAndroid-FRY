@@ -6,4 +6,6 @@
     <item name="sw_width" type="dimen">60dp</item>
     <item name="sw_radius" type="dimen">15dp</item>
     <item name="sw_thumb_frame" type="dimen">2dp</item>
+    <item name="text_image_button_interval" type="dimen">5dp</item>
+    <item name="text_size_default" type="dimen">24sp</item>
 </resources>

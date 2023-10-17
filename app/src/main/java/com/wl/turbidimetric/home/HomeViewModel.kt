@@ -2,6 +2,7 @@ package com.wl.turbidimetric.home
 
 import android.view.View
 import androidx.lifecycle.*
+import com.wl.turbidimetric.R
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.EventGlobal
@@ -25,6 +26,8 @@ import java.util.*
 import kotlin.concurrent.timer
 import kotlin.math.absoluteValue
 import com.wl.wllib.LogToFile.i
+import kotlinx.coroutines.flow.*
+
 class HomeViewModel(
     private val projectRepository: ProjectRepository,
     private val testResultRepository: TestResultRepository
@@ -38,7 +41,10 @@ class HomeViewModel(
      * 自检
      */
     fun goGetMachineState() {
-        dialogGetMachine.postValue(true)
+//        dialogGetMachine.postValue(true)
+        viewModelScope.launch {
+            _dialogUiState.emit(HomeDialogUiState(DialogState.GET_MACHINE_SHOW, ""))
+        }
         testState = TestState.GetMachineState
         getMachineState()
     }
@@ -83,34 +89,55 @@ class HomeViewModel(
     private var cons = arrayListOf<Int>()
 
     /**
-     * 自检中对话框
+     * 对话框状态，不包括调试的和不需要viewmodel处理的
      */
-    val dialogGetMachine = MutableLiveData(false);
+    private val _dialogUiState = MutableSharedFlow<HomeDialogUiState>()
+    val dialogUiState = _dialogUiState.asSharedFlow()
 
     /**
-     * 自检失败对话框
+     * 界面的其他状态
      */
-    val getMachineFailedMsg = MutableLiveData("");
+    private val _testMachineUiState = MutableStateFlow(
+        HomeMachineUiState(
+            r1State = false,
+            r2State = -1,
+            cleanoutFluidState = false,
+            reactionTemp = 0.0,
+            r1Temp = 0.0,
+        )
+    )
+    val testMachineUiState: StateFlow<HomeMachineUiState> = _testMachineUiState.asStateFlow()
 
-    /**
-     * 检测结束 比色皿不足对话框
-     */
-    val dialogTestFinishCuvetteDeficiency = MutableLiveData(false)
 
-    /**
-     * 检测结束提示
-     */
-    val dialogTestFinish = MutableLiveData(false)
+//    /**
+//     * 自检中对话框
+//     */
+//    val dialogGetMachine = MutableLiveData(false);
+//
+//    /**
+//     * 自检失败对话框
+//     */
+//    val getMachineFailedMsg = MutableLiveData("");
 
-    /**
-     * 正常检测 样本不足对话框
-     */
-    val dialogTestSampleDeficiency = MutableLiveData(false)
-
-    /**
-     * 开始检测 比色皿，样本，试剂不存在
-     */
-    val getStateNotExistMsg = MutableLiveData("")
+//    /**
+//     * 检测结束 比色皿不足对话框
+//     */
+//    val dialogTestFinishCuvetteDeficiency = MutableLiveData(false)
+//
+//    /**
+//     * 检测结束提示
+//     */
+//    val dialogTestFinish = MutableLiveData(false)
+//
+//    /**
+//     * 正常检测 样本不足对话框
+//     */
+//    val dialogTestSampleDeficiency = MutableLiveData(false)
+//
+//    /**
+//     * 开始检测 比色皿，样本，试剂不存在
+//     */
+//    val getStateNotExistMsg = MutableLiveData("")
 
     /**
      * 选择项目是否可用
@@ -141,7 +168,8 @@ class HomeViewModel(
     /**当前排所有比色皿的状态
      *
      */
-    var cuvetteStates = MutableLiveData(initCuvetteStates())
+    private val _cuvetteStates = MutableStateFlow(initCuvetteStates())
+    val cuvetteStates: StateFlow<Array<Array<CuvetteItem>?>> = _cuvetteStates.asStateFlow()
 
     /**当前排所有比色皿的状态
      *
@@ -152,7 +180,7 @@ class HomeViewModel(
     /**当前排所有样本的状态
      *
      */
-    var samplesStates = MutableLiveData(initSampleStates())
+    var samplesStates = MutableStateFlow(initSampleStates())
 
 
     /**当前排所有样本的状态
@@ -320,7 +348,7 @@ class HomeViewModel(
 
 
     val testMsg = MutableLiveData("");
-    val toastMsg = MutableLiveData("");
+//    val toastMsg = MutableLiveData("");
 
     val projectDatas = projectRepository.allDatas.flow()
 
@@ -350,36 +378,36 @@ class HomeViewModel(
      */
     var scanResults = arrayListOf<String?>()
 
-
-    /**
-     * r1状态
-     */
-    val r1State = MutableLiveData(false)
-
-    /**
-     * r2状态
-     */
-    val r2State = MutableLiveData(false)
-
-    /**
-     * 清洗液状态
-     */
-    val cleanoutFluidState = MutableLiveData(false)
-
-    /**
-     * r1状态
-     */
-    val r2VolumeState = MutableLiveData(0)
-
-    /**
-     * 反应槽温度
-     */
-    val reactionTemp = MutableLiveData(0.0)
-
-    /**
-     * r1温度
-     */
-    val r1Temp = MutableLiveData(0.0)
+//    /**
+//     * r1状态
+//     */
+//    private val _r1State = MutableStateFlow(false)
+////    val r1State = _r1State.asStateFlow()
+//
+//    /**
+//     * r2状态
+//     */
+//    val _r2State = MutableStateFlow(false)
+//
+//    /**
+//     * 清洗液状态
+//     */
+//    val _cleanoutFluidState = MutableStateFlow(false)
+//
+//    /**
+//     * r2状态
+//     */
+//    val _r2VolumeState = MutableStateFlow(0)
+//
+//    /**
+//     * 反应槽温度
+//     */
+//    val _reactionTemp = MutableStateFlow(0.0)
+//
+//    /**
+//     * r1温度
+//     */
+//    val r1Temp = MutableStateFlow(0.0)
 
     /**
      * 手动模式下，需要取样的样本数量
@@ -399,22 +427,33 @@ class HomeViewModel(
     var r1Reagent: Boolean = false
         set(value) {
             field = value
-            r1State.postValue(value)
+//            r1State.postValue(value)
+            _testMachineUiState.update {
+                it.copy(r1State = value)
+            }
         }
     var r2Reagent: Boolean = false
         set(value) {
             field = value
-            r2State.postValue(value)
+//            r2State.postValue(value)
         }
     var r2Volume: Int = 0
         set(value) {
             field = value
-            r2VolumeState.postValue(value)
+//            r2VolumeState.postValue(value)
+            _testMachineUiState.update {
+                it.copy(r2State = value)
+            }
+//            _r2VolumeState.value = value
         }
     var cleanoutFluid: Boolean = false
         set(value) {
             field = value
-            cleanoutFluidState.postValue(value)
+//            cleanoutFluidState.postValue(value)
+            _testMachineUiState.update {
+                it.copy(cleanoutFluidState = value)
+            }
+//            _cleanoutFluidState.value = value
         }
 
     /**
@@ -470,24 +509,34 @@ class HomeViewModel(
 //            toast("舱门未关")
 //            return
 //        }
-        if (!machineStateNormal()) {
-            toastMsg.postValue("请重新自检或重启仪器！")
-            return
+
+        val errorMsg = if (!machineStateNormal()) {
+            "请重新自检或重启仪器！"
+//            toastMsg.postValue("请重新自检或重启仪器！")
+//            return
+        } else if (testState != TestState.None) {
+            "正在检测，请勿操作！"
+//            toastMsg.postValue("正在检测，请勿操作！")
+//            return
+        } else if (matchingTestState != MatchingArgState.None) {
+            "正在拟合质控，请勿操作！"
+//            toastMsg.postValue("正在拟合质控，请勿操作！")
+//            return
+        } else if (repeatabilityState != RepeatabilityState.None) {
+            "正在进行重复性检测，请勿操作！"
+//            toastMsg.postValue("正在进行重复性检测，请勿操作！")
+//            return
+        } else if (selectProject == null) {
+            "未选择检测标曲"
+//            toastMsg.postValue("未选择检测标曲")
+//            return
+        } else {
+            ""
         }
-        if (testState != TestState.None) {
-            toastMsg.postValue("正在检测，请勿操作！")
-            return
-        }
-        if (matchingTestState != MatchingArgState.None) {
-            toastMsg.postValue("正在拟合质控，请勿操作！")
-            return
-        }
-        if (repeatabilityState != RepeatabilityState.None) {
-            toastMsg.postValue("正在进行重复性检测，请勿操作！")
-            return
-        }
-        if (selectProject == null) {
-            toastMsg.postValue("未选择检测标曲")
+        if (errorMsg.isNotEmpty()) {
+            viewModelScope.launch {
+                _dialogUiState.emit(HomeDialogUiState(dialogState = DialogState.NOTIFY, errorMsg))
+            }
             return
         }
         clickStart = true
@@ -509,8 +558,12 @@ class HomeViewModel(
 
         mSamplesStates = initSampleStates()
         mCuvetteStates = initCuvetteStates()
-        cuvetteStates.postValue(mCuvetteStates)
-        samplesStates.postValue(mSamplesStates)
+//        cuvetteStates.postValue(mCuvetteStates)
+//        samplesStates.postValue(mSamplesStates)
+        cuvetteStates.update {
+            mCuvetteStates
+        }
+
 
         i("跳过 $cuvetteStartPos 个比色皿")
 
@@ -615,7 +668,8 @@ class HomeViewModel(
      * @param reply ReplyModel<StirProbeCleaningModel>
      */
     override fun readDataStirProbeCleaningModel(reply: ReplyModel<StirProbeCleaningModel>) {
-        cleanoutFluidState.postValue(reply.data.cleanoutFluid)
+//        cleanoutFluidState.postValue(reply.data.cleanoutFluid)
+
         if (!runningTest()) return
         if (!machineStateNormal()) return
         i("接收到 搅拌针清洗 reply=$reply stirProbeCleaningRecoverStir=$stirProbeCleaningRecoverStir")
@@ -680,8 +734,16 @@ class HomeViewModel(
     override fun readDataTempModel(reply: ReplyModel<TempModel>) {
         i("接收到 获取设置温度 reply=$reply")
 
-        reactionTemp.postValue(reply.data.reactionTemp / 10.0)
-        r1Temp.postValue(reply.data.r1Temp / 10.0)
+//        reactionTemp.postValue(reply.data.reactionTemp / 10.0)
+//        r1Temp.postValue(reply.data.r1Temp / 10.0)
+        _testMachineUiState.update {
+            it.copy(
+                reactionTemp = reply.data.reactionTemp / 10.0,
+                r1Temp = reply.data.r1Temp / 10.0
+            )
+        }
+//        _reactionTemp.value = reply.data.reactionTemp / 10.0
+//        r1Temp.value = reply.data.r1Temp / 10.0
     }
 
     /**
@@ -702,6 +764,7 @@ class HomeViewModel(
         }
         machineArgState = MachineState.RunningError
         i("报错了，cmd=$cmd state=$state")
+
         testMsg.postValue("报错了，cmd=$cmd state=$state")
     }
 
@@ -829,7 +892,11 @@ class HomeViewModel(
         samplePos?.let {
             mSamplesStates[sampleShelfPos]!![samplePos].cuvetteID = cuvettePos
         }
-        samplesStates.postValue(mSamplesStates)
+//        samplesStates.postValue(mSamplesStates)
+        samplesStates.value = mSamplesStates
+//        _testUiState.update {
+//            it.copy(sampleStates = mSamplesStates)
+//        }
         i("updateSampleState samplePos=${samplePos} sampleShelfPos=$sampleShelfPos")
         i("updateSampleState samplesState=${mSamplesStates.print()}")
     }
@@ -851,7 +918,11 @@ class HomeViewModel(
         mCuvetteStates[cuvetteShelfPos]!![cuvettePos].state = state
         testResult?.let { mCuvetteStates[cuvetteShelfPos]!![cuvettePos].testResult = testResult }
         samplePos?.let { mCuvetteStates[cuvetteShelfPos]!![cuvettePos].sampleID = samplePos }
-        cuvetteStates.postValue(mCuvetteStates)
+//        cuvetteStates.postValue(mCuvetteStates)
+        cuvetteStates.value = mCuvetteStates
+//        _testUiState.update {
+//            it.copy(cuvetteStates = mCuvetteStates)
+//        }
         i("updateCuvetteState  cuvetteShelfPos=$cuvetteShelfPos")
         i("updateCuvetteState cuvetteStates=${mCuvetteStates.print()}")
     }
@@ -1037,7 +1108,11 @@ class HomeViewModel(
                 resultModels[pos]?.testOriginalValue1 = resultOriginalTest1[pos]
 
                 mCuvetteStates[cuvetteShelfPos]?.get(pos)?.testResult = resultModels[pos]
-                cuvetteStates.postValue(mCuvetteStates)
+//                cuvetteStates.postValue(mCuvetteStates)
+                cuvetteStates.value = mCuvetteStates;
+//                _testUiState.update {
+//                    it.copy(cuvetteStates = mCuvetteStates)
+//                }
             }
             CuvetteState.Test2 -> {
                 if (SystemGlobal.isCodeDebug) {
@@ -1104,7 +1179,6 @@ class HomeViewModel(
         testMsg.postValue(
             testMsg.value?.plus("这排比色皿检测结束 比色皿位置=$cuvetteShelfPos 样本位置=$sampleShelfPos \n 第一次:$resultTest1 \n 第二次:$resultTest2 \n 第三次:$resultTest3 \n 第四次:$resultTest4 \n  吸光度:$absorbances \n 浓度=$cons \n选择的四参数为${selectProject ?: "未选择"}\n\n")
         )
-
         resultModels.forEach {
             i("resultModel=$it")
         }
@@ -1210,7 +1284,16 @@ class HomeViewModel(
             } else {
                 if (lastCuvetteShelf(cuvetteShelfPos)) {//最后一排比色皿
                     //提示，比色皿不足了
-                    dialogTestFinishCuvetteDeficiency.postValue(true)
+                    viewModelScope.launch {
+                        _dialogUiState.emit(
+                            HomeDialogUiState(
+                                dialogState = DialogState.CUVETTE_DEFICIENCY,
+                                ""
+                            )
+                        )
+                    }
+//                    dialogTestFinishCuvetteDeficiency.postValue(true)
+
                 } else {
                     checkTestState(accord = {
                         //还有比色皿。继续移动比色皿，检测
@@ -1219,7 +1302,15 @@ class HomeViewModel(
                         moveSampleShelfNext()
                     }, discrepancy = { str ->
                         continueTestGetState = true
-                        getStateNotExistMsg.postValue(str)
+//                        getStateNotExistMsg.postValue(str)
+                        viewModelScope.launch {
+                            _dialogUiState.emit(
+                                HomeDialogUiState(
+                                    dialogState = DialogState.GET_STATE_NOT_EXIST,
+                                    str
+                                )
+                            )
+                        }
                     })
 //                    //还有比色皿。继续移动比色皿，检测
 //                    moveCuvetteShelfNext()
@@ -1230,7 +1321,15 @@ class HomeViewModel(
         } else {
             if (lastCuvetteShelf(cuvetteShelfPos)) {//最后一排比色皿
                 //提示，比色皿不足了
-                dialogTestFinishCuvetteDeficiency.postValue(true)
+//                dialogTestFinishCuvetteDeficiency.postValue(true)
+                viewModelScope.launch {
+                    _dialogUiState.emit(
+                        HomeDialogUiState(
+                            dialogState = DialogState.CUVETTE_DEFICIENCY,
+                            ""
+                        )
+                    )
+                }
             } else {
                 //还有比色皿。继续移动比色皿，检测
                 checkTestState(accord = {
@@ -1238,7 +1337,15 @@ class HomeViewModel(
                     moveCuvetteShelfNext()
                 }, discrepancy = { str ->
                     continueTestGetState = true
-                    getStateNotExistMsg.postValue(str)
+//                    getStateNotExistMsg.postValue(str)
+                    viewModelScope.launch {
+                        _dialogUiState.emit(
+                            HomeDialogUiState(
+                                dialogState = DialogState.GET_STATE_NOT_EXIST,
+                                "试剂和清洗液不足"
+                            )
+                        )
+                    }
                 })
 //                moveSample()
 //                moveCuvetteShelfNext()
@@ -1730,7 +1837,10 @@ class HomeViewModel(
      * 检测结束动作完成后提示
      */
     public fun showFinishDialog() {
-        dialogTestFinish.postValue(true)
+//        dialogTestFinish.postValue(true)
+        viewModelScope.launch {
+            _dialogUiState.emit(HomeDialogUiState(dialogState = DialogState.TEST_FINISH, ""))
+        }
         testState = TestState.None
     }
 
@@ -1841,7 +1951,10 @@ class HomeViewModel(
      */
     override fun readDataGetMachineStateModel(reply: ReplyModel<GetMachineStateModel>) {
         i("接收到 自检 reply=$reply")
-        dialogGetMachine.postValue(false)
+//        dialogGetMachine.postValue(false)
+        viewModelScope.launch {
+            _dialogUiState.emit(HomeDialogUiState(DialogState.GET_MACHINE_DISMISS, ""))
+        }
         val errorInfo = reply.data.errorInfo
         testState = TestState.None
         if (errorInfo.isNullOrEmpty()) {
@@ -1858,7 +1971,10 @@ class HomeViewModel(
                 sb.append("\n")
             }
             i("自检失败，错误信息=${sb}")
-            getMachineFailedMsg.postValue(sb.toString())
+//            getMachineFailedMsg.postValue(sb.toString())
+            viewModelScope.launch {
+                _dialogUiState.emit(HomeDialogUiState(DialogState.GET_MACHINE_FAILED_SHOW, ""))
+            }
         }
     }
 
@@ -1943,12 +2059,28 @@ class HomeViewModel(
         i("cuvetteShelfPos=${cuvetteShelfPos} sampleShelfPos=${sampleShelfPos}")
         if (cuvetteShelfPos == -1) {
             i("没有比色皿架")
-            getStateNotExistMsg.postValue("比色皿不足，请添加")
+//            getStateNotExistMsg.postValue("比色皿不足，请添加")
+            viewModelScope.launch {
+                _dialogUiState.emit(
+                    HomeDialogUiState(
+                        dialogState = DialogState.GET_STATE_NOT_EXIST,
+                        "比色皿不足，请添加"
+                    )
+                )
+            }
             return
         }
         if (sampleShelfPos == -1) {
             i("没有样本架")
-            getStateNotExistMsg.postValue("样本不足，请添加")
+//            getStateNotExistMsg.postValue("样本不足，请添加")
+            viewModelScope.launch {
+                _dialogUiState.emit(
+                    HomeDialogUiState(
+                        dialogState = DialogState.GET_STATE_NOT_EXIST,
+                        "样本不足，请添加"
+                    )
+                )
+            }
             return
         }
 
@@ -1957,7 +2089,15 @@ class HomeViewModel(
             moveSampleShelf(sampleShelfPos)
             moveCuvetteShelf(cuvetteShelfPos)
         }, discrepancy = { str ->
-            getStateNotExistMsg.postValue(str)
+//            getStateNotExistMsg.postValue(str)
+            viewModelScope.launch {
+                _dialogUiState.emit(
+                    HomeDialogUiState(
+                        dialogState = DialogState.GET_STATE_NOT_EXIST,
+                        str
+                    )
+                )
+            }
             return@checkTestState
         })
     }
@@ -2021,7 +2161,11 @@ class HomeViewModel(
             arrays[i] = array
         }
         mSamplesStates = arrays
-        samplesStates.postValue(mSamplesStates)
+//        samplesStates.postValue(mSamplesStates)
+        samplesStates.value = mSamplesStates
+//        _testUiState.update {
+//            it.copy(sampleStates = mSamplesStates)
+//        }
         i("getInitSampleShelfPos sampleShelfPos=$sampleShelfPos lastSampleShelfPos=$lastSampleShelfPos")
     }
 
@@ -2053,7 +2197,11 @@ class HomeViewModel(
             arrays[i] = array
         }
         mCuvetteStates = arrays
-        cuvetteStates.postValue(mCuvetteStates)
+//        cuvetteStates.postValue(mCuvetteStates)
+        cuvetteStates.value = mCuvetteStates
+//        _testUiState.update {
+//            it.copy(cuvetteStates = mCuvetteStates)
+//        }
         i("getInitCuvetteShelfPos cuvetteShelfPos=$cuvetteShelfPos lastCuvetteShelfPos=$lastCuvetteShelfPos")
     }
 

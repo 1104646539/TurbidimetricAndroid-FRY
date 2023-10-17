@@ -3,12 +3,10 @@ package com.wl.turbidimetric.test
 import com.wl.turbidimetric.ex.toHex
 import com.wl.turbidimetric.global.SerialGlobal
 import com.wl.wllib.CRC.CRC16
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.util.concurrent.LinkedBlockingQueue
 import com.wl.wllib.LogToFile.i
+import kotlinx.coroutines.*
+
 /**
  * 仅测试回复用
  */
@@ -19,7 +17,7 @@ object TestSerialPort {
      * 测试回复
      * @param data UByteArray
      */
-    public fun testReply(data: UByteArray) = runBlocking {
+     suspend fun testReply(data: UByteArray)  {
 //        GlobalScope.launch {
 //            launch {
 
@@ -28,6 +26,7 @@ object TestSerialPort {
         when (data[0]) {
             SerialGlobal.CMD_GetMachineState -> {
 //                reply = reply.plus(ubyteArrayOf(0x3Fu, 0xFFu, 0xFFu, 0xFFu))
+                delay(500)
                 reply = reply.plus(ubyteArrayOf(0x00u, 0x00u, 0x00u, 0x00u))
             }
             SerialGlobal.CMD_GetState -> {
@@ -77,7 +76,7 @@ object TestSerialPort {
     val results = LinkedBlockingQueue<UByteArray>()
 
     init {
-        GlobalScope.launch {
+        GlobalScope.launch(Dispatchers.IO) {
             launch {
                 while (true) {
                     delay(50)

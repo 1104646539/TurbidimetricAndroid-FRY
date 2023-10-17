@@ -17,6 +17,7 @@ import java.util.*
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.LinkedBlockingQueue
 import com.wl.wllib.LogToFile.i
+
 /**
  * 串口操作类
  */
@@ -38,6 +39,7 @@ object SerialPortUtil {
     init {
         open()
     }
+
     fun open() {
         if (SystemGlobal.isCodeDebug) {
             TestSerialPort.callback = this::dispatchData
@@ -342,7 +344,9 @@ object SerialPortUtil {
     private fun writeAsync(data: UByteArray) {
         c("writeAsync ${data.toHex()}")
         if (SystemGlobal.isCodeDebug) {
-            TestSerialPort.testReply(data)
+            GlobalScope.launch(Dispatchers.IO) {
+                TestSerialPort.testReply(data)
+            }
         } else {
             sendQueue.add(data)
         }

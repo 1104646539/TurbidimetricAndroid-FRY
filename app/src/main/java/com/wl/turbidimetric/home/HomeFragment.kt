@@ -20,12 +20,12 @@ import com.wl.turbidimetric.view.HiltDialog
 import com.wl.turbidimetric.view.HomeConfigDialog
 import com.wl.turbidimetric.view.HomeDetailsDialog
 import com.wl.wwanandroid.base.BaseFragment
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import com.wl.wllib.LogToFile.i
 import com.wl.wllib.ktxRunOnBgCache
 import com.wl.wllib.toLongTimeStr
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
 import java.util.Date
 
 class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.fragment_home) {
@@ -35,13 +35,12 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
      * 最新的项目
      */
     private val projects: MutableList<ProjectModel> = mutableListOf()
-    private val r2VolumeIds =
-        intArrayOf(
-            R.drawable.icon_r2_0,
-            R.drawable.icon_r2_1,
-            R.drawable.icon_r2_2,
-            R.drawable.icon_r2_3,
-        )
+    private val r2VolumeIds = intArrayOf(
+        R.drawable.icon_r2_0,
+        R.drawable.icon_r2_1,
+        R.drawable.icon_r2_2,
+        R.drawable.icon_r2_3,
+    )
 
     /**
      * 首页显示样本和比色皿详情的对话框
@@ -103,25 +102,29 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 
 
     override fun init(savedInstanceState: Bundle?) {
+        test()
+
+        initView()
+        listener()
         lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                test()
-
-                initView()
-                listener()
-                vm.goGetMachineState()
+//                vm.goGetMachineState()
             }
         }
-        lifecycleScope.launch((Dispatchers.IO)) {
-            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                vm.projectDatas.collectLatest {
-                    projects.clear()
-                    projects.addAll(it)
 
-                    vm.recoverSelectProject(projects)
-                }
+        launchAndRepeatWithViewLifecycle {
+
+        }
+        launchAndRepeatWithViewLifecycle {
+            vm.projectDatas.collectLatest {
+                projects.clear()
+                projects.addAll(it)
+
+                vm.recoverSelectProject(projects)
             }
         }
+
+
     }
 
     private fun initView() {
@@ -129,123 +132,147 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
     }
 
     private fun listener() {
-        listenerDialog()
         listenerView()
-
+        listenerDialog()
     }
 
     private fun listenerView() {
-        vm.r1State.observe(this) {
-            vd.ivR1.setImageResource(if (it?.not() == true) R.drawable.icon_r1_empty else R.drawable.icon_r1_full)
-        }
-        vm.r2State.observe(this) {
-
-        }
-        vm.r2VolumeState.observe(this) {
-            if ((it ?: 0) in r2VolumeIds.indices) {
-                vd.ivR2.setImageResource(r2VolumeIds[it])
-            } else {
-                vd.ivR2.setImageResource(r2VolumeIds[0])
+        launchAndRepeatWithViewLifecycle {
+//            vm.testUiState.collect { state ->
+//                vd.ssv.sampleStates = state.sampleStates[0]
+//                vd.ssv2.sampleStates = state.sampleStates[1]
+//                vd.ssv3.sampleStates = state.sampleStates[2]
+//                vd.ssv4.sampleStates = state.sampleStates[3]
+//
+//                vd.csv.cuvetteStates = state.cuvetteStates[3]
+//                vd.csv2.cuvetteStates = state.cuvetteStates[2]
+//                vd.csv3.cuvetteStates = state.cuvetteStates[1]
+//                vd.csv4.cuvetteStates = state.cuvetteStates[0]
+//            }
+//        }
+            launchAndRepeatWithViewLifecycle {
+                vm.testMachineUiState.collectLatest {
+                    vd.ivR1.setImageResource(if (it?.r1State.not()) R.drawable.icon_r1_empty else R.drawable.icon_r1_full)
+                    if ((it.r2State ?: 0) in r2VolumeIds.indices) {
+                        vd.ivR2.setImageResource(r2VolumeIds[it.r2State])
+                    } else {
+                        vd.ivR2.setImageResource(r2VolumeIds[0])
+                    }
+                    vd.ivCleanoutFluid.setImageResource(if (it.cleanoutFluidState.not() == true) R.drawable.icon_cleanout_fluid_empty else R.drawable.icon_cleanout_fluid_full)
+                    vd.tvTemp.text = (it.reactionTemp?.toString() ?: "0").plus("℃")
+                }
             }
-        }
-        vm.cleanoutFluidState.observe(this) {
-            vd.ivCleanoutFluid.setImageResource(if (it?.not() == true) R.drawable.icon_cleanout_fluid_empty else R.drawable.icon_cleanout_fluid_full)
-        }
-        vm.reactionTemp.observe(this) {
-            vd.tvTemp.text = (it?.toString() ?: "0").plus("℃")
-        }
-        vm.r1Temp.observe(this) {
+//            vm.r1State.observe(this) {
+//                vd.ivR1.setImageResource(if (it?.not() == true) R.drawable.icon_r1_empty else R.drawable.icon_r1_full)
+//            }
+//            vm.r2State.observe(this) {
+//
+//            }
+//            vm.r2VolumeState.observe(this) {
+//                if ((it ?: 0) in r2VolumeIds.indices) {
+//                    vd.ivR2.setImageResource(r2VolumeIds[it])
+//                } else {
+//                    vd.ivR2.setImageResource(r2VolumeIds[0])
+//                }
+//            }
+//            vm.cleanoutFluidState.observe(this) {
+//                vd.ivCleanoutFluid.setImageResource(if (it?.not() == true) R.drawable.icon_cleanout_fluid_empty else R.drawable.icon_cleanout_fluid_full)
+//            }
+//            vm.reactionTemp.observe(this) {
+//                vd.tvTemp.text = (it?.toString() ?: "0").plus("℃")
+//            }
+//            vm.r1Temp.observe(this) {
 //            vd.tvTemp.text = "R1=${vm.r1State.value} R2=${vm.r2State.value} R2量=${vm.r2Volume.value} 清洗液=${vm.cleanoutFluidState.value} 反应槽温度=${vm.reactionTemp.value} R1温度=${vm.r1Temp.value}"
-        }
-        vd.ssv.label = "1"
-        vd.ssv2.label = "2"
-        vd.ssv3.label = "3"
-        vd.ssv4.label = "4"
-        vd.ssv.clickIndex = { it, item ->
-            toast("样本 index=$it item=$item")
-            showDetailsDialog(item)
-        }
-        vd.ssv2.clickIndex = { it, item ->
-            toast("样本 index2=$it item=$item")
-            showDetailsDialog(item)
-        }
-        vd.ssv3.clickIndex = { it, item ->
-            toast("样本 index3=$it item=$item")
-            showDetailsDialog(item)
-        }
-        vd.ssv4.clickIndex = { it, item ->
-            toast("样本 index4=$it item=$item")
-            showDetailsDialog(item)
-        }
-        vm.samplesStates.observe(this) {
-            vd.ssv.sampleStates = it[0]
-            vd.ssv2.sampleStates = it[1]
-            vd.ssv3.sampleStates = it[2]
-            vd.ssv4.sampleStates = it[3]
-        }
+//            }
+            vd.ssv.label = "1"
+            vd.ssv2.label = "2"
+            vd.ssv3.label = "3"
+            vd.ssv4.label = "4"
+            vd.ssv.clickIndex = { it, item ->
+                toast("样本 index=$it item=$item")
+                showDetailsDialog(item)
+            }
+            vd.ssv2.clickIndex = { it, item ->
+                toast("样本 index2=$it item=$item")
+                showDetailsDialog(item)
+            }
+            vd.ssv3.clickIndex = { it, item ->
+                toast("样本 index3=$it item=$item")
+                showDetailsDialog(item)
+            }
+            vd.ssv4.clickIndex = { it, item ->
+                toast("样本 index4=$it item=$item")
+                showDetailsDialog(item)
+            }
+//        vm.samplesStates.observe(this) {
+//            vd.ssv.sampleStates = it[0]
+//            vd.ssv2.sampleStates = it[1]
+//            vd.ssv3.sampleStates = it[2]
+//            vd.ssv4.sampleStates = it[3]
+//        }
 
-        vd.csv.label = "4"
-        vd.csv2.label = "3"
-        vd.csv3.label = "2"
-        vd.csv4.label = "1"
-        vd.csv.clickIndex = { it, item ->
-            toast("比色皿 index=$it item=$item")
-            showDetailsDialog(item)
-        }
-        vd.csv2.clickIndex = { it, item ->
-            toast("比色皿 index2=$it item=$item")
-            showDetailsDialog(item)
-        }
-        vd.csv3.clickIndex = { it, item ->
-            toast("比色皿 index3=$it item=$item")
-            showDetailsDialog(item)
-        }
-        vd.csv4.clickIndex = { it, item ->
-            toast("比色皿 index4=$it item=$item")
-            showDetailsDialog(item)
-        }
-        vm.cuvetteStates.observe(this) {
-            vd.csv.cuvetteStates = it[3]
-            vd.csv2.cuvetteStates = it[2]
-            vd.csv3.cuvetteStates = it[1]
-            vd.csv4.cuvetteStates = it[0]
-        }
+            vd.csv.label = "4"
+            vd.csv2.label = "3"
+            vd.csv3.label = "2"
+            vd.csv4.label = "1"
+            vd.csv.clickIndex = { it, item ->
+                toast("比色皿 index=$it item=$item")
+                showDetailsDialog(item)
+            }
+            vd.csv2.clickIndex = { it, item ->
+                toast("比色皿 index2=$it item=$item")
+                showDetailsDialog(item)
+            }
+            vd.csv3.clickIndex = { it, item ->
+                toast("比色皿 index3=$it item=$item")
+                showDetailsDialog(item)
+            }
+            vd.csv4.clickIndex = { it, item ->
+                toast("比色皿 index4=$it item=$item")
+                showDetailsDialog(item)
+            }
+//        vm.cuvetteStates.observe(this) {
+//            vd.csv.cuvetteStates = it[3]
+//            vd.csv2.cuvetteStates = it[2]
+//            vd.csv3.cuvetteStates = it[1]
+//            vd.csv4.cuvetteStates = it[0]
+//        }
 
-        obTestState.observe(this) {
-            if (it != TestState.None && it != TestState.TestFinish) {
-                vd.btnStart.setBackgroundResource(R.drawable.rip_positive2)
-                vd.btnStart.setText("正在分析")
-                vm.enableView(false)
-            } else {
-                vd.btnStart.setBackgroundResource(R.drawable.rip_positive)
-                vd.btnStart.setText("分析")
-                vm.enableView(true)
+            obTestState.observe(this) {
+                if (it != TestState.None && it != TestState.TestFinish) {
+                    vd.btnStart.setBackgroundResource(R.drawable.rip_positive2)
+                    vd.btnStart.setText("正在分析")
+                    vm.enableView(false)
+                } else {
+                    vd.btnStart.setBackgroundResource(R.drawable.rip_positive)
+                    vd.btnStart.setText("分析")
+                    vm.enableView(true)
+                }
+            }
+            vd.btnStart.setOnClickListener {
+                if (vm.selectProject == null) {
+                    showConfigDialog()
+                    toast("请选择标曲")
+                } else if (!isAuto() && vm.needSamplingNum <= 0) {
+                    showConfigDialog()
+                    toast("请输入检测数量")
+                } else {
+                    vm.clickStart()
+                }
+            }
+            vd.btnDebugDialog.setOnClickListener {
+                debugShowDetailsDialog?.show(
+                    vm.testMsg.value ?: "",
+                    "确定",
+                    onConfirm = { it.dismiss() },
+                    gravity = Gravity.LEFT
+                )
+            }
+
+            vd.btnConfig.setOnClickListener {
+                showConfigDialog()
             }
         }
-        vd.btnStart.setOnClickListener {
-            if (vm.selectProject == null) {
-                showConfigDialog()
-                toast("请选择标曲")
-            } else if (!isAuto() && vm.needSamplingNum <= 0) {
-                showConfigDialog()
-                toast("请输入检测数量")
-            } else {
-                vm.clickStart()
-            }
-        }
-        vd.btnDebugDialog.setOnClickListener {
-            debugShowDetailsDialog?.show(
-                vm.testMsg.value ?: "",
-                "确定",
-                onConfirm = { it.dismiss() },
-                gravity = Gravity.LEFT
-            )
-        }
-
-        vd.btnConfig.setOnClickListener {
-            showConfigDialog()
-        }
-
     }
 
     /**
@@ -253,8 +280,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
      */
     private fun showConfigDialog() {
         i("showConfigDialog before")
-        homeConfigDialog?.show(
-            vm.selectProjectEnable.value ?: true,
+        homeConfigDialog?.show(vm.selectProjectEnable.value ?: true,
             vm.editDetectionNumEnable.value ?: true,
             vm.skipCuvetteEnable.value ?: true,
             projects,
@@ -303,119 +329,216 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 
     }
 
-    private fun listenerDialog() {
-
-        /**
-         * 自检中
-         */
-        vm.dialogGetMachine.observe(this) { show ->
-            i("收到自检变化：$show ${dialogGetMachine == null}")
-            if (show) {
-                dialogGetMachine?.show()
-            } else {
-                dialogGetMachine?.dismiss()
-            }
-        }
-        /**
-         * 自检失败对话框
-         */
-        vm.getMachineFailedMsg.observe(this) { show ->
-            dialog?.show(
-                msg = show,
-                confirmMsg = "重新自检",
-                onConfirm = {
-                    it.dismiss()
-                    vm.dialogGetMachineFailedConfirm()
-                },
-                cancelMsg = "我知道了",
-                onCancel = {
-                    it.dismiss()
-                    vm.dialogGetMachineFailedCancel()
-                }, false
-            ).takeIf {
-                show.isNotEmpty()
-            }
-        }
-        /**
-         * 检测结束后 比色皿不足
-         */
-        vm.dialogTestFinishCuvetteDeficiency.observe(this) {
-            dialog?.show(msg = "比色皿检测结束，是否添加？", confirmMsg = "我已添加", onConfirm = {
-                it.dismiss()
-                vm.dialogTestFinishCuvetteDeficiencyConfirm()
-            }, cancelMsg = "结束检测", onCancel = {
-                it.dismiss()
-                vm.dialogTestFinishCuvetteDeficiencyCancel()
-            }, false)
-        }
-        /**
-         * 开始检测 比色皿,样本，试剂不足
-         */
-        vm.getStateNotExistMsg.observe(this) { show ->
-            dialog?.show(
-                msg = show,
-                confirmMsg = "我已添加",
-                onConfirm = {
-                    it.dismiss()
-                    vm.dialogGetStateNotExistConfirm()
-                },
-                cancelMsg = "结束检测",
-                onCancel = {
-                    it.dismiss()
-                    vm.dialogGetStateNotExistCancel()
-                }, false
-            ).takeIf {
-                show.isNotEmpty()
-            }
-        }
-        /**
-         * 正常检测 样本不足
-         */
-        vm.dialogTestSampleDeficiency.observe(this) {
-            dialog?.show(msg = "样本不足，是否添加？", confirmMsg = "我已添加", onConfirm = {
-                it.dismiss()
-                vm.dialogTestSampleDeficiencyConfirm()
-            }, cancelMsg = "结束检测", onCancel = {
-                it.dismiss()
-                vm.dialogTestSampleDeficiencyCancel()
-            }, false)
-        }
-
-        /**
-         * 检测结束 正常样本取样完成的提示
-         */
-        vm.dialogTestFinish.observe(this) { show ->
-            if (show) {
-                dialog?.show(msg = "检测结束", confirmMsg = "确定", onConfirm = {
-                    it.dismiss()
-                })
-            } else {
-                dialog?.dismiss()
-            }
-        }
-        /**
-         * 显示调试的数据
-         */
-        vm.testMsg.observe(this) {
-            debugShowDetailsDialog?.let { dialog ->
-                if (dialog.isShow()) {
-                    dialog!!.show(
-                        it,
-                        "确定",
-                        onConfirm = { it.dismiss() },
-                        gravity = Gravity.LEFT
-                    )
+    private fun listenerDialog2() {
+        launchAndRepeatWithViewLifecycle {
+            /**
+             * 显示调试的数据
+             */
+            vm.testMsg.observe(viewLifecycleOwner) {
+                debugShowDetailsDialog?.let { dialog ->
+                    if (dialog.isShow()) {
+                        dialog!!.show(
+                            it, "确定", onConfirm = { it.dismiss() }, gravity = Gravity.LEFT
+                        )
+                    }
                 }
             }
+        }
+        launchAndRepeatWithViewLifecycle {
+            vm.dialogUiState.collect { state ->
+                i("launchAndRepeatWithViewLifecycle state=${state.dialogState}")
+                when (state.dialogState) {
+                    /**
+                     * 自检中
+                     */
+                    DialogState.GET_MACHINE_SHOW -> {
+                        dialogGetMachine?.show()
+                    }
+                    DialogState.GET_MACHINE_DISMISS -> {
+                        dialogGetMachine?.dismiss()
+                    }
+                    /**
+                     * 自检失败对话框
+                     */
+                    DialogState.GET_MACHINE_FAILED_SHOW -> {
+                        dialog?.show(msg = state.dialogMsg, confirmMsg = "重新自检", onConfirm = {
+                            it.dismiss()
+                            vm.dialogGetMachineFailedConfirm()
+                        }, cancelMsg = "我知道了", onCancel = {
+                            it.dismiss()
+                            vm.dialogGetMachineFailedCancel()
+                        }, false
+                        )
+                    }
+                    /**
+                     * 检测结束后 比色皿不足
+                     */
+                    DialogState.CUVETTE_DEFICIENCY -> {
+                        dialog?.show(msg = "比色皿检测结束，是否添加？", confirmMsg = "我已添加", onConfirm = {
+                            it.dismiss()
+                            vm.dialogTestFinishCuvetteDeficiencyConfirm()
+                        }, cancelMsg = "结束检测", onCancel = {
+                            it.dismiss()
+                            vm.dialogTestFinishCuvetteDeficiencyCancel()
+                        }, false)
+                    }
+                    /**
+                     * 开始检测 比色皿,样本，试剂不足
+                     */
+                    DialogState.GET_STATE_NOT_EXIST -> {
+                        dialog?.show(msg = state.dialogMsg, confirmMsg = "我已添加", onConfirm = {
+                            it.dismiss()
+                            vm.dialogGetStateNotExistConfirm()
+                        }, cancelMsg = "结束检测", onCancel = {
+                            it.dismiss()
+                            vm.dialogGetStateNotExistCancel()
+                        }, false
+                        )
+                    }
+                    /**
+                     * 正常检测 样本不足
+                     */
+                    DialogState.SAMPLE_DEFICIENCY -> {
+                        dialog?.show(msg = "样本不足，是否添加？", confirmMsg = "我已添加", onConfirm = {
+                            it.dismiss()
+                            vm.dialogTestSampleDeficiencyConfirm()
+                        }, cancelMsg = "结束检测", onCancel = {
+                            it.dismiss()
+                            vm.dialogTestSampleDeficiencyCancel()
+                        }, false)
+                    }
+                    /**
+                     * 检测结束 正常样本取样完成的提示
+                     */
+                    DialogState.TEST_FINISH -> {
+                        dialog?.show(msg = "检测结束", confirmMsg = "确定", onConfirm = {
+                            it.dismiss()
+                        })
+                    }
+                    /**
+                     * 通知
+                     */
+                    DialogState.NOTIFY -> {
+                        snack(vd.root, state.dialogMsg)
+                    }
+                }
+            }
+        }
+    }
 
-        }
-        /**
-         * 显示信息
-         */
-        vm.toastMsg.observe(this) { msg ->
-            i("msg=$msg")
-            snack(vd.root, msg)
-        }
+    private fun listenerDialog() {
+        listenerDialog2()
+//        /**
+//         * 自检中
+//         */
+//        vm.dialogGetMachine.observe(this) { show ->
+//            i("收到自检变化：$show ${dialogGetMachine == null}")
+//            if (show) {
+//                dialogGetMachine?.show()
+//            } else {
+//                dialogGetMachine?.dismiss()
+//            }
+//        }
+//        /**
+//         * 自检失败对话框
+//         */
+//        vm.getMachineFailedMsg.observe(this) { show ->
+//            dialog?.show(
+//                msg = show,
+//                confirmMsg = "重新自检",
+//                onConfirm = {
+//                    it.dismiss()
+//                    vm.dialogGetMachineFailedConfirm()
+//                },
+//                cancelMsg = "我知道了",
+//                onCancel = {
+//                    it.dismiss()
+//                    vm.dialogGetMachineFailedCancel()
+//                }, false
+//            ).takeIf {
+//                show.isNotEmpty()
+//            }
+//        }
+//        /**
+//         * 检测结束后 比色皿不足
+//         */
+//        vm.dialogTestFinishCuvetteDeficiency.observe(this) {
+//            dialog?.show(msg = "比色皿检测结束，是否添加？", confirmMsg = "我已添加", onConfirm = {
+//                it.dismiss()
+//                vm.dialogTestFinishCuvetteDeficiencyConfirm()
+//            }, cancelMsg = "结束检测", onCancel = {
+//                it.dismiss()
+//                vm.dialogTestFinishCuvetteDeficiencyCancel()
+//            }, false)
+//        }
+//        /**
+//         * 开始检测 比色皿,样本，试剂不足
+//         */
+//        vm.getStateNotExistMsg.observe(this) { show ->
+//            dialog?.show(
+//                msg = show,
+//                confirmMsg = "我已添加",
+//                onConfirm = {
+//                    it.dismiss()
+//                    vm.dialogGetStateNotExistConfirm()
+//                },
+//                cancelMsg = "结束检测",
+//                onCancel = {
+//                    it.dismiss()
+//                    vm.dialogGetStateNotExistCancel()
+//                }, false
+//            ).takeIf {
+//                show.isNotEmpty()
+//            }
+//        }
+//        /**
+//         * 正常检测 样本不足
+//         */
+//        vm.dialogTestSampleDeficiency.observe(this) {
+//            dialog?.show(msg = "样本不足，是否添加？", confirmMsg = "我已添加", onConfirm = {
+//                it.dismiss()
+//                vm.dialogTestSampleDeficiencyConfirm()
+//            }, cancelMsg = "结束检测", onCancel = {
+//                it.dismiss()
+//                vm.dialogTestSampleDeficiencyCancel()
+//            }, false)
+//        }
+//
+//        /**
+//         * 检测结束 正常样本取样完成的提示
+//         */
+//        vm.dialogTestFinish.observe(this) { show ->
+//            if (show) {
+//                dialog?.show(msg = "检测结束", confirmMsg = "确定", onConfirm = {
+//                    it.dismiss()
+//                })
+//            } else {
+//                dialog?.dismiss()
+//            }
+//        }
+//        /**
+//         * 显示调试的数据
+//         */
+//        vm.testMsg.observe(this) {
+//            debugShowDetailsDialog?.let { dialog ->
+//                if (dialog.isShow()) {
+//                    dialog!!.show(
+//                        it,
+//                        "确定",
+//                        onConfirm = { it.dismiss() },
+//                        gravity = Gravity.LEFT
+//                    )
+//                }
+//            }
+//
+//        }
+//        /**
+//         * 显示信息
+//         */
+//        vm.toastMsg.observe(this) { msg ->
+//            i("msg=$msg")
+//            snack(vd.root, msg)
+//        }
 
     }
 

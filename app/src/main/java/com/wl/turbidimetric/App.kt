@@ -19,11 +19,11 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         instance = this
-//        ToastUtil.init(this)
-//        initData()
+        ToastUtil.init(this)
+        initData()
         ktxRunOnBgCache {
             DBManager.init(this)
-//        initDataStore();
+            initDataStore();
             LogToFile.init()
 //
             //没有项目参数的时候，添加一个默认参数

@@ -68,7 +68,7 @@ enum class MatchingArgState {
 }
 
 /**
- * 拟合参数流程的状态
+ * 重复性测试流程的状态
  */
 enum class RepeatabilityState {
     None,//等待开始

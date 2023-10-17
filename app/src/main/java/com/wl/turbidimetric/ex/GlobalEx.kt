@@ -58,7 +58,7 @@ inline fun Array<Array<CuvetteItem>?>.print(): String {
         ts?.forEachIndexed { j, t ->
             sb.append("[${t.state},${t.testResult?.id}] ")
         }
-        sb.append("\n")
+//        sb.append("\n")
     }
     return sb.toString();
 }
@@ -69,7 +69,7 @@ inline fun Array<Array<SampleItem>?>.print(): String {
         ts?.forEachIndexed { j, t ->
             sb.append("[${t.state},${t.testResult?.id}] ")
         }
-        sb.append("\n")
+//        sb.append("\n")
     }
     return sb.toString();
 }

@@ -9,25 +9,25 @@ import kotlin.concurrent.thread
  */
 class BaseSerialPort {
     private var serialPort: SerialPort? = null;
-    private val BUFSIZE = 500
-    private val buf = ByteArray(BUFSIZE)
-    var readInterval:Long = 100
-
-    private val readThread = thread {
-        while (true) {
-            Thread.sleep(readInterval)
-            val retSize = read(buf)
-            if (retSize != null) {
-                if (retSize <= 0) {
-                    continue
-                }
-                val tempByteArray = buf.copyOf(retSize)
-                onParseListener?.onParseListener(tempByteArray)
-            }
-        }
-    }
-
-    private var onParseListener: OnParseListener? = null
+//    private val BUFSIZE = 500
+//    private val buf = ByteArray(BUFSIZE)
+//    var readInterval:Long = 100
+//
+//    private val readThread = thread {
+//        while (true) {
+//            Thread.sleep(readInterval)
+//            val retSize = read(buf)
+//            if (retSize != null) {
+//                if (retSize <= 0) {
+//                    continue
+//                }
+//                val tempByteArray = buf.copyOf(retSize)
+//                onParseListener?.onParseListener(tempByteArray)
+//            }
+//        }
+//    }
+//
+//    private var onParseListener: OnParseListener? = null
 
     fun openSerial(
         addr: String,
@@ -40,17 +40,17 @@ class BaseSerialPort {
         serialPort!!.open(addr, baudrate, databits, parity, stopbits)
     }
 
-    fun openReadListener(onParseListener: OnParseListener? = null) {
-        this.onParseListener = onParseListener
-    }
-
-
-    fun cancelReadListener() {
-        readThread.interrupt()
-    }
+//    fun openReadListener(onParseListener: OnParseListener? = null) {
+//        this.onParseListener = onParseListener
+//    }
+//
+//
+//    fun cancelReadListener() {
+//        readThread.interrupt()
+//    }
 
     fun close() {
-        cancelReadListener()
+//        cancelReadListener()
         serialPort?.close()
     }
 
@@ -64,8 +64,8 @@ class BaseSerialPort {
         return serialPort?.write(byteArray, byteArray.size) ?: 0
     }
 
-    interface OnParseListener {
-        fun onParseListener(byteArray: ByteArray): Unit
-    }
+//    interface OnParseListener {
+//        fun onParseListener(byteArray: ByteArray): Unit
+//    }
 
 }

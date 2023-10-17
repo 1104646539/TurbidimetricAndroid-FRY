@@ -275,13 +275,14 @@ object SerialPortUtil {
                 while (true) {
                     delay(50)
                     val count = serialPort.read(byteArray)
-                    val re = byteArray.copyOf(count).toUByteArray()
-                    data.addAll(re)
-
+                    if (count > 0) {
+                        val re = byteArray.copyOf(count).toUByteArray()
+                        data.addAll(re)
+                        c("每次接收的re=${re.toHex()}")
+                    }
                     if (data.size < hCount + allCount) {
                         continue
                     }
-
                     i@ for (i in data.indices) {
                         if (data.size >= hCount + allCount && data[i] == header[0]) {
                             var k = i;
@@ -290,9 +291,6 @@ object SerialPortUtil {
                                 if (data[k] == element) {
                                     count++
                                     if (hCount == count) {
-//                                        println("date2 ${Date().time}")
-//                                        println("匹配了")
-
                                         //找到了前缀
                                         val temp: UByteArray =
                                             data.toUByteArray().copyOfRange(0, k + allCount + 1)
@@ -303,9 +301,6 @@ object SerialPortUtil {
                                                 .copyOfRange(k + allCount + 1, data.size)
                                             data.clear()
                                             data.addAll(remaining)
-//                                            println(
-//                                                "remaining=${remaining} k=$k"
-//                                            )
                                         } else {
                                             data.clear()
                                         }

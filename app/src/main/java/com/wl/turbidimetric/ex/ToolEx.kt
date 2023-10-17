@@ -14,7 +14,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.global.SystemGlobal
-import com.wl.turbidimetric.model.MachineState
 import com.wl.turbidimetric.model.MachineTestModel
 import com.wl.turbidimetric.model.ProjectModel
 import com.wl.turbidimetric.model.TestState
@@ -290,7 +289,7 @@ fun isAuto(machineTestModel: MachineTestModel = MachineTestModel.valueOf(LocalDa
  * @return Boolean
  */
 fun machineStateNormal(): Boolean {
-    return SystemGlobal.machineArgState == MachineState.Normal
+    return !SystemGlobal.testState.isNotPrepare()
 }
 
 /**

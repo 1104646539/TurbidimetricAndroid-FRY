@@ -13,6 +13,7 @@ import com.wl.turbidimetric.databinding.FragmentHomeBinding
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.SystemGlobal.obTestState
+import com.wl.turbidimetric.global.SystemGlobal.testState
 import com.wl.turbidimetric.model.ProjectModel
 import com.wl.turbidimetric.model.TestState
 import com.wl.turbidimetric.util.ScanCodeUtil
@@ -106,11 +107,12 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 
         initView()
         listener()
-        lifecycleScope.launch {
-            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                vm.goGetMachineState()
-            }
-        }
+        vm.goGetMachineState()
+//        lifecycleScope.launch {
+//            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+//                vm.goGetMachineState()
+//            }
+//        }
         launchAndRepeatWithViewLifecycle {
             vm.projectDatas.collectLatest {
                 projects.clear()
@@ -202,18 +204,24 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 vd.csv4.cuvetteStates = it[0]
             }
         }
-
-        obTestState.observe(viewLifecycleOwner) {
-            if (it != TestState.None && it != TestState.TestFinish) {
-                vd.btnStart.setBackgroundResource(R.drawable.rip_positive2)
-                vd.btnStart.setText("正在分析")
-                vm.enableView(false)
-            } else {
-                vd.btnStart.setBackgroundResource(R.drawable.rip_positive)
-                vd.btnStart.setText("分析")
-                vm.enableView(true)
+        launchAndRepeatWithViewLifecycle {
+            obTestState.collectLatest {
+                if (it.isNotPrepare()) {
+                    vd.btnStart.setBackgroundResource(R.drawable.rip_positive2)
+                    vd.btnStart.setText("重新自检")
+                    vm.enableView(true)
+                } else if (it.isRunning()) {
+                    vd.btnStart.setBackgroundResource(R.drawable.rip_positive2)
+                    vd.btnStart.setText("正在检测")
+                    vm.enableView(false)
+                } else {
+                    vd.btnStart.setBackgroundResource(R.drawable.rip_positive)
+                    vd.btnStart.setText("分析")
+                    vm.enableView(true)
+                }
             }
         }
+
         vd.btnStart.setOnClickListener {
             if (vm.selectProject == null) {
                 showConfigDialog()
@@ -293,8 +301,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 
     }
 
-    private fun listenerDialog2() {
-        launchAndRepeatWithViewLifecycle {
+    private fun listenerDialog() {
+        lifecycleScope.launch {
             /**
              * 显示调试的数据
              */
@@ -308,7 +316,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 }
             }
         }
-        launchAndRepeatWithViewLifecycle (Lifecycle.State.CREATED){
+        lifecycleScope.launch {
             vm.dialogUiState.collectLatest { state ->
                 i("launchAndRepeatWithViewLifecycle state=${state.dialogState}")
                 when (state.dialogState) {
@@ -390,121 +398,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         }
     }
 
-    private fun listenerDialog() {
-        listenerDialog2()
-//        /**
-//         * 自检中
-//         */
-//        vm.dialogGetMachine.observe(this) { show ->
-//            i("收到自检变化：$show ${dialogGetMachine == null}")
-//            if (show) {
-//                dialogGetMachine?.show()
-//            } else {
-//                dialogGetMachine?.dismiss()
-//            }
-//        }
-//        /**
-//         * 自检失败对话框
-//         */
-//        vm.getMachineFailedMsg.observe(this) { show ->
-//            dialog?.show(
-//                msg = show,
-//                confirmMsg = "重新自检",
-//                onConfirm = {
-//                    it.dismiss()
-//                    vm.dialogGetMachineFailedConfirm()
-//                },
-//                cancelMsg = "我知道了",
-//                onCancel = {
-//                    it.dismiss()
-//                    vm.dialogGetMachineFailedCancel()
-//                }, false
-//            ).takeIf {
-//                show.isNotEmpty()
-//            }
-//        }
-//        /**
-//         * 检测结束后 比色皿不足
-//         */
-//        vm.dialogTestFinishCuvetteDeficiency.observe(this) {
-//            dialog?.show(msg = "比色皿检测结束，是否添加？", confirmMsg = "我已添加", onConfirm = {
-//                it.dismiss()
-//                vm.dialogTestFinishCuvetteDeficiencyConfirm()
-//            }, cancelMsg = "结束检测", onCancel = {
-//                it.dismiss()
-//                vm.dialogTestFinishCuvetteDeficiencyCancel()
-//            }, false)
-//        }
-//        /**
-//         * 开始检测 比色皿,样本，试剂不足
-//         */
-//        vm.getStateNotExistMsg.observe(this) { show ->
-//            dialog?.show(
-//                msg = show,
-//                confirmMsg = "我已添加",
-//                onConfirm = {
-//                    it.dismiss()
-//                    vm.dialogGetStateNotExistConfirm()
-//                },
-//                cancelMsg = "结束检测",
-//                onCancel = {
-//                    it.dismiss()
-//                    vm.dialogGetStateNotExistCancel()
-//                }, false
-//            ).takeIf {
-//                show.isNotEmpty()
-//            }
-//        }
-//        /**
-//         * 正常检测 样本不足
-//         */
-//        vm.dialogTestSampleDeficiency.observe(this) {
-//            dialog?.show(msg = "样本不足，是否添加？", confirmMsg = "我已添加", onConfirm = {
-//                it.dismiss()
-//                vm.dialogTestSampleDeficiencyConfirm()
-//            }, cancelMsg = "结束检测", onCancel = {
-//                it.dismiss()
-//                vm.dialogTestSampleDeficiencyCancel()
-//            }, false)
-//        }
-//
-//        /**
-//         * 检测结束 正常样本取样完成的提示
-//         */
-//        vm.dialogTestFinish.observe(this) { show ->
-//            if (show) {
-//                dialog?.show(msg = "检测结束", confirmMsg = "确定", onConfirm = {
-//                    it.dismiss()
-//                })
-//            } else {
-//                dialog?.dismiss()
-//            }
-//        }
-//        /**
-//         * 显示调试的数据
-//         */
-//        vm.testMsg.observe(this) {
-//            debugShowDetailsDialog?.let { dialog ->
-//                if (dialog.isShow()) {
-//                    dialog!!.show(
-//                        it,
-//                        "确定",
-//                        onConfirm = { it.dismiss() },
-//                        gravity = Gravity.LEFT
-//                    )
-//                }
-//            }
-//
-//        }
-//        /**
-//         * 显示信息
-//         */
-//        vm.toastMsg.observe(this) { msg ->
-//            i("msg=$msg")
-//            snack(vd.root, msg)
-//        }
-
-    }
 
 
 }

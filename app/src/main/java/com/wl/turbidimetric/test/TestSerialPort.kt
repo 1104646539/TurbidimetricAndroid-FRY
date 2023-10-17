@@ -25,8 +25,8 @@ object TestSerialPort {
         var reply = ubyteArrayOf(data[0], state)
         when (data[0]) {
             SerialGlobal.CMD_GetMachineState -> {
-//                reply = reply.plus(ubyteArrayOf(0x3Fu, 0xFFu, 0xFFu, 0xFFu))
                 delay(2000)
+//                reply = reply.plus(ubyteArrayOf(0x3Fu, 0xFFu, 0xFFu, 0xFFu))
                 reply = reply.plus(ubyteArrayOf(0x00u, 0x00u, 0x00u, 0x00u))
             }
             SerialGlobal.CMD_GetState -> {

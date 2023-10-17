@@ -13,10 +13,11 @@ import com.github.mikephil.charting.data.LineDataSet
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.FragmentMatchingArgsBinding
 import com.wl.turbidimetric.ex.*
-import com.wl.turbidimetric.global.SystemGlobal.matchingTestState
-import com.wl.turbidimetric.global.SystemGlobal.obMatchingTestState
-import com.wl.turbidimetric.model.MatchingArgState
+import com.wl.turbidimetric.global.SystemGlobal
+import com.wl.turbidimetric.global.SystemGlobal.obTestState
+import com.wl.turbidimetric.global.SystemGlobal.testState
 import com.wl.turbidimetric.model.ProjectModel
+import com.wl.turbidimetric.model.TestState
 import com.wl.turbidimetric.view.CoverProjectDialog
 import com.wl.turbidimetric.view.HiltDialog
 import com.wl.wwanandroid.base.BaseFragment
@@ -39,8 +40,7 @@ class MatchingArgsFragment :
 
     companion object {
         @JvmStatic
-        fun newInstance() =
-            MatchingArgsFragment()
+        fun newInstance() = MatchingArgsFragment()
     }
 
     private val dialog: HiltDialog by lazy {
@@ -173,17 +173,32 @@ class MatchingArgsFragment :
             changeCurve(project)
         }
 
-        obMatchingTestState.observe(this) {
-            if (it != MatchingArgState.None && it != MatchingArgState.Finish) {
-                vd.btnStart.setBackgroundResource(R.drawable.rip_positive2)
-                vd.btnStart.setText("正在拟合")
-                vm.qualityEnable.postValue(false)
-                vm.reagentNoEnable.postValue(false)
-            } else {
-                vd.btnStart.setBackgroundResource(R.drawable.rip_positive)
-                vd.btnStart.setText("开始拟合")
-                vm.qualityEnable.postValue(true)
-                vm.reagentNoEnable.postValue(true)
+//        obMatchingTestState.observe(this) {
+//            if (it != MatchingArgState.None && it != MatchingArgState.Finish) {
+//                vd.btnStart.setBackgroundResource(R.drawable.rip_positive2)
+//                vd.btnStart.setText("正在拟合")
+//                vm.qualityEnable.postValue(false)
+//                vm.reagentNoEnable.postValue(false)
+//            } else {
+//                vd.btnStart.setBackgroundResource(R.drawable.rip_positive)
+//                vd.btnStart.setText("开始拟合")
+//                vm.qualityEnable.postValue(true)
+//                vm.reagentNoEnable.postValue(true)
+//            }
+//        }
+        launchAndRepeatWithViewLifecycle {
+            obTestState.collectLatest {
+                if (it.isRunning()) {
+                    vd.btnStart.setBackgroundResource(R.drawable.rip_positive2)
+                    vd.btnStart.setText("正在拟合")
+                    vm.qualityEnable.postValue(false)
+                    vm.reagentNoEnable.postValue(false)
+                } else {
+                    vd.btnStart.setBackgroundResource(R.drawable.rip_positive)
+                    vd.btnStart.setText("开始拟合")
+                    vm.qualityEnable.postValue(true)
+                    vm.reagentNoEnable.postValue(true)
+                }
             }
         }
         vd.btnStart.setOnClickListener {
@@ -218,8 +233,11 @@ class MatchingArgsFragment :
     }
 
     private fun startMatching() {
-        if (matchingTestState != MatchingArgState.None && matchingTestState != MatchingArgState.Finish) {
-            toast("正在拟合")
+        if (testState.isNotPrepare()) {
+            toast("请重新自检")
+            return
+        } else if (testState.isRunning()) {
+            toast("正在检测")
             return
         }
 
@@ -234,14 +252,14 @@ class MatchingArgsFragment :
         coverProjectDialog.show(adapter.items, onConfirm = { projectModel, baseDialog ->
             if (projectModel == null) {
                 toast("未选择覆盖的标曲，取消拟合！")
-                matchingTestState == MatchingArgState.None
+                testState = TestState.Normal
             } else {
                 vm.clickStart(projectModel)
             }
             baseDialog.dismiss()
         }, onCancel = {
             toast("未选择覆盖的标曲，取消拟合！")
-            matchingTestState == MatchingArgState.None
+            testState = TestState.Normal
             it.dismiss()
         })
     }
@@ -273,9 +291,7 @@ class MatchingArgsFragment :
         vm.fitGoodnessText.postValue("R²=${project.fitGoodness.scale(6)}")
 
 
-        if (vd.lcCurve.data != null &&
-            vd.lcCurve.data.dataSetCount > 0
-        ) {
+        if (vd.lcCurve.data != null && vd.lcCurve.data.dataSetCount > 0) {
             val set1 = vd.lcCurve.data.getDataSetByIndex(0) as LineDataSet
             set1.values = values
             vd.lcCurve.data.notifyDataChanged()
@@ -291,17 +307,17 @@ class MatchingArgsFragment :
          */
         vm.getStateNotExistMsg.observe(this) { msg ->
             if (msg.isNotEmpty()) {
-                dialog.show(
-                    msg = "${vm.getStateNotExistMsg.value}",
-                    confirmMsg = "我已添加", onConfirm = {
+                dialog.show(msg = "${vm.getStateNotExistMsg.value}",
+                    confirmMsg = "我已添加",
+                    onConfirm = {
                         it.dismiss()
                         vm.dialogGetStateNotExistConfirm()
                     },
-                    cancelMsg = "结束检测", onCancel = {
+                    cancelMsg = "结束检测",
+                    onCancel = {
                         it.dismiss()
                         vm.dialogGetStateNotExistCancel()
-                    }
-                )
+                    })
             }
         }
         vm.matchingFinishMsg.observe(this) {

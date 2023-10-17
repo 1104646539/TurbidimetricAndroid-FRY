@@ -7,9 +7,8 @@ import androidx.lifecycle.viewModelScope
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.SystemGlobal
-import com.wl.turbidimetric.global.SystemGlobal.matchingTestState
-import com.wl.turbidimetric.global.SystemGlobal.repeatabilityState
 import com.wl.turbidimetric.global.SystemGlobal.testState
+import com.wl.turbidimetric.global.SystemGlobal.testType
 import com.wl.turbidimetric.home.ProjectRepository
 import com.wl.turbidimetric.home.TestResultRepository
 import com.wl.turbidimetric.model.*
@@ -286,7 +285,7 @@ class RepeatabilityViewModel(
      */
     override fun readDataStateFailed(cmd: UByte, state: UByte) {
         if (!runningRepeatability()) return
-        SystemGlobal.machineArgState = MachineState.RunningError
+        testState = TestState.RunningError
         i("报错了，cmd=$cmd state=$state")
         testMsg.postValue("报错了，cmd=$cmd state=$state")
     }
@@ -304,20 +303,13 @@ class RepeatabilityViewModel(
             toastMsg.postValue("请重新自检或重启仪器！")
             return
         }
-        if (testState != TestState.None) {
+        if (testState != TestState.Normal) {
             toastMsg.postValue("正在检测，请勿操作！")
             return
         }
-        if (matchingTestState != MatchingArgState.None) {
-            toast("正在拟合质控，请勿操作！")
-            return
-        }
-        if (repeatabilityState != RepeatabilityState.None && repeatabilityState != RepeatabilityState.Finish) {
-            toastMsg.postValue("正在质控，请勿操作！")
-            return
-        }
         initState()
-        repeatabilityState = RepeatabilityState.GetState;
+        testState = TestState.GetState;
+        testType = TestType.Repeatability
         getState()
     }
 
@@ -366,7 +358,7 @@ class RepeatabilityViewModel(
         resultOriginalTest2.clear()
         resultOriginalTest3.clear()
         resultOriginalTest4.clear()
-        repeatabilityState = RepeatabilityState.None
+        testState = TestState.None
         sampleStep = 0
         testMsg.postValue("")
         samplePos = -1;
@@ -432,7 +424,7 @@ class RepeatabilityViewModel(
             getStateNotExistMsg.postValue("清洗液不足，请添加")
             return
         }
-        repeatabilityState = RepeatabilityState.MoveSample
+        testState = TestState.MoveSample
         //开始检测
         moveSampleShelf(sampleShelfPos)
         moveCuvetteShelf(cuvetteShelfPos)
@@ -482,7 +474,7 @@ class RepeatabilityViewModel(
      * @param reply ReplyModel<MoveCuvetteShelfModel>
      */
     override fun readDataMoveCuvetteShelfModel(reply: ReplyModel<MoveCuvetteShelfModel>) {
-        if (repeatabilityState == RepeatabilityState.Finish) {
+        if (testState == TestState.TestFinish) {
             cuvetteShelfMoveFinish = true
             if (isMatchingFinish()) {
                 showMatchingDialog()
@@ -493,16 +485,16 @@ class RepeatabilityViewModel(
         if (!machineStateNormal()) return
         i("接收到 移动比色皿架 reply=$reply")
         cuvettePos = 0
-        when (repeatabilityState) {
-            RepeatabilityState.MoveSample -> {
+        when (testState) {
+            TestState.MoveSample -> {
                 moveCuvetteDripSample()
             }
-            RepeatabilityState.Test1 -> {
+            TestState.Test1 -> {
 
             }
-            RepeatabilityState.Test2,
-            RepeatabilityState.Test3,
-            RepeatabilityState.Test4 -> {
+            TestState.Test2,
+            TestState.Test3,
+            TestState.Test4 -> {
                 moveCuvetteTest()
             }
             else -> {}
@@ -540,7 +532,7 @@ class RepeatabilityViewModel(
     }
 
     private fun isMatchingFinish(): Boolean {
-        return repeatabilityState == RepeatabilityState.Finish && cuvetteShelfMoveFinish && sampleShelfMoveFinish
+        return testState == TestState.TestFinish && cuvetteShelfMoveFinish && sampleShelfMoveFinish
     }
 
 
@@ -551,11 +543,11 @@ class RepeatabilityViewModel(
     override fun readDataMoveSampleModel(reply: ReplyModel<MoveSampleModel>) {
         if (!runningRepeatability()) return
         if (!machineStateNormal()) return
-        i("接收到 移动样本 reply=$reply samplePos=$samplePos repeatabilityState=$repeatabilityState sampleStep=$sampleStep")
+        i("接收到 移动样本 reply=$reply samplePos=$samplePos testState=$testState sampleStep=$sampleStep")
         sampleMoveFinish = true
 
-        when (repeatabilityState) {
-            RepeatabilityState.MoveSample -> {//去取需要移动的已混匀的样本
+        when (testState) {
+            TestState.MoveSample -> {//去取需要移动的已混匀的样本
                 sampleStep++
                 sampling(moveSampleVolume)
             }
@@ -639,7 +631,7 @@ class RepeatabilityViewModel(
 
         if (cuvettePos == 12) {
             //最后一个也检测结束了
-            repeatabilityState = RepeatabilityState.Test2
+            testState = TestState.Test2
             cuvettePos = -1
             viewModelScope.launch {
                 delay(testShelfInterval)
@@ -659,8 +651,8 @@ class RepeatabilityViewModel(
      * @param reply ReplyModel<MoveSampleShelfModel>
      */
     override fun readDataMoveSampleShelfModel(reply: ReplyModel<MoveSampleShelfModel>) {
-        i("接收到 移动样本架 reply=$reply repeatabilityState=$repeatabilityState")
-        if (repeatabilityState == RepeatabilityState.Finish) {
+        i("接收到 移动样本架 reply=$reply testState=$testState")
+        if (testState == TestState.TestFinish) {
             sampleShelfMoveFinish = true
             if (isMatchingFinish()) {
                 showMatchingDialog()
@@ -670,7 +662,7 @@ class RepeatabilityViewModel(
         if (!runningRepeatability()) return
         if (!machineStateNormal()) return
         sampleShelfMoveFinish = true
-        if (repeatabilityState != RepeatabilityState.Finish) {
+        if (testState != TestState.TestFinish) {
             //一开始就要移动到第二个位置去取第一个位置的稀释液
             moveSample(2)
         }
@@ -684,28 +676,28 @@ class RepeatabilityViewModel(
     override fun readDataTestModel(reply: ReplyModel<TestModel>) {
         if (!runningRepeatability()) return
         if (!machineStateNormal()) return
-        i("接收到 检测 reply=$reply cuvettePos=$cuvettePos repeatabilityState=$repeatabilityState 检测值=${reply.data.value}")
+        i("接收到 检测 reply=$reply cuvettePos=$cuvettePos testState=$testState 检测值=${reply.data.value}")
 
         calcTestResult(reply.data.value)
     }
 
     private fun calcTestResult(value: Int) {
-        when (repeatabilityState) {
-            RepeatabilityState.DripReagent -> {
+        when (testState) {
+            TestState.DripReagent -> {
                 updateCuvetteState(cuvettePos - 3, CuvetteState.Test1)
                 resultTest1.add(calcAbsorbance(value.toBigDecimal()))
                 resultOriginalTest1.add(value)
                 updateResult()
                 dripReagentAndStirAndTestFinish()
             }
-            RepeatabilityState.Test2 -> {
+            TestState.Test2 -> {
                 updateCuvetteState(cuvettePos, CuvetteState.Test2)
                 resultTest2.add(calcAbsorbance(value.toBigDecimal()))
                 resultOriginalTest2.add(value)
                 updateResult()
                 //检测结束,开始检测第三次
                 if (cuvettePos == 9) {
-                    repeatabilityState = RepeatabilityState.Test3
+                    testState = TestState.Test3
 
                     viewModelScope.launch {
                         delay(testShelfInterval)
@@ -719,14 +711,14 @@ class RepeatabilityViewModel(
                 }
 
             }
-            RepeatabilityState.Test3 -> {
+            TestState.Test3 -> {
                 updateCuvetteState(cuvettePos, CuvetteState.Test3)
                 resultTest3.add(calcAbsorbance(value.toBigDecimal()))
                 resultOriginalTest3.add(value)
                 updateResult()
                 //检测结束,开始检测第四次
                 if (cuvettePos == 9) {
-                    repeatabilityState = RepeatabilityState.Test4
+                    testState = TestState.Test4
                     viewModelScope.launch {
                         delay(testShelfInterval)
                         moveCuvetteTest(-cuvettePos)
@@ -739,7 +731,7 @@ class RepeatabilityViewModel(
                 }
 
             }
-            RepeatabilityState.Test4 -> {
+            TestState.Test4 -> {
                 updateCuvetteState(cuvettePos, CuvetteState.Test4)
                 resultTest4.add(calcAbsorbance(value.toBigDecimal()))
                 resultOriginalTest4.add(value)
@@ -765,7 +757,7 @@ class RepeatabilityViewModel(
      * 拟合结束，复位
      */
     private fun matchingFinish() {
-        repeatabilityState = RepeatabilityState.Finish
+        testState = TestState.TestFinish
         moveCuvetteShelf(-1)
         moveSampleShelf(-1)
         samplingProbeCleaning()
@@ -915,17 +907,17 @@ class RepeatabilityViewModel(
     override fun readDataDripSampleModel(reply: ReplyModel<DripSampleModel>) {
         if (!runningRepeatability()) return
         if (!machineStateNormal()) return
-        i("接收到 加样 reply=$reply cuvettePos=$cuvettePos repeatabilityState=$repeatabilityState sampleStep=$sampleStep samplePos=$samplePos")
+        i("接收到 加样 reply=$reply cuvettePos=$cuvettePos testState=$testState sampleStep=$sampleStep samplePos=$samplePos")
 
         dripSamplingFinish = true
 
-        when (repeatabilityState) {
-            RepeatabilityState.MoveSample -> {//加完样判断是否结束
+        when (testState) {
+            TestState.MoveSample -> {//加完样判断是否结束
                 updateCuvetteState(cuvettePos - 1, CuvetteState.DripSample)
 //                samplingProbeCleaning()
                 if ((sampleStep == 10)) {
                     //开始加试剂的步骤
-                    repeatabilityState = RepeatabilityState.DripReagent
+                    testState = TestState.DripReagent
                     sampleStep = 0
                     cuvettePos = -1
 //                moveSample(-samplePos + 1)
@@ -952,12 +944,12 @@ class RepeatabilityViewModel(
     override fun readDataSamplingModel(reply: ReplyModel<SamplingModel>) {
         if (!runningRepeatability()) return
         if (!machineStateNormal()) return
-        i("接收到 取样 reply=$reply repeatabilityState=$repeatabilityState sampleStep=$sampleStep samplePos=$samplePos")
+        i("接收到 取样 reply=$reply testState=$testState sampleStep=$sampleStep samplePos=$samplePos")
 
         samplingFinish = true
 
-        when (repeatabilityState) {
-            RepeatabilityState.MoveSample -> {//去加已混匀的样本
+        when (testState) {
+            TestState.MoveSample -> {//去加已混匀的样本
                 goDripSample()
             }
             else -> {}
@@ -1000,12 +992,12 @@ class RepeatabilityViewModel(
     override fun readDataMoveCuvetteTestModel(reply: ReplyModel<MoveCuvetteTestModel>) {
         if (!runningRepeatability()) return
         if (!machineStateNormal()) return
-        i("接收到 移动比色皿到检测位 reply=$reply cuvetteStates=$cuvetteStates repeatabilityState=$repeatabilityState")
+        i("接收到 移动比色皿到检测位 reply=$reply cuvetteStates=$cuvetteStates testState=$testState")
 
-        when (repeatabilityState) {
-            RepeatabilityState.Test2,
-            RepeatabilityState.Test3,
-            RepeatabilityState.Test4 -> {
+        when (testState) {
+            TestState.Test2,
+            TestState.Test3,
+            TestState.Test4 -> {
                 test()
             }
             else -> {}
@@ -1036,10 +1028,10 @@ class RepeatabilityViewModel(
         if (!runningRepeatability()) return
         if (!machineStateNormal()) return
         i("接收到 取样针清洗 reply=$reply samplePos=$samplePos sampleStep=$sampleStep")
-        if (repeatabilityState == RepeatabilityState.MoveSample) {//加已混匀的样本的清洗
+        if (testState == TestState.MoveSample) {//加已混匀的样本的清洗
             if ((sampleStep == 9)) {
                 //开始加试剂的步骤
-                repeatabilityState = RepeatabilityState.DripReagent
+                testState = TestState.DripReagent
                 sampleStep = 0
                 cuvettePos = -1
 //                moveSample(-samplePos + 1)
@@ -1102,7 +1094,7 @@ class RepeatabilityViewModel(
 //        sampleDoorLocked = reply.data.isOpen
 //        sampleDoorLockedLD.postValue(reply.data.isOpen)
 //        //拟合完成后的开门，不成功代表有故障
-//        if (repeatabilityState == RepeatabilityState.Finish) {
+//        if (testState == TestState.TestFinish) {
 //            if (cuvetteDoorLocked && sampleDoorLocked) {
 //                showMatchingDialog()
 //            } else if (!sampleDoorLocked) {
@@ -1113,7 +1105,7 @@ class RepeatabilityViewModel(
 //        if (!runningRepeatability()) return
 //        if (!machineStateNormal()) return
         //开始检测前的检测状态，必须开门
-//        if (repeatabilityState == RepeatabilityState.None) {
+//        if (testState == TestState.None) {
 //
 //        }
 
@@ -1127,7 +1119,7 @@ class RepeatabilityViewModel(
 //        i("接收到 比色皿门状态 reply=$reply")
 //        cuvetteDoorLocked = reply.data.isOpen
 //        cuvetteDoorLockedLD.postValue(reply.data.isOpen)
-//        if (repeatabilityState == RepeatabilityState.Finish && cuvetteDoorLocked && sampleDoorLocked) {
+//        if (testState == TestState.TestFinish && cuvetteDoorLocked && sampleDoorLocked) {
 //            showMatchingDialog()
 //        }
 //        if (!runningRepeatability()) return
@@ -1139,7 +1131,7 @@ class RepeatabilityViewModel(
      */
     fun showMatchingDialog() {
         matchingFinishMsg.postValue("重复性检测结束")
-        repeatabilityState = RepeatabilityState.None
+        testState = TestState.Normal
     }
 
     /**
@@ -1206,7 +1198,7 @@ class RepeatabilityViewModel(
      * 移动比色皿到 检测位
      */
     private fun moveCuvetteTest(step: Int = 1) {
-        i("发送 移动比色皿到 检测位 repeatabilityState=$repeatabilityState step=$step")
+        i("发送 移动比色皿到 检测位 testState=$testState step=$step")
         cuvettePos += step
         SerialPortUtil.moveCuvetteTest(step > 0, step.absoluteValue)
     }
@@ -1226,6 +1218,7 @@ class RepeatabilityViewModel(
     private fun takeReagent() {
         i("发送 取试剂")
         takeReagentFinish = false
+        dripReagentFinish = false
         SerialPortUtil.takeReagent()
     }
 
@@ -1311,7 +1304,7 @@ class RepeatabilityViewModel(
      * 是否正在测试重复性
      */
     fun runningRepeatability(): Boolean {
-        return repeatabilityState != RepeatabilityState.None && repeatabilityState != RepeatabilityState.Finish
+        return testState != TestState.None && testState != TestState.TestFinish
     }
 }
 

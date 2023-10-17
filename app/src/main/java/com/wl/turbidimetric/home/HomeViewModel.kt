@@ -9,10 +9,8 @@ import com.wl.turbidimetric.global.EventGlobal
 import com.wl.turbidimetric.global.EventMsg
 import com.wl.turbidimetric.global.SerialGlobal
 import com.wl.turbidimetric.global.SystemGlobal
-import com.wl.turbidimetric.global.SystemGlobal.machineArgState
-import com.wl.turbidimetric.global.SystemGlobal.matchingTestState
-import com.wl.turbidimetric.global.SystemGlobal.repeatabilityState
 import com.wl.turbidimetric.global.SystemGlobal.testState
+import com.wl.turbidimetric.global.SystemGlobal.testType
 import com.wl.turbidimetric.model.*
 import com.wl.turbidimetric.util.Callback2
 import com.wl.turbidimetric.util.OnScanResult
@@ -462,31 +460,10 @@ class HomeViewModel(
      * 测试用的 end
      */
     fun clickStart() {
-//        if (DoorAllOpen()) {
-//            toast("舱门未关")
-//            return
-//        }
-
-        val errorMsg = if (!machineStateNormal()) {
-            "请重新自检或重启仪器！"
-//            toastMsg.postValue("请重新自检或重启仪器！")
-//            return
-        } else if (testState != TestState.None) {
+        val errorMsg = if (testState.isRunning()) {
             "正在检测，请勿操作！"
-//            toastMsg.postValue("正在检测，请勿操作！")
-//            return
-        } else if (matchingTestState != MatchingArgState.None) {
-            "正在拟合质控，请勿操作！"
-//            toastMsg.postValue("正在拟合质控，请勿操作！")
-//            return
-        } else if (repeatabilityState != RepeatabilityState.None) {
-            "正在进行重复性检测，请勿操作！"
-//            toastMsg.postValue("正在进行重复性检测，请勿操作！")
-//            return
         } else if (selectProject == null) {
             "未选择检测标曲"
-//            toastMsg.postValue("未选择检测标曲")
-//            return
         } else {
             ""
         }
@@ -496,6 +473,12 @@ class HomeViewModel(
             }
             return
         }
+        //需要重新自检
+        if (testState.isNotPrepare()) {
+            goGetMachineState()
+            return
+        }
+        testType = TestType.Test
         clickStart = true
         initState()
         getState()
@@ -713,7 +696,7 @@ class HomeViewModel(
             )
             return
         }
-        machineArgState = MachineState.RunningError
+        testState = TestState.RunningError
         i("报错了，cmd=$cmd state=$state")
 
         testMsg.postValue("报错了，cmd=$cmd state=$state")
@@ -1784,11 +1767,11 @@ class HomeViewModel(
         viewModelScope.launch {
             _dialogUiState.emit(HomeDialogUiState(dialogState = DialogState.TEST_FINISH, ""))
         }
-        testState = TestState.None
+        testState = TestState.Normal
     }
 
     private fun isTestFinish(): Boolean {
-        return testState == TestState.TestFinish && sampleShelfMoveFinish && cuvetteShelfMoveFinish
+        return testState == TestState.TestFinish && testType == TestType.Test && sampleShelfMoveFinish && cuvetteShelfMoveFinish
     }
 
 
@@ -1902,11 +1885,11 @@ class HomeViewModel(
         testState = TestState.None
         if (errorInfo.isNullOrEmpty()) {
             i("自检完成")
-            machineArgState = MachineState.Normal
+            testState = TestState.Normal
             //自检成功后获取一下r1,r2，清洗液状态
             getState()
         } else {
-            machineArgState = MachineState.NotGetMachineState
+            testState = TestState.NotGetMachineState
             val sb = StringBuffer()
             for (error in errorInfo) {
                 sb.append(error.errorMsg)
@@ -1916,7 +1899,12 @@ class HomeViewModel(
             i("自检失败，错误信息=${sb}")
 //            getMachineFailedMsg.postValue(sb.toString())
             viewModelScope.launch {
-                _dialogUiState.emit(HomeDialogUiState(DialogState.GET_MACHINE_FAILED_SHOW, ""))
+                _dialogUiState.emit(
+                    HomeDialogUiState(
+                        DialogState.GET_MACHINE_FAILED_SHOW,
+                        sb.toString()
+                    )
+                )
             }
         }
     }
@@ -1938,7 +1926,7 @@ class HomeViewModel(
         r2Reagent = reply.data.r2Reagent
         r2Volume = reply.data.r2Volume
         cleanoutFluid = reply.data.cleanoutFluid
-        i("接收到 获取状态 reply=$reply continueTestCuvetteState=$continueTestCuvetteState continueTestSampleState=$continueTestSampleState clickStart=$clickStart r1Reagent=$r1Reagent r2Reagent=$r2Reagent cleanoutFluid=$cleanoutFluid continueTestGetState=$continueTestGetState")
+        i("接收到 获取状态 testState=$testState reply=$reply continueTestCuvetteState=$continueTestCuvetteState continueTestSampleState=$continueTestSampleState clickStart=$clickStart r1Reagent=$r1Reagent r2Reagent=$r2Reagent cleanoutFluid=$cleanoutFluid continueTestGetState=$continueTestGetState")
         if (!runningTest()) return
         if (!machineStateNormal()) return
 //        i("接收到 获取状态 reply=$reply continueTestCuvetteState=$continueTestCuvetteState continueTestSampleState=$continueTestSampleState clickStart=$clickStart r1Reagent=$r1Reagent r2Reagent=$r2Reagent cleanoutFluid=$cleanoutFluid continueTestGetState=$continueTestGetState")
@@ -2374,6 +2362,7 @@ class HomeViewModel(
     private fun takeReagent() {
         i("发送 取试剂")
         takeReagentFinish = false
+        dripReagentFinish = false
         SerialPortUtil.takeReagent()
     }
 
@@ -2435,7 +2424,7 @@ class HomeViewModel(
      * 是否正在检测
      */
     private fun runningTest(): Boolean {
-        return testState != TestState.None && matchingTestState == MatchingArgState.None
+        return testState.isRunning() && testType == TestType.Test
     }
 
     fun clickTest1(view: View) {

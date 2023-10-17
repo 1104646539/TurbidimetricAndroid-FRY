@@ -22,7 +22,6 @@ import com.wl.turbidimetric.databinding.ActivityMainBinding
 import com.wl.turbidimetric.global.EventGlobal
 import com.wl.turbidimetric.global.EventMsg
 import com.wl.turbidimetric.global.SystemGlobal
-import com.wl.turbidimetric.model.MatchingArgState
 import com.wl.turbidimetric.model.TestState
 import com.wl.turbidimetric.util.ActivityDataBindingDelegate
 import com.wl.turbidimetric.util.SerialPortUtil
@@ -101,7 +100,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         listener()
 //        lifecycleScope.launch {
 //            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED){
-                initNav()
+        initNav()
 //            }
 //        }
 
@@ -139,10 +138,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
      * 关机提示
      */
     private fun showShutdownDialog() {
-        if ((TestState.None == SystemGlobal.testState || TestState.None == SystemGlobal.testState)
-            && (MatchingArgState.None == SystemGlobal.matchingTestState || MatchingArgState.Finish == SystemGlobal.matchingTestState)
-        ) {
-
+        if (!SystemGlobal.testState.isRunning()) {
             shutdownDialog.show("确定要关机吗？请确定仪器检测结束。", "关机", { shutdown() }, "取消", { it.dismiss() })
             return
         } else {

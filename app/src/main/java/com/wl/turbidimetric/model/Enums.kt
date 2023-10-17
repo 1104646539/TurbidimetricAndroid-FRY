@@ -33,62 +33,64 @@ enum class SampleState {
     ScanFailed,//扫码失败
     Pierced,//刺破完成
     Sampling,//取样完成
+
 }
 
 /**
  * 检测状态
+ * @property state Int
+ * @constructor
  */
-enum class TestState {
-    None,//等待开始
-    GetMachineState,//自检中
-    DripSample,//取样加样中
-    DripReagent,//取试剂加试剂中
-    Test1,//检测过第一次
-    Test2,//检测过第二次
-    Test3,//检测过第三次
-    Test4,//检测过第四次
-    TestFinish //正在执行结束流程
+enum class TestState(val state: Int) {
+    None(0),//等待开始自检
+    GetMachineState(10),//自检中
+    NotGetMachineState(11),//自检失败后未重新自检
+    RunningError(50),//在运行时出现错误
+    Normal(100),//正常的，自检成功后，等待开始
+    GetState(101),//获取状态中
+    DripDiluentVolume(102),//加稀释液中
+    DripStandardVolume(103),//加标准品中
+    MoveSample(104),//移动已混匀的
+    DripSample(105),//取样加样中
+    DripReagent(106),//取试剂加试剂中
+    Test1(107),//检测过第一次
+    Test2(108),//检测过第二次
+    Test3(109),//检测过第三次
+    Test4(110),//检测过第四次
+    TestFinish(111); //正在执行结束流程
+
+    /**
+     * 是否正在运行
+     * @return Boolean
+     */
+    fun isRunning(): Boolean {
+        return this.state > Normal.state
+    }
+
+    /**
+     * 是否未准备好
+     * @return Boolean
+     */
+    fun isNotPrepare(): Boolean {
+        return this.state < Normal.state
+    }
+
+    /**
+     * 是否在运行中报错
+     * @return Boolean
+     */
+    fun isRunningError(): Boolean {
+        return this.state == RunningError.state
+    }
 }
 
 /**
- * 拟合参数流程的状态
+ * 检测类型
  */
-enum class MatchingArgState {
-    None,//等待开始
-    GetState,//获取状态中
-    DripDiluentVolume,//加稀释液中
-    DripStandardVolume,//加标准品中
-    MoveSample,//移动已混匀的
-    DripReagent,//加试剂中
-    Test1,//检测第一次
-    Test2,//检测第二次
-    Test3,//检测第三次
-    Test4,//检测第四次
-    Finish//拟合结束
-}
-
-/**
- * 重复性测试流程的状态
- */
-enum class RepeatabilityState {
-    None,//等待开始
-    GetState,//获取状态中
-    MoveSample,//移动已混匀的
-    DripReagent,//加试剂中
-    Test1,//检测第一次
-    Test2,//检测第二次
-    Test3,//检测第三次
-    Test4,//检测第四次
-    Finish//拟合结束
-}
-
-/**
- * 仪器当前状态
- */
-enum class MachineState {
-    None,//未知，刚开机
-    Normal,//正常的，自检成功后
-    RunningError,//在运行时出现错误
-    NotGetMachineState,//自检失败后未重新自检
+enum class TestType {
+    None,//无
+    Test,//检测
+    MatchingArgs,//标曲
+    Repeatability,//重复性测试
 }
 

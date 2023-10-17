@@ -7,9 +7,8 @@ import androidx.lifecycle.viewModelScope
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.SystemGlobal
-import com.wl.turbidimetric.global.SystemGlobal.matchingTestState
-import com.wl.turbidimetric.global.SystemGlobal.repeatabilityState
 import com.wl.turbidimetric.global.SystemGlobal.testState
+import com.wl.turbidimetric.global.SystemGlobal.testType
 import com.wl.turbidimetric.home.ProjectRepository
 import com.wl.turbidimetric.model.*
 import com.wl.turbidimetric.print.PrintUtil
@@ -24,6 +23,7 @@ import java.math.BigDecimal
 import java.util.*
 import kotlin.math.absoluteValue
 import com.wl.wllib.LogToFile.i
+
 /**
  * 曲线拟合和质控
  *
@@ -44,10 +44,12 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
      * 序号是否可输入
      */
     val reagentNoEnable = MutableLiveData(true)
+
     /**
      * 是否质控是否可输入
      */
     val qualityEnable = MutableLiveData(true)
+
     /**
      * 四次检测的吸光度值
      */
@@ -336,11 +338,10 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
      */
     override fun readDataStateFailed(cmd: UByte, state: UByte) {
         if (!runningMatching()) return
-        SystemGlobal.machineArgState = MachineState.RunningError
+        testState = TestState.RunningError
         i("报错了，cmd=$cmd state=$state")
         testMsg.postValue("报错了，cmd=$cmd state=$state")
     }
-
 
 
     /**
@@ -355,22 +356,15 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
             toastMsg.postValue("请重新自检或重启仪器！")
             return
         }
-        if (testState != TestState.None) {
+        if (testState != TestState.Normal) {
             toastMsg.postValue("正在检测，请勿操作！")
             return
         }
-        if (repeatabilityState != RepeatabilityState.None) {
-            toast("正在进行重复性检测，请勿操作！")
-            return
-        }
 
-        if (matchingTestState != MatchingArgState.None && matchingTestState != MatchingArgState.Finish) {
-            toastMsg.postValue("正在质控，请勿操作！")
-            return
-        }
         this.coverProjectModel = projectModel
         initState()
-        matchingTestState = MatchingArgState.GetState;
+        testState = TestState.GetState;
+        testType = TestType.MatchingArgs
         getState()
     }
 
@@ -383,7 +377,7 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
         resultOriginalTest2.clear()
         resultOriginalTest3.clear()
         resultOriginalTest4.clear()
-        matchingTestState = MatchingArgState.None
+        testState = TestState.None
         sampleStep = 0
         testMsg.postValue("")
         samplePos = -1;
@@ -455,7 +449,7 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
             getStateNotExistMsg.postValue("清洗液不足，请添加")
             return
         }
-        matchingTestState = MatchingArgState.DripDiluentVolume
+        testState = TestState.DripDiluentVolume
         //开始检测
         moveSampleShelf(sampleShelfPos)
 //        moveCuvetteShelf(cuvetteShelfPos)
@@ -505,7 +499,7 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
      * @param reply ReplyModel<MoveCuvetteShelfModel>
      */
     override fun readDataMoveCuvetteShelfModel(reply: ReplyModel<MoveCuvetteShelfModel>) {
-        if (matchingTestState == MatchingArgState.Finish) {
+        if (testState == TestState.TestFinish) {
             cuvetteShelfMoveFinish = true
             if (isMatchingFinish()) {
                 showMatchingDialog()
@@ -516,16 +510,16 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
         if (!machineStateNormal()) return
         i("接收到 移动比色皿架 reply=$reply")
         cuvettePos = 0
-        when (matchingTestState) {
-            MatchingArgState.MoveSample -> {
+        when (testState) {
+            TestState.MoveSample -> {
                 moveCuvetteDripSample()
             }
-            MatchingArgState.Test1 -> {
+            TestState.Test1 -> {
 
             }
-            MatchingArgState.Test2,
-            MatchingArgState.Test3,
-            MatchingArgState.Test4 -> {
+            TestState.Test2,
+            TestState.Test3,
+            TestState.Test4 -> {
                 moveCuvetteTest()
             }
             else -> {}
@@ -563,7 +557,7 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
     }
 
     private fun isMatchingFinish(): Boolean {
-        return matchingTestState == MatchingArgState.Finish && cuvetteShelfMoveFinish && sampleShelfMoveFinish
+        return testState == TestState.TestFinish && cuvetteShelfMoveFinish && sampleShelfMoveFinish
     }
 
 
@@ -574,27 +568,27 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
     override fun readDataMoveSampleModel(reply: ReplyModel<MoveSampleModel>) {
         if (!runningMatching()) return
         if (!machineStateNormal()) return
-        i("接收到 移动样本 reply=$reply samplePos=$samplePos matchingTestState=$matchingTestState sampleStep=$sampleStep")
+        i("接收到 移动样本 reply=$reply samplePos=$samplePos testState=$testState sampleStep=$sampleStep")
         sampleMoveFinish = true
 
-        when (matchingTestState) {
-            MatchingArgState.DripDiluentVolume,
-            MatchingArgState.DripStandardVolume
+        when (testState) {
+            TestState.DripDiluentVolume,
+            TestState.DripStandardVolume
             -> {//去取稀释液、标准品
                 if (samplePos == 1 || samplePos == 2) {
                     sampleStep++
-                    val volume = getSamplingVolume(matchingTestState, sampleStep - 1)
+                    val volume = getSamplingVolume(testState, sampleStep - 1)
                     sampling(volume)
                 } else {
-                    val volume = getSamplingVolume(matchingTestState, sampleStep - 1)
+                    val volume = getSamplingVolume(testState, sampleStep - 1)
                     dripSample(
-                        matchingTestState == MatchingArgState.DripStandardVolume,
+                        testState == TestState.DripStandardVolume,
                         inplace = true,
                         volume
                     )
                 }
             }
-            MatchingArgState.MoveSample -> {//去取需要移动的已混匀的样本
+            TestState.MoveSample -> {//去取需要移动的已混匀的样本
                 sampleStep++
                 sampling(LocalData.SamplingVolume)
             }
@@ -607,12 +601,12 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
 
     /**
      * 获取当前位置取样加样的量
-     * @param matchingTestState
+     * @param testState
      * @param step
      * @return Int
      */
-    private fun getSamplingVolume(matchingTestState: MatchingArgState, step: Int): Int {
-        return if (matchingTestState == MatchingArgState.DripDiluentVolume) {
+    private fun getSamplingVolume(testState: TestState, step: Int): Int {
+        return if (testState == TestState.DripDiluentVolume) {
             dripDiluentVolumes[step]
         } else {
             dripStandardVolumes[step]
@@ -649,7 +643,7 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
     override fun readDataMoveCuvetteDripReagentModel(reply: ReplyModel<MoveCuvetteDripReagentModel>) {
         if (!runningMatching()) return
         if (!machineStateNormal()) return
-        i("接收到 移动比色皿到加试剂位 reply=$reply cuvetteStates=$cuvetteStates")
+        i("接收到 移动比色皿到加试剂位 reply=$reply cuvettePos=$cuvettePos stirFinish=$stirFinish takeReagentFinish=$takeReagentFinish cuvetteStates=$cuvetteStates")
 
         cuvetteMoveFinish = true
 
@@ -678,6 +672,7 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
      * 如果未结束，则继续移动比色皿，检测
      */
     private fun dripReagentAndStirAndTestFinish() {
+        i("dripReagentAndStirAndTestFinish cuvettePos=$cuvettePos dripReagentFinish=$dripReagentFinish takeReagentFinish=$takeReagentFinish")
         if ((cuvetteNeedDripReagent(cuvettePos) && !dripReagentFinish)) {
             return
         }
@@ -690,7 +685,7 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
 
         if ((cuvettePos == 9 && quality) || (cuvettePos == 7 && !quality)) {
             //最后一个也检测结束了
-            matchingTestState = MatchingArgState.Test2
+            testState = TestState.Test2
             cuvettePos = -1
             viewModelScope.launch {
                 delay(testShelfInterval)
@@ -710,8 +705,8 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
      * @param reply ReplyModel<MoveSampleShelfModel>
      */
     override fun readDataMoveSampleShelfModel(reply: ReplyModel<MoveSampleShelfModel>) {
-        i("接收到 移动样本架 reply=$reply matchingTestState=$matchingTestState")
-        if (matchingTestState == MatchingArgState.Finish) {
+        i("接收到 移动样本架 reply=$reply testState=$testState")
+        if (testState == TestState.TestFinish) {
             sampleShelfMoveFinish = true
             if (isMatchingFinish()) {
                 showMatchingDialog()
@@ -721,7 +716,7 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
         if (!runningMatching()) return
         if (!machineStateNormal()) return
         sampleShelfMoveFinish = true
-        if (matchingTestState != MatchingArgState.Finish) {
+        if (testState != TestState.TestFinish) {
             //一开始就要移动到第二个位置去取第一个位置的稀释液
             moveSample(2)
         }
@@ -735,28 +730,28 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
     override fun readDataTestModel(reply: ReplyModel<TestModel>) {
         if (!runningMatching()) return
         if (!machineStateNormal()) return
-        i("接收到 检测 reply=$reply cuvettePos=$cuvettePos matchingTestState=$matchingTestState 检测值=${reply.data.value}")
+        i("接收到 检测 reply=$reply cuvettePos=$cuvettePos testState=$testState 检测值=${reply.data.value}")
 
         calcTestResult(reply.data.value)
     }
 
     private fun calcTestResult(value: Int) {
-        when (matchingTestState) {
-            MatchingArgState.DripReagent -> {
+        when (testState) {
+            TestState.DripReagent -> {
                 updateCuvetteState(cuvettePos - 3, CuvetteState.Test1)
                 resultTest1.add(calcAbsorbance(value.toBigDecimal()))
                 resultOriginalTest1.add(value)
                 updateResult()
                 dripReagentAndStirAndTestFinish()
             }
-            MatchingArgState.Test2 -> {
+            TestState.Test2 -> {
                 updateCuvetteState(cuvettePos, CuvetteState.Test2)
                 resultTest2.add(calcAbsorbance(value.toBigDecimal()))
                 resultOriginalTest2.add(value)
                 updateResult()
                 //检测结束,开始检测第三次
                 if ((cuvettePos == 4 && !quality) || (cuvettePos == 6 && quality)) {
-                    matchingTestState = MatchingArgState.Test3
+                    testState = TestState.Test3
 
                     viewModelScope.launch {
                         delay(testShelfInterval)
@@ -770,14 +765,14 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
                 }
 
             }
-            MatchingArgState.Test3 -> {
+            TestState.Test3 -> {
                 updateCuvetteState(cuvettePos, CuvetteState.Test3)
                 resultTest3.add(calcAbsorbance(value.toBigDecimal()))
                 resultOriginalTest3.add(value)
                 updateResult()
                 //检测结束,开始检测第四次
                 if ((cuvettePos == 4 && !quality) || (cuvettePos == 6 && quality)) {
-                    matchingTestState = MatchingArgState.Test4
+                    testState = TestState.Test4
                     viewModelScope.launch {
                         delay(testShelfInterval)
                         moveCuvetteTest(-cuvettePos)
@@ -790,7 +785,7 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
                 }
 
             }
-            MatchingArgState.Test4 -> {
+            TestState.Test4 -> {
                 updateCuvetteState(cuvettePos, CuvetteState.Test4)
                 resultTest4.add(calcAbsorbance(value.toBigDecimal()))
                 resultOriginalTest4.add(value)
@@ -816,7 +811,7 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
      * 拟合结束，复位
      */
     private fun matchingFinish() {
-        matchingTestState = MatchingArgState.Finish
+        testState = TestState.TestFinish
         moveCuvetteShelf(-1)
         moveSampleShelf(-1)
     }
@@ -934,7 +929,7 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
     /**
      * 打印上次的
      */
-    fun print(){
+    fun print() {
         curProject?.let {
             PrintUtil.printMatchingQuality(
                 absorbancys,
@@ -981,13 +976,13 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
     override fun readDataDripSampleModel(reply: ReplyModel<DripSampleModel>) {
         if (!runningMatching()) return
         if (!machineStateNormal()) return
-        i("接收到 加样 reply=$reply cuvettePos=$cuvettePos matchingTestState=$matchingTestState sampleStep=$sampleStep samplePos=$samplePos")
+        i("接收到 加样 reply=$reply cuvettePos=$cuvettePos testState=$testState sampleStep=$sampleStep samplePos=$samplePos")
 
         dripSamplingFinish = true
         samplingFinish = false
 
-        when (matchingTestState) {
-            MatchingArgState.DripDiluentVolume -> {//加稀释液
+        when (testState) {
+            TestState.DripDiluentVolume -> {//加稀释液
                 if (sampleStep == 3) {
                     //已经加完三个了，清洗取样针，然后进行下一个步骤，取标准品
                     samplingProbeCleaning()
@@ -995,10 +990,10 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
                     moveSample(-samplePos + 1)
                 }
             }
-            MatchingArgState.DripStandardVolume -> {//加标准品
+            TestState.DripStandardVolume -> {//加标准品
                 samplingProbeCleaning()
             }
-            MatchingArgState.MoveSample -> {//加已混匀的样本
+            TestState.MoveSample -> {//加已混匀的样本
                 updateCuvetteState(cuvettePos - 1, CuvetteState.DripSample)
                 samplingProbeCleaning()
             }
@@ -1015,18 +1010,18 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
     override fun readDataSamplingModel(reply: ReplyModel<SamplingModel>) {
         if (!runningMatching()) return
         if (!machineStateNormal()) return
-        i("接收到 取样 reply=$reply matchingTestState=$matchingTestState sampleStep=$sampleStep samplePos=$samplePos")
+        i("接收到 取样 reply=$reply testState=$testState sampleStep=$sampleStep samplePos=$samplePos")
 
         samplingFinish = true
 
-        when (matchingTestState) {
-            MatchingArgState.DripDiluentVolume -> {//去加稀释液
+        when (testState) {
+            TestState.DripDiluentVolume -> {//去加稀释液
                 moveSample(sampleStep + 1)
             }
-            MatchingArgState.DripStandardVolume -> {//去加标准品
+            TestState.DripStandardVolume -> {//去加标准品
                 moveSample(sampleStep)
             }
-            MatchingArgState.MoveSample -> {//去加已混匀的样本
+            TestState.MoveSample -> {//去加已混匀的样本
                 goDripSample()
             }
             else -> {}
@@ -1068,12 +1063,12 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
     override fun readDataMoveCuvetteTestModel(reply: ReplyModel<MoveCuvetteTestModel>) {
         if (!runningMatching()) return
         if (!machineStateNormal()) return
-        i("接收到 移动比色皿到检测位 reply=$reply cuvetteStates=$cuvetteStates matchingTestState=$matchingTestState")
+        i("接收到 移动比色皿到检测位 reply=$reply cuvetteStates=$cuvetteStates testState=$testState")
 
-        when (matchingTestState) {
-            MatchingArgState.Test2,
-            MatchingArgState.Test3,
-            MatchingArgState.Test4 -> {
+        when (testState) {
+            TestState.Test2,
+            TestState.Test3,
+            TestState.Test4 -> {
                 test()
             }
             else -> {}
@@ -1087,7 +1082,7 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
     override fun readDataTakeReagentModel(reply: ReplyModel<TakeReagentModel>) {
         if (!runningMatching()) return
         if (!machineStateNormal()) return
-        i("接收到 取试剂 reply=$reply")
+        i("接收到 取试剂 reply=$reply cuvettePos=$cuvettePos cuvetteMoveFinish=$cuvetteMoveFinish")
         takeReagentFinish = true
 
         //取完试剂判断是否移动比色皿完成，完成就直接取样
@@ -1104,25 +1099,25 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
         if (!runningMatching()) return
         if (!machineStateNormal()) return
         i("接收到 取样针清洗 reply=$reply samplePos=$samplePos sampleStep=$sampleStep")
-        if (matchingTestState == MatchingArgState.DripDiluentVolume) {//加完稀释液后的清洗
+        if (testState == TestState.DripDiluentVolume) {//加完稀释液后的清洗
             sampleStep = 0
-            matchingTestState = MatchingArgState.DripStandardVolume
+            testState = TestState.DripStandardVolume
             moveSample(-samplePos + 2)//直接到取标准品的位置
-        } else if (matchingTestState == MatchingArgState.DripStandardVolume) {//加标准后的清洗
+        } else if (testState == TestState.DripStandardVolume) {//加标准后的清洗
             if (sampleStep == 3) {
                 //开始移动已混匀样本的步骤
                 //第一步、先复位样本和比色皿
-                matchingTestState = MatchingArgState.MoveSample
+                testState = TestState.MoveSample
                 sampleStep = 0
                 moveSample(-samplePos + 1)
                 moveCuvetteShelf(cuvetteShelfPos)
             } else {//继续加标准品
                 moveSample(-samplePos + 2)
             }
-        } else if (matchingTestState == MatchingArgState.MoveSample) {//加已混匀的样本的清洗
+        } else if (testState == TestState.MoveSample) {//加已混匀的样本的清洗
             if ((sampleStep == 5 && !quality) || (sampleStep == 7 && quality)) {
                 //开始加试剂的步骤
-                matchingTestState = MatchingArgState.DripReagent
+                testState = TestState.DripReagent
                 sampleStep = 0
                 cuvettePos = -1
                 moveSample(-samplePos + 1)
@@ -1202,7 +1197,7 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
      */
     fun showMatchingDialog() {
         matchingFinishMsg.postValue(testMsg.value)
-        matchingTestState = MatchingArgState.None
+        testState = TestState.Normal
     }
 
     /**
@@ -1284,7 +1279,7 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
      * 移动比色皿到 检测位
      */
     private fun moveCuvetteTest(step: Int = 1) {
-        i("发送 移动比色皿到 检测位 matchingTestState=$matchingTestState step=$step")
+        i("发送 移动比色皿到 检测位 testState=$testState step=$step")
         cuvettePos += step
         SerialPortUtil.moveCuvetteTest(step > 0, step.absoluteValue)
     }
@@ -1304,6 +1299,7 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
     private fun takeReagent() {
         i("发送 取试剂")
         takeReagentFinish = false
+        dripReagentFinish = false
         SerialPortUtil.takeReagent()
     }
 
@@ -1389,7 +1385,7 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
      * 是否正在拟合
      */
     fun runningMatching(): Boolean {
-        return matchingTestState != MatchingArgState.None && matchingTestState != MatchingArgState.Finish
+        return testState.isRunning() && testType == TestType.MatchingArgs
     }
 }
 

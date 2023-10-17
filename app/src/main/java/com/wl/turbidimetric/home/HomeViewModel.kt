@@ -180,7 +180,8 @@ class HomeViewModel(
     /**当前排所有样本的状态
      *
      */
-    var samplesStates = MutableStateFlow(initSampleStates())
+    private var _samplesStates = MutableStateFlow(initSampleStates())
+    val sampleStates: StateFlow<Array<Array<SampleItem>?>> = _samplesStates.asStateFlow()
 
 
     /**当前排所有样本的状态
@@ -264,11 +265,6 @@ class HomeViewModel(
      */
     private var stirFinish = true
 
-//    /**
-//     * 输入的跳过的比色皿数量
-//     */
-//    var skipCuvetteNum = 0;
-
     /**
      *比色皿起始的位置，只限于第一排比色皿用来跳过前面的几个已经使用过的比色皿
      */
@@ -348,8 +344,6 @@ class HomeViewModel(
 
 
     val testMsg = MutableLiveData("");
-//    val toastMsg = MutableLiveData("");
-
     val projectDatas = projectRepository.allDatas.flow()
 
     /**
@@ -378,37 +372,6 @@ class HomeViewModel(
      */
     var scanResults = arrayListOf<String?>()
 
-//    /**
-//     * r1状态
-//     */
-//    private val _r1State = MutableStateFlow(false)
-////    val r1State = _r1State.asStateFlow()
-//
-//    /**
-//     * r2状态
-//     */
-//    val _r2State = MutableStateFlow(false)
-//
-//    /**
-//     * 清洗液状态
-//     */
-//    val _cleanoutFluidState = MutableStateFlow(false)
-//
-//    /**
-//     * r2状态
-//     */
-//    val _r2VolumeState = MutableStateFlow(0)
-//
-//    /**
-//     * 反应槽温度
-//     */
-//    val _reactionTemp = MutableStateFlow(0.0)
-//
-//    /**
-//     * r1温度
-//     */
-//    val r1Temp = MutableStateFlow(0.0)
-
     /**
      * 手动模式下，需要取样的样本数量
      */
@@ -427,7 +390,6 @@ class HomeViewModel(
     var r1Reagent: Boolean = false
         set(value) {
             field = value
-//            r1State.postValue(value)
             _testMachineUiState.update {
                 it.copy(r1State = value)
             }
@@ -435,25 +397,20 @@ class HomeViewModel(
     var r2Reagent: Boolean = false
         set(value) {
             field = value
-//            r2State.postValue(value)
         }
     var r2Volume: Int = 0
         set(value) {
             field = value
-//            r2VolumeState.postValue(value)
             _testMachineUiState.update {
                 it.copy(r2State = value)
             }
-//            _r2VolumeState.value = value
         }
     var cleanoutFluid: Boolean = false
         set(value) {
             field = value
-//            cleanoutFluidState.postValue(value)
             _testMachineUiState.update {
                 it.copy(cleanoutFluidState = value)
             }
-//            _cleanoutFluidState.value = value
         }
 
     /**
@@ -558,9 +515,7 @@ class HomeViewModel(
 
         mSamplesStates = initSampleStates()
         mCuvetteStates = initCuvetteStates()
-//        cuvetteStates.postValue(mCuvetteStates)
-//        samplesStates.postValue(mSamplesStates)
-        cuvetteStates.update {
+        _cuvetteStates.update {
             mCuvetteStates
         }
 
@@ -734,16 +689,12 @@ class HomeViewModel(
     override fun readDataTempModel(reply: ReplyModel<TempModel>) {
         i("接收到 获取设置温度 reply=$reply")
 
-//        reactionTemp.postValue(reply.data.reactionTemp / 10.0)
-//        r1Temp.postValue(reply.data.r1Temp / 10.0)
         _testMachineUiState.update {
             it.copy(
                 reactionTemp = reply.data.reactionTemp / 10.0,
                 r1Temp = reply.data.r1Temp / 10.0
             )
         }
-//        _reactionTemp.value = reply.data.reactionTemp / 10.0
-//        r1Temp.value = reply.data.r1Temp / 10.0
     }
 
     /**
@@ -892,11 +843,7 @@ class HomeViewModel(
         samplePos?.let {
             mSamplesStates[sampleShelfPos]!![samplePos].cuvetteID = cuvettePos
         }
-//        samplesStates.postValue(mSamplesStates)
-        samplesStates.value = mSamplesStates
-//        _testUiState.update {
-//            it.copy(sampleStates = mSamplesStates)
-//        }
+        _samplesStates.value = mSamplesStates.copyOf()
         i("updateSampleState samplePos=${samplePos} sampleShelfPos=$sampleShelfPos")
         i("updateSampleState samplesState=${mSamplesStates.print()}")
     }
@@ -918,11 +865,7 @@ class HomeViewModel(
         mCuvetteStates[cuvetteShelfPos]!![cuvettePos].state = state
         testResult?.let { mCuvetteStates[cuvetteShelfPos]!![cuvettePos].testResult = testResult }
         samplePos?.let { mCuvetteStates[cuvetteShelfPos]!![cuvettePos].sampleID = samplePos }
-//        cuvetteStates.postValue(mCuvetteStates)
-        cuvetteStates.value = mCuvetteStates
-//        _testUiState.update {
-//            it.copy(cuvetteStates = mCuvetteStates)
-//        }
+        _cuvetteStates.value = mCuvetteStates.copyOf()
         i("updateCuvetteState  cuvetteShelfPos=$cuvetteShelfPos")
         i("updateCuvetteState cuvetteStates=${mCuvetteStates.print()}")
     }
@@ -1109,7 +1052,7 @@ class HomeViewModel(
 
                 mCuvetteStates[cuvetteShelfPos]?.get(pos)?.testResult = resultModels[pos]
 //                cuvetteStates.postValue(mCuvetteStates)
-                cuvetteStates.value = mCuvetteStates;
+                _cuvetteStates.value = mCuvetteStates;
 //                _testUiState.update {
 //                    it.copy(cuvetteStates = mCuvetteStates)
 //                }
@@ -2162,7 +2105,7 @@ class HomeViewModel(
         }
         mSamplesStates = arrays
 //        samplesStates.postValue(mSamplesStates)
-        samplesStates.value = mSamplesStates
+        _samplesStates.value = mSamplesStates
 //        _testUiState.update {
 //            it.copy(sampleStates = mSamplesStates)
 //        }
@@ -2198,7 +2141,7 @@ class HomeViewModel(
         }
         mCuvetteStates = arrays
 //        cuvetteStates.postValue(mCuvetteStates)
-        cuvetteStates.value = mCuvetteStates
+        _cuvetteStates.value = mCuvetteStates
 //        _testUiState.update {
 //            it.copy(cuvetteStates = mCuvetteStates)
 //        }

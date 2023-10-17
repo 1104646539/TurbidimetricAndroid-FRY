@@ -108,12 +108,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         listener()
         lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-//                vm.goGetMachineState()
+                vm.goGetMachineState()
             }
-        }
-
-        launchAndRepeatWithViewLifecycle {
-
         }
         launchAndRepeatWithViewLifecycle {
             vm.projectDatas.collectLatest {
@@ -138,140 +134,108 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 
     private fun listenerView() {
         launchAndRepeatWithViewLifecycle {
-//            vm.testUiState.collect { state ->
-//                vd.ssv.sampleStates = state.sampleStates[0]
-//                vd.ssv2.sampleStates = state.sampleStates[1]
-//                vd.ssv3.sampleStates = state.sampleStates[2]
-//                vd.ssv4.sampleStates = state.sampleStates[3]
-//
-//                vd.csv.cuvetteStates = state.cuvetteStates[3]
-//                vd.csv2.cuvetteStates = state.cuvetteStates[2]
-//                vd.csv3.cuvetteStates = state.cuvetteStates[1]
-//                vd.csv4.cuvetteStates = state.cuvetteStates[0]
-//            }
-//        }
-            launchAndRepeatWithViewLifecycle {
-                vm.testMachineUiState.collectLatest {
-                    vd.ivR1.setImageResource(if (it?.r1State.not()) R.drawable.icon_r1_empty else R.drawable.icon_r1_full)
-                    if ((it.r2State ?: 0) in r2VolumeIds.indices) {
-                        vd.ivR2.setImageResource(r2VolumeIds[it.r2State])
-                    } else {
-                        vd.ivR2.setImageResource(r2VolumeIds[0])
-                    }
-                    vd.ivCleanoutFluid.setImageResource(if (it.cleanoutFluidState.not() == true) R.drawable.icon_cleanout_fluid_empty else R.drawable.icon_cleanout_fluid_full)
-                    vd.tvTemp.text = (it.reactionTemp?.toString() ?: "0").plus("℃")
-                }
-            }
-//            vm.r1State.observe(this) {
-//                vd.ivR1.setImageResource(if (it?.not() == true) R.drawable.icon_r1_empty else R.drawable.icon_r1_full)
-//            }
-//            vm.r2State.observe(this) {
-//
-//            }
-//            vm.r2VolumeState.observe(this) {
-//                if ((it ?: 0) in r2VolumeIds.indices) {
-//                    vd.ivR2.setImageResource(r2VolumeIds[it])
-//                } else {
-//                    vd.ivR2.setImageResource(r2VolumeIds[0])
-//                }
-//            }
-//            vm.cleanoutFluidState.observe(this) {
-//                vd.ivCleanoutFluid.setImageResource(if (it?.not() == true) R.drawable.icon_cleanout_fluid_empty else R.drawable.icon_cleanout_fluid_full)
-//            }
-//            vm.reactionTemp.observe(this) {
-//                vd.tvTemp.text = (it?.toString() ?: "0").plus("℃")
-//            }
-//            vm.r1Temp.observe(this) {
-//            vd.tvTemp.text = "R1=${vm.r1State.value} R2=${vm.r2State.value} R2量=${vm.r2Volume.value} 清洗液=${vm.cleanoutFluidState.value} 反应槽温度=${vm.reactionTemp.value} R1温度=${vm.r1Temp.value}"
-//            }
-            vd.ssv.label = "1"
-            vd.ssv2.label = "2"
-            vd.ssv3.label = "3"
-            vd.ssv4.label = "4"
-            vd.ssv.clickIndex = { it, item ->
-                toast("样本 index=$it item=$item")
-                showDetailsDialog(item)
-            }
-            vd.ssv2.clickIndex = { it, item ->
-                toast("样本 index2=$it item=$item")
-                showDetailsDialog(item)
-            }
-            vd.ssv3.clickIndex = { it, item ->
-                toast("样本 index3=$it item=$item")
-                showDetailsDialog(item)
-            }
-            vd.ssv4.clickIndex = { it, item ->
-                toast("样本 index4=$it item=$item")
-                showDetailsDialog(item)
-            }
-//        vm.samplesStates.observe(this) {
-//            vd.ssv.sampleStates = it[0]
-//            vd.ssv2.sampleStates = it[1]
-//            vd.ssv3.sampleStates = it[2]
-//            vd.ssv4.sampleStates = it[3]
-//        }
-
-            vd.csv.label = "4"
-            vd.csv2.label = "3"
-            vd.csv3.label = "2"
-            vd.csv4.label = "1"
-            vd.csv.clickIndex = { it, item ->
-                toast("比色皿 index=$it item=$item")
-                showDetailsDialog(item)
-            }
-            vd.csv2.clickIndex = { it, item ->
-                toast("比色皿 index2=$it item=$item")
-                showDetailsDialog(item)
-            }
-            vd.csv3.clickIndex = { it, item ->
-                toast("比色皿 index3=$it item=$item")
-                showDetailsDialog(item)
-            }
-            vd.csv4.clickIndex = { it, item ->
-                toast("比色皿 index4=$it item=$item")
-                showDetailsDialog(item)
-            }
-//        vm.cuvetteStates.observe(this) {
-//            vd.csv.cuvetteStates = it[3]
-//            vd.csv2.cuvetteStates = it[2]
-//            vd.csv3.cuvetteStates = it[1]
-//            vd.csv4.cuvetteStates = it[0]
-//        }
-
-            obTestState.observe(this) {
-                if (it != TestState.None && it != TestState.TestFinish) {
-                    vd.btnStart.setBackgroundResource(R.drawable.rip_positive2)
-                    vd.btnStart.setText("正在分析")
-                    vm.enableView(false)
+            vm.testMachineUiState.collectLatest {
+                vd.ivR1.setImageResource(if (it?.r1State.not()) R.drawable.icon_r1_empty else R.drawable.icon_r1_full)
+                if ((it.r2State ?: 0) in r2VolumeIds.indices) {
+                    vd.ivR2.setImageResource(r2VolumeIds[it.r2State])
                 } else {
-                    vd.btnStart.setBackgroundResource(R.drawable.rip_positive)
-                    vd.btnStart.setText("分析")
-                    vm.enableView(true)
+                    vd.ivR2.setImageResource(r2VolumeIds[0])
                 }
+                vd.ivCleanoutFluid.setImageResource(if (it.cleanoutFluidState.not() == true) R.drawable.icon_cleanout_fluid_empty else R.drawable.icon_cleanout_fluid_full)
+                vd.tvTemp.text = (it.reactionTemp?.toString() ?: "0").plus("℃")
             }
-            vd.btnStart.setOnClickListener {
-                if (vm.selectProject == null) {
-                    showConfigDialog()
-                    toast("请选择标曲")
-                } else if (!isAuto() && vm.needSamplingNum <= 0) {
-                    showConfigDialog()
-                    toast("请输入检测数量")
-                } else {
-                    vm.clickStart()
-                }
+        }
+        vd.ssv.label = "1"
+        vd.ssv2.label = "2"
+        vd.ssv3.label = "3"
+        vd.ssv4.label = "4"
+        vd.ssv.clickIndex = { it, item ->
+            toast("样本 index=$it item=$item")
+            showDetailsDialog(item)
+        }
+        vd.ssv2.clickIndex = { it, item ->
+            toast("样本 index2=$it item=$item")
+            showDetailsDialog(item)
+        }
+        vd.ssv3.clickIndex = { it, item ->
+            toast("样本 index3=$it item=$item")
+            showDetailsDialog(item)
+        }
+        vd.ssv4.clickIndex = { it, item ->
+            toast("样本 index4=$it item=$item")
+            showDetailsDialog(item)
+        }
+        launchAndRepeatWithViewLifecycle {
+            vm.sampleStates.collectLatest {
+                vd.ssv.sampleStates = it[0]
+                vd.ssv2.sampleStates = it[1]
+                vd.ssv3.sampleStates = it[2]
+                vd.ssv4.sampleStates = it[3]
             }
-            vd.btnDebugDialog.setOnClickListener {
-                debugShowDetailsDialog?.show(
-                    vm.testMsg.value ?: "",
-                    "确定",
-                    onConfirm = { it.dismiss() },
-                    gravity = Gravity.LEFT
-                )
-            }
+        }
 
-            vd.btnConfig.setOnClickListener {
+        vd.csv.label = "4"
+        vd.csv2.label = "3"
+        vd.csv3.label = "2"
+        vd.csv4.label = "1"
+        vd.csv.clickIndex = { it, item ->
+            toast("比色皿 index=$it item=$item")
+            showDetailsDialog(item)
+        }
+        vd.csv2.clickIndex = { it, item ->
+            toast("比色皿 index2=$it item=$item")
+            showDetailsDialog(item)
+        }
+        vd.csv3.clickIndex = { it, item ->
+            toast("比色皿 index3=$it item=$item")
+            showDetailsDialog(item)
+        }
+        vd.csv4.clickIndex = { it, item ->
+            toast("比色皿 index4=$it item=$item")
+            showDetailsDialog(item)
+        }
+        launchAndRepeatWithViewLifecycle {
+            vm.cuvetteStates.collectLatest {
+                vd.csv.cuvetteStates = it[3]
+                vd.csv2.cuvetteStates = it[2]
+                vd.csv3.cuvetteStates = it[1]
+                vd.csv4.cuvetteStates = it[0]
+            }
+        }
+
+        obTestState.observe(viewLifecycleOwner) {
+            if (it != TestState.None && it != TestState.TestFinish) {
+                vd.btnStart.setBackgroundResource(R.drawable.rip_positive2)
+                vd.btnStart.setText("正在分析")
+                vm.enableView(false)
+            } else {
+                vd.btnStart.setBackgroundResource(R.drawable.rip_positive)
+                vd.btnStart.setText("分析")
+                vm.enableView(true)
+            }
+        }
+        vd.btnStart.setOnClickListener {
+            if (vm.selectProject == null) {
                 showConfigDialog()
+                toast("请选择标曲")
+            } else if (!isAuto() && vm.needSamplingNum <= 0) {
+                showConfigDialog()
+                toast("请输入检测数量")
+            } else {
+                vm.clickStart()
             }
+        }
+        vd.btnDebugDialog.setOnClickListener {
+            debugShowDetailsDialog?.show(
+                vm.testMsg.value ?: "",
+                "确定",
+                onConfirm = { it.dismiss() },
+                gravity = Gravity.LEFT
+            )
+        }
+
+        vd.btnConfig.setOnClickListener {
+            showConfigDialog()
         }
     }
 
@@ -344,8 +308,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 }
             }
         }
-        launchAndRepeatWithViewLifecycle {
-            vm.dialogUiState.collect { state ->
+        launchAndRepeatWithViewLifecycle (Lifecycle.State.CREATED){
+            vm.dialogUiState.collectLatest { state ->
                 i("launchAndRepeatWithViewLifecycle state=${state.dialogState}")
                 when (state.dialogState) {
                     /**

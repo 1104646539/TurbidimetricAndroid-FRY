@@ -9,6 +9,7 @@ import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.global.SystemGlobal.testState
 import com.wl.turbidimetric.global.SystemGlobal.testType
+import com.wl.turbidimetric.home.HomeDialogUiState
 import com.wl.turbidimetric.home.ProjectRepository
 import com.wl.turbidimetric.model.*
 import com.wl.turbidimetric.print.PrintUtil
@@ -23,6 +24,11 @@ import java.math.BigDecimal
 import java.util.*
 import kotlin.math.absoluteValue
 import com.wl.wllib.LogToFile.i
+import com.wl.wllib.toTimeStr
+import kotlinx.coroutines.flow.*
+import kotlin.math.round
+import kotlin.math.roundToInt
+import kotlin.random.Random
 
 /**
  * 曲线拟合和质控
@@ -219,28 +225,34 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
      */
     private var cuvetteShelfStates: IntArray = IntArray(4)
 
-    /**
-     * 开始检测 比色皿，样本，试剂,清洗液不存在
-     */
-    val getStateNotExistMsg = MutableLiveData("")
+//    /**
+//     * 开始检测 比色皿，样本，试剂,清洗液不存在
+//     */
+//    val getStateNotExistMsg = MutableLiveData("")
+//
+//    /**
+//     * 拟合质控结束提示
+//     */
+//    val matchingFinishMsg = MutableLiveData("")
 
-    /**
-     * 拟合质控结束提示
-     */
-    val matchingFinishMsg = MutableLiveData("")
+    private val _dialogUiState = MutableSharedFlow<MatchingArgsDialogUiState>()
+    val dialogUiState: SharedFlow<MatchingArgsDialogUiState> = _dialogUiState.asSharedFlow()
 
-    /**
-     * 显示选中项目的拟合公式
-     */
-    val equationText = MutableLiveData("")
+    private val _curveUiState = MutableStateFlow(MatchingArgsCurveUiState("", ""))
+    val curveUiState = _curveUiState.asStateFlow()
 
-    /**
-     * 显示选中项目的拟合度 R²
-     */
-    val fitGoodnessText = MutableLiveData("")
+//    /**
+//     * 显示选中项目的拟合公式
+//     */
+//    val equationText = MutableLiveData("")
+//
+//    /**
+//     * 显示选中项目的拟合度 R²
+//     */
+//    val fitGoodnessText = MutableLiveData("")
 
     val testMsg = MutableLiveData("")
-    val toastMsg = MutableLiveData("")
+//    val toastMsg = MutableLiveData("")
 
     /**
      * 每排之间的检测间隔
@@ -353,11 +365,27 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
 //            return
 //        }
         if (!machineStateNormal()) {
-            toastMsg.postValue("请重新自检或重启仪器！")
+//            toastMsg.postValue("请重新自检或重启仪器！")
+            viewModelScope.launch {
+                _dialogUiState.emit(
+                    MatchingArgsDialogUiState(
+                        dialogState = DialogState.GetStateNotExistMsg,
+                        msg = "请重新自检或重启仪器"
+                    )
+                )
+            }
             return
         }
         if (testState != TestState.Normal) {
-            toastMsg.postValue("正在检测，请勿操作！")
+//            toastMsg.postValue("正在检测，请勿操作！")
+            viewModelScope.launch {
+                _dialogUiState.emit(
+                    MatchingArgsDialogUiState(
+                        dialogState = DialogState.GetStateNotExistMsg,
+                        msg = "正在检测，请勿操作"
+                    )
+                )
+            }
             return
         }
 
@@ -369,6 +397,8 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
     }
 
     private fun initState() {
+        curProject = null
+
         resultTest1.clear()
         resultTest2.clear()
         resultTest3.clear()
@@ -424,31 +454,36 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
         getInitialPos()
 
         i("cuvetteShelfPos=${cuvetteShelfPos} sampleShelfPos=${sampleShelfPos}")
-        if (cuvetteShelfPos == -1) {
+        val errorMsg = if (cuvetteShelfPos == -1) {
             i("没有比色皿架")
-            getStateNotExistMsg.postValue("比色皿不足，请添加")
-            return
-        }
-        if (sampleShelfPos == -1) {
+            "比色皿不足，请添加"
+        } else if (sampleShelfPos == -1) {
             i("没有样本架")
-            getStateNotExistMsg.postValue("样本不足，请添加")
-            return
-        }
-        if (!r1Reagent) {
+            "样本不足，请添加"
+        } else if (!r1Reagent) {
             i("没有R1试剂")
-            getStateNotExistMsg.postValue("R1试剂不足，请添加")
-            return
-        }
-        if (!r2Reagent) {
+            "R1试剂不足，请添加"
+        } else if (!r2Reagent) {
             i("没有R2试剂")
-            getStateNotExistMsg.postValue("R2试剂不足，请添加")
-            return
-        }
-        if (!cleanoutFluid) {
+            "R2试剂不足，请添加"
+        } else if (!cleanoutFluid) {
             i("没有清洗液试剂")
-            getStateNotExistMsg.postValue("清洗液不足，请添加")
+            "清洗液不足，请添加"
+        } else {
+            ""
+        }
+        if (errorMsg.isNotEmpty()) {
+            viewModelScope.launch {
+                _dialogUiState.emit(
+                    MatchingArgsDialogUiState(
+                        DialogState.GetStateNotExistMsg,
+                        errorMsg
+                    )
+                )
+            }
             return
         }
+
         testState = TestState.DripDiluentVolume
         //开始检测
         moveSampleShelf(sampleShelfPos)
@@ -835,6 +870,10 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
     var absorbancys: List<Double> = mutableListOf()
     var yzs: List<Double> = mutableListOf()
 
+    fun roundResult(): BigDecimal {
+        return Random(Date().time).nextFloat().toBigDecimal()
+    }
+
     /**
      * 计算拟合曲线
      */
@@ -849,10 +888,14 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
             resultOriginalTest3.clear()
             resultOriginalTest4.clear()
             repeat(testValues1.size) {
-                resultTest1.add(testValues1[it].toBigDecimal())
-                resultTest2.add(testValues2[it].toBigDecimal())
-                resultTest3.add(testValues3[it].toBigDecimal())
-                resultTest4.add(testValues4[it].toBigDecimal())
+//                resultTest1.add(testValues1[it].toBigDecimal())
+//                resultTest2.add(testValues2[it].toBigDecimal())
+//                resultTest3.add(testValues3[it].toBigDecimal())
+//                resultTest4.add(testValues4[it].toBigDecimal())
+                resultTest1.add(roundResult())
+                resultTest2.add(roundResult())
+                resultTest3.add(roundResult())
+                resultTest4.add(roundResult())
 
                 resultOriginalTest1.add(testOriginalValues1[it])
                 resultOriginalTest2.add(testOriginalValues2[it])
@@ -894,7 +937,8 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
                     "第三次:$resultTest3 \n" +
                     "第四次原始:$resultOriginalTest4 \n" +
                     "第四次:$resultTest4 \n" +
-                    "吸光度:$result 拟合度：${cf.fitGoodness} \n" +
+                    "吸光度:$result \n" +
+                    "拟合度：${cf.fitGoodness} \n" +
                     "四参数：f0=${f0} f1=${f1} f2=${f2} f3=${f3} \n " +
                     "验算 ${yzs}\n"
         )
@@ -904,7 +948,7 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
             this.f2 = f2
             this.f3 = f3
             this.fitGoodness = cf.fitGoodness
-            this.createTime = Date().toLongTimeStr()
+            this.createTime = Date().toTimeStr()
             this.projectLjz = 100
             this.reagentNO = reagentNOStr
             this.reactionValues = absorbancys.subList(0, 5).map { it.toInt() }.toIntArray()
@@ -1195,8 +1239,16 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
     /**
      * 显示拟合结束对话框
      */
-    fun showMatchingDialog() {
-        matchingFinishMsg.postValue(testMsg.value)
+    private fun showMatchingDialog() {
+        viewModelScope.launch {
+            _dialogUiState.emit(
+                MatchingArgsDialogUiState(
+                    DialogState.MatchingFinishMsg,
+                    testMsg.value ?: ""
+                )
+            )
+        }
+//        matchingFinishMsg.postValue(testMsg.value)
         testState = TestState.Normal
     }
 
@@ -1211,7 +1263,7 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
                 projectRepository.removeProject(it)
                 coverProjectModel = null
             }
-            curProject = null
+
         }
     }
 
@@ -1386,6 +1438,27 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
      */
     fun runningMatching(): Boolean {
         return testState.isRunning() && testType == TestType.MatchingArgs
+    }
+
+    fun changeSelectProject(project: ProjectModel) {
+        _curveUiState.update {
+            it.copy(
+                equationText = "Y=${project.f0.scale(8)}+${project.f1.scale(8)}x+${
+                    project.f2.scale(
+                        8
+                    )
+                }x²+${project.f3.scale(8)}x³",
+                fitGoodnessText = "R²=${project.fitGoodness.scale(6)}"
+            )
+        }
+//        vm.equationText.postValue(
+//            "Y=${project.f0.scale(8)}+${project.f1.scale(8)}x+${
+//                project.f2.scale(
+//                    8
+//                )
+//            }x²+${project.f3.scale(8)}x³"
+//        )
+//        vm.fitGoodnessText.postValue("R²=${project.fitGoodness.scale(6)}")
     }
 }
 

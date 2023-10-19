@@ -1,37 +1,35 @@
 package com.wl.turbidimetric.main
 
+import android.app.Dialog
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.res.Configuration
 import android.hardware.usb.UsbManager
-import android.os.Bundle
-import android.os.Debug
 import android.os.Handler
 import android.os.Message
 import android.util.Log
+import android.widget.Spinner
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import com.lxj.xpopup.XPopup
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.ActivityMainBinding
 import com.wl.turbidimetric.global.EventGlobal
 import com.wl.turbidimetric.global.EventMsg
 import com.wl.turbidimetric.global.SystemGlobal
-import com.wl.turbidimetric.model.TestState
+import com.wl.turbidimetric.home.HomeProjectAdapter
+import com.wl.turbidimetric.model.ProjectModel
 import com.wl.turbidimetric.util.ActivityDataBindingDelegate
 import com.wl.turbidimetric.util.SerialPortUtil
-import com.wl.turbidimetric.view.HiltDialog
+import com.wl.turbidimetric.view.dialog.HiltDialog
+import com.wl.turbidimetric.view.dialog.showPop
 import com.wl.weiqianwllib.upan.StorageState
 import com.wl.weiqianwllib.upan.StorageUtil
 import com.wl.weiqianwllib.upan.StorageUtil.OPEN_DOCUMENT_TREE_CODE
 import com.wl.wllib.LogToFile.i
 import com.wl.wllib.ktxRunOnBgCache
-import com.wl.wllib.ktxRunOnUi
 import com.wl.wwanandroid.base.BaseActivity
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -98,13 +96,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     override fun init() {
         supportActionBar?.hide()
         listener()
-//        lifecycleScope.launch {
-//            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED){
         initNav()
-//            }
-//        }
-
-
         test()
     }
 
@@ -134,17 +126,26 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         }
     }
 
+
     /**
      * 关机提示
      */
     private fun showShutdownDialog() {
         if (!SystemGlobal.testState.isRunning()) {
-            shutdownDialog.show("确定要关机吗？请确定仪器检测结束。", "关机", { shutdown() }, "取消", { it.dismiss() })
+            shutdownDialog.showPop(this) {
+                it.showDialog(
+                    "确定要关机吗？请确定仪器检测结束。",
+                    "关机",
+                    { shutdown() },
+                    "取消",
+                    { it.dismiss() })
+            }
             return
         } else {
-            shutdownDialog.show("检测过程中不能关机", "我知道了", { it.dismiss() })
+            shutdownDialog.showPop(this) {
+                it.showDialog("检测过程中不能关机", "我知道了", { it.dismiss() })
+            }
         }
-
     }
 
     val shutdownDialog by lazy {
@@ -152,8 +153,9 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     }
 
     fun shutdown() {
-        shutdownDialog.show("即将关机，请等待……", "我知道了", { it.dismiss() })
-
+        shutdownDialog.showPop(this, isCancelable = false) {
+            it.showDialog("即将关机，请等待……", "我知道了", { it.dismiss() })
+        }
         lifecycleScope.launch {
             delay(3000)
             SerialPortUtil.shutdown()

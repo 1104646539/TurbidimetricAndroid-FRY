@@ -1,34 +1,29 @@
-package com.wl.turbidimetric.view
+package com.wl.turbidimetric.view.dialog
 
 import android.content.Context
 import android.widget.TextView
+import com.lxj.xpopup.core.BasePopupView
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.home.HomeViewModel
 import com.wl.turbidimetric.model.CuvetteState
 import com.wl.turbidimetric.model.SampleState
 import com.wl.turbidimetric.model.TestResultModel
 
-class HomeDetailsDialog(val context: Context) : BaseDialog(context) {
-    val tvResultID: TextView
-    val tvDetectionNum: TextView
-    val tvLabel: TextView
-    val tvLabelHilt: TextView
-    val tvState: TextView
+class HomeDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_home_details) {
+    var tvResultID: TextView? = null
+    var tvDetectionNum: TextView? = null
+    var tvLabel: TextView? = null
+    var tvLabelHilt: TextView? = null
+    var tvState: TextView? = null
 
-    init {
-        addView(R.layout.dialog_home_details)
-        tvResultID = getView(R.id.tv_result_id) as TextView
-        tvDetectionNum = getView(R.id.tv_detection_num) as TextView
-        tvLabel = getView(R.id.tv_label) as TextView
-        tvLabelHilt = getView(R.id.tv_label_hilt) as TextView
-        tvState = getView(R.id.tv_state) as TextView
-    }
 
-    fun show(
+    fun showDialog(
         item: HomeViewModel.CuvetteItem?
     ) {
         if (item == null) return
-        super.show("确定", { dismiss() }, "", null, true)
+        this.confirmText = "确定"
+        this.confirmClick = { dismiss() }
+
         show(
             (item.testResult?.id ?: "-").toString(),
             item.testResult?.detectionNum ?: "-",
@@ -56,11 +51,12 @@ class HomeDetailsDialog(val context: Context) : BaseDialog(context) {
         }
     }
 
-    fun show(
+    fun showDialog(
         item: HomeViewModel.SampleItem?
     ) {
         if (item == null) return
-        super.show("确定", { dismiss() }, "", null, true)
+        this.confirmText = "确定"
+        this.confirmClick = { dismiss() }
         show(
             (item.testResult?.id ?: "-").toString(),
             item.testResult?.detectionNum ?: "-",
@@ -85,6 +81,12 @@ class HomeDetailsDialog(val context: Context) : BaseDialog(context) {
         }
     }
 
+    var resultID: String? = null
+    var detectionNum: String? = null
+    var label: String? = null
+    var labelHilt: String? = null
+    var state: String? = null
+    var testResultModel: TestResultModel? = null
     private fun show(
         resultID: String,
         detectionNum: String,
@@ -93,12 +95,31 @@ class HomeDetailsDialog(val context: Context) : BaseDialog(context) {
         state: String,
         testResultModel: TestResultModel?
     ) {
+        this.resultID = resultID
+        this.detectionNum = detectionNum
+        this.label = label
+        this.labelHilt = labelHilt
+        this.state = state
+        this.testResultModel = testResultModel
 
-        tvState.text = state
-        tvResultID.text = resultID
-        tvLabel.text = label
-        tvLabelHilt.text = labelHilt
-        tvDetectionNum.text = detectionNum
-
+        super.show()
     }
+
+    override fun initDialogView() {
+        tvResultID = findViewById(R.id.tv_result_id)
+        tvDetectionNum = findViewById(R.id.tv_detection_num)
+        tvLabel = findViewById(R.id.tv_label)
+        tvLabelHilt = findViewById(R.id.tv_label_hilt)
+        tvState = findViewById(R.id.tv_state)
+    }
+
+    override fun setContent() {
+        super.setContent()
+        tvState?.text = state
+        tvResultID?.text = resultID
+        tvLabel?.text = label
+        tvLabelHilt?.text = labelHilt
+        tvDetectionNum?.text = detectionNum
+    }
+
 }

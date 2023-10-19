@@ -10,7 +10,8 @@ import com.wl.turbidimetric.databinding.FragmentRepeatabilityBinding
 import com.wl.turbidimetric.ex.snack
 import com.wl.turbidimetric.home.HomeProjectAdapter
 import com.wl.turbidimetric.model.ProjectModel
-import com.wl.turbidimetric.view.HiltDialog
+import com.wl.turbidimetric.view.dialog.HiltDialog
+import com.wl.turbidimetric.view.dialog.showPop
 import com.wl.wwanandroid.base.BaseFragment
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -95,27 +96,31 @@ class RepeatabilityFragment :
          */
         vm.getStateNotExistMsg.observe(this) { msg ->
             if (msg.isNotEmpty()) {
-                dialog.show(
-                    msg = "${vm.getStateNotExistMsg.value}",
-                    confirmMsg = "我已添加", onConfirm = {
-                        it.dismiss()
-                        vm.dialogGetStateNotExistConfirm()
-                    },
-                    cancelMsg = "结束检测", onCancel = {
-                        it.dismiss()
-                        vm.dialogGetStateNotExistCancel()
-                    }
-                )
+                dialog.showPop(requireContext(), isCancelable = false) { d ->
+                    d.showDialog(
+                        msg = "${vm.getStateNotExistMsg.value}",
+                        confirmText = "我已添加", confirmClick = {
+                            d.dismiss()
+                            vm.dialogGetStateNotExistConfirm()
+                        },
+                        cancelText = "结束检测", cancelClick = {
+                            d.dismiss()
+                            vm.dialogGetStateNotExistCancel()
+                        }
+                    )
+                }
             }
         }
         vm.matchingFinishMsg.observe(this) {
             if (it.isNotEmpty()) {
-                dialog.show(
-                    msg = it,
-                    confirmMsg = "我知道了", onConfirm = {
-                        it.dismiss()
-                    }
-                )
+                dialog.showPop(requireContext(), isCancelable = false) { d ->
+                    d.showDialog(
+                        msg = it,
+                        confirmText = "我知道了", confirmClick = {
+                            d.dismiss()
+                        }
+                    )
+                }
             }
         }
     }

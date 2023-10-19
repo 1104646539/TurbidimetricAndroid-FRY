@@ -2,8 +2,6 @@ package com.wl.turbidimetric.home
 
 import android.app.ProgressDialog
 import android.os.Bundle
-import android.os.Debug
-import android.util.DisplayMetrics
 import android.util.Log
 import android.view.Gravity
 import androidx.fragment.app.viewModels
@@ -13,19 +11,15 @@ import com.wl.turbidimetric.databinding.FragmentHomeBinding
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.SystemGlobal.obTestState
-import com.wl.turbidimetric.global.SystemGlobal.testState
 import com.wl.turbidimetric.model.ProjectModel
-import com.wl.turbidimetric.model.TestState
-import com.wl.turbidimetric.util.ScanCodeUtil
-import com.wl.turbidimetric.view.HiltDialog
-import com.wl.turbidimetric.view.HomeConfigDialog
-import com.wl.turbidimetric.view.HomeDetailsDialog
+import com.wl.turbidimetric.view.dialog.HiltDialog
+import com.wl.turbidimetric.view.dialog.HomeConfigDialog
+import com.wl.turbidimetric.view.dialog.HomeDetailsDialog
+import com.wl.turbidimetric.view.dialog.showPop
 import com.wl.wwanandroid.base.BaseFragment
 import kotlinx.coroutines.launch
 import com.wl.wllib.LogToFile.i
-import com.wl.wllib.ktxRunOnBgCache
 import com.wl.wllib.toLongTimeStr
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import java.util.Date
 
@@ -52,9 +46,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
      * 显示调试时详情的对话框
      */
     private val debugShowDetailsDialog: HiltDialog by lazy {
-        HiltDialog(requireContext()).apply {
-            width = 1500
-        }
+        HiltDialog(requireContext())
     }
 
     /**
@@ -65,9 +57,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
     }
 
     private val dialog: HiltDialog by lazy {
-        HiltDialog(requireContext()).apply {
-            width = 1500
-        }
         HiltDialog(requireContext())
     }
     private val dialogGetMachine: ProgressDialog by lazy {
@@ -234,12 +223,13 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             }
         }
         vd.btnDebugDialog.setOnClickListener {
-            debugShowDetailsDialog?.show(
-                vm.testMsg.value ?: "",
-                "确定",
-                onConfirm = { it.dismiss() },
-                gravity = Gravity.LEFT
-            )
+            debugShowDetailsDialog.showPop(requireContext()) {
+                it.showDialog(vm.testMsg.value ?: "",
+                    "确定",
+                    confirmClick = { it.dismiss() }
+                )
+            }
+
         }
 
         vd.btnConfig.setOnClickListener {
@@ -252,30 +242,32 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
      */
     private fun showConfigDialog() {
         i("showConfigDialog before")
-        homeConfigDialog?.show(vm.selectProjectEnable.value ?: true,
-            vm.editDetectionNumEnable.value ?: true,
-            vm.skipCuvetteEnable.value ?: true,
-            projects,
-            vm.selectProject,
-            vm.cuvetteStartPos,
-            if (vm.detectionNumInput.isNullOrEmpty()) LocalData.DetectionNum else vm.detectionNumInput,
-            vm.needSamplingNum,
-            { projectModel, skipNum, detectionNum, sampleNum, baseDialog ->
-                if (projectModel == null) {
-                    toast("请选择标曲")
-                } else {
-                    if (isTestRunning()) {
-                        toast("正在检测，请稍后")
-                        return@show
+        homeConfigDialog?.showPop(requireContext()) {
+            it?.showDialog(vm.selectProjectEnable.value ?: true,
+                vm.editDetectionNumEnable.value ?: true,
+                vm.skipCuvetteEnable.value ?: true,
+                projects,
+                vm.selectProject,
+                vm.cuvetteStartPos,
+                if (vm.detectionNumInput.isNullOrEmpty()) LocalData.DetectionNum else vm.detectionNumInput,
+                vm.needSamplingNum,
+                { projectModel, skipNum, detectionNum, sampleNum, baseDialog ->
+                    if (projectModel == null) {
+                        toast("请选择标曲")
+                    } else {
+                        if (isTestRunning()) {
+                            toast("正在检测，请稍后")
+                            return@showDialog
+                        }
+                        //选择的项目变更
+                        vm.changeConfig(projectModel, skipNum, detectionNum, sampleNum)
+                        baseDialog.dismiss()
                     }
-                    //选择的项目变更
-                    vm.changeConfig(projectModel, skipNum, detectionNum, sampleNum)
-                    baseDialog.dismiss()
-                }
-            },
-            {
-                it.dismiss()
-            })
+                },
+                {
+                    it.dismiss()
+                })
+        }
         i("showConfigDialog after")
 
     }
@@ -285,7 +277,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
      * @param item SampleItem?
      */
     private fun showDetailsDialog(item: HomeViewModel.SampleItem?) {
-        homeDetailsDialog?.show(item)
+        homeDetailsDialog?.showDialog(item)
     }
 
     /**
@@ -293,7 +285,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
      * @param item SampleItem?
      */
     private fun showDetailsDialog(item: HomeViewModel.CuvetteItem?) {
-        homeDetailsDialog?.show(item)
+        homeDetailsDialog?.showDialog(item)
     }
 
 
@@ -309,9 +301,11 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             vm.testMsg.observe(viewLifecycleOwner) {
                 debugShowDetailsDialog?.let { dialog ->
                     if (dialog.isShow()) {
-                        dialog!!.show(
-                            it, "确定", onConfirm = { it.dismiss() }, gravity = Gravity.LEFT
-                        )
+                        dialog?.showPop(requireContext()) { d ->
+                            d.showDialog(
+                                it, "确定", confirmClick = { it.dismiss() }
+                            )
+                        }
                     }
                 }
             }
@@ -333,59 +327,91 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                      * 自检失败对话框
                      */
                     DialogState.GET_MACHINE_FAILED_SHOW -> {
-                        dialog?.show(msg = state.dialogMsg, confirmMsg = "重新自检", onConfirm = {
-                            it.dismiss()
-                            vm.dialogGetMachineFailedConfirm()
-                        }, cancelMsg = "我知道了", onCancel = {
-                            it.dismiss()
-                            vm.dialogGetMachineFailedCancel()
-                        }, false
-                        )
+                        dialog?.showPop(requireContext(), isCancelable = false) {
+                            it?.showDialog(
+                                msg = state.dialogMsg,
+                                confirmText = "重新自检",
+                                confirmClick = {
+                                    it.dismiss()
+                                    vm.dialogGetMachineFailedConfirm()
+                                },
+                                cancelText = "我知道了",
+                                cancelClick = {
+                                    it.dismiss()
+                                    vm.dialogGetMachineFailedCancel()
+                                }
+                            )
+                        }
+
                     }
                     /**
                      * 检测结束后 比色皿不足
                      */
                     DialogState.CUVETTE_DEFICIENCY -> {
-                        dialog?.show(msg = "比色皿检测结束，是否添加？", confirmMsg = "我已添加", onConfirm = {
-                            it.dismiss()
-                            vm.dialogTestFinishCuvetteDeficiencyConfirm()
-                        }, cancelMsg = "结束检测", onCancel = {
-                            it.dismiss()
-                            vm.dialogTestFinishCuvetteDeficiencyCancel()
-                        }, false)
+                        dialog?.showPop(requireContext(), isCancelable = false) {
+                            it?.showDialog(
+                                msg = "比色皿检测结束，是否添加？",
+                                confirmText = "我已添加",
+                                confirmClick = {
+                                    it.dismiss()
+                                    vm.dialogTestFinishCuvetteDeficiencyConfirm()
+                                },
+                                cancelText = "结束检测",
+                                cancelClick = {
+                                    it.dismiss()
+                                    vm.dialogTestFinishCuvetteDeficiencyCancel()
+                                })
+                        }
                     }
                     /**
                      * 开始检测 比色皿,样本，试剂不足
                      */
                     DialogState.GET_STATE_NOT_EXIST -> {
-                        dialog?.show(msg = state.dialogMsg, confirmMsg = "我已添加", onConfirm = {
-                            it.dismiss()
-                            vm.dialogGetStateNotExistConfirm()
-                        }, cancelMsg = "结束检测", onCancel = {
-                            it.dismiss()
-                            vm.dialogGetStateNotExistCancel()
-                        }, false
-                        )
+                        dialog?.showPop(requireContext(), isCancelable = false) {
+                            dialog?.showDialog(
+                                msg = state.dialogMsg,
+                                confirmText = "我已添加",
+                                confirmClick = {
+                                    it.dismiss()
+                                    vm.dialogGetStateNotExistConfirm()
+                                },
+                                cancelText = "结束检测",
+                                cancelClick = {
+                                    it.dismiss()
+                                    vm.dialogGetStateNotExistCancel()
+                                }
+                            )
+                        }
                     }
+
                     /**
                      * 正常检测 样本不足
                      */
                     DialogState.SAMPLE_DEFICIENCY -> {
-                        dialog?.show(msg = "样本不足，是否添加？", confirmMsg = "我已添加", onConfirm = {
-                            it.dismiss()
-                            vm.dialogTestSampleDeficiencyConfirm()
-                        }, cancelMsg = "结束检测", onCancel = {
-                            it.dismiss()
-                            vm.dialogTestSampleDeficiencyCancel()
-                        }, false)
+                        dialog?.showPop(requireContext(), isCancelable = false) {
+                            it?.showDialog(
+                                msg = "样本不足，是否添加？",
+                                confirmText = "我已添加",
+                                confirmClick = {
+                                    it.dismiss()
+                                    vm.dialogTestSampleDeficiencyConfirm()
+                                },
+                                cancelText = "结束检测",
+                                cancelClick = {
+                                    it.dismiss()
+                                    vm.dialogTestSampleDeficiencyCancel()
+                                })
+                        }
                     }
                     /**
                      * 检测结束 正常样本取样完成的提示
                      */
                     DialogState.TEST_FINISH -> {
-                        dialog?.show(msg = "检测结束", confirmMsg = "确定", onConfirm = {
-                            it.dismiss()
-                        })
+                        dialog?.showPop(requireContext(), isCancelable = false) {
+                            it?.showDialog(msg = "检测结束", confirmText = "确定", confirmClick = {
+                                it.dismiss()
+                            })
+                        }
                     }
                     /**
                      * 通知
@@ -397,7 +423,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             }
         }
     }
-
 
 
 }

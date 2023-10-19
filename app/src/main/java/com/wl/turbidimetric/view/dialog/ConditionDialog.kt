@@ -1,4 +1,4 @@
-package com.wl.turbidimetric.view
+package com.wl.turbidimetric.view.dialog
 
 import android.app.Activity
 import android.content.Context
@@ -29,65 +29,20 @@ import java.util.*
  * @property resultAdapter SpinnerAdapter
  * @constructor
  */
-class ConditionDialog(val context: Context) : BaseDialog(context) {
-    private val spnResults: Spinner
-    private val etName: EditText
-    private val etQRCode: EditText
-    private val etConMin: EditText
-    private val etConMax: EditText
-    private val tvResults: TextView
-    private val tvTestTimeMin: TextView
-    private val tvTestTimeMax: TextView
-    private val resultAdapter: SelectQueryAdapter
-    private val results = getResource().getStringArray(R.array.results)
+open class ConditionDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_condition) {
+    var spnResults: Spinner? = null
+    var etName: EditText? = null
+    var etQRCode: EditText? = null
+    var etConMin: EditText? = null
+    var etConMax: EditText? = null
+    var tvResults: TextView? = null
+    var tvTestTimeMin: TextView? = null
+    var tvTestTimeMax: TextView? = null
+    var resultAdapter: SelectQueryAdapter? = null
+    var results = getResource().getStringArray(R.array.results)
 
     var testTimeMin = ""
     var testTimeMax = ""
-
-    init {
-        addView(R.layout.dialog_condition)
-        dialogUtil.setWidthHeight(
-            WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT
-        )
-        etName = getView(R.id.et_name)
-        etQRCode = getView(R.id.et_qrcode)
-        etConMin = getView(R.id.et_con_min)
-        etConMax = getView(R.id.et_con_max)
-        spnResults = getView(R.id.spn_results)
-        tvResults = getView(R.id.tv_spn_results)
-        tvTestTimeMin = getView(R.id.tv_testtime_min)
-        tvTestTimeMax = getView(R.id.tv_testtime_max)
-
-        resultAdapter = SelectQueryAdapter(context, results)
-        spnResults.adapter = resultAdapter
-
-        resultAdapter.onItemSelectChange = { index, _ ->
-            tvResults.text = resultAdapter.getSelectText()
-        }
-
-        tvTestTimeMin.setOnClickListener {
-            val calendar =
-                if (tvTestTimeMin.text.isNullOrEmpty()) Calendar.getInstance() else Calendar.getInstance()
-                    .apply {
-                        time = tvTestTimeMin.text.toString().longStrToDate()
-                    }
-            showSelectTimeDialog(calendar) { longStr, time ->
-                tvTestTimeMin.text = longStr
-                testTimeMin = longStr
-            }
-        }
-        tvTestTimeMax.setOnClickListener {
-            val calendar =
-                if (tvTestTimeMax.text.isNullOrEmpty()) Calendar.getInstance() else Calendar.getInstance()
-                    .apply {
-                        time = tvTestTimeMax.text.toString().longStrToDate()
-                    }
-            showSelectTimeDialog(calendar) { longStr, time ->
-                tvTestTimeMax.text = longStr
-                testTimeMax = longStr
-            }
-        }
-    }
 
     /**
      * 时间选择器
@@ -128,37 +83,60 @@ class ConditionDialog(val context: Context) : BaseDialog(context) {
         picker.show()
     }
 
+    override fun setContent() {
+        super.setContent()
 
-    fun show(
-        onConfirm: (ConditionModel) -> Unit?, onCancel: onClick?, isCancelable: Boolean
+        if (resultAdapter == null) {
+            resultAdapter = SelectQueryAdapter(context, results)
+            spnResults?.adapter = resultAdapter
+        }
+
+        resultAdapter?.onItemSelectChange = { index, _ ->
+            tvResults?.text = resultAdapter?.getSelectText()
+        }
+
+        tvTestTimeMin?.setOnClickListener {
+            val calendar =
+                if (tvTestTimeMin?.text.isNullOrEmpty()) Calendar.getInstance() else Calendar.getInstance()
+                    .apply {
+                        time = tvTestTimeMin?.text.toString().longStrToDate()
+                    }
+            showSelectTimeDialog(calendar) { longStr, time ->
+                tvTestTimeMin?.text = longStr
+                testTimeMin = longStr
+            }
+        }
+        tvTestTimeMax?.setOnClickListener {
+            val calendar =
+                if (tvTestTimeMax?.text.isNullOrEmpty()) Calendar.getInstance() else Calendar.getInstance()
+                    .apply {
+                        time = tvTestTimeMax?.text.toString().longStrToDate()
+                    }
+            showSelectTimeDialog(calendar) { longStr, time ->
+                tvTestTimeMax?.text = longStr
+                testTimeMax = longStr
+            }
+        }
+
+    }
+
+    fun showDialog(
+        onConfirm: (ConditionModel) -> Unit?, onCancel: onClick?
     ) {
-//        if (conditionModel.name.isNotEmpty()) {
-//            etName.setText(conditionModel.name)
-//        }
-//        if (conditionModel.qrcode.isNotEmpty()) {
-//            etQRCode.setText(conditionModel.qrcode)
-//        }
-//        if (conditionModel.conMin.isNotEmpty()) {
-//            etConMin.setText(conditionModel.conMin)
-//        }
-//        if (conditionModel.conMax.isNotEmpty()) {
-//            etConMax.setText(conditionModel.conMax)
-//        }
-//        if (conditionModel.results.isNotEmpty()) {
-////            val index = results.indexOfFirst { it == conditionModel.conMax }
-////            spnResults.setSelection(results.indexOf(conditionModel.results))
-//        }
-
-
-        super.show2("确定", {
+        this.confirmText = "确定"
+        this.confirmClick = {
             if (verify()) {
                 onConfirm.invoke(getCondition())
             }
-        }, "清空", {
+        }
+        this.confirmText2 = "清空"
+        this.confirmClick2 = {
             clearCondition()
-//                resultAdapter.clearSelectedInfo()
-        }, "取消", onCancel, isCancelable
-        )
+        }
+        this.cancelText = "取消"
+        this.cancelClick = onCancel
+
+        super.show()
     }
 
     /**
@@ -179,33 +157,46 @@ class ConditionDialog(val context: Context) : BaseDialog(context) {
      * 清空所有条件
      */
     private fun clearCondition() {
-        etName.setText("")
-        etQRCode.setText("")
-        etConMin.setText("")
-        etConMax.setText("")
-        tvResults.setText("请选择")
-        resultAdapter.clearSelectedInfo()
-        tvTestTimeMin.setText("")
-        tvTestTimeMax.setText("")
+        etName?.setText("")
+        etQRCode?.setText("")
+        etConMin?.setText("")
+        etConMax?.setText("")
+        tvResults?.setText("请选择")
+        resultAdapter?.clearSelectedInfo()
+        tvTestTimeMin?.setText("")
+        tvTestTimeMax?.setText("")
         testTimeMin = ""
         testTimeMax = ""
     }
 
     private fun getCondition(): ConditionModel {
-        val name = etName.text.toString().ifEmpty { "" }
-        val qrcode = etQRCode.text.toString().ifEmpty { "" }
+        val name = etName?.text.toString().ifEmpty { "" }
+        val qrcode = etQRCode?.text.toString().ifEmpty { "" }
         val testTimeMax = if (testTimeMax.isEmpty()) 0 else testTimeMax.longStrToLong()
         val testTimeMin = if (testTimeMin.isEmpty()) 0 else testTimeMin.longStrToLong()
 
         return ConditionModel(
             name = name,
             qrcode = qrcode,
-            conMin = etConMin.text.toString().toIntOrNull() ?: 0,
-            conMax = etConMax.text.toString().toIntOrNull() ?: 0,
-            results = if (resultAdapter.getSelectItemsValue() == null) arrayOf() else resultAdapter.getSelectItemsValue()!!,
+            conMin = etConMin?.text.toString().toIntOrNull() ?: 0,
+            conMax = etConMax?.text.toString().toIntOrNull() ?: 0,
+            results = if (resultAdapter?.getSelectItemsValue() == null) arrayOf() else resultAdapter?.getSelectItemsValue()!!,
             testTimeMin = testTimeMin,
             testTimeMax = testTimeMax,
         )
+    }
+
+    override fun initDialogView() {
+        etName = findViewById(R.id.et_name)
+        etQRCode = findViewById(R.id.et_qrcode)
+        etConMin = findViewById(R.id.et_con_min)
+        etConMax = findViewById(R.id.et_con_max)
+        spnResults = findViewById(R.id.spn_results)
+        tvResults = findViewById(R.id.tv_spn_results)
+        tvTestTimeMin = findViewById(R.id.tv_testtime_min)
+        tvTestTimeMax = findViewById(R.id.tv_testtime_max)
+
+
     }
 
 

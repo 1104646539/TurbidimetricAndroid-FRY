@@ -8,12 +8,11 @@
 
     <LinearLayout
         android:id="@+id/root"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="60dp"
         android:background="@drawable/bg_dialog_hint"
         android:gravity="center_horizontal"
-        android:minWidth="800dp"
         android:orientation="vertical">
 
         <ImageView

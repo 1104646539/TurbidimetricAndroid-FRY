@@ -2,9 +2,6 @@ package com.wl.turbidimetric.datamanager
 
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -24,9 +21,10 @@ import com.wl.turbidimetric.model.TestResultModel
 import com.wl.turbidimetric.model.TestResultModel_
 import com.wl.turbidimetric.print.PrintUtil
 import com.wl.turbidimetric.util.ExportExcelHelper
-import com.wl.turbidimetric.view.ConditionDialog
-import com.wl.turbidimetric.view.HiltDialog
-import com.wl.turbidimetric.view.ResultDetailsDialog
+import com.wl.turbidimetric.view.dialog.ConditionDialog
+import com.wl.turbidimetric.view.dialog.HiltDialog
+import com.wl.turbidimetric.view.dialog.ResultDetailsDialog
+import com.wl.turbidimetric.view.dialog.showPop
 import com.wl.wllib.LogToFile.i
 import com.wl.wwanandroid.base.BaseFragment
 import io.objectbox.query.Query
@@ -166,9 +164,11 @@ class DataManagerFragment :
             if (id > 0) {
                 val result = DBManager.TestResultBox.get(id)
                 result?.let {
-                    resultDialog.show(result) {
-                        vm.update(it)
-                        true
+                    resultDialog.showPop(requireContext(), isCancelable = false) {
+                        it.showDialog(result) {
+                            vm.update(it)
+                            true
+                        }
                     }
                 }
             } else {
@@ -191,15 +191,17 @@ class DataManagerFragment :
 
         vm.showDeleteDialog.observe(this) {
             if (it) {
-                deleteDialog.show("确定要删除数据吗?", "确定", {
-                    val results = getSelectData()
-                    it.dismiss()
-                    if (!results.isNullOrEmpty()) {
-                        vm.clickDeleteDialogConfirm(results)
-                    }
-                }, "取消", {
-                    it.dismiss()
-                }, false)
+                deleteDialog.showPop(requireContext(), isCancelable = false) {
+                    it.showDialog("确定要删除数据吗?", "确定", {
+                        val results = getSelectData()
+                        it.dismiss()
+                        if (!results.isNullOrEmpty()) {
+                            vm.clickDeleteDialogConfirm(results)
+                        }
+                    }, "取消", {
+                        it.dismiss()
+                    })
+                }
             }
         }
         lifecycleScope.launch(Dispatchers.IO) {
@@ -273,17 +275,17 @@ class DataManagerFragment :
      * 显示筛选对话框
      */
     private fun showConditionDialog() {
-        conditionDialog.show({ conditionModel ->
-            lifecycleScope.launch {
-                queryData(conditionModel.buildQuery())
-            }
-            conditionDialog.dismiss()
-            i("conditionModel=$conditionModel")
-
-        }, {
-            conditionDialog.dismiss()
-        }, true)
-
+        conditionDialog.showPop(requireContext(), isCancelable = false) {
+            it.showDialog({ conditionModel ->
+                lifecycleScope.launch {
+                    queryData(conditionModel.buildQuery())
+                }
+                it.dismiss()
+                i("conditionModel=$conditionModel")
+            }, {
+                it.dismiss()
+            })
+        }
     }
 
     var datasJob: Job? = null

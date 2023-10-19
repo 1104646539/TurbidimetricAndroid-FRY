@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_dialog_hint"
@@ -18,11 +19,34 @@
             android:layout_height="wrap_content"
             android:text="请选择要覆盖的标曲:" />
 
-        <Spinner
-            android:id="@+id/spn_project"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:minHeight="50dp" />
+                <Spinner
+                    android:id="@+id/spn_project"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:minHeight="50dp"
+                    android:spinnerMode="dropdown"
+                    android:typeface="monospace" />
+<!--        <com.skydoves.powerspinner.PowerSpinnerView-->
+<!--            android:id="@+id/psView"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:background="@color/white"-->
+<!--            android:gravity="center"-->
+<!--            android:padding="10dp"-->
+<!--            android:textColor="@color/textColor"-->
+<!--            android:textColorHint="@color/textColor"-->
+<!--            android:textSize="20sp"-->
+<!--            android:typeface="monospace"-->
+<!--            app:spinner_arrow_gravity="end"-->
+<!--            app:spinner_arrow_padding="8dp"-->
+<!--            app:spinner_divider_color="@color/divider"-->
+<!--            app:spinner_divider_show="true"-->
+<!--            app:spinner_divider_size="0.4dp"-->
+<!--            app:spinner_item_height="70dp"-->
+<!--            app:spinner_popup_animation="dropdown"-->
+<!--            app:spinner_popup_background="@color/white"-->
+<!--            app:spinner_popup_height="800dp"-->
+<!--            app:spinner_popup_max_height="1000dp" />-->
     </LinearLayout>
 </LinearLayout>

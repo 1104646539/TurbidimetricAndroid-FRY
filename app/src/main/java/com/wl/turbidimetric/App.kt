@@ -3,6 +3,7 @@ package com.wl.turbidimetric
 import android.app.Application
 import android.content.Context
 import android.os.Debug
+import com.lxj.xpopup.XPopup
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.db.DBManager
 import com.wl.turbidimetric.model.ProjectModel
@@ -25,6 +26,7 @@ class App : Application() {
             DBManager.init(this)
             initDataStore();
             LogToFile.init()
+            initPop()
 //
             //没有项目参数的时候，添加一个默认参数
             if (DBManager.ProjectBox.all.isNullOrEmpty()) {
@@ -35,6 +37,11 @@ class App : Application() {
                 }
             }
         }
+    }
+
+    private fun initPop() {
+        XPopup.setAnimationDuration(300)
+        XPopup.setPrimaryColor(R.color.themePositiveColor)
     }
 
 

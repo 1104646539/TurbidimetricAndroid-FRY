@@ -169,6 +169,7 @@
                 </LinearLayout>
 
                 <TextView
+                    android:id="@+id/tvEquationText"
                     style="@style/TextHilt"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -176,17 +177,16 @@
                     android:layout_marginTop="100dp"
                     android:layout_marginRight="40dp"
                     android:gravity="left|center_vertical"
-                    android:text="@{model.equationText}"
                     android:textColor="@color/themePositiveColor" />
 
                 <TextView
+                    android:id="@+id/tvFitGoodnessText"
                     style="@style/TextHilt"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="40dp"
                     android:layout_marginTop="10dp"
                     android:layout_marginRight="40dp"
-                    android:text="@{model.fitGoodnessText}"
                     android:textColor="@color/themePositiveColor" />
 
                 <com.github.mikephil.charting.charts.LineChart

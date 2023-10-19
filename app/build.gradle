@@ -166,6 +166,9 @@ dependencies {
     implementation 'com.github.gzu-liyujiang.AndroidPicker:WheelPicker:4.1.11'
     implementation 'com.github.gzu-liyujiang.AndroidPicker:Common:4.1.11'
     implementation 'com.github.gzu-liyujiang.AndroidPicker:WheelView:4.1.11'
-
-
+    implementation "com.github.skydoves:powerspinner:1.2.1"
+    //dialog
+    implementation ("com.github.li-xiaojun:XPopup:2.9.19"){
+        exclude group: "com.davemorrissey.labs", module: "subsampling-scale-image-view-androidx"
+    }
 }

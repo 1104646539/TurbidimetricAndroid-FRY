@@ -1,28 +1,28 @@
 package com.wl.turbidimetric.matchingargs
 
 import android.os.Bundle
+import android.view.Gravity
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
+import com.lxj.xpopup.XPopup
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.FragmentMatchingArgsBinding
 import com.wl.turbidimetric.ex.*
-import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.global.SystemGlobal.obTestState
 import com.wl.turbidimetric.global.SystemGlobal.testState
+import com.wl.turbidimetric.home.HomeProjectAdapter
 import com.wl.turbidimetric.model.ProjectModel
 import com.wl.turbidimetric.model.TestState
-import com.wl.turbidimetric.view.CoverProjectDialog
-import com.wl.turbidimetric.view.HiltDialog
+import com.wl.turbidimetric.view.dialog.CoverProjectDialog
+import com.wl.turbidimetric.view.dialog.HiltDialog
+import com.wl.turbidimetric.view.dialog.showPop
 import com.wl.wwanandroid.base.BaseFragment
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import com.wl.wllib.LogToFile.i
 
 /**
@@ -43,35 +43,34 @@ class MatchingArgsFragment :
         fun newInstance() = MatchingArgsFragment()
     }
 
-    private val dialog: HiltDialog by lazy {
-        HiltDialog(requireContext())
-    }
-
     override fun initViewModel() {
         vd.model = vm
     }
 
+    private val dialog: HiltDialog by lazy {
+        HiltDialog(requireContext())
+    }
+    private val finishCoverDialog: HiltDialog by lazy {
+        HiltDialog(requireContext())
+    }
+
     private val adapter: MatchingArgsAdapter by lazy {
         MatchingArgsAdapter()
+    }
+    private val coverProjectDialog: CoverProjectDialog by lazy {
+        CoverProjectDialog(requireContext())
     }
 
     /**
      * 显示调试时详情的对话框
      */
     private val debugShowDetailsDialog: HiltDialog by lazy {
-        HiltDialog(requireContext()).apply {
-            width = 1500
-        }
+        HiltDialog(requireContext())
     }
 
     override fun init(savedInstanceState: Bundle?) {
-        lifecycleScope.launch {
-            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                initView()
-                listener()
-            }
-        }
-
+        initView()
+        listener()
     }
 
     private fun listener() {
@@ -80,6 +79,11 @@ class MatchingArgsFragment :
     }
 
     private fun initView() {
+        initCurveView()
+        test()
+    }
+
+    private fun initCurveView() {
         val set1 = LineDataSet(arrayListOf(), null)
         set1.setDrawValues(false)//不绘制值在点上
         set1.setDrawIcons(false)//不绘制值icon在点上
@@ -130,8 +134,6 @@ class MatchingArgsFragment :
         vd.lcCurve.setNoDataText("无数据")
         //设置数据，更新
         vd.lcCurve.data = data
-
-        test()
     }
 
     private fun test() {
@@ -139,53 +141,31 @@ class MatchingArgsFragment :
     }
 
     private fun listenerView() {
-        /**
-         * 显示调试的数据
-         */
-        vm.testMsg.observe(this) {
-            i("it=$it")
-            if (debugShowDetailsDialog.isShow()) {
-                debugShowDetailsDialog.show(it, "确定", onConfirm = { it.dismiss() })
-            }
-        }
-
         vd.rv.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         vd.rv.adapter = adapter
 
-        lifecycleScope.launch {
+        launchAndRepeatWithViewLifecycle(Lifecycle.State.CREATED) {
             vm.datas.collectLatest {
                 adapter.submit(it)
                 //默认选择最近一个
 //                if (adapter.selectPos < 0 && adapter.items.isNotEmpty()) {
                 adapter.setSelectIndex(0)
                 adapter.notifyItemChanged(0)
+
 //                }
             }
         }
-        vm.toastMsg.observe(this) { msg ->
-            i("msg=$msg")
-            snack(vd.root, msg)
-        }
+//        vm.toastMsg.observe(this) { msg ->
+//            i("msg=$msg")
+//            snack(vd.root, msg)
+//        }
 
         adapter.onSelectChange = { project ->
             i("选中的=${project}")
             changeCurve(project)
         }
 
-//        obMatchingTestState.observe(this) {
-//            if (it != MatchingArgState.None && it != MatchingArgState.Finish) {
-//                vd.btnStart.setBackgroundResource(R.drawable.rip_positive2)
-//                vd.btnStart.setText("正在拟合")
-//                vm.qualityEnable.postValue(false)
-//                vm.reagentNoEnable.postValue(false)
-//            } else {
-//                vd.btnStart.setBackgroundResource(R.drawable.rip_positive)
-//                vd.btnStart.setText("开始拟合")
-//                vm.qualityEnable.postValue(true)
-//                vm.reagentNoEnable.postValue(true)
-//            }
-//        }
         launchAndRepeatWithViewLifecycle {
             obTestState.collectLatest {
                 if (it.isRunning()) {
@@ -201,36 +181,29 @@ class MatchingArgsFragment :
                 }
             }
         }
+        launchAndRepeatWithViewLifecycle {
+            vm.curveUiState.collectLatest {
+                vd.tvEquationText.text = it.equationText
+                vd.tvFitGoodnessText.text = it.fitGoodnessText
+            }
+        }
         vd.btnStart.setOnClickListener {
             startMatching();
-//            dialog.show("asdfasdfasfasdflkjaaaaaaaaaakjllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllasdffafsdfasf","确定",{},"取消",{})
         }
         vd.btnPrint.setOnClickListener {
             vm.print()
         }
 
-//        vd.btnDebug2.setOnClickListener {
-//            DBManager.ProjectBox.put(ProjectModel().apply {
-//                reagentNO = "5452"
-//                reactionValues = intArrayOf(60, 91, 2722, 11722, 27298)
-//                f0 = 9.702673786
-//                f1 = 0.7425860767
-//                f2 = -4.513632E-4
-//                f3 = 1.406E-7
-//                projectLjz = 100
-//                fitGoodness = 0.9998
-//                createTime = Date().toLongString()
-//            })
-//        }
-
         vd.btnDebugDialog.setOnClickListener {
-            debugShowDetailsDialog.show(vm.testMsg.value ?: "", "确定", onConfirm = { it.dismiss() })
+            debugShowDetailsDialog.showPop(requireContext()) {
+                it.showDialog(
+                    vm.testMsg.value ?: "",
+                    "确定",
+                    confirmClick = { it.dismiss() })
+            }
         }
     }
 
-    val coverProjectDialog: CoverProjectDialog by lazy {
-        CoverProjectDialog(requireContext())
-    }
 
     private fun startMatching() {
         if (testState.isNotPrepare()) {
@@ -249,19 +222,21 @@ class MatchingArgsFragment :
             vm.clickStart(null)
             return
         }
-        coverProjectDialog.show(adapter.items, onConfirm = { projectModel, baseDialog ->
-            if (projectModel == null) {
+        coverProjectDialog.showPop(requireContext(), isCancelable = false) {
+            it.show(adapter.items, onConfirm = { projectModel, baseDialog ->
+                if (projectModel == null) {
+                    toast("未选择覆盖的标曲，取消拟合！")
+                    testState = TestState.Normal
+                } else {
+                    vm.clickStart(projectModel)
+                }
+                baseDialog.dismiss()
+            }, onCancel = {
                 toast("未选择覆盖的标曲，取消拟合！")
                 testState = TestState.Normal
-            } else {
-                vm.clickStart(projectModel)
-            }
-            baseDialog.dismiss()
-        }, onCancel = {
-            toast("未选择覆盖的标曲，取消拟合！")
-            testState = TestState.Normal
-            it.dismiss()
-        })
+                it.dismiss()
+            })
+        }
     }
 
     /**
@@ -279,16 +254,17 @@ class MatchingArgsFragment :
             return
         }
 
+        vm.changeSelectProject(project)
 
-        //方程和拟合度
-        vm.equationText.postValue(
-            "Y=${project.f0.scale(8)}+${project.f1.scale(8)}x+${
-                project.f2.scale(
-                    8
-                )
-            }x²+${project.f3.scale(8)}x³"
-        )
-        vm.fitGoodnessText.postValue("R²=${project.fitGoodness.scale(6)}")
+//        //方程和拟合度
+//        vm.equationText.postValue(
+//            "Y=${project.f0.scale(8)}+${project.f1.scale(8)}x+${
+//                project.f2.scale(
+//                    8
+//                )
+//            }x²+${project.f3.scale(8)}x³"
+//        )
+//        vm.fitGoodnessText.postValue("R²=${project.fitGoodness.scale(6)}")
 
 
         if (vd.lcCurve.data != null && vd.lcCurve.data.dataSetCount > 0) {
@@ -302,27 +278,89 @@ class MatchingArgsFragment :
     }
 
     private fun listenerDialog() {
-        /**
-         * 开始检测 比色皿,样本，试剂不足
-         */
-        vm.getStateNotExistMsg.observe(this) { msg ->
-            if (msg.isNotEmpty()) {
-                dialog.show(msg = "${vm.getStateNotExistMsg.value}",
-                    confirmMsg = "我已添加",
-                    onConfirm = {
-                        it.dismiss()
-                        vm.dialogGetStateNotExistConfirm()
-                    },
-                    cancelMsg = "结束检测",
-                    onCancel = {
-                        it.dismiss()
-                        vm.dialogGetStateNotExistCancel()
-                    })
+        launchAndRepeatWithViewLifecycle {
+            vm.dialogUiState.collect {
+                when (it.dialogState) {
+                    DialogState.GetStateNotExistMsg -> {//开始检测，确实清洗液等
+                        dialog.showPop(requireContext()) {
+                            it.showDialog(
+                                msg = "${it.msg}",
+                                confirmText = "我已添加",
+                                confirmClick = {
+                                    it.dismiss()
+                                    vm.dialogGetStateNotExistConfirm()
+                                },
+                                cancelText = "结束检测",
+                                cancelClick = {
+                                    it.dismiss()
+                                    vm.dialogGetStateNotExistCancel()
+                                }
+                            )
+                        }
+                    }
+                    DialogState.MatchingFinishMsg -> {//检测结束，提示是否保存
+//                        vm.saveProject()
+                        val msg = it.msg.plus("\n确定保存该条标曲记录？\n\n")
+                        finishCoverDialog.showPop(
+                            requireContext(),
+                            width = 1500,
+                            maxWidth = 1500,
+                            isCancelable = false
+                        ) {
+                            it.showDialog(
+                                msg = msg,
+                                confirmText = "保存", confirmClick = {
+                                    vm.saveProject()
+                                    it.dismiss()
+                                }, cancelText = "取消", cancelClick = {
+                                    it.dismiss()
+                                }
+                            )
+                        }
+
+                    }
+                    else -> {
+
+                    }
+                }
             }
         }
-        vm.matchingFinishMsg.observe(this) {
-            if (it.isNotEmpty()) {
-                vm.saveProject()
+        /**
+         * 显示调试的数据
+         */
+        vm.testMsg.observe(this) {
+            i("it=$it")
+            if (debugShowDetailsDialog.isShow()) {
+                debugShowDetailsDialog.showPop(
+                    requireContext(), width = 1500,
+                    maxWidth = 1500,
+                    isCancelable = true
+                ) { d ->
+                    d.showDialog(it, "确定", confirmClick = { d.dismiss() })
+                }
+            }
+        }
+//        /**
+//         * 开始检测 比色皿,样本，试剂不足
+//         */
+//        vm.getStateNotExistMsg.observe(this) { msg ->
+//            if (msg.isNotEmpty()) {
+//                dialog.show(msg = "${vm.getStateNotExistMsg.value}",
+//                    confirmMsg = "我已添加",
+//                    onConfirm = {
+//                        it.dismiss()
+//                        vm.dialogGetStateNotExistConfirm()
+//                    },
+//                    cancelMsg = "结束检测",
+//                    onCancel = {
+//                        it.dismiss()
+//                        vm.dialogGetStateNotExistCancel()
+//                    })
+//            }
+//        }
+//        vm.matchingFinishMsg.observe(this) {
+//            if (it.isNotEmpty()) {
+//                vm.saveProject()
 //                val msg = it.plus("确定保存该条标曲记录？")
 //                dialog.show(
 //                    msg = msg,
@@ -333,8 +371,8 @@ class MatchingArgsFragment :
 //                        it.dismiss()
 //                    }
 //                )
-            }
-        }
+//            }
+//        }
     }
 
 }

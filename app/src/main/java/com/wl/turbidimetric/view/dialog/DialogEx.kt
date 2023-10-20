@@ -28,9 +28,11 @@ inline fun <T : BasePopupView> T.showPop(
         .maxWidth(maxWidth).maxHeight(maxHeight)
         .dismissOnTouchOutside(isCancelable)
         .dismissOnBackPressed(isCancelable)
+        .autoOpenSoftInput(false)
+        .autoFocusEditText(false)
+        .isRequestFocus(false)
         .asCustom(this)
     la.invoke(d as T)
-//    la.invoke(this)
 }
 
 fun Boolean?.isShow(): Int {

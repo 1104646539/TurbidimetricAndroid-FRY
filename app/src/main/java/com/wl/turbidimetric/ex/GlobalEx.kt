@@ -30,6 +30,20 @@ fun Double.scale(scale: Int): Double {
 }
 
 /**
+ * 用来将double类型的值四舍五入下保留几位小数
+ * @receiver Double
+ * @param scale Int
+ * @return Double
+ */
+fun Double.scaleStr(scale: Int): String {
+    return try {
+        val two = BigDecimal(this)
+        two.setScale(scale, BigDecimal.ROUND_HALF_UP).toPlainString()
+    } catch (e: Exception) {
+        "0.0"
+    }
+}
+/**
  * 显示snack提示
  * @param view View
  * @param msg String

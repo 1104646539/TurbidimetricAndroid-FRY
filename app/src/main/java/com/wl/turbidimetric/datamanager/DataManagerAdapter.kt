@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.ItemDatamanagerResultBinding
 import com.wl.turbidimetric.model.TestResultModel
+import com.wl.wllib.LogToFile.i
 import com.wl.wllib.toLongTimeStr
 import com.wl.wllib.toTimeStr
 
@@ -24,7 +25,7 @@ class DataManagerAdapter :
             oldItem: TestResultModel,
             newItem: TestResultModel
         ): Boolean {
-            return oldItem == newItem;
+            return oldItem.id == newItem.id;
         }
 
         override fun areContentsTheSame(
@@ -71,16 +72,12 @@ class DataManagerAdapter :
     }
 
 
-    override fun getItemViewType(position: Int): Int {
-        return position
-    }
-
     fun getSelectedItems(): List<TestResultModel> {
         val items = mutableListOf<TestResultModel>().apply {
             for (i in 0 until itemCount) {
-                val item = getItem(i)!!
-                if (item.isSelect) {
-                    add(item)
+                getItem(i)?.let {
+                    if (it.isSelect)
+                        add(it)
                 }
             }
         }
@@ -102,11 +99,14 @@ class DataManagerAdapter :
                         getItem(position)?.let {
                             if (it.isSelect) {
                                 holder.binding.root.setBackgroundResource(R.drawable.bg_item_select)
-                            } else if (holder.absoluteAdapterPosition % 2 == 0) {
+                            } else
+//                                if (holder.absoluteAdapterPosition % 2 == 0)
+                            {
                                 holder.binding.root.setBackgroundColor(Color.WHITE)
-                            } else {
-                                holder.binding.root.setBackgroundResource(R.drawable.rip_item)
                             }
+//                            else {
+//                                holder.binding.root.setBackgroundResource(R.drawable.rip_item)
+//                            }
                             holder.binding.ivSelect.isSelected = it?.isSelect ?: false
                         }
                     }
@@ -128,14 +128,18 @@ class DataManagerAdapter :
                 }
             }
             holder.binding.ivSelect.isSelected = item?.isSelect ?: false
+//            i("onBindViewHolder position=$position item.id=${item?.id} isselect=${item?.isSelect} absoluteAdapterPosition=${holder.absoluteAdapterPosition} bindingAdapterPosition=${holder.bindingAdapterPosition} layoutPosition=${holder.layoutPosition}")
             item?.let {
                 if (it.isSelect) {
                     holder.binding.root.setBackgroundResource(R.drawable.bg_item_select)
-                } else if (holder.absoluteAdapterPosition % 2 == 0) {
+                } else
+//                    if (holder.absoluteAdapterPosition % 2 == 0)
+                {
                     holder.binding.root.setBackgroundColor(Color.WHITE)
-                } else {
-                    holder.binding.root.setBackgroundResource(R.drawable.rip_item)
                 }
+//                else {
+//                    holder.binding.root.setBackgroundResource(R.drawable.rip_item)
+//                }
             }
         }
     }

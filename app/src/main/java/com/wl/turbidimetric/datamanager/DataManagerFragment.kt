@@ -4,9 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,6 +13,7 @@ import com.wl.turbidimetric.databinding.FragmentDataManagerBinding
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.db.DBManager
 import com.wl.turbidimetric.ex.PD
+import com.wl.turbidimetric.ex.launchAndRepeatWithViewLifecycle
 import com.wl.turbidimetric.ex.toast
 import com.wl.turbidimetric.model.ConditionModel
 import com.wl.turbidimetric.model.TestResultModel
@@ -59,6 +58,13 @@ class DataManagerFragment :
      * 删除对话框
      */
     val deleteDialog by lazy {
+        HiltDialog(requireContext())
+    }
+
+    /**
+     * 等待任务对话框
+     */
+    val waitDialog by lazy {
         HiltDialog(requireContext())
     }
 
@@ -113,14 +119,14 @@ class DataManagerFragment :
 
     private fun createTestData(): List<TestResultModel> {
         return mutableListOf<TestResultModel>().apply {
-            for (i in 0..100) {
+            for (i in 0..6000) {
                 val dr = TestResultModel(
                     testResult = (i % 2 == 0).PD("阳性", "阴性"),
                     concentration = 66 + i,
                     absorbances = "121120".toBigDecimal(),
                     name = (i % 2 == 0).PD("张三", "李四"),
-                    gender = "",
-                    age = "",
+                    gender = (i % 2 == 0).PD("男", "女"),
+                    age = (i % 90).toString(),
                     detectionNum = LocalData.getDetectionNumInc(),
                     testOriginalValue1 = 52111,
                     testOriginalValue2 = 52112,
@@ -154,7 +160,16 @@ class DataManagerFragment :
         }
 
         vd.btnExportExcel.setOnClickListener {
-            exportExcel()
+            exportExcelSelected()
+        }
+        vd.btnExportExcelAll.setOnClickListener {
+            exportExcelAll()
+        }
+
+        lifecycleScope.launch {
+            vm.resultSize.collectLatest {
+                vd.tvCount.text = "(${it}条)"
+            }
         }
 
         adapter.onLongClick = { id ->
@@ -201,25 +216,22 @@ class DataManagerFragment :
                 }
             }
         }
-        lifecycleScope.launch(Dispatchers.IO) {
-            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                val con: Query<TestResultModel> = DBManager.TestResultBox.query().orderDesc(
-                    TestResultModel_.id
-                ).build()
-                queryData(con)
+
+        launchAndRepeatWithViewLifecycle {
+            adapter.loadStateFlow.collectLatest { loadState ->
+                if (loadState.source.refresh is LoadState.NotLoading && loadState.append.endOfPaginationReached && adapter.itemCount < 1) {
+                    vd.rv?.isVisible = false
+                    vd.empty?.isVisible = true
+                } else {
+                    vd.rv?.isVisible = true
+                    vd.empty?.isVisible = false
+                }
             }
         }
-        lifecycleScope.launch {
-            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                adapter.loadStateFlow.collectLatest { loadState ->
-                    if (loadState.source.refresh is LoadState.NotLoading && loadState.append.endOfPaginationReached && adapter.itemCount < 1) {
-                        vd.rv?.isVisible = false
-                        vd.empty?.isVisible = true
-                    } else {
-                        vd.rv?.isVisible = true
-                        vd.empty?.isVisible = false
-                    }
-                }
+
+        launchAndRepeatWithViewLifecycle {
+            vm.conditionModel.collectLatest {
+                queryData(it)
             }
         }
     }
@@ -236,38 +248,79 @@ class DataManagerFragment :
         PrintUtil.printTest(results)
     }
 
-    /**
-     * 验证 导出数据到Excel
-     */
-    private fun exportExcelVerify() {
-        val selectData = getSelectData()
-        if (selectData.isNullOrEmpty()) {
-            toast("请选择数据")
-            return
-        }
-        selectData?.let {
-            exportExcel()
-        }
+    private fun exportExcelSelected() {
+        exportExcel(false)
+    }
+
+
+    private fun exportExcelAll() {
+        exportExcel(true)
     }
 
     /**
-     * 导出数据到Excel
+     * 导出数据到U盘 （excel格式.xls）
+     * @param exportAll Boolean
+     * @param dialog HiltDialog
+     * @param items List<TestResultModel>?
      */
-    private fun exportExcel() {
-        lifecycleScope.launch {
-            getSelectData()?.let { it ->
-                ExportExcelHelper.export(requireContext(), it, { toast("成功$it") }, { toast(it) })
+    private fun exportExcel(exportAll: Boolean) {
+        waitDialog.showPop(requireContext()) { dialog ->
+            //step1、 显示等待对话框
+            dialog.showDialog("请等待……", confirmText = "", confirmClick = {})
+            lifecycleScope.launch(Dispatchers.IO) {
+                //step2、 获取数据
+                val data = if (exportAll) {
+                    val condition = vm.conditionModel.value
+                    vm.getFilterAll(condition)
+                } else {
+                    getSelectData()
+                }
+                //step3、 导出 等待结果
+                val err = exportExcelVerify(data)
+                if (err.isEmpty()) {
+                    ExportExcelHelper.export(
+                        requireContext(),
+                        data!!,
+                        { msg ->
+                            lifecycleScope.launch(Dispatchers.Main) {
+                                dialog.showDialog("导出成功,文件保存在 $msg", "确定", { d ->
+                                    d.dismiss()
+                                })
+                            }
+                        },
+                        { it ->
+                            lifecycleScope.launch(Dispatchers.Main) {
+                                dialog.showDialog("导出失败,$it", "确定", { d ->
+                                    d.dismiss()
+                                })
+                            }
+                        })
+                } else {
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        dialog.showDialog("导出失败,$err", "确定", { d ->
+                            d.dismiss()
+                        })
+                    }
+                }
             }
         }
     }
 
-    private fun getSelectData(): List<TestResultModel>? {
-//        val all = adapter.snapshot().map { it!! }
-//        val select = all.filter { it?.isSelect ?: false }
-//
-//        i("all=${all.size} select=${select.size}")
-//        return select
+    /**
+     * 验证
+     */
+    private fun exportExcelVerify(items: List<TestResultModel>?): String {
+        return if (items.isNullOrEmpty()) {
+            "请选择数据"
+        } else if (items.size > 4000) {
+            "一次操作不能大于4000条，当前操作了${items.size}条"
+        } else {
+            ""
+        }
+    }
 
+
+    private fun getSelectData(): List<TestResultModel>? {
         return adapter.getSelectedItems()
     }
 
@@ -277,9 +330,7 @@ class DataManagerFragment :
     private fun showConditionDialog() {
         conditionDialog.showPop(requireContext(), isCancelable = false) {
             it.showDialog({ conditionModel ->
-                lifecycleScope.launch {
-                    queryData(conditionModel.buildQuery())
-                }
+                vm.conditionChange(conditionModel)
                 it.dismiss()
                 i("conditionModel=$conditionModel")
             }, {
@@ -289,7 +340,7 @@ class DataManagerFragment :
     }
 
     var datasJob: Job? = null
-    private suspend fun queryData(condition: Query<TestResultModel>) {
+    private suspend fun queryData(condition: ConditionModel) {
         datasJob?.cancelAndJoin()
         datasJob = lifecycleScope.launch {
             vm.item(condition).collectLatest {
@@ -303,49 +354,6 @@ class DataManagerFragment :
         }
     }
 
-    private fun ConditionModel.buildQuery(): Query<TestResultModel> {
-        val condition: QueryBuilder<TestResultModel> = DBManager.TestResultBox.query().orderDesc(
-            TestResultModel_.id
-        )
-
-        if (name.isNotEmpty()) {
-            condition.contains(
-                TestResultModel_.name,
-                name,
-                QueryBuilder.StringOrder.CASE_INSENSITIVE
-            )
-        }
-        if (qrcode.isNotEmpty()) {
-            condition.contains(
-                TestResultModel_.sampleQRCode,
-                qrcode,
-                QueryBuilder.StringOrder.CASE_INSENSITIVE
-            )
-        }
-        if (conMin != 0) {
-            condition.greaterOrEqual(TestResultModel_.concentration, conMin.toLong())
-        }
-        if (conMax != 0) {
-            condition.lessOrEqual(TestResultModel_.concentration, conMax.toLong())
-        }
-        if (testTimeMin != 0L) {
-            condition.greaterOrEqual(TestResultModel_.testTime, testTimeMin)
-        }
-        if (testTimeMax != 0L) {
-            condition.lessOrEqual(TestResultModel_.testTime, testTimeMax)
-        }
-
-
-        if (results.isNotEmpty()) {
-            condition.`in`(
-                TestResultModel_.testResult,
-                results,
-                QueryBuilder.StringOrder.CASE_INSENSITIVE
-            )
-        }
-
-        return condition.build()
-    }
 
     private val resultDialog by lazy {
         ResultDetailsDialog(requireContext())

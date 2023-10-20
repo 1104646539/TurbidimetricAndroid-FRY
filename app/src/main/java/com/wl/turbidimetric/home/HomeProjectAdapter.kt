@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.*
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.ex.scale
+import com.wl.turbidimetric.ex.scaleStr
 import com.wl.turbidimetric.model.ProjectModel
 import com.wl.wllib.LogToFile.i
 
@@ -44,10 +45,10 @@ class HomeProjectAdapter @JvmOverloads constructor(
             val tvTime = root.findViewById<TextView>(R.id.tvTime)
             val tvNO = root.findViewById<TextView>(R.id.tvNO)
 
-            tvA1?.text = "f0:" + items?.get(position)?.f0?.scale(6).toString()
-            tvA2?.text = "f1:" + items?.get(position)?.f1?.scale(6).toString()
-            tvX0?.text = "f2:" + items?.get(position)?.f2?.scale(6).toString()
-            tvP?.text = "f3:" + items?.get(position)?.f3?.scale(6).toString()
+            tvA1?.text = "f0:" + items?.get(position)?.f0?.scaleStr(6).toString()
+            tvA2?.text = "f1:" + items?.get(position)?.f1?.scaleStr(6).toString()
+            tvX0?.text = "f2:" + items?.get(position)?.f2?.scaleStr(6).toString()
+            tvP?.text = "f3:" + items?.get(position)?.f3?.scaleStr(6).toString()
             tvTime?.text = "时间:" + items?.get(position)?.createTime
             tvNO?.text =
                 "序号:" + if (items?.get(position)?.reagentNO.isNullOrEmpty()) "-" else items?.get(
@@ -85,10 +86,10 @@ class HomeProjectAdapter @JvmOverloads constructor(
             val tvTime = root.findViewById<TextView>(R.id.tvTime)
             val tvNO = root.findViewById<TextView>(R.id.tvNO)
 
-            tvA1?.text = "f0:" + items?.get(position)?.f0?.scale(6).toString()
-            tvA2?.text = "f1:" + items?.get(position)?.f1?.scale(6).toString()
-            tvX0?.text = "f2:" + items?.get(position)?.f2?.scale(6).toString()
-            tvP?.text = "f3:" + items?.get(position)?.f3?.scale(6).toString()
+            tvA1?.text = "f0:" + items?.get(position)?.f0?.scaleStr(6).toString()
+            tvA2?.text = "f1:" + items?.get(position)?.f1?.scaleStr(6).toString()
+            tvX0?.text = "f2:" + items?.get(position)?.f2?.scaleStr(6).toString()
+            tvP?.text = "f3:" + items?.get(position)?.f3?.scaleStr(6).toString()
             tvTime?.text = "时间:" + items?.get(position)?.createTime
             tvNO?.text =
                 "序号:" + if (items?.get(position)?.reagentNO.isNullOrEmpty()) "-" else items?.get(

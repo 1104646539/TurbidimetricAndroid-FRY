@@ -4,11 +4,13 @@
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
     android:orientation="vertical"
+    android:focusable="false"
+    android:focusableInTouchMode="false"
     android:padding="15dp">
 
     <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:orientation="horizontal">
 
         <TextView
@@ -42,7 +44,7 @@
 
     <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:layout_marginTop="10dp"
         android:orientation="horizontal">
 
@@ -78,7 +80,7 @@
 
     <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:layout_marginTop="10dp"
         android:orientation="horizontal">
 
@@ -103,7 +105,7 @@
                 android:id="@+id/tv_spn_results"
                 style="@style/TextHilt"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:text="请选择"
                 android:textColor="@color/textGray" />
         </RelativeLayout>
@@ -111,7 +113,7 @@
 
     <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:layout_marginTop="10dp"
         android:orientation="horizontal">
 

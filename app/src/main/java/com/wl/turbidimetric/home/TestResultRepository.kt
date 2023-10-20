@@ -5,13 +5,14 @@ import androidx.paging.PagingConfig
 import com.wl.turbidimetric.db.DBManager
 import com.wl.turbidimetric.model.TestResultModel
 import io.objectbox.android.ObjectBoxDataSource
+import io.objectbox.query.LazyList
 import io.objectbox.query.Query
 import kotlinx.coroutines.Dispatchers
 
 class TestResultRepository() {
 
     fun datas(condition: Query<TestResultModel>?) = Pager(
-        PagingConfig(pageSize = 500),
+        PagingConfig(pageSize = 50),
         pagingSourceFactory = ObjectBoxDataSource.Factory(
             condition
         )
@@ -27,7 +28,10 @@ class TestResultRepository() {
     }
 
     fun removeTestResult(testResults: List<TestResultModel>) {
-         DBManager.TestResultBox.remove(testResults)
+        DBManager.TestResultBox.remove(testResults)
     }
 
+    fun getAllTestResult(condition: Query<TestResultModel>): LazyList<TestResultModel> {
+        return condition.findLazy()
+    }
 }

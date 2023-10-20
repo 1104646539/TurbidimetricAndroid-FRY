@@ -44,6 +44,15 @@
                         android:text="数据管理"
                         android:textStyle="bold" />
 
+                    <TextView
+                        style="@style/TextHilt"
+                        android:id="@+id/tvCount"
+                        android:layout_width="wrap_content"
+                        android:textColor="@color/themePositiveColor"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="12dp"
+                        android:text="(100)"/>
+
                 </LinearLayout>
 
                 <LinearLayout
@@ -179,6 +188,15 @@
                     android:layout_marginLeft="20dp"
                     android:minWidth="150dp"
                     android:text="导出Excel"
+                    android:textAllCaps="false" />
+                <Button
+                    android:id="@+id/btnExportExcelAll"
+                    style="@style/BtnPositive"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:minWidth="150dp"
+                    android:text="导出Excel(全部)"
                     android:textAllCaps="false" />
             </LinearLayout>
 

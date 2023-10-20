@@ -6,12 +6,17 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.wl.turbidimetric.db.DBManager
 import com.wl.turbidimetric.home.ProjectRepository
 import com.wl.turbidimetric.home.TestResultRepository
+import com.wl.turbidimetric.model.ConditionModel
 import com.wl.turbidimetric.model.TestResultModel
+import com.wl.turbidimetric.model.TestResultModel_
 import com.wl.wwanandroid.base.BaseViewModel
+import io.objectbox.query.LazyList
 import io.objectbox.query.Query
-import kotlinx.coroutines.flow.Flow
+import io.objectbox.query.QueryBuilder
+import kotlinx.coroutines.flow.*
 
 
 class DataManagerViewModel(
@@ -23,9 +28,21 @@ class DataManagerViewModel(
      */
     val showDeleteDialog = MutableLiveData(false)
 
+    /**
+     * 筛选条件
+     */
+    private val _conditionModel = MutableStateFlow(ConditionModel())
+    val conditionModel: StateFlow<ConditionModel> = _conditionModel.asStateFlow()
 
-    public fun item(condition: Query<TestResultModel>?): Flow<PagingData<TestResultModel>> {
-        return testResultRepository.datas(condition).cachedIn(viewModelScope)
+    /**
+     * 结果数量
+     */
+    private val _resultSize = MutableStateFlow(0L)
+    val resultSize: StateFlow<Long> = _resultSize.asStateFlow()
+
+    public fun item(condition: ConditionModel): Flow<PagingData<TestResultModel>> {
+        _resultSize.value = condition.buildQuery().count()
+        return testResultRepository.datas(condition.buildQuery()).cachedIn(viewModelScope)
     }
 
     fun update(testResult: TestResultModel): Long {
@@ -44,6 +61,58 @@ class DataManagerViewModel(
         remove(results)
     }
 
+    fun getFilterAll(condition: ConditionModel): LazyList<TestResultModel> {
+        return testResultRepository.getAllTestResult(condition.buildQuery())
+    }
+
+    fun conditionChange(conditionModel: ConditionModel) {
+        _conditionModel.value = conditionModel
+        _resultSize.value = conditionModel.buildQuery().count()
+    }
+
+    open fun ConditionModel.buildQuery(): Query<TestResultModel> {
+        val condition: QueryBuilder<TestResultModel> = DBManager.TestResultBox.query().orderDesc(
+            TestResultModel_.id
+        )
+
+        if (name.isNotEmpty()) {
+            condition.contains(
+                TestResultModel_.name,
+                name,
+                QueryBuilder.StringOrder.CASE_INSENSITIVE
+            )
+        }
+        if (qrcode.isNotEmpty()) {
+            condition.contains(
+                TestResultModel_.sampleQRCode,
+                qrcode,
+                QueryBuilder.StringOrder.CASE_INSENSITIVE
+            )
+        }
+        if (conMin != 0) {
+            condition.greaterOrEqual(TestResultModel_.concentration, conMin.toLong())
+        }
+        if (conMax != 0) {
+            condition.lessOrEqual(TestResultModel_.concentration, conMax.toLong())
+        }
+        if (testTimeMin != 0L) {
+            condition.greaterOrEqual(TestResultModel_.testTime, testTimeMin)
+        }
+        if (testTimeMax != 0L) {
+            condition.lessOrEqual(TestResultModel_.testTime, testTimeMax)
+        }
+
+
+        if (results.isNotEmpty()) {
+            condition.`in`(
+                TestResultModel_.testResult,
+                results,
+                QueryBuilder.StringOrder.CASE_INSENSITIVE
+            )
+        }
+
+        return condition.build()
+    }
 }
 
 class DataManagerViewModelFactory(

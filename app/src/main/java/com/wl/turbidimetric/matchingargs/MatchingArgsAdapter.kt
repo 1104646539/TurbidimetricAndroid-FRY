@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.ItemMatchingargsBinding
 import com.wl.turbidimetric.ex.scale
+import com.wl.turbidimetric.ex.scaleStr
 import com.wl.turbidimetric.model.ProjectModel
 import com.wl.wllib.LogToFile.i
 class MatchingArgsAdapter() :
@@ -30,12 +31,12 @@ class MatchingArgsAdapter() :
         fun bindData(item: ProjectModel?) {
             binding.setVariable(BR.item, item)
             binding.tvID.text = (item?.reagentNO ?: "-").toString()
-            binding.tvA1.text = (item?.f0 ?: 0.0).scale(8).toString()
-            binding.tvA2.text = (item?.f1 ?: 0.0).scale(8).toString()
-            binding.tvX0.text = (item?.f2 ?: 0.0).scale(8).toString()
-            binding.tvP.text = (item?.f3 ?: 0.0).scale(8).toString()
+            binding.tvA1.text = (item?.f0 ?: 0.0).scaleStr(6).toString()
+            binding.tvA2.text = (item?.f1 ?: 0.0).scaleStr(6).toString()
+            binding.tvX0.text = (item?.f2 ?: 0.0).scaleStr(6).toString()
+            binding.tvP.text = (item?.f3 ?: 0.0).scaleStr(6).toString()
             binding.tvTestTime.text = item?.createTime ?: "-"
-            binding.tvFitGoodness.text = (item?.fitGoodness ?: 0.0).scale(8).toString()
+            binding.tvFitGoodness.text = (item?.fitGoodness ?: 0.0).scaleStr(6).toString()
         }
     }
 

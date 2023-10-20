@@ -39,12 +39,12 @@ object ExportExcelHelper {
     ) {
 
         if (!StorageUtil.isExist()) {
-            onFailed("导出失败，没有插入U盘")
+            onFailed("没有插入U盘")
             return
         }
 
         if (datas.isNullOrEmpty()) {
-            onFailed("导出失败，没有数据")
+            onFailed("没有数据")
             return
         }
         val fileName = getFileName()
@@ -55,7 +55,7 @@ object ExportExcelHelper {
             excelOutputStream =
                 StorageUtil.getOutputStream(newfile!!, context)
             if (excelOutputStream == null) {
-                onFailed("导出失败,无法写入")
+                onFailed("无法写入")
                 return
             }
             //输出
@@ -66,19 +66,19 @@ object ExportExcelHelper {
                     excelOutputStream
                 )
             if (isSuccess) {
-                onSuccess(fileName)
+                onSuccess("数据表/$fileName")
             } else {
-                onFailed("导出失败")
+                onFailed("无法写入")
             }
         } catch (e: FileNotFoundException) {
-            onFailed("导出失败")
+            onFailed("无法写入")
         } catch (e: IOException) {
-            onFailed("导出失败")
+            onFailed("无法写入")
         } finally {
             try {
                 excelOutputStream?.close()
             } catch (e: IOException) {
-                onFailed("导出失败")
+                onFailed("无法写入")
             }
         }
     }
@@ -88,7 +88,7 @@ object ExportExcelHelper {
      * @return String
      */
     private fun getFileName(): String {
-        return "数据表${Date().toTimeStr()}.xls";
+        return "${Date().toTimeStr()}.xls";
     } /**
      * 数据转换成导出的格式
      * @param datas List<TestResultModel>
@@ -112,7 +112,7 @@ object ExportExcelHelper {
                 add("${it.testValue2}")
                 add("${it.testValue3}")
                 add("${it.testValue4}")
-                add("${it.testTime}")
+                add("${it.testTime.toTimeStr()}")
             }
         }
     }

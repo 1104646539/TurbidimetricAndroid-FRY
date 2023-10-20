@@ -71,13 +71,13 @@ abstract class CustomBtn3Popup(val ctx: Context, val viewId: Int) : CenterPopupV
     abstract fun showIcon(): Boolean
 
     open fun setContent() {
-        btnConfirm!!.visibility = confirmText?.isNotEmpty().isShow()
+        btnConfirm?.visibility = confirmText?.isNotEmpty().isShow()
         confirmClick?.let { click -> btnConfirm?.setOnClickListener { click.invoke(this) } }
 
-        btnConfirm2!!.visibility = confirmText2?.isNotEmpty().isShow()
+        btnConfirm2?.visibility = confirmText2?.isNotEmpty().isShow()
         confirmClick2?.let { click -> btnConfirm2?.setOnClickListener { click.invoke(this) } }
 
-        btnCancel!!.visibility = cancelText?.isNotEmpty().isShow()
+        btnCancel?.visibility = cancelText?.isNotEmpty().isShow()
         cancelClick?.let { click -> btnCancel?.setOnClickListener { click.invoke(this) } }
 
 

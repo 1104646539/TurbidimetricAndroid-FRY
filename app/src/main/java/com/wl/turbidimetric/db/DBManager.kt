@@ -18,6 +18,7 @@ object DBManager {
 
     fun init(context: Context) {
         boxStore = MyObjectBox.builder().androidContext(context)
-            .debugFlags(DebugFlags.LOG_QUERIES or DebugFlags.LOG_QUERY_PARAMETERS).build()
+            .debugFlags(DebugFlags.LOG_QUERIES or DebugFlags.LOG_QUERY_PARAMETERS)
+            .build()
     }
 }

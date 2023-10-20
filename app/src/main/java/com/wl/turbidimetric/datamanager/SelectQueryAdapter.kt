@@ -47,8 +47,8 @@ class SelectQueryAdapter(
         val root =
             LayoutInflater.from(context).inflate(R.layout.item_select_drop, parent, false)
 //        val name = root.findViewById<TextView>(R.id.tv_name)
-//        val iv_select = root.findViewById<ImageView>(R.id.iv_select)
-//        iv_select.visibility = View.GONE
+        val iv_select = root.findViewById<ImageView>(R.id.iv_select)
+        iv_select.visibility = View.GONE
 //        //        name.setText(items.get(position).getName());
 //        var str = ""
 //        for (i in items!!.indices) {
@@ -98,7 +98,7 @@ class SelectQueryAdapter(
     }
 
     override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup?): View? {
-        val  root = LayoutInflater.from(context).inflate(R.layout.item_select_drop, parent, false)
+        val root = LayoutInflater.from(context).inflate(R.layout.item_select_drop, parent, false)
         val name = root.findViewById<TextView>(R.id.tv_name)
         val iv_select = root.findViewById<ImageView>(R.id.iv_select)
         name.text = items!![position].name

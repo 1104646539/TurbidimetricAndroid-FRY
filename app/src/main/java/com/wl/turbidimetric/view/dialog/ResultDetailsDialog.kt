@@ -50,6 +50,10 @@ class ResultDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog
         this.cancelClick = { dismiss() }
 
         this.result = result
+
+        if(isCreated){
+            setContent()
+        }
         super.show()
     }
 
@@ -75,7 +79,6 @@ class ResultDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog
         etAbs?.text = result?.absorbances.toString()
         etCon?.text = result?.concentration.toString()
         etResult?.text = result?.testResult
-
 
     }
 

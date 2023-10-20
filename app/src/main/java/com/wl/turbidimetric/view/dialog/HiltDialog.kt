@@ -46,8 +46,8 @@ open class HiltDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_hin
 
     fun showDialog(
         msg: String,
-        confirmText: String,
-        confirmClick: onClick,
+        confirmText: String = "",
+        confirmClick: onClick? = null,
         cancelText: String = "",
         cancelClick: onClick? = null,
         showIcon: Boolean = false,

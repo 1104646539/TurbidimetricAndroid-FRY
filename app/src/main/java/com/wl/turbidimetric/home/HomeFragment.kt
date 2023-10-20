@@ -239,7 +239,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
      */
     private fun showConfigDialog() {
         i("showConfigDialog before")
-        homeConfigDialog?.showPop(requireContext()) {
+        homeConfigDialog?.showPop(requireContext(), width = 1000, maxWidth = 1000) {
             it?.showDialog(vm.selectProjectEnable.value ?: true,
                 vm.editDetectionNumEnable.value ?: true,
                 vm.skipCuvetteEnable.value ?: true,

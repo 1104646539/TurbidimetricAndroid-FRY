@@ -30,7 +30,7 @@ inline fun <T : BasePopupView> T.showPop(
         .dismissOnBackPressed(isCancelable)
         .autoOpenSoftInput(false)
         .autoFocusEditText(false)
-        .isRequestFocus(false)
+//        .isRequestFocus(false)
         .asCustom(this)
     la.invoke(d as T)
 }

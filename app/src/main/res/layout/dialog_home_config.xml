@@ -3,6 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_dialog_hint"
+    android:focusableInTouchMode="true"
+    android:focusable="true"
     android:orientation="vertical"
     android:padding="40dp">
 

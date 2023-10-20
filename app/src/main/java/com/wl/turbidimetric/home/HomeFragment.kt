@@ -12,10 +12,7 @@ import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.SystemGlobal.obTestState
 import com.wl.turbidimetric.model.ProjectModel
-import com.wl.turbidimetric.view.dialog.HiltDialog
-import com.wl.turbidimetric.view.dialog.HomeConfigDialog
-import com.wl.turbidimetric.view.dialog.HomeDetailsDialog
-import com.wl.turbidimetric.view.dialog.showPop
+import com.wl.turbidimetric.view.dialog.*
 import com.wl.wwanandroid.base.BaseFragment
 import kotlinx.coroutines.launch
 import com.wl.wllib.LogToFile.i
@@ -277,7 +274,9 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
      * @param item SampleItem?
      */
     private fun showDetailsDialog(item: HomeViewModel.SampleItem?) {
-        homeDetailsDialog?.showDialog(item)
+        homeDetailsDialog?.showPop(requireContext()) {
+            it?.showDialog(item)
+        }
     }
 
     /**
@@ -285,7 +284,9 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
      * @param item SampleItem?
      */
     private fun showDetailsDialog(item: HomeViewModel.CuvetteItem?) {
-        homeDetailsDialog?.showDialog(item)
+        homeDetailsDialog?.showPop(requireContext()) {
+            it?.showDialog(item)
+        }
     }
 
 
@@ -303,7 +304,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     if (dialog.isShow()) {
                         dialog?.showPop(requireContext()) { d ->
                             d.showDialog(
-                                it, "确定", confirmClick = { it.dismiss() }
+                                it, "确定", confirmClick = { it.dismiss() }, showIcon = false
                             )
                         }
                     }
@@ -339,7 +340,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                                 cancelClick = {
                                     it.dismiss()
                                     vm.dialogGetMachineFailedCancel()
-                                }
+                                }, showIcon = true, iconId = ICON_HINT
                             )
                         }
 
@@ -360,7 +361,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                                 cancelClick = {
                                     it.dismiss()
                                     vm.dialogTestFinishCuvetteDeficiencyCancel()
-                                })
+                                }, showIcon = true, iconId = ICON_HINT
+                            )
                         }
                     }
                     /**
@@ -379,7 +381,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                                 cancelClick = {
                                     it.dismiss()
                                     vm.dialogGetStateNotExistCancel()
-                                }
+                                }, showIcon = true, iconId = ICON_HINT
                             )
                         }
                     }
@@ -410,14 +412,14 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                         dialog?.showPop(requireContext(), isCancelable = false) {
                             it?.showDialog(msg = "检测结束", confirmText = "确定", confirmClick = {
                                 it.dismiss()
-                            })
+                            }, showIcon = true, iconId = ICON_FINISH)
                         }
                     }
                     /**
                      * 通知
                      */
                     DialogState.NOTIFY -> {
-                        snack(vd.root, state.dialogMsg)
+                        toast(state.dialogMsg)
                     }
                 }
             }

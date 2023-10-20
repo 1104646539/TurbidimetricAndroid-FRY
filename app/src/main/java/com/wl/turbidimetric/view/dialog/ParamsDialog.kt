@@ -105,4 +105,13 @@ class ParamsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_params
         etSamplingProbeCleaningTime?.selectionLast()
         etStirProbeCleaningTime?.selectionLast()
     }
+
+    override fun getResId(): Int {
+        return 0
+    }
+
+    override fun showIcon(): Boolean {
+        return false
+    }
+
 }

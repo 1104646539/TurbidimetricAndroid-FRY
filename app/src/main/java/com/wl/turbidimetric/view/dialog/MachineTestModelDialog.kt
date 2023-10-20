@@ -84,4 +84,13 @@ class MachineTestModelDialog(val ct: Context) :
         cbSample?.isChecked = sampleExist == true
         cbScanCode?.isChecked = scanCode == true
     }
+
+    override fun getResId(): Int {
+        return 0
+    }
+
+    override fun showIcon(): Boolean {
+        return false
+    }
+
 }

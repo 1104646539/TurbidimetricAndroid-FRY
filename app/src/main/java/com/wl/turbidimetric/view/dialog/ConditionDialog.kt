@@ -200,4 +200,13 @@ open class ConditionDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
     }
 
 
+    override fun getResId(): Int {
+        return 0
+    }
+
+    override fun showIcon(): Boolean {
+        return false
+    }
+
+
 }

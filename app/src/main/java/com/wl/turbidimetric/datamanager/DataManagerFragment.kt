@@ -21,10 +21,7 @@ import com.wl.turbidimetric.model.TestResultModel
 import com.wl.turbidimetric.model.TestResultModel_
 import com.wl.turbidimetric.print.PrintUtil
 import com.wl.turbidimetric.util.ExportExcelHelper
-import com.wl.turbidimetric.view.dialog.ConditionDialog
-import com.wl.turbidimetric.view.dialog.HiltDialog
-import com.wl.turbidimetric.view.dialog.ResultDetailsDialog
-import com.wl.turbidimetric.view.dialog.showPop
+import com.wl.turbidimetric.view.dialog.*
 import com.wl.wllib.LogToFile.i
 import com.wl.wwanandroid.base.BaseFragment
 import io.objectbox.query.Query
@@ -200,7 +197,7 @@ class DataManagerFragment :
                         }
                     }, "取消", {
                         it.dismiss()
-                    })
+                    }, showIcon = true, iconId = ICON_HINT)
                 }
             }
         }
@@ -232,6 +229,9 @@ class DataManagerFragment :
         if (results.isNullOrEmpty()) {
             toast("请选择数据")
             return
+        }
+        results?.forEach {
+            i("选中的:${it.id}")
         }
         PrintUtil.printTest(results)
     }

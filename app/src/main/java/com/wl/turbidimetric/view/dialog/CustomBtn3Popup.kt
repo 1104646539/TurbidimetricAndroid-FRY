@@ -2,8 +2,11 @@ package com.wl.turbidimetric.view.dialog
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.LinearLayout
+import androidx.core.view.isVisible
 import com.lxj.xpopup.animator.PopupAnimator
 import com.lxj.xpopup.core.BasePopupView
 import com.lxj.xpopup.core.CenterPopupView
@@ -28,6 +31,7 @@ abstract class CustomBtn3Popup(val ctx: Context, val viewId: Int) : CenterPopupV
     var btnConfirm: Button? = null
     var btnConfirm2: Button? = null
     var btnCancel: Button? = null
+    var ivIcon: ImageView? = null
 
     var confirmText: String? = null
     var confirmClick: onClick? = null
@@ -53,16 +57,20 @@ abstract class CustomBtn3Popup(val ctx: Context, val viewId: Int) : CenterPopupV
         btnConfirm = findViewById(R.id.btn_confirm)
         btnConfirm2 = findViewById(R.id.btn_confirm2)
         btnCancel = findViewById(R.id.btn_cancel)
-
-
+        ivIcon = findViewById(R.id.iv_icon)
 
         initDialogView()
+
         setContent()
     }
 
 
     abstract fun initDialogView()
-   open fun setContent() {
+
+    abstract fun getResId(): Int
+    abstract fun showIcon(): Boolean
+
+    open fun setContent() {
         btnConfirm!!.visibility = confirmText?.isNotEmpty().isShow()
         confirmClick?.let { click -> btnConfirm?.setOnClickListener { click.invoke(this) } }
 
@@ -71,6 +79,12 @@ abstract class CustomBtn3Popup(val ctx: Context, val viewId: Int) : CenterPopupV
 
         btnCancel!!.visibility = cancelText?.isNotEmpty().isShow()
         cancelClick?.let { click -> btnCancel?.setOnClickListener { click.invoke(this) } }
+
+
+        ivIcon?.visibility = showIcon().isShow()
+        if (showIcon() && getResId() != 0) {
+            ivIcon?.setImageResource(getResId())
+        }
     }
 
     // 设置最大宽度，看需要而定，

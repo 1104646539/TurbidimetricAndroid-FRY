@@ -16,6 +16,9 @@ import com.wl.wllib.toTimeStr
 
 class DataManagerAdapter :
     PagingDataAdapter<TestResultModel, DataManagerAdapter.DataManagerViewHolder>(diffCallback = MyDiff()) {
+    //局部刷新 选择改变
+    val REFRESH_SELECT_CHANGE = 100
+
     class MyDiff : DiffUtil.ItemCallback<TestResultModel>() {
         override fun areItemsTheSame(
             oldItem: TestResultModel,
@@ -64,8 +67,6 @@ class DataManagerAdapter :
                 onLongClick?.invoke(item?.id ?: 0)
                 true
             }
-
-
         }
     }
 
@@ -77,13 +78,41 @@ class DataManagerAdapter :
     fun getSelectedItems(): List<TestResultModel> {
         val items = mutableListOf<TestResultModel>().apply {
             for (i in 0 until itemCount) {
-                val item =getItem(i)!!
+                val item = getItem(i)!!
                 if (item.isSelect) {
                     add(item)
                 }
             }
         }
         return items
+    }
+
+    override fun onBindViewHolder(
+        holder: DataManagerViewHolder,
+        position: Int,
+        payloads: MutableList<Any>
+    ) {
+        if (payloads.isNullOrEmpty()) {
+            super.onBindViewHolder(holder, position, payloads)
+        } else {
+            val tem = payloads[0]
+            if (tem is Int) {
+                when (tem) {
+                    REFRESH_SELECT_CHANGE -> {
+                        getItem(position)?.let {
+                            if (it.isSelect) {
+                                holder.binding.root.setBackgroundResource(R.drawable.bg_item_select)
+                            } else if (holder.absoluteAdapterPosition % 2 == 0) {
+                                holder.binding.root.setBackgroundColor(Color.WHITE)
+                            } else {
+                                holder.binding.root.setBackgroundResource(R.drawable.rip_item)
+                            }
+                            holder.binding.ivSelect.isSelected = it?.isSelect ?: false
+                        }
+                    }
+                }
+            }
+        }
     }
 
     override fun onBindViewHolder(holder: DataManagerViewHolder, position: Int) {
@@ -93,27 +122,11 @@ class DataManagerAdapter :
 
             holder.binding.root.setOnClickListener {
                 item?.let { item ->
-                    holder.binding.ivSelect?.let { view ->
-                        item.isSelect = !item.isSelect
-                        view.isSelected = !view.isSelected
-
-                        if (item.isSelect) {
-                            holder.binding.root.setBackgroundResource(R.drawable.bg_item_select)
-                        } else if (holder.absoluteAdapterPosition % 2 == 0) {
-                            holder.binding.root.setBackgroundColor(Color.WHITE)
-                        } else {
-                            holder.binding.root.setBackgroundResource(R.drawable.rip_item)
-                        }
-
-
-                    }
+                    item.isSelect = !item.isSelect
+                    snapshot()[position]?.isSelect = item.isSelect
+                    notifyItemChanged(position, REFRESH_SELECT_CHANGE)
                 }
             }
-//            holder.binding.root.setOnClickListener {
-//                item?.let { item ->
-//                    onSelectChange?.invoke(holder.absoluteAdapterPosition, !item.isSelect)
-//                }
-//            }
             holder.binding.ivSelect.isSelected = item?.isSelect ?: false
             item?.let {
                 if (it.isSelect) {

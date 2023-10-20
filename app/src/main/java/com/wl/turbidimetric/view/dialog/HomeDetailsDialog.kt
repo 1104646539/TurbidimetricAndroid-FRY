@@ -111,6 +111,7 @@ class HomeDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_h
         tvLabel = findViewById(R.id.tv_label)
         tvLabelHilt = findViewById(R.id.tv_label_hilt)
         tvState = findViewById(R.id.tv_state)
+
     }
 
     override fun setContent() {
@@ -120,6 +121,16 @@ class HomeDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_h
         tvLabel?.text = label
         tvLabelHilt?.text = labelHilt
         tvDetectionNum?.text = detectionNum
+
+
+    }
+
+    override fun getResId(): Int {
+        return 0
+    }
+
+    override fun showIcon(): Boolean {
+        return false
     }
 
 }

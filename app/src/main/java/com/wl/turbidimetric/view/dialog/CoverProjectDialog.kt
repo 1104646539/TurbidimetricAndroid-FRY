@@ -74,6 +74,14 @@ class CoverProjectDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_
 
     override fun initDialogView() {
         spnProject = findViewById(R.id.spn_project)
-        findViewById<ImageView>(R.id.iv_icon).visibility = View.GONE
     }
+
+    override fun getResId(): Int {
+        return 0
+    }
+
+    override fun showIcon(): Boolean {
+        return false
+    }
+
 }

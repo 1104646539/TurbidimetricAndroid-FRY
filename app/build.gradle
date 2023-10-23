@@ -7,8 +7,34 @@ plugins {
     id("io.objectbox")
 }
 
-android {
+def synchronized getVersionProperty(propName, defValue) {
+    def file = file("version.properties")
+    def ret = defValue
+    if (file.exists() && file.canRead()) {
+        FileInputStream input = new FileInputStream(file)
+        Properties props = new Properties()
+        props.load(input)
+        ret = props.get(propName);
+        input.close()
+    }
+    return ret
+}
 
+def getAppVersionName() {
+    String versionName = getVersionProperty("VERSION_NAME", "1.0.0.0")
+    return versionName
+}
+
+def getAppVersionCode() {
+    String versionCodeTxt = getVersionProperty("VERSION_CODE", "1")
+    int versionCode = versionCodeTxt as Integer
+    return versionCode
+}
+
+
+def appVersionName = getAppVersionName()
+def appVersionCode = getAppVersionCode()
+android {
     signingConfigs {
 //        debug {
 //            storeFile file('E:\\platform.keystore')
@@ -33,12 +59,21 @@ android {
         applicationId "com.wl.turbidimetric"
         minSdk 21
         targetSdk 25
-        versionCode 1
-        versionName "1.0.0.0"
-
+        versionCode appVersionCode
+        versionName appVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 
+    }
+    //release版本输出包名自动追加版本号和版本名称
+    applicationVariants.all {
+        variant ->
+            variant.outputs.all {
+                //只处理生产版本
+//                if (buildType.name == 'release') {
+                def createTime = new Date().format("YYYY-MM-dd", TimeZone.getTimeZone("GMT+08:00"))
+                outputFileName = "乳胶比浊" + defaultConfig.versionName + "_" + createTime + "_" + buildType.name + ".apk"
+            }
     }
     sourceSets {
         main {
@@ -53,6 +88,13 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             zipAlignEnabled true
+//            buildConfigField("int", "buildNo", "${appBuildNo}")
+        }
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            zipAlignEnabled true
+//            buildConfigField("int", "buildNo", "${appBuildNo}")
         }
     }
     compileOptions {
@@ -168,7 +210,7 @@ dependencies {
     implementation 'com.github.gzu-liyujiang.AndroidPicker:WheelView:4.1.11'
     implementation "com.github.skydoves:powerspinner:1.2.1"
     //dialog
-    implementation ("com.github.li-xiaojun:XPopup:2.9.19"){
+    implementation("com.github.li-xiaojun:XPopup:2.9.19") {
         exclude group: "com.davemorrissey.labs", module: "subsampling-scale-image-view-androidx"
     }
 }

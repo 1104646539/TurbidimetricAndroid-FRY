@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.Gravity
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.*
+import com.wl.turbidimetric.BuildConfig
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.FragmentHomeBinding
 import com.wl.turbidimetric.datastore.LocalData

@@ -1314,7 +1314,7 @@ class RepeatabilityViewModel(
      * 是否正在测试重复性
      */
     fun runningRepeatability(): Boolean {
-        return testState != TestState.None && testState != TestState.TestFinish
+        return isTestRunning()
     }
 }
 

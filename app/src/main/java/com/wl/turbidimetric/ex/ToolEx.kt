@@ -272,7 +272,7 @@ fun calculateMean(numArray: DoubleArray): Double {
  * @return Boolean
  */
 fun isTestRunning(): Boolean {
-    return TestState.None != SystemGlobal.testState && TestState.TestFinish != SystemGlobal.testState
+    return TestState.None != SystemGlobal.testState && TestState.TestFinish != SystemGlobal.testState && TestState.Normal != SystemGlobal.testState
 }
 
 /**

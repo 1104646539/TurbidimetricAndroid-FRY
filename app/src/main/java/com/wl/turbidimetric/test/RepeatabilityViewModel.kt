@@ -24,6 +24,7 @@ import java.text.NumberFormat
 import java.util.*
 import kotlin.math.absoluteValue
 import com.wl.wllib.LogToFile.i
+
 /**
  * 重复性测试
  *
@@ -380,6 +381,15 @@ class RepeatabilityViewModel(
     override fun readDataGetMachineStateModel(reply: ReplyModel<GetMachineStateModel>) {
         if (!runningRepeatability()) return
 //        i("接收到 样本舱门状态 reply=$reply")
+    }
+
+    /**
+     * 挤压
+     * @param reply ReplyModel<SqueezingModel>
+     */
+    override fun readDataSqueezing(reply: ReplyModel<SqueezingModel>) {
+        if (!runningRepeatability()) return
+        i("接收到 挤压 reply=$reply")
     }
 
     /**

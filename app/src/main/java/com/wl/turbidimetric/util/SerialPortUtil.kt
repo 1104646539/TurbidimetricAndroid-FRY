@@ -216,6 +216,11 @@ object SerialPortUtil {
                     it.readDataTempModel(transitionTempModel(ready))
                 }
             }
+            SerialGlobal.CMD_Squeezing -> {
+                callback {
+                    it.readDataSqueezing(transitionSqueezingModel(ready))
+                }
+            }
 
             else -> {}
         }
@@ -721,6 +726,15 @@ object SerialPortUtil {
     }
 
     /**
+     * 挤压
+     */
+    public fun squeezing() {
+        writeAsync(
+            createCmd(SerialGlobal.CMD_Squeezing)
+        )
+    }
+
+    /**
      * 获取当前温度
      */
     public fun getTemp() {
@@ -768,4 +782,5 @@ interface Callback2 {
     fun readDataGetVersionModel(reply: ReplyModel<GetVersionModel>)
     fun readDataTempModel(reply: ReplyModel<TempModel>)
     fun readDataStateFailed(cmd: UByte, state: UByte)
+    fun readDataSqueezing(reply: ReplyModel<SqueezingModel>)
 }

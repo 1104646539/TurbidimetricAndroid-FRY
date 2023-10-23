@@ -32,6 +32,7 @@ enum class SampleState {
     ScanSuccess,//扫码成功
     ScanFailed,//扫码失败
     Pierced,//刺破完成
+    Squeezing,//挤压完成
     Sampling,//取样完成
 
 }

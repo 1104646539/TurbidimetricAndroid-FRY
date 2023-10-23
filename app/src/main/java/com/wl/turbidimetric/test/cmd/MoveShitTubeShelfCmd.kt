@@ -97,4 +97,8 @@ class MoveSampleShelfCmd(private val pos: Int) : CmdIF() {
 
 
     }
+
+    override fun readDataSqueezing(reply: ReplyModel<SqueezingModel>) {
+
+    }
 }

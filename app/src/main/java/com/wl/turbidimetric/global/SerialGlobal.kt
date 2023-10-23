@@ -109,6 +109,10 @@ object SerialGlobal {
      * 关机
      */
     const val CMD_Shutdown:UByte = 0x16u
+    /**
+     * 挤压
+     */
+    const val CMD_Squeezing:UByte = 0x17u
 
     /**
      * 响应

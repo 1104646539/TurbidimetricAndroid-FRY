@@ -169,3 +169,11 @@ data class SampleDoorModel(val isOpen: Boolean = false)
  * @constructor
  */
 data class TempModel(val reactionTemp: Int = 0, val r1Temp: Int = 0)
+
+
+/**
+ * 挤压
+ * @property v Int
+ * @constructor
+ */
+data class SqueezingModel(val v:Int = 0)

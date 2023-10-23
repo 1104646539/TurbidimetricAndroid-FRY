@@ -345,3 +345,18 @@ fun transitionTempModel(data: UByteArray): ReplyModel<TempModel> {
         )
     )
 }
+
+/**
+ * 解析成 挤压
+ * @param data UByteArray
+ * @return ReplyModel<SqueezingModel>
+ */
+fun transitionSqueezingModel(data: UByteArray): ReplyModel<SqueezingModel> {
+    return ReplyModel(
+        SerialGlobal.CMD_Squeezing,
+        data[1].toInt(),
+        SqueezingModel(
+            data[1].toInt(),
+        )
+    )
+}

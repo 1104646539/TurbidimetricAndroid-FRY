@@ -101,4 +101,8 @@ class CmdProxy() : CmdIF() {
 
     }
 
+    override fun readDataSqueezing(reply: ReplyModel<SqueezingModel>) {
+
+    }
+
 }

@@ -355,6 +355,16 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
         testMsg.postValue("报错了，cmd=$cmd state=$state")
     }
 
+    /**
+     * 挤压
+     * @param reply ReplyModel<SqueezingModel>
+     */
+    override fun readDataSqueezing(reply: ReplyModel<SqueezingModel>) {
+        if (!runningMatching()) return
+        if (!machineStateNormal()) return
+        i("接收到 挤压 reply=$reply")
+    }
+
 
     /**
      * 点击开始拟合

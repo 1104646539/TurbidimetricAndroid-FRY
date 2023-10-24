@@ -15,6 +15,8 @@ class HomeDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_h
     var tvLabel: TextView? = null
     var tvLabelHilt: TextView? = null
     var tvState: TextView? = null
+    var tvDetectionBarcode: TextView? = null
+    var tDetectionResult: TextView? = null
 
 
     fun showDialog(
@@ -27,9 +29,11 @@ class HomeDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_h
         show(
             (item.testResult?.id ?: "-").toString(),
             item.testResult?.detectionNum ?: "-",
+            item.testResult?.sampleBarcode ?: "-",
             item.sampleID ?: "-",
             "对应样本序号:",
             getState(item.state),
+            item?.testResult?.testResult ?: "-",
             item.testResult
         )
     }
@@ -60,9 +64,11 @@ class HomeDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_h
         show(
             (item.testResult?.id ?: "-").toString(),
             item.testResult?.detectionNum ?: "-",
+            item.testResult?.sampleBarcode ?: "-",
             item.cuvetteID ?: "-",
             "对应比色皿序号:",
             getState(item.state),
+            item?.testResult?.testResult ?: "-",
             item.testResult
         )
     }
@@ -83,22 +89,28 @@ class HomeDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_h
 
     var resultID: String? = null
     var detectionNum: String? = null
+    var detectionBarcode: String? = null
     var label: String? = null
     var labelHilt: String? = null
     var state: String? = null
     var testResultModel: TestResultModel? = null
+    var result: String? = null
     private fun show(
         resultID: String,
         detectionNum: String,
+        detectionBarcode: String,
         label: String,
         labelHilt: String,
         state: String,
+        result: String,
         testResultModel: TestResultModel?
     ) {
         this.resultID = resultID
         this.detectionNum = detectionNum
+        this.detectionBarcode = detectionBarcode
         this.label = label
         this.labelHilt = labelHilt
+        this.result = result
         this.state = state
         this.testResultModel = testResultModel
 
@@ -111,18 +123,20 @@ class HomeDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_h
         tvLabel = findViewById(R.id.tv_label)
         tvLabelHilt = findViewById(R.id.tv_label_hilt)
         tvState = findViewById(R.id.tv_state)
+        tvDetectionBarcode = findViewById(R.id.tv_detection_barcode)
+        tDetectionResult = findViewById(R.id.tv_result)
 
     }
 
     override fun setContent() {
         super.setContent()
-        tvState?.text = state
-        tvResultID?.text = resultID
+        tvState?.text = state.takeIf { !it.isNullOrEmpty() } ?: "-"
+        tvResultID?.text = resultID.takeIf { !it.isNullOrEmpty() } ?: "-"
         tvLabel?.text = label
-        tvLabelHilt?.text = labelHilt
-        tvDetectionNum?.text = detectionNum
-
-
+        tvLabelHilt?.text = labelHilt.takeIf { !it.isNullOrEmpty() } ?: "-"
+        tvDetectionNum?.text = detectionNum.takeIf { !it.isNullOrEmpty() } ?: "-"
+        tvDetectionBarcode?.text = detectionBarcode.takeIf { !it.isNullOrEmpty() } ?: "-"
+        tDetectionResult?.text = result.takeIf { !it.isNullOrEmpty() } ?: "-"
     }
 
     override fun getResId(): Int {

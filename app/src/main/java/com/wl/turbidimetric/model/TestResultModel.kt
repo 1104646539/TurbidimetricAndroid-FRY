@@ -16,7 +16,7 @@ data class TestResultModel(
     /**
      * 样本码
      */
-    var sampleQRCode: String = "",
+    var sampleBarcode: String = "",
     /**
      * 编号
      */
@@ -109,7 +109,7 @@ data class TestResultModel(
         if (name != other.name) return false
         if (gender != other.gender) return false
         if (age != other.age) return false
-        if (sampleQRCode != other.sampleQRCode) return false
+        if (sampleBarcode !=other.sampleBarcode) return false
         if (detectionNum != other.detectionNum) return false
         if (testState != other.testState) return false
         if (testResult != other.testResult) return false
@@ -136,7 +136,7 @@ data class TestResultModel(
         result = 31 * result + name.hashCode()
         result = 31 * result + gender.hashCode()
         result = 31 * result + age.hashCode()
-        result = 31 * result + sampleQRCode.hashCode()
+        result = 31 * result + sampleBarcode.hashCode()
         result = 31 * result + detectionNum.hashCode()
         result = 31 * result + testState
         result = 31 * result + testResult.hashCode()
@@ -157,7 +157,7 @@ data class TestResultModel(
     }
 
     override fun toString(): String {
-        return "TestResultModel(id=$id, isSelect=$isSelect, name='$name', gender='$gender', age='$age', sampleQRCode='$sampleQRCode', detectionNum='$detectionNum', testState=$testState, testResult='$testResult', absorbances=$absorbances, concentration=$concentration, testValue1=$testValue1, testValue2=$testValue2, testValue3=$testValue3, testValue4=$testValue4, testOriginalValue1=$testOriginalValue1, testOriginalValue2=$testOriginalValue2, testOriginalValue3=$testOriginalValue3, testOriginalValue4=$testOriginalValue4, createTime='$createTime', testTime='$testTime', project=$project)"
+        return "TestResultModel(id=$id, isSelect=$isSelect, name='$name', gender='$gender', age='$age', sampleBarcode='$sampleBarcode', detectionNum='$detectionNum', testState=$testState, testResult='$testResult', absorbances=$absorbances, concentration=$concentration, testValue1=$testValue1, testValue2=$testValue2, testValue3=$testValue3, testValue4=$testValue4, testOriginalValue1=$testOriginalValue1, testOriginalValue2=$testOriginalValue2, testOriginalValue3=$testOriginalValue3, testOriginalValue4=$testOriginalValue4, createTime='$createTime', testTime='$testTime', project=$project)"
     }
 
 }

@@ -84,7 +84,7 @@
     },
     {
       "id": "4:2539073134430729651",
-      "lastPropertyId": "22:6139411301883623601",
+      "lastPropertyId": "23:3889165018749616975",
       "name": "TestResultModel",
       "properties": [
         {
@@ -147,11 +147,6 @@
           "relationTarget": "ProjectModel"
         },
         {
-          "id": "12:2515398612214530018",
-          "name": "sampleQRCode",
-          "type": 9
-        },
-        {
           "id": "13:4468770525281012004",
           "name": "testState",
           "type": 5
@@ -200,6 +195,11 @@
           "id": "22:6139411301883623601",
           "name": "testOriginalValue4",
           "type": 5
+        },
+        {
+          "id": "23:3889165018749616975",
+          "name": "sampleBarcode",
+          "type": 9
         }
       ],
       "relations": []
@@ -248,7 +248,8 @@
     1646808971098359971,
     8842476606991025676,
     7467987783571111820,
-    7258462941602574188
+    7258462941602574188,
+    2515398612214530018
   ],
   "retiredRelationUids": [],
   "version": 1

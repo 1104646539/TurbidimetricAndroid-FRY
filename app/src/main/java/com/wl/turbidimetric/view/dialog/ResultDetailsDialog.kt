@@ -28,6 +28,7 @@ class ResultDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog
     var etAbs: TextView? = null
     var etCon: TextView? = null
     var etResult: TextView? = null
+    var etSampleBarcode: TextView? = null
 
 
     var result: TestResultModel? = null
@@ -42,6 +43,7 @@ class ResultDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog
             result.absorbances = (etAbs?.text.toString().toDoubleOrNull() ?: 0.0).toBigDecimal()
             result.concentration = etCon?.text.toString().toIntOrNull() ?: 0
             result.testResult = etResult?.text.toString()
+            result.sampleBarcode = etSampleBarcode?.text.toString()
             dismiss().takeIf {
                 onConfirm.invoke(result)
             }
@@ -66,6 +68,7 @@ class ResultDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog
         etAbs = findViewById(R.id.etAbs)
         etCon = findViewById(R.id.etCon)
         etResult = findViewById(R.id.etResult)
+        etSampleBarcode = findViewById(R.id.etSampleBarcode)
     }
 
     override fun setContent() {
@@ -79,7 +82,7 @@ class ResultDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog
         etAbs?.text = result?.absorbances.toString()
         etCon?.text = result?.concentration.toString()
         etResult?.text = result?.testResult
-
+        etSampleBarcode?.text = result?.sampleBarcode
     }
 
     override fun getResId(): Int {

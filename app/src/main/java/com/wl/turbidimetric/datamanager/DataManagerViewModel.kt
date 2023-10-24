@@ -84,7 +84,7 @@ class DataManagerViewModel(
         }
         if (qrcode.isNotEmpty()) {
             condition.contains(
-                TestResultModel_.sampleQRCode,
+                TestResultModel_.sampleBarcode,
                 qrcode,
                 QueryBuilder.StringOrder.CASE_INSENSITIVE
             )

@@ -283,7 +283,7 @@ object SerialPortUtil {
                     if (count > 0) {
                         val re = byteArray.copyOf(count).toUByteArray()
                         data.addAll(re)
-                        c("每次接收的re=${re.toHex()}")
+//                        c("每次接收的re=${re.toHex()}")
                     }
                     if (data.size < hCount + allCount) {
                         continue

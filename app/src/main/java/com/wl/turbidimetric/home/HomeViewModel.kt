@@ -936,7 +936,7 @@ class HomeViewModel(
      */
     private fun createResultModel(str: String?): TestResultModel {
         val resultModel = TestResultModel(
-            sampleQRCode = str ?: "",
+            sampleBarcode = str ?: "",
             createTime = Date().time,
             detectionNum = LocalData.getDetectionNumInc(),
         ).apply {

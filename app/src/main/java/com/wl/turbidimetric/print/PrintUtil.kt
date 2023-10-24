@@ -50,7 +50,7 @@ object PrintUtil {
         sb.append("\n")
 
         sb.append("编号:${result.detectionNum ?: ""}\n")
-        sb.append("条码:${result.sampleQRCode ?: ""}\n")
+        sb.append("条码:${result.sampleBarcode ?: ""}\n")
         sb.append("姓名:${result.name ?: ""}\n")
         sb.append("性别:${result.gender ?: ""}\n")
         sb.append("年龄:${result.age ?: ""}\n")

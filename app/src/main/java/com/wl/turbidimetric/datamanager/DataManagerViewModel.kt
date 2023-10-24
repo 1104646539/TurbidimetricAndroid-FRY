@@ -13,6 +13,7 @@ import com.wl.turbidimetric.model.ConditionModel
 import com.wl.turbidimetric.model.TestResultModel
 import com.wl.turbidimetric.model.TestResultModel_
 import com.wl.wwanandroid.base.BaseViewModel
+import io.objectbox.kotlin.toFlow
 import io.objectbox.query.LazyList
 import io.objectbox.query.Query
 import io.objectbox.query.QueryBuilder

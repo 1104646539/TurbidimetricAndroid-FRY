@@ -345,11 +345,12 @@ class DataManagerFragment :
         datasJob = lifecycleScope.launch {
             vm.item(condition).collectLatest {
                 i("---监听到了变化---condition=$condition")
+                vm.conditionChange(condition)
                 adapter?.submitData(it)
 
-//                withContext(Dispatchers.Main) {
-//                    vd.rv.scrollToPosition(0)
-//                }
+                withContext(Dispatchers.Main) {
+                    vd.rv.scrollToPosition(0)
+                }
             }
         }
     }

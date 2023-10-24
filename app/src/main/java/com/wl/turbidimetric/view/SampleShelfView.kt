@@ -190,6 +190,7 @@ class SampleShelfView :
             SampleState.ScanFailed -> colorNone
             SampleState.ScanSuccess -> colorSampling
             SampleState.Pierced -> colorSampling
+            SampleState.Squeezing -> colorFinish
             SampleState.Sampling -> colorFinish
             else -> colorNone
         }
@@ -251,7 +252,7 @@ class SampleShelfView :
                     val isClick: Boolean =
                         sampleRects[i]?.contains(clickX.toFloat(), clickY.toFloat()) ?: false
                     if (isClick) {
-                        clickIndex?.invoke(i,sampleStates?.get(i))
+                        clickIndex?.invoke(i, sampleStates?.get(i))
                         return true
                     }
                 }

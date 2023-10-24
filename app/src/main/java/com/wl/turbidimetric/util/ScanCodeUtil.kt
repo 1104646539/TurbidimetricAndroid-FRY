@@ -73,7 +73,8 @@ object ScanCodeUtil {
                             withContext(Dispatchers.Main) {
                                 if (isScan) {
                                     isScan = false
-                                    onScanResult?.scanSuccess(result.toString())
+                                    onScanResult?.scanSuccess(String(result.toByteArray()))
+//                                    onScanResult?.scanSuccess(result.toString())
                                 }
                             }
                         }

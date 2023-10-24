@@ -1,5 +1,7 @@
 package com.wl.turbidimetric.util
 
+import com.wl.turbidimetric.R
+import com.wl.turbidimetric.ex.getResource
 import com.wl.turbidimetric.ex.getStep
 import com.wl.turbidimetric.ex.merge
 import com.wl.turbidimetric.global.SerialGlobal
@@ -7,28 +9,16 @@ import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.*
 
 /**
+ *
  * 自检的错误信息
  */
-val Motors = listOf(
-    "取样泵",
-    "样本架X",
-    "样本架Y",
-    "比色皿架X",
-    "比色皿架Y",
-    "试剂针X",
-    "试剂针Y",
-    "样本针X",
-    "样本针Z",
-    "试剂泵",
-    "搅拌",
-    "扶正",
-    "转盘",
-    "请移除样本架和比色皿",
-    "舱门未关",
-    "R1试剂不足",
-    "清洗液不足",
-)
+val MOTORS: Array<String> = getResource().getStringArray(R.array.getMachineStateErrors)
 
+/**
+ * 错误号的具体信息
+ * 错误0代表无错误 错误1代表不能复位  错误2表示不能向前移动 错误3表示管架X轴错误
+ */
+val ERRORNUM = getResource().getStringArray(R.array.errorNum)
 /**
  *一次合格的回复格式如下。一共14位，其中6位前缀，1位功能码，1位状态码，4位数据位，2位CRC校验位
  * 前缀	        功能   状态码    数据位		校验
@@ -47,23 +37,22 @@ fun transitionGetMachineStateModel(data: UByteArray): ReplyModel<GetMachineState
         val num = (states shr (i * 2)) and 3
 //        println("states=$states num=$num i =$i ")
         if (num > 0) {
-            errorInfo.add(ErrorInfo("错误号:$num", "电机:${Motors[(i)]}"))
+            errorInfo.add(ErrorInfo("错误号:$num", "错误信息:${MOTORS[i]}"))
         }
     }
+    //这几个是只有一种错误的，固定错误号为1
     val removeSampleAndCuvette = (states shr 26) and 1
     val door = (states shr 27) and 1
     val r1 = (states shr 28) and 1
     val cleanoutFluid = (states shr 29) and 1
 
-    if (removeSampleAndCuvette == 1) errorInfo.add(ErrorInfo("错误号:1", "错误信息:${Motors[(13)]}"))
-    if (door == 1) errorInfo.add(ErrorInfo("错误号:1", "错误信息:${Motors[(14)]}"))
-    if (r1 == 1) errorInfo.add(ErrorInfo("错误号:1", "错误信息:${Motors[15]}"))
-    if (cleanoutFluid == 1) errorInfo.add(ErrorInfo("错误号:1", "错误信息:${Motors[(16)]}"))
+    if (removeSampleAndCuvette == 1) errorInfo.add(ErrorInfo("错误号:1", "错误信息:${MOTORS[(13)]}"))
+    if (door == 1) errorInfo.add(ErrorInfo("错误号:1", "错误信息:${MOTORS[(14)]}"))
+    if (r1 == 1) errorInfo.add(ErrorInfo("错误号:1", "错误信息:${MOTORS[15]}"))
+    if (cleanoutFluid == 1) errorInfo.add(ErrorInfo("错误号:1", "错误信息:${MOTORS[(16)]}"))
 
     return ReplyModel(
-        SerialGlobal.CMD_GetMachineState,
-        data[1].toInt(),
-        GetMachineStateModel(errorInfo)
+        SerialGlobal.CMD_GetMachineState, data[1].toInt(), GetMachineStateModel(errorInfo)
     )
 }
 
@@ -74,20 +63,12 @@ fun transitionGetMachineStateModel(data: UByteArray): ReplyModel<GetMachineState
  */
 fun transitionGetStateModel(data: UByteArray): ReplyModel<GetStateModel> {
     return ReplyModel(
-        SerialGlobal.CMD_GetState,
-        data[1].toInt(),
-        GetStateModel(
+        SerialGlobal.CMD_GetState, data[1].toInt(), GetStateModel(
             sampleShelfs = intArrayOf(
-                getStep(data[4], 4),
-                getStep(data[4], 5),
-                getStep(data[4], 6),
-                getStep(data[4], 7)
+                getStep(data[4], 4), getStep(data[4], 5), getStep(data[4], 6), getStep(data[4], 7)
             ),
             cuvetteShelfs = intArrayOf(
-                getStep(data[4], 0),
-                getStep(data[4], 1),
-                getStep(data[4], 2),
-                getStep(data[4], 3)
+                getStep(data[4], 0), getStep(data[4], 1), getStep(data[4], 2), getStep(data[4], 3)
             ),
             r1Reagent = getStep(data[5], 1) == 1,
             r2Reagent = getStep(data[5], 0) == 1,
@@ -104,9 +85,7 @@ fun transitionGetStateModel(data: UByteArray): ReplyModel<GetStateModel> {
  */
 fun transitionMoveCuvetteShelfModel(data: UByteArray): ReplyModel<MoveCuvetteShelfModel> {
     return ReplyModel(
-        SerialGlobal.CMD_MoveCuvetteShelf,
-        data[1].toInt(),
-        MoveCuvetteShelfModel()
+        SerialGlobal.CMD_MoveCuvetteShelf, data[1].toInt(), MoveCuvetteShelfModel()
     )
 }
 
@@ -117,9 +96,7 @@ fun transitionMoveCuvetteShelfModel(data: UByteArray): ReplyModel<MoveCuvetteShe
  */
 fun transitionMoveSampleShelfModel(data: UByteArray): ReplyModel<MoveSampleShelfModel> {
     return ReplyModel(
-        SerialGlobal.CMD_MoveSampleShelf,
-        data[1].toInt(),
-        MoveSampleShelfModel()
+        SerialGlobal.CMD_MoveSampleShelf, data[1].toInt(), MoveSampleShelfModel()
     )
 }
 
@@ -130,9 +107,7 @@ fun transitionMoveSampleShelfModel(data: UByteArray): ReplyModel<MoveSampleShelf
  */
 fun transitionMoveSampleModel(data: UByteArray): ReplyModel<MoveSampleModel> {
     return ReplyModel(
-        SerialGlobal.CMD_MoveSample,
-        data[1].toInt(),
-        MoveSampleModel(getStep(data[5], 0) == 1)
+        SerialGlobal.CMD_MoveSample, data[1].toInt(), MoveSampleModel(getStep(data[5], 0) == 1)
     )
 }
 
@@ -143,9 +118,7 @@ fun transitionMoveSampleModel(data: UByteArray): ReplyModel<MoveSampleModel> {
  */
 fun transitionMoveCuvetteDripSampleModel(data: UByteArray): ReplyModel<MoveCuvetteDripSampleModel> {
     return ReplyModel(
-        SerialGlobal.CMD_MoveCuvetteDripSample,
-        data[1].toInt(),
-        MoveCuvetteDripSampleModel()
+        SerialGlobal.CMD_MoveCuvetteDripSample, data[1].toInt(), MoveCuvetteDripSampleModel()
     )
 }
 
@@ -156,9 +129,7 @@ fun transitionMoveCuvetteDripSampleModel(data: UByteArray): ReplyModel<MoveCuvet
  */
 fun transitionMoveCuvetteDripReagentModel(data: UByteArray): ReplyModel<MoveCuvetteDripReagentModel> {
     return ReplyModel(
-        SerialGlobal.CMD_MoveCuvetteDripReagent,
-        data[1].toInt(),
-        MoveCuvetteDripReagentModel()
+        SerialGlobal.CMD_MoveCuvetteDripReagent, data[1].toInt(), MoveCuvetteDripReagentModel()
     )
 }
 
@@ -169,9 +140,7 @@ fun transitionMoveCuvetteDripReagentModel(data: UByteArray): ReplyModel<MoveCuve
  */
 fun transitionMoveCuvetteTestModel(data: UByteArray): ReplyModel<MoveCuvetteTestModel> {
     return ReplyModel(
-        SerialGlobal.CMD_MoveCuvetteTest,
-        data[1].toInt(),
-        MoveCuvetteTestModel()
+        SerialGlobal.CMD_MoveCuvetteTest, data[1].toInt(), MoveCuvetteTestModel()
     )
 }
 
@@ -182,9 +151,7 @@ fun transitionMoveCuvetteTestModel(data: UByteArray): ReplyModel<MoveCuvetteTest
  */
 fun transitionSamplingModel(data: UByteArray): ReplyModel<SamplingModel> {
     return ReplyModel(
-        SerialGlobal.CMD_Sampling,
-        data[1].toInt(),
-        SamplingModel()
+        SerialGlobal.CMD_Sampling, data[1].toInt(), SamplingModel()
     )
 }
 
@@ -221,9 +188,7 @@ fun transitionStirProbeCleaningModel(data: UByteArray): ReplyModel<StirProbeClea
  */
 fun transitionDripSampleModel(data: UByteArray): ReplyModel<DripSampleModel> {
     return ReplyModel(
-        SerialGlobal.CMD_DripSample,
-        data[1].toInt(),
-        DripSampleModel()
+        SerialGlobal.CMD_DripSample, data[1].toInt(), DripSampleModel()
     )
 }
 
@@ -234,9 +199,7 @@ fun transitionDripSampleModel(data: UByteArray): ReplyModel<DripSampleModel> {
  */
 fun transitionStirModel(data: UByteArray): ReplyModel<StirModel> {
     return ReplyModel(
-        SerialGlobal.CMD_Stir,
-        data[1].toInt(),
-        StirModel()
+        SerialGlobal.CMD_Stir, data[1].toInt(), StirModel()
     )
 }
 
@@ -247,9 +210,7 @@ fun transitionStirModel(data: UByteArray): ReplyModel<StirModel> {
  */
 fun transitionDripReagentModel(data: UByteArray): ReplyModel<DripReagentModel> {
     return ReplyModel(
-        SerialGlobal.CMD_DripReagent,
-        data[1].toInt(),
-        DripReagentModel()
+        SerialGlobal.CMD_DripReagent, data[1].toInt(), DripReagentModel()
     )
 }
 
@@ -273,9 +234,7 @@ fun transitionTakeReagentModel(data: UByteArray): ReplyModel<TakeReagentModel> {
  */
 fun transitionTestModel(data: UByteArray): ReplyModel<TestModel> {
     return ReplyModel(
-        SerialGlobal.CMD_Test,
-        data[1].toInt(),
-        TestModel(value = merge(data.copyOfRange(2, 6)))
+        SerialGlobal.CMD_Test, data[1].toInt(), TestModel(value = merge(data.copyOfRange(2, 6)))
     )
 }
 
@@ -312,9 +271,7 @@ fun transitionSampleDoorModel(data: UByteArray): ReplyModel<SampleDoorModel> {
  */
 fun transitionPiercedModel(data: UByteArray): ReplyModel<PiercedModel> {
     return ReplyModel(
-        SerialGlobal.CMD_Pierced,
-        data[1].toInt(),
-        PiercedModel()
+        SerialGlobal.CMD_Pierced, data[1].toInt(), PiercedModel()
     )
 }
 
@@ -337,9 +294,7 @@ fun transitionGetVersionModel(data: UByteArray): ReplyModel<GetVersionModel> {
  */
 fun transitionTempModel(data: UByteArray): ReplyModel<TempModel> {
     return ReplyModel(
-        SerialGlobal.CMD_GetSetTemp,
-        data[1].toInt(),
-        TempModel(
+        SerialGlobal.CMD_GetSetTemp, data[1].toInt(), TempModel(
             reactionTemp = merge(ubyteArrayOf(data[2], data[3])),
             r1Temp = merge(ubyteArrayOf(data[4], data[5]))
         )
@@ -353,9 +308,7 @@ fun transitionTempModel(data: UByteArray): ReplyModel<TempModel> {
  */
 fun transitionSqueezingModel(data: UByteArray): ReplyModel<SqueezingModel> {
     return ReplyModel(
-        SerialGlobal.CMD_Squeezing,
-        data[1].toInt(),
-        SqueezingModel(
+        SerialGlobal.CMD_Squeezing, data[1].toInt(), SqueezingModel(
             data[1].toInt(),
         )
     )

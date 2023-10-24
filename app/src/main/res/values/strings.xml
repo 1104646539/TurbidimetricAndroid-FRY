@@ -14,4 +14,29 @@
         <item>阳性</item>
         <item>样本无效</item>
     </string-array>
+    <string-array name="getMachineStateErrors">
+        <item>取样泵</item>
+        <item>样本架X</item>
+        <item>样本架Y</item>
+        <item>比色皿架X</item>
+        <item>比色皿架Y</item>
+        <item>试剂针X</item>
+        <item>试剂针Y</item>
+        <item>样本针X</item>
+        <item>样本针Z</item>
+        <item>试剂泵</item>
+        <item>搅拌</item>
+        <item>扶正</item>
+        <item>转盘</item>
+        <item>请移除样本架和比色皿</item>
+        <item>舱门未关</item>
+        <item>R1试剂不足</item>
+        <item>清洗液不足</item>
+        <item>挤压错误</item>
+    </string-array>
+    <string-array name="errorNum">
+        <item>不能复位</item>
+        <item>不能向前移动</item>
+        <item>管架X轴错误</item>
+    </string-array>
 </resources>

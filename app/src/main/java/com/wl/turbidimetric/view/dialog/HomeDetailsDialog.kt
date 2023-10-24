@@ -114,6 +114,9 @@ class HomeDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_h
         this.state = state
         this.testResultModel = testResultModel
 
+        if (isCreated) {
+            setContent()
+        }
         super.show()
     }
 

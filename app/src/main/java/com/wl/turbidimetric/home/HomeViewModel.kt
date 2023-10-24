@@ -462,9 +462,9 @@ class HomeViewModel(
      */
     fun clickStart() {
         val errorMsg = if (testState.isRunning()) {
-            "正在检测，请勿操作！"
+            "正在检检测测，请勿操作！"
         } else if (selectProject == null) {
-            "未选择检测标曲"
+            "未选择标曲"
         } else {
             ""
         }
@@ -1018,7 +1018,7 @@ class HomeViewModel(
                 updateTestResultModel(value, cuvettePos, CuvetteState.Test4)
                 if (lastNeed(cuvettePos, CuvetteState.Test3)) {
                     //检测结束，下一个步骤，计算值
-                    calcResult()
+                    showResultFinishAndNext()
                 } else {
                     viewModelScope.launch {
                         delay(testPosInterval)
@@ -1124,9 +1124,9 @@ class HomeViewModel(
 
 
     /**
-     * 计算结果
+     * 显示结果、清空数据并开始下一排检测
      */
-    private fun calcResult() {
+    private fun showResultFinishAndNext() {
         testMsg.postValue(
             testMsg.value?.plus("这排比色皿检测结束 比色皿位置=$cuvetteShelfPos 样本位置=$sampleShelfPos \n 第一次:$resultTest1 \n 第二次:$resultTest2 \n 第三次:$resultTest3 \n 第四次:$resultTest4 \n  吸光度:$absorbances \n 浓度=$cons \n选择的四参数为${selectProject ?: "未选择"}\n\n")
         )
@@ -1135,6 +1135,15 @@ class HomeViewModel(
         }
         i("这排比色皿检测结束")
 
+        clearSingleShelf()
+
+        continueTestNextCuvette()
+    }
+
+    /**
+     * 单排比色皿结束结束后清理
+     */
+    private fun clearSingleShelf() {
         resultTest1.clear()
         resultTest2.clear()
         resultTest3.clear()
@@ -1151,7 +1160,6 @@ class HomeViewModel(
         resultModels.clear()
 
 
-        continueTestNextCuvette()
     }
 
 //    /**
@@ -1562,8 +1570,7 @@ class HomeViewModel(
                 //这排最后一个比色皿，需要去下一个步骤，加试剂
                 i("这排最后一个比色皿，需要去下一个步骤，加试剂")
                 stepDripReagent()
-            }
-            else if ((isAuto() && lastSamplePos(samplePos)) || !isAuto()) {//这排最后一个样本
+            } else if ((isAuto() && lastSamplePos(samplePos)) || !isAuto()) {//这排最后一个样本
                 if (!isAuto() && manualModelSamplingFinish()) {
                     i("手动模式，样本加样完成！")
                     stepDripReagent()

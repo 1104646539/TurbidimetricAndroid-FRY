@@ -106,8 +106,9 @@ fun transitionMoveSampleShelfModel(data: UByteArray): ReplyModel<MoveSampleShelf
  * @return ReplyModel<Any>
  */
 fun transitionMoveSampleModel(data: UByteArray): ReplyModel<MoveSampleModel> {
+    val type = data[5].toInt().takeIf { it < 3 } ?: 0
     return ReplyModel(
-        SerialGlobal.CMD_MoveSample, data[1].toInt(), MoveSampleModel(getStep(data[5], 0) == 1)
+        SerialGlobal.CMD_MoveSample, data[1].toInt(), MoveSampleModel(SampleType.values()[type])
     )
 }
 

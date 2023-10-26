@@ -17,6 +17,13 @@ data class TestResultModel(
      * 样本码
      */
     var sampleBarcode: String = "",
+
+    /**
+     * 样本类型
+     * @see SampleType
+     */
+    var sampleType: Int = SampleType.NONEXISTENT.ordinal,
+
     /**
      * 编号
      */
@@ -109,7 +116,7 @@ data class TestResultModel(
         if (name != other.name) return false
         if (gender != other.gender) return false
         if (age != other.age) return false
-        if (sampleBarcode !=other.sampleBarcode) return false
+        if (sampleBarcode != other.sampleBarcode) return false
         if (detectionNum != other.detectionNum) return false
         if (testState != other.testState) return false
         if (testResult != other.testResult) return false
@@ -126,6 +133,7 @@ data class TestResultModel(
         if (createTime != other.createTime) return false
         if (testTime != other.testTime) return false
         if (project != other.project) return false
+        if (sampleType != other.sampleType) return false
 
         return true
     }
@@ -153,11 +161,12 @@ data class TestResultModel(
         result = 31 * result + createTime.hashCode()
         result = 31 * result + testTime.hashCode()
         result = 31 * result + project.hashCode()
+        result = 31 * result + sampleType.hashCode()
         return result
     }
 
     override fun toString(): String {
-        return "TestResultModel(id=$id, isSelect=$isSelect, name='$name', gender='$gender', age='$age', sampleBarcode='$sampleBarcode', detectionNum='$detectionNum', testState=$testState, testResult='$testResult', absorbances=$absorbances, concentration=$concentration, testValue1=$testValue1, testValue2=$testValue2, testValue3=$testValue3, testValue4=$testValue4, testOriginalValue1=$testOriginalValue1, testOriginalValue2=$testOriginalValue2, testOriginalValue3=$testOriginalValue3, testOriginalValue4=$testOriginalValue4, createTime='$createTime', testTime='$testTime', project=$project)"
+        return "TestResultModel(id=$id, isSelect=$isSelect, name='$name', sampleType='$sampleType',gender='$gender', age='$age', sampleBarcode='$sampleBarcode', detectionNum='$detectionNum', testState=$testState, testResult='$testResult', absorbances=$absorbances, concentration=$concentration, testValue1=$testValue1, testValue2=$testValue2, testValue3=$testValue3, testValue4=$testValue4, testOriginalValue1=$testOriginalValue1, testOriginalValue2=$testOriginalValue2, testOriginalValue3=$testOriginalValue3, testOriginalValue4=$testOriginalValue4, createTime='$createTime', testTime='$testTime', project=$project)"
     }
 
 }

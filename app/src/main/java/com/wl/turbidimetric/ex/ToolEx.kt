@@ -16,6 +16,7 @@ import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.MachineTestModel
 import com.wl.turbidimetric.model.ProjectModel
+import com.wl.turbidimetric.model.SampleType
 import com.wl.turbidimetric.model.TestState
 import com.wl.turbidimetric.util.CurveFitter
 import kotlinx.coroutines.CoroutineScope
@@ -329,4 +330,29 @@ inline fun Fragment.launchAndRepeatWithViewLifecycle(
             block()
         }
     }
+}
+
+/**
+ * 是样本
+ * @receiver SampleType
+ * @return Boolean
+ */
+fun SampleType.isSample(): Boolean {
+    return this == SampleType.SAMPLE
+}
+/**
+ * 不存在
+ * @receiver SampleType
+ * @return Boolean
+ */
+fun SampleType.isNonexistent(): Boolean {
+    return this == SampleType.NONEXISTENT
+}
+/**
+ * 是比色杯
+ * @receiver SampleType
+ * @return Boolean
+ */
+fun SampleType.isCuvette(): Boolean {
+    return this == SampleType.CUVETTE
 }

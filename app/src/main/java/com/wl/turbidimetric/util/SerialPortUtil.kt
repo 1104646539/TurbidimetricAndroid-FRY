@@ -727,10 +727,11 @@ object SerialPortUtil {
 
     /**
      * 挤压
+     * @param enable 是否挤压 比色杯不挤压
      */
-    public fun squeezing() {
+    public fun squeezing(enable: Boolean = true) {
         writeAsync(
-            createCmd(SerialGlobal.CMD_Squeezing)
+            createCmd(SerialGlobal.CMD_Squeezing, data4 = if (enable) 0x1u else 0x0u)
         )
     }
 

@@ -84,7 +84,7 @@
     },
     {
       "id": "4:2539073134430729651",
-      "lastPropertyId": "23:3889165018749616975",
+      "lastPropertyId": "24:8299564898023582926",
       "name": "TestResultModel",
       "properties": [
         {
@@ -200,6 +200,11 @@
           "id": "23:3889165018749616975",
           "name": "sampleBarcode",
           "type": 9
+        },
+        {
+          "id": "24:8299564898023582926",
+          "name": "sampleType",
+          "type": 5
         }
       ],
       "relations": []

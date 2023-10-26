@@ -6,6 +6,7 @@ import com.wl.wllib.CRC.CRC16
 import java.util.concurrent.LinkedBlockingQueue
 import com.wl.wllib.LogToFile.i
 import kotlinx.coroutines.*
+import kotlin.random.Random
 
 /**
  * 仅测试回复用
@@ -17,7 +18,7 @@ object TestSerialPort {
      * 测试回复
      * @param data UByteArray
      */
-     suspend fun testReply(data: UByteArray)  {
+    suspend fun testReply(data: UByteArray) {
 //        GlobalScope.launch {
 //            launch {
 
@@ -34,7 +35,7 @@ object TestSerialPort {
                 reply = reply.plus(ubyteArrayOf(0x0u, 0x2u, 0x11u, 0xffu))//0001 0001
             }
             SerialGlobal.CMD_MoveSample -> {
-                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x1u))
+                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x1u))//0不存在 1样本管 2比色皿
             }
             SerialGlobal.CMD_Test -> {
                 reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x23u, 0x0u))

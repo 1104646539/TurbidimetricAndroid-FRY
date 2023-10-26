@@ -51,10 +51,10 @@ data class MoveCuvetteShelfModel(val v: Int = 0)
 
 /**
  * 移动样本
- * @property exist Boolean 样本是否存在
+ * @property SampleType
  * @constructor
  */
-data class MoveSampleModel(val exist: Boolean = false)
+data class MoveSampleModel(val type: SampleType = SampleType.NONEXISTENT)
 
 /**
  * 移动比色皿 加样位
@@ -176,4 +176,11 @@ data class TempModel(val reactionTemp: Int = 0, val r1Temp: Int = 0)
  * @property v Int
  * @constructor
  */
-data class SqueezingModel(val v:Int = 0)
+data class SqueezingModel(val v: Int = 0)
+
+/**
+ * 检测到的采便管的类型
+ */
+enum class SampleType(val state: String) {
+    NONEXISTENT("不存在"), SAMPLE("样本管"), CUVETTE("比色杯")
+}

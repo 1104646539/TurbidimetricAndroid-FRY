@@ -1,12 +1,14 @@
 package com.wl.turbidimetric.view.dialog
 
 import android.content.Context
+import android.widget.LinearLayout
 import android.widget.TextView
 import com.lxj.xpopup.core.BasePopupView
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.home.HomeViewModel
 import com.wl.turbidimetric.model.CuvetteState
 import com.wl.turbidimetric.model.SampleState
+import com.wl.turbidimetric.model.SampleType
 import com.wl.turbidimetric.model.TestResultModel
 
 class HomeDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_home_details) {
@@ -17,6 +19,8 @@ class HomeDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_h
     var tvState: TextView? = null
     var tvDetectionBarcode: TextView? = null
     var tDetectionResult: TextView? = null
+    var tvSampleType: TextView? = null
+    var llSampleType: LinearLayout? = null
 
 
     fun showDialog(
@@ -34,6 +38,7 @@ class HomeDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_h
             "对应样本序号:",
             getState(item.state),
             item?.testResult?.testResult ?: "-",
+            null,
             item.testResult
         )
     }
@@ -69,6 +74,7 @@ class HomeDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_h
             "对应比色皿序号:",
             getState(item.state),
             item?.testResult?.testResult ?: "-",
+            item?.sampleType ?: SampleType.NONEXISTENT,
             item.testResult
         )
     }
@@ -95,6 +101,7 @@ class HomeDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_h
     var state: String? = null
     var testResultModel: TestResultModel? = null
     var result: String? = null
+    var sampleType: SampleType? = null
     private fun show(
         resultID: String,
         detectionNum: String,
@@ -103,6 +110,7 @@ class HomeDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_h
         labelHilt: String,
         state: String,
         result: String,
+        sampleType: SampleType?,
         testResultModel: TestResultModel?
     ) {
         this.resultID = resultID
@@ -113,7 +121,7 @@ class HomeDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_h
         this.result = result
         this.state = state
         this.testResultModel = testResultModel
-
+        this.sampleType = sampleType
         if (isCreated) {
             setContent()
         }
@@ -128,6 +136,8 @@ class HomeDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_h
         tvState = findViewById(R.id.tv_state)
         tvDetectionBarcode = findViewById(R.id.tv_detection_barcode)
         tDetectionResult = findViewById(R.id.tv_result)
+        llSampleType = findViewById(R.id.ll_sample_type)
+        tvSampleType = findViewById(R.id.tv_sample_type)
 
     }
 
@@ -140,6 +150,8 @@ class HomeDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_h
         tvDetectionNum?.text = detectionNum.takeIf { !it.isNullOrEmpty() } ?: "-"
         tvDetectionBarcode?.text = detectionBarcode.takeIf { !it.isNullOrEmpty() } ?: "-"
         tDetectionResult?.text = result.takeIf { !it.isNullOrEmpty() } ?: "-"
+        llSampleType?.visibility = (sampleType != null).isShow()
+        tvSampleType?.text = sampleType?.state ?: "-"
     }
 
     override fun getResId(): Int {

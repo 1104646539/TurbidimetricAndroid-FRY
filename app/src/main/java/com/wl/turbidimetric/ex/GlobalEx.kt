@@ -81,7 +81,7 @@ inline fun Array<Array<SampleItem>?>.print(): String {
     val sb = StringBuffer()
     this.forEachIndexed { i, ts ->
         ts?.forEachIndexed { j, t ->
-            sb.append("[${t.state},${t.testResult?.id}] ")
+            sb.append("[${t.state},${t.sampleType?.ordinal},${t.testResult?.id}] ")
         }
 //        sb.append("\n")
     }

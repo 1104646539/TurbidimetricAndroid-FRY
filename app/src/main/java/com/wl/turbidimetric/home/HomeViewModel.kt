@@ -2,7 +2,6 @@ package com.wl.turbidimetric.home
 
 import android.view.View
 import androidx.lifecycle.*
-import com.wl.turbidimetric.R
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.EventGlobal
@@ -636,6 +635,7 @@ class HomeViewModel(
         if (!sampleNeedSampling(samplePos - 1)) {
             samplingFinish = true
             dripSampleFinish = true
+            i("不需要取样 下一步")
         }
         nextStepDripReagent()
     }
@@ -766,15 +766,15 @@ class HomeViewModel(
         dripSampleFinish = false
         scanFinish = false
 
-        var exist = reply.data.exist
-
+        var isNonexistent = reply.data.type.isNonexistent()
+        var isCuvette = reply.data.type.isCuvette()
         //最后一个位置不需要扫码，直接取样
         if (samplePos < sampleMax) {
-            if ((SystemGlobal.isCodeDebug && !sampleExists[samplePos]) || (isAuto() && LocalData.SampleExist && !exist)) {
+//            if ((SystemGlobal.isCodeDebug && !sampleExists[samplePos]) || (isAuto() && LocalData.SampleExist && isNonexistent)) {
                 //如果是自动模式并且已开启样本传感器,并且是未识别到样本，才是没有样本
-//            if ((isAuto() && LocalData.SampleExist && !exist)) {
+            if ((isAuto() && LocalData.SampleExist && isNonexistent)) {
                 //没有样本，移动到下一个位置
-                i("没有样本,移动到下一个位置")
+//                i("没有样本,移动到下一个位置")
                 scanFinish = true
                 scanResults.add(null)
                 i("scanResults=$scanResults")
@@ -783,7 +783,7 @@ class HomeViewModel(
                 //有样本
                 i("有样本")
                 updateSampleState(samplePos, SampleState.Exist)
-                startScan(samplePos)
+                startScan(samplePos, reply.data.type)
             }
         }
         //判断是否需要取样。取样位和扫码位差一个位置
@@ -802,7 +802,9 @@ class HomeViewModel(
 
         //判断是否需要取样。取样位和扫码位差一个位置
         if (sampleNeedSampling(samplePos - 1)) {
-            squeezing()
+            val isSample =
+                mSamplesStates[sampleShelfPos]?.get(samplePos - 1)?.sampleType?.isSample() == true
+            squeezing(isSample)
         } else if (samplePos == sampleMax && sampleMoveFinish) {
             //加入sampleMoveFinish的判断是为了防止在上面的nextStepDripReagent()之前samplePos=sampleMax-1，而移动了样本后，导致samplePos == sampleMax从而发生同时移动样本和比色皿的问题
             //最后一个样本，并且不需要取样时，下一步
@@ -817,7 +819,8 @@ class HomeViewModel(
      */
     private fun sampleNeedSampling(samplePos: Int): Boolean {
         if (samplePos < 0) return false
-        return mSamplesStates[sampleShelfPos]!![samplePos].state == SampleState.Pierced
+        return mSamplesStates[sampleShelfPos]!![samplePos].state == SampleState.Pierced || mSamplesStates[sampleShelfPos]!![samplePos].state == SampleState.Squeezing
+//        return mSamplesStates[sampleShelfPos]!![samplePos].state == SampleState.Squeezing
     }
 
     /**
@@ -838,6 +841,7 @@ class HomeViewModel(
     private fun updateSampleState(
         samplePos: Int,
         state: SampleState? = null,
+        sampleType: SampleType? = null,
         testResult: TestResultModel? = null,
         cuvettePos: String? = null
     ) {
@@ -853,8 +857,11 @@ class HomeViewModel(
         samplePos?.let {
             mSamplesStates[sampleShelfPos]!![samplePos].cuvetteID = cuvettePos
         }
+        sampleType?.let {
+            mSamplesStates[sampleShelfPos]!![samplePos].sampleType = sampleType
+        }
         _samplesStates.value = mSamplesStates.copyOf()
-        i("updateSampleState ShelfPos=$sampleShelfPos samplePos=$samplePos  samplesState=${mSamplesStates.print()}")
+        i("updateSampleState ShelfPos=$sampleShelfPos samplePos=$samplePos  sampleType=$sampleType samplesState=${mSamplesStates.print()}")
     }
 
     /**
@@ -881,7 +888,7 @@ class HomeViewModel(
     /**
      * 开始扫码
      */
-    private fun startScan(samplePos: Int) {
+    private fun startScan(samplePos: Int, sampleType: SampleType) {
         scanFinish = false
         piercedFinish = false
 
@@ -890,21 +897,37 @@ class HomeViewModel(
                 ScanCodeUtil.startScan()
             }
         } else {
-            //如果是测试用的。。。或者是自动模式，但是未开启扫码、或者是手动模式时。走扫码成功路线
-            if ((SystemGlobal.isCodeDebug && tempSampleState[samplePos] == 1) || (isAuto() && !LocalData.ScanCode) || (!isAuto())) {
-                scanSuccess("")
+            /**
+             * 以下情况不扫码，直接成功
+             * 1、如果是测试用的并且测试数据是扫码成功
+             * 2、是自动模式，但是未开启扫码
+             * 3、是手动模式时
+             * 4、是比色杯时
+             */
+            if ((SystemGlobal.isCodeDebug && tempSampleState[samplePos] == 1) || (isAuto() && !LocalData.ScanCode) || (!isAuto()) || sampleType.isCuvette()) {
+                callScanSuccess("", sampleType)
             } else {
-                scanFailed()
+                callScanFailed(sampleType)
             }
         }
+    }
+
+    private fun callScanSuccess(str: String, sampleType: SampleType) {
+        i("扫码成功 str=$str")
+        updateSampleState(samplePos, SampleState.ScanSuccess, sampleType = sampleType)
+        scanSuccess(str)
+    }
+
+    private fun callScanFailed(sampleType: SampleType) {
+        i("扫码失败")
+        updateSampleState(samplePos, SampleState.ScanFailed, sampleType = sampleType)
+        scanFailed()
     }
 
     /**
      * 扫码成功
      */
     override fun scanSuccess(str: String) {
-        i("扫码成功 str=$str")
-        updateSampleState(samplePos, SampleState.ScanSuccess)
         scanFinish = true
         pierced()
         scanResults.add(str ?: "")
@@ -915,14 +938,13 @@ class HomeViewModel(
      * 扫码失败
      */
     override fun scanFailed() {
-        i("扫码失败")
-        updateSampleState(samplePos, SampleState.ScanFailed)
         scanFinish = true
         piercedFinish = true
         //当不需要取样时，直接下一步
         if (!sampleNeedSampling(samplePos - 1)) {
             samplingFinish = true
             dripSampleFinish = true
+            i("不需要取样 下一步")
         }
         nextStepDripReagent()
         scanResults.add(null)
@@ -934,11 +956,12 @@ class HomeViewModel(
      * 新建检测记录
      * @param str String?
      */
-    private fun createResultModel(str: String?): TestResultModel {
+    private fun createResultModel(str: String?, sampleItem: SampleItem?): TestResultModel {
         val resultModel = TestResultModel(
             sampleBarcode = str ?: "",
             createTime = Date().time,
             detectionNum = LocalData.getDetectionNumInc(),
+            sampleType = sampleItem?.sampleType?.ordinal ?: SampleType.NONEXISTENT.ordinal
         ).apply {
             project.target = selectProject
         }
@@ -1501,12 +1524,15 @@ class HomeViewModel(
         c("接收到 加样 reply=$reply cuvettePos=$cuvettePos samplePos=$samplePos")
 
         dripSampleFinish = true
-        val result = createResultModel(scanResults[samplePos - 1])
+        val result = createResultModel(
+            scanResults[samplePos - 1],
+            mSamplesStates[sampleShelfPos]?.get(samplePos - 1)
+        )
         updateCuvetteState(
             cuvettePos, CuvetteState.DripSample, result, "${sampleShelfPos + 1}- $samplePos"
         )
         updateSampleState(
-            samplePos - 1, null, result, "${cuvetteShelfPos + 1}- ${cuvettePos + 1}"
+            samplePos - 1, null, null, result, "${cuvetteShelfPos + 1}- ${cuvettePos + 1}"
         )
         samplingProbeCleaning()
 
@@ -2369,10 +2395,11 @@ class HomeViewModel(
 
     /**
      * 挤压
+     * 比色杯不需要挤压（下位机收到不需要挤压会直接返回）。样本管才需要
      */
-    private fun squeezing() {
-        c("发送 挤压")
-        SerialPortUtil.squeezing()
+    private fun squeezing(enable: Boolean = true) {
+        c("发送 挤压 enable=$enable")
+        SerialPortUtil.squeezing(enable)
     }
 
     /**
@@ -2504,7 +2531,10 @@ class HomeViewModel(
     )
 
     data class SampleItem(
-        var state: SampleState, var testResult: TestResultModel? = null, var cuvetteID: String? = ""
+        var state: SampleState,
+        var testResult: TestResultModel? = null,
+        var cuvetteID: String? = "",
+        var sampleType: SampleType? = null
     )
 }
 

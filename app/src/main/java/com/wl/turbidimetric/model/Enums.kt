@@ -28,6 +28,7 @@ enum class MachineTestModel {
  */
 enum class SampleState {
     None,//啥也没干
+    NONEXISTENT,//确定没有任何样本
     Exist,//确定存在
     ScanSuccess,//扫码成功
     ScanFailed,//扫码失败
@@ -95,3 +96,9 @@ enum class TestType {
     Repeatability,//重复性测试
 }
 
+/**
+ * 检测到的采便管的类型
+ */
+enum class SampleType(val state: String) {
+    NONEXISTENT("不存在"), SAMPLE("样本管"), CUVETTE("比色杯")
+}

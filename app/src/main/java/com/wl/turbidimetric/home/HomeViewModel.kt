@@ -385,6 +385,14 @@ class HomeViewModel(
      */
     var continueTestGetState = false
 
+    /**
+     * 保存着当前样本位置的类型（如果有）
+     */
+    var sampleType: SampleType? = null
+
+    /**
+     * r1试剂
+     */
     var r1Reagent: Boolean = false
         set(value) {
             field = value
@@ -392,10 +400,18 @@ class HomeViewModel(
                 it.copy(r1State = value)
             }
         }
+
+    /**
+     * r2试剂
+     */
     var r2Reagent: Boolean = false
         set(value) {
             field = value
         }
+
+    /**
+     * r2试剂量
+     */
     var r2Volume: Int = 0
         set(value) {
             field = value
@@ -403,6 +419,10 @@ class HomeViewModel(
                 it.copy(r2State = value)
             }
         }
+
+    /**
+     * 清洗液量
+     */
     var cleanoutFluid: Boolean = false
         set(value) {
             field = value
@@ -765,25 +785,26 @@ class HomeViewModel(
         samplingFinish = false
         dripSampleFinish = false
         scanFinish = false
-
+        sampleType = reply.data.type
         var isNonexistent = reply.data.type.isNonexistent()
         var isCuvette = reply.data.type.isCuvette()
         //最后一个位置不需要扫码，直接取样
         if (samplePos < sampleMax) {
 //            if ((SystemGlobal.isCodeDebug && !sampleExists[samplePos]) || (isAuto() && LocalData.SampleExist && isNonexistent)) {
-                //如果是自动模式并且已开启样本传感器,并且是未识别到样本，才是没有样本
+            //如果是自动模式并且已开启样本传感器,并且是未识别到样本，才是没有样本
             if ((isAuto() && LocalData.SampleExist && isNonexistent)) {
                 //没有样本，移动到下一个位置
 //                i("没有样本,移动到下一个位置")
                 scanFinish = true
                 scanResults.add(null)
                 i("scanResults=$scanResults")
+                updateSampleState(samplePos, SampleState.NONEXISTENT)
                 nextStepDripReagent()
             } else {
                 //有样本
                 i("有样本")
                 updateSampleState(samplePos, SampleState.Exist)
-                startScan(samplePos, reply.data.type)
+                startScan(samplePos)
             }
         }
         //判断是否需要取样。取样位和扫码位差一个位置
@@ -885,14 +906,21 @@ class HomeViewModel(
         i("updateCuvetteState ShelfPos=$cuvetteShelfPos cuvettePos=$cuvettePos cuvetteStates=${mCuvetteStates.print()}")
     }
 
+
     /**
      * 开始扫码
      */
-    private fun startScan(samplePos: Int, sampleType: SampleType) {
+    private fun startScan(samplePos: Int) {
         scanFinish = false
         piercedFinish = false
 
-        if (!SystemGlobal.isCodeDebug && (isAuto() && LocalData.ScanCode)) {
+
+        /**
+         * 以下情况需要扫码
+         * 1、测试用的
+         * 2、自动模式并且开启了扫码并且样本类型为样本管
+         */
+        if (!SystemGlobal.isCodeDebug && (isAuto() && LocalData.ScanCode && sampleType?.isSample() == true)) {
             viewModelScope.launch {
                 ScanCodeUtil.startScan()
             }
@@ -904,30 +932,20 @@ class HomeViewModel(
              * 3、是手动模式时
              * 4、是比色杯时
              */
-            if ((SystemGlobal.isCodeDebug && tempSampleState[samplePos] == 1) || (isAuto() && !LocalData.ScanCode) || (!isAuto()) || sampleType.isCuvette()) {
-                callScanSuccess("", sampleType)
+            if ((SystemGlobal.isCodeDebug && tempSampleState[samplePos] == 1) || (isAuto() && !LocalData.ScanCode) || (!isAuto()) || sampleType?.isCuvette() == true) {
+                scanSuccess("")
             } else {
-                callScanFailed(sampleType)
+                scanFailed()
             }
         }
-    }
-
-    private fun callScanSuccess(str: String, sampleType: SampleType) {
-        i("扫码成功 str=$str")
-        updateSampleState(samplePos, SampleState.ScanSuccess, sampleType = sampleType)
-        scanSuccess(str)
-    }
-
-    private fun callScanFailed(sampleType: SampleType) {
-        i("扫码失败")
-        updateSampleState(samplePos, SampleState.ScanFailed, sampleType = sampleType)
-        scanFailed()
     }
 
     /**
      * 扫码成功
      */
     override fun scanSuccess(str: String) {
+        i("扫码成功 str=$str")
+        updateSampleState(samplePos, SampleState.ScanSuccess, sampleType = sampleType)
         scanFinish = true
         pierced()
         scanResults.add(str ?: "")
@@ -938,6 +956,8 @@ class HomeViewModel(
      * 扫码失败
      */
     override fun scanFailed() {
+        i("扫码失败")
+        updateSampleState(samplePos, SampleState.ScanFailed, sampleType = sampleType)
         scanFinish = true
         piercedFinish = true
         //当不需要取样时，直接下一步

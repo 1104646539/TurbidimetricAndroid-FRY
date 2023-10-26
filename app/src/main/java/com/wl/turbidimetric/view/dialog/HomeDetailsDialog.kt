@@ -82,6 +82,7 @@ class HomeDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_h
     private fun getState(state: SampleState): String {
         return when (state) {
             SampleState.None -> "未知"
+            SampleState.NONEXISTENT -> "没有样本"
             SampleState.Exist -> "存在"
             SampleState.ScanSuccess -> "扫码成功"
             SampleState.ScanFailed -> "扫码失败"

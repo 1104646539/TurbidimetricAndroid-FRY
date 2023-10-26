@@ -178,9 +178,4 @@ data class TempModel(val reactionTemp: Int = 0, val r1Temp: Int = 0)
  */
 data class SqueezingModel(val v: Int = 0)
 
-/**
- * 检测到的采便管的类型
- */
-enum class SampleType(val state: String) {
-    NONEXISTENT("不存在"), SAMPLE("样本管"), CUVETTE("比色杯")
-}
+

@@ -16,7 +16,6 @@ import kotlinx.coroutines.*
 import java.util.*
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.LinkedBlockingQueue
-import com.wl.wllib.LogToFile.i
 
 /**
  * 串口操作类
@@ -476,12 +475,12 @@ object SerialPortUtil {
      * @param volume 取样量
      * @param squeezing 是否挤压
      */
-    fun sampling(volume: Int = LocalData.SamplingVolume, squeezing: Boolean = true) {
+    fun sampling(volume: Int = LocalData.SamplingVolume, sampleType: SampleType) {
 //        c("发送 取样")
         writeAsync(
             createCmd(
                 SerialGlobal.CMD_Sampling,
-                data2 = (if (squeezing) 1 else 0).toUByte(),
+                data2 = (if (sampleType.isSample()) 0 else 1).toUByte(),
                 data3 = (volume shr 8).toUByte(),
                 data4 = volume.toUByte()
             )
@@ -678,8 +677,13 @@ object SerialPortUtil {
     /**
      * 刺破
      */
-    fun pierced() {
-        writeAsync(createCmd(SerialGlobal.CMD_Pierced))
+    fun pierced(sampleType: SampleType) {
+        writeAsync(
+            createCmd(
+                SerialGlobal.CMD_Pierced,
+                data4 = if (sampleType.isSample()) 0x1u else 0x0u
+            )
+        )
     }
 
     /**

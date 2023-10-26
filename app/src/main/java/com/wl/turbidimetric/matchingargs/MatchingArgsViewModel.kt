@@ -9,13 +9,11 @@ import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.global.SystemGlobal.testState
 import com.wl.turbidimetric.global.SystemGlobal.testType
-import com.wl.turbidimetric.home.HomeDialogUiState
 import com.wl.turbidimetric.home.ProjectRepository
 import com.wl.turbidimetric.model.*
 import com.wl.turbidimetric.print.PrintUtil
 import com.wl.turbidimetric.util.Callback2
 import com.wl.turbidimetric.util.SerialPortUtil
-import com.wl.wllib.toLongTimeStr
 import com.wl.wwanandroid.base.BaseViewModel
 import io.objectbox.kotlin.flow
 import kotlinx.coroutines.delay
@@ -26,8 +24,6 @@ import kotlin.math.absoluteValue
 import com.wl.wllib.LogToFile.i
 import com.wl.wllib.toTimeStr
 import kotlinx.coroutines.flow.*
-import kotlin.math.round
-import kotlin.math.roundToInt
 import kotlin.random.Random
 
 /**
@@ -1352,7 +1348,7 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
     private fun sampling(volume: Int) {
         i("发送 取样 volume=$volume")
         samplingFinish = false
-        SerialPortUtil.sampling(volume, squeezing = false)
+        SerialPortUtil.sampling(volume, SampleType.CUVETTE)
     }
 
     /**

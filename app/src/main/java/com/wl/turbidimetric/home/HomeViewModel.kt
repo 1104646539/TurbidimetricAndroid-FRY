@@ -994,9 +994,11 @@ class HomeViewModel(
      * 刺破
      */
     private fun pierced() {
-        c("发送 刺破")
+        val type =
+            mSamplesStates?.get(sampleShelfPos)?.get(samplePos)?.sampleType ?: SampleType.CUVETTE
+        c("发送 刺破 type=$type")
         piercedFinish = false
-        SerialPortUtil.pierced()
+        SerialPortUtil.pierced(type)
     }
 
 
@@ -2407,10 +2409,12 @@ class HomeViewModel(
      * 取样
      */
     private fun sampling() {
-        c("发送 取样")
+        val type = mSamplesStates?.get(sampleShelfPos)?.get(samplePos - 1)?.sampleType
+            ?: SampleType.CUVETTE
+        c("发送 取样 type=$type")
         samplingFinish = false
         dripSampleFinish = false
-        SerialPortUtil.sampling()
+        SerialPortUtil.sampling(sampleType = type)
     }
 
     /**

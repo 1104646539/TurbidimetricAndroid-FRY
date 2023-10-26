@@ -1219,7 +1219,7 @@ class RepeatabilityViewModel(
     private fun sampling(volume: Int) {
         i("发送 取样 volume=$volume")
         samplingFinish = false
-        SerialPortUtil.sampling(volume, squeezing = false)
+        SerialPortUtil.sampling(volume, SampleType.CUVETTE)
     }
 
     /**

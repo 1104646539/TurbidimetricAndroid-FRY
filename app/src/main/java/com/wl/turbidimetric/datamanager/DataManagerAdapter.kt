@@ -123,8 +123,8 @@ class DataManagerAdapter :
             holder.binding.root.setOnClickListener {
                 item?.let { item ->
                     item.isSelect = !item.isSelect
-                    snapshot()[position]?.isSelect = item.isSelect
-                    notifyItemChanged(position, REFRESH_SELECT_CHANGE)
+                    snapshot()[holder.absoluteAdapterPosition]?.isSelect = item.isSelect
+                    notifyItemChanged(holder.absoluteAdapterPosition, REFRESH_SELECT_CHANGE)
                 }
             }
             holder.binding.ivSelect.isSelected = item?.isSelect ?: false

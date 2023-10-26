@@ -35,7 +35,7 @@ object TestSerialPort {
                 reply = reply.plus(ubyteArrayOf(0x0u, 0x2u, 0x11u, 0xffu))//0001 0001
             }
             SerialGlobal.CMD_MoveSample -> {
-                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x1u))//0不存在 1样本管 2比色皿
+                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x2u))//0不存在 1样本管 2比色杯
             }
             SerialGlobal.CMD_Test -> {
                 reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x23u, 0x0u))

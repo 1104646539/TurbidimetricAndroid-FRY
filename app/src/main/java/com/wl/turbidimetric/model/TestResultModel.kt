@@ -89,6 +89,11 @@ data class TestResultModel(
      * 检测时间 第四次
      */
     var testTime: Long = 0,
+
+    var deliveryTime: String = "", //送检时间
+    var deliveryDepartment: String = "",//送检科室
+    var deliveryDoctor: String = "",//送检医生
+
 ) : BaseOBModel(0) {
 
     lateinit var project: ToOne<ProjectModel>
@@ -134,6 +139,9 @@ data class TestResultModel(
         if (testTime != other.testTime) return false
         if (project != other.project) return false
         if (sampleType != other.sampleType) return false
+        if (deliveryTime != other.deliveryTime) return false
+        if (deliveryDepartment != other.deliveryDepartment) return false
+        if (deliveryDoctor != other.deliveryDoctor) return false
 
         return true
     }
@@ -162,6 +170,9 @@ data class TestResultModel(
         result = 31 * result + testTime.hashCode()
         result = 31 * result + project.hashCode()
         result = 31 * result + sampleType.hashCode()
+        result = 31 * result + deliveryTime.hashCode()
+        result = 31 * result + deliveryDepartment.hashCode()
+        result = 31 * result + deliveryDoctor.hashCode()
         return result
     }
 

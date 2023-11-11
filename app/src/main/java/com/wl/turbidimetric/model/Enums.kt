@@ -93,7 +93,19 @@ enum class TestType {
     None,//无
     Test,//检测
     MatchingArgs,//标曲
-    Repeatability,//重复性测试
+    Repeatability;//重复性测试
+
+    fun isTest(): Boolean {
+        return this == Test
+    }
+
+    fun isMatchingArgs(): Boolean {
+        return this == MatchingArgs
+    }
+
+    fun isRepeatability(): Boolean {
+        return this == Repeatability
+    }
 }
 
 /**

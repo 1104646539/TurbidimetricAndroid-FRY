@@ -16,15 +16,13 @@ import com.wl.turbidimetric.ex.PD
 import com.wl.turbidimetric.ex.launchAndRepeatWithViewLifecycle
 import com.wl.turbidimetric.ex.toast
 import com.wl.turbidimetric.model.ConditionModel
+import com.wl.turbidimetric.model.ProjectModel
 import com.wl.turbidimetric.model.TestResultModel
-import com.wl.turbidimetric.model.TestResultModel_
 import com.wl.turbidimetric.print.PrintUtil
 import com.wl.turbidimetric.util.ExportExcelHelper
 import com.wl.turbidimetric.view.dialog.*
 import com.wl.wllib.LogToFile.i
 import com.wl.wwanandroid.base.BaseFragment
-import io.objectbox.query.Query
-import io.objectbox.query.QueryBuilder
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
 import java.util.*
@@ -71,7 +69,7 @@ class DataManagerFragment :
     override fun init(savedInstanceState: Bundle?) {
         initView()
         listener()
-        test()
+//        test()
     }
 
     private fun initView() {
@@ -90,8 +88,8 @@ class DataManagerFragment :
     }
 
     fun test() {
-//        val testdatas = createTestData()
-//        DBManager.TestResultBox.put(testdatas)
+        val testdatas = createTestData()
+        DBManager.TestResultBox.put(testdatas)
     }
 
     private fun createPrintData(): List<List<String>> {
@@ -119,7 +117,7 @@ class DataManagerFragment :
 
     private fun createTestData(): List<TestResultModel> {
         return mutableListOf<TestResultModel>().apply {
-            for (i in 0..6000) {
+            for (i in 0..600) {
                 val dr = TestResultModel(
                     testResult = (i % 2 == 0).PD("阳性", "阴性"),
                     concentration = 66 + i,
@@ -136,8 +134,13 @@ class DataManagerFragment :
                     testValue2 = "52.32".toBigDecimal(),
                     testValue3 = "52.33".toBigDecimal(),
                     testValue4 = "52.34".toBigDecimal(),
-                    testTime = Date().time
-                )
+                    testTime = Date().time,
+                    deliveryTime = "",
+                    deliveryDepartment = "",
+                    deliveryDoctor = "",
+                ).apply {
+                    project.target = ProjectModel()
+                }
                 add(dr)
             }
         }
@@ -165,7 +168,15 @@ class DataManagerFragment :
         vd.btnExportExcelAll.setOnClickListener {
             exportExcelAll()
         }
-
+        vd.btnUpload.setOnClickListener {
+            upload()
+        }
+        vd.btnGetBacklog.setOnClickListener {
+            getBacklog()
+        }
+        vd.btnGetBacklog2.setOnClickListener {
+            getBacklog2()
+        }
         lifecycleScope.launch {
             vm.resultSize.collectLatest {
                 vd.tvCount.text = "(${it}条)"
@@ -193,6 +204,27 @@ class DataManagerFragment :
         }
         adapter.onSelectChange = { pos, selected ->
 
+        }
+    }
+
+    private fun getBacklog2() {
+
+    }
+
+    private fun getBacklog() {
+    }
+
+    /**
+     * 上传
+     */
+    private fun upload() {
+        val results = getSelectData()
+        if (results.isNullOrEmpty()) {
+            toast("请选择数据")
+            return
+        }
+
+        lifecycleScope.launch(Dispatchers.IO) {
         }
     }
 
@@ -242,9 +274,7 @@ class DataManagerFragment :
             toast("请选择数据")
             return
         }
-        results?.forEach {
-            i("选中的:${it.id}")
-        }
+
         PrintUtil.printTest(results)
     }
 

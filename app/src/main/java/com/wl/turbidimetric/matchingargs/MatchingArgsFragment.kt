@@ -222,7 +222,12 @@ class MatchingArgsFragment :
             vm.clickStart(null)
             return
         }
-        coverProjectDialog.showPop(requireContext(), isCancelable = false, width = 1000, maxWidth = 1000) {
+        coverProjectDialog.showPop(
+            requireContext(),
+            isCancelable = false,
+            width = 1000,
+            maxWidth = 1000
+        ) {
             it.show(adapter.items, onConfirm = { projectModel, baseDialog ->
                 if (projectModel == null) {
                     toast("未选择覆盖的标曲，取消拟合！")
@@ -282,17 +287,17 @@ class MatchingArgsFragment :
             vm.dialogUiState.collect {
                 when (it.dialogState) {
                     DialogState.GetStateNotExistMsg -> {//开始检测，确实清洗液等
-                        dialog.showPop(requireContext()) {
-                            it.showDialog(
+                        dialog.showPop(requireContext()) { dialog ->
+                            dialog.showDialog(
                                 msg = "${it.msg}",
                                 confirmText = "我已添加",
                                 confirmClick = {
-                                    it.dismiss()
+                                    dialog.dismiss()
                                     vm.dialogGetStateNotExistConfirm()
                                 },
                                 cancelText = "结束检测",
                                 cancelClick = {
-                                    it.dismiss()
+                                    dialog.dismiss()
                                     vm.dialogGetStateNotExistCancel()
                                 }
                             )
@@ -306,18 +311,30 @@ class MatchingArgsFragment :
                             width = 1500,
                             maxWidth = 1500,
                             isCancelable = false
-                        ) {
-                            it.showDialog(
+                        ) { dialog ->
+                            dialog.showDialog(
                                 msg = msg,
                                 confirmText = "保存", confirmClick = {
                                     vm.saveProject()
-                                    it.dismiss()
+                                    dialog.dismiss()
                                 }, cancelText = "取消", cancelClick = {
-                                    it.dismiss()
+                                    dialog.dismiss()
                                 }
                             )
                         }
 
+                    }
+                    DialogState.ACCIDENT -> {//意外的检测结束等
+                        dialog.showPop(requireContext()) { dialog ->
+                            dialog.showDialog(
+                                msg = "${it.msg}",
+                                confirmText = "我已添加",
+                                confirmClick = {
+                                    dialog.dismiss()
+
+                                }
+                            )
+                        }
                     }
                     else -> {
 
@@ -340,39 +357,6 @@ class MatchingArgsFragment :
                 }
             }
         }
-//        /**
-//         * 开始检测 比色皿,样本，试剂不足
-//         */
-//        vm.getStateNotExistMsg.observe(this) { msg ->
-//            if (msg.isNotEmpty()) {
-//                dialog.show(msg = "${vm.getStateNotExistMsg.value}",
-//                    confirmMsg = "我已添加",
-//                    onConfirm = {
-//                        it.dismiss()
-//                        vm.dialogGetStateNotExistConfirm()
-//                    },
-//                    cancelMsg = "结束检测",
-//                    onCancel = {
-//                        it.dismiss()
-//                        vm.dialogGetStateNotExistCancel()
-//                    })
-//            }
-//        }
-//        vm.matchingFinishMsg.observe(this) {
-//            if (it.isNotEmpty()) {
-//                vm.saveProject()
-//                val msg = it.plus("确定保存该条标曲记录？")
-//                dialog.show(
-//                    msg = msg,
-//                    confirmMsg = "保存", onConfirm = {
-//                        vm.saveProject()
-//                        it.dismiss()
-//                    }, cancelMsg = "取消", onCancel = {
-//                        it.dismiss()
-//                    }
-//                )
-//            }
-//        }
     }
 
 }

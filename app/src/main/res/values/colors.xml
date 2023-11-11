@@ -9,6 +9,7 @@
     <color name="divider">#f1f1f1</color>
     <color name="textColor">#333333</color>
     <color name="textGray">#999999</color>
+    <color name="textHilt">#888888</color>
     <color name="frameColor">#e3e3e3</color>
     <color name="bg_gray">#f5f5f5</color>
     <color name="white">#FFFFFFFF</color>

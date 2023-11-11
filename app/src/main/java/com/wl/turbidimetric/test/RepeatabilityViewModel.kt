@@ -11,9 +11,12 @@ import com.wl.turbidimetric.global.SystemGlobal.testState
 import com.wl.turbidimetric.global.SystemGlobal.testType
 import com.wl.turbidimetric.home.ProjectRepository
 import com.wl.turbidimetric.home.TestResultRepository
+import com.wl.turbidimetric.matchingargs.DialogState
+import com.wl.turbidimetric.matchingargs.MatchingArgsDialogUiState
 import com.wl.turbidimetric.model.*
 import com.wl.turbidimetric.util.Callback2
 import com.wl.turbidimetric.util.SerialPortUtil
+import com.wl.wllib.LogToFile
 import com.wl.wwanandroid.base.BaseViewModel
 import io.objectbox.kotlin.flow
 import kotlinx.coroutines.Dispatchers
@@ -217,6 +220,10 @@ class RepeatabilityViewModel(
      */
     var testPosInterval: Long = 1000 * 10;
 
+    /**
+     * 移动样本时检测到样本管的标记
+     */
+    var isDetectedSample = false
 
     /**
      * 测试用的 start
@@ -334,10 +341,10 @@ class RepeatabilityViewModel(
                         testValue2 = resultTest2[index],
                         testValue3 = resultTest3[index],
                         testValue4 = resultTest4[index],
-                        testOriginalValue1 = testOriginalValues1[index],
-                        testOriginalValue2 = testOriginalValues2[index],
-                        testOriginalValue3 = testOriginalValues3[index],
-                        testOriginalValue4 = testOriginalValues4[index],
+                        testOriginalValue1 = resultOriginalTest1[index],
+                        testOriginalValue2 = resultOriginalTest2[index],
+                        testOriginalValue3 = resultOriginalTest3[index],
+                        testOriginalValue4 = resultOriginalTest4[index],
                     ).apply {
                         project.target = selectProject
                     }
@@ -351,6 +358,7 @@ class RepeatabilityViewModel(
     }
 
     private fun initState() {
+        isDetectedSample = false
         resultTest1.clear()
         resultTest2.clear()
         resultTest3.clear()
@@ -513,8 +521,8 @@ class RepeatabilityViewModel(
     }
 
     private fun openAllDoor() {
-//        openSampleDoor()
-//        openCuvetteDoor()
+        openSampleDoor()
+        openCuvetteDoor()
     }
 
     /**
@@ -556,10 +564,21 @@ class RepeatabilityViewModel(
         i("接收到 移动样本 reply=$reply samplePos=$samplePos testState=$testState sampleStep=$sampleStep")
         sampleMoveFinish = true
 
+
         when (testState) {
-            TestState.MoveSample -> {//去取需要移动的已混匀的样本
-                sampleStep++
-                sampling(moveSampleVolume)
+            TestState.MoveSample -> {//因为需要检测第一个样本是否是比色杯，所以一次移动一个位置
+                if (samplePos == 0) {
+                    //如果是样本管，直接检测结束，并报错，因为质控不允许使用样本管
+                    if (reply.data.type.isSample()) {
+                        isDetectedSample = true
+                        matchingFinish()
+                        return
+                    }
+                    moveSample(1)
+                } else if (samplePos == 1) {
+                    sampleStep++
+                    sampling(moveSampleVolume)
+                }
             }
             else -> {
 
@@ -674,7 +693,7 @@ class RepeatabilityViewModel(
         sampleShelfMoveFinish = true
         if (testState != TestState.TestFinish) {
             //一开始就要移动到第二个位置去取第一个位置的稀释液
-            moveSample(2)
+            moveSample(1)
         }
     }
 
@@ -770,7 +789,7 @@ class RepeatabilityViewModel(
         testState = TestState.TestFinish
         moveCuvetteShelf(-1)
         moveSampleShelf(-1)
-        samplingProbeCleaning()
+//        samplingProbeCleaning()
     }
 
     /**
@@ -917,34 +936,13 @@ class RepeatabilityViewModel(
     override fun readDataDripSampleModel(reply: ReplyModel<DripSampleModel>) {
         if (!runningRepeatability()) return
         if (!machineStateNormal()) return
-        i("接收到 加样 reply=$reply cuvettePos=$cuvettePos testState=$testState sampleStep=$sampleStep samplePos=$samplePos")
+        i("接收到 加样 reply=$reply cuvettePos=$cuvettePos testState=$testState sampleStep=$sampleStep samplePos=$samplePos cuvetteStates=$cuvetteStates")
 
         dripSamplingFinish = true
 
-        when (testState) {
-            TestState.MoveSample -> {//加完样判断是否结束
-                updateCuvetteState(cuvettePos - 1, CuvetteState.DripSample)
-//                samplingProbeCleaning()
-                if ((sampleStep == 10)) {
-                    //开始加试剂的步骤
-                    testState = TestState.DripReagent
-                    sampleStep = 0
-                    cuvettePos = -1
-//                moveSample(-samplePos + 1)
-                    moveCuvetteDripReagent()
+        samplingProbeCleaning()
 
-                    takeReagent()
-                } else {//继续取样。同一个样本位置
-//                    moveSample()
-                    sampleStep++
-                    sampling(moveSampleVolume)
-                    moveCuvetteDripSample()
-                }
-            }
-            else -> {}
-        }
 
-        i("加样 cuvetteStates=$cuvetteStates")
     }
 
     /**
@@ -1038,20 +1036,42 @@ class RepeatabilityViewModel(
         if (!runningRepeatability()) return
         if (!machineStateNormal()) return
         i("接收到 取样针清洗 reply=$reply samplePos=$samplePos sampleStep=$sampleStep")
-        if (testState == TestState.MoveSample) {//加已混匀的样本的清洗
-            if ((sampleStep == 9)) {
-                //开始加试剂的步骤
-                testState = TestState.DripReagent
-                sampleStep = 0
-                cuvettePos = -1
+//        if (testState == TestState.MoveSample) {//加已混匀的样本的清洗
+//            if ((sampleStep == 9)) {
+//                //开始加试剂的步骤
+//                testState = TestState.DripReagent
+//                sampleStep = 0
+//                cuvettePos = -1
+////                moveSample(-samplePos + 1)
+//                moveCuvetteDripReagent()
+//
+//                takeReagent()
+//            } else {//继续移动已混匀的样本
+//                moveSample()
+//                moveCuvetteDripSample()
+//            }
+//        }
+        when (testState) {
+            TestState.MoveSample -> {//加完样判断是否结束
+                updateCuvetteState(cuvettePos - 1, CuvetteState.DripSample)
+//                samplingProbeCleaning()
+                if ((sampleStep == 10)) {
+                    //开始加试剂的步骤
+                    testState = TestState.DripReagent
+                    sampleStep = 0
+                    cuvettePos = -1
 //                moveSample(-samplePos + 1)
-                moveCuvetteDripReagent()
+                    moveCuvetteDripReagent()
 
-                takeReagent()
-            } else {//继续移动已混匀的样本
-                moveSample()
-                moveCuvetteDripSample()
+                    takeReagent()
+                } else {//去清洗
+//                    moveSample()
+                    sampleStep++
+                    sampling(moveSampleVolume)
+                    moveCuvetteDripSample()
+                }
             }
+            else -> {}
         }
     }
 
@@ -1140,8 +1160,14 @@ class RepeatabilityViewModel(
      * 显示拟合结束对话框
      */
     fun showMatchingDialog() {
-        matchingFinishMsg.postValue("重复性检测结束")
-        testState = TestState.Normal
+        if (isDetectedSample) {
+            isDetectedSample = false
+            testState = TestState.Normal
+            matchingFinishMsg.postValue("检测到放入的是样本管，请在样本架上放置比色杯")
+        } else {
+            matchingFinishMsg.postValue("重复性检测结束")
+            testState = TestState.Normal
+        }
     }
 
     /**

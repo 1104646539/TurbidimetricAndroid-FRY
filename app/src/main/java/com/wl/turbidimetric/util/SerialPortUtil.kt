@@ -278,7 +278,7 @@ object SerialPortUtil {
             withContext(Dispatchers.IO) {
                 while (true) {
                     delay(50)
-                    val count = serialPort.read(byteArray)
+                    val count = serialPort.read(byteArray, byteArray.size)
                     if (count > 0) {
                         val re = byteArray.copyOf(count).toUByteArray()
                         data.addAll(re)

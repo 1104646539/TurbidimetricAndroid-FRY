@@ -15,6 +15,7 @@ object SystemGlobal {
             field = value
             _obTestState.value = value
         }
+
     //检测类型
     var testType = TestType.None
 
@@ -35,7 +36,7 @@ object SystemGlobal {
     //仪器检测模式
 //    var machineTestModel = MachineTestModel.Auto
 
-    var isCodeDebug = false;
+    var isCodeDebug = false
 
     //可监听的检测状态
     private val _obTestState = MutableStateFlow(TestState.None)

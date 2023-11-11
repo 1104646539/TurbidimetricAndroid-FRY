@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import com.lxj.xpopup.core.BasePopupView
 import com.wl.turbidimetric.R
+import com.wl.turbidimetric.databinding.FragmentSettings2Binding
 import com.wl.turbidimetric.databinding.FragmentSettingsBinding
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.ex.*

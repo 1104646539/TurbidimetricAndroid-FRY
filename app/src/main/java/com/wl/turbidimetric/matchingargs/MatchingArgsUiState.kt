@@ -23,4 +23,5 @@ enum class DialogState {
     None,//无
     GetStateNotExistMsg,//开始检测 比色皿，样本，试剂,清洗液不存在
     MatchingFinishMsg,//拟合质控结束提示
+    ACCIDENT,//意外错误等
 }

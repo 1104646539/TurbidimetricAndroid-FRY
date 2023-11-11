@@ -213,4 +213,7 @@ dependencies {
     implementation("com.github.li-xiaojun:XPopup:2.9.19") {
         exclude group: "com.davemorrissey.labs", module: "subsampling-scale-image-view-androidx"
     }
+    //json解析
+    implementation 'com.google.code.gson:gson:2.8.5'
+
 }

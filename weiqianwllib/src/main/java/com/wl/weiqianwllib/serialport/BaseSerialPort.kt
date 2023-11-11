@@ -54,11 +54,9 @@ class BaseSerialPort {
         serialPort?.close()
     }
 
-    fun read(byteArray: ByteArray): Int {
-        return serialPort?.read(byteArray, byteArray.size) ?: 0
+    fun read(byteArray: ByteArray, size: Int): Int {
+        return serialPort?.read(byteArray, size) ?: 0
     }
-
-
 
     fun write(byteArray: ByteArray): Int {
         return serialPort?.write(byteArray, byteArray.size) ?: 0

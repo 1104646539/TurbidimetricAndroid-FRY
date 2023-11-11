@@ -84,7 +84,7 @@
     },
     {
       "id": "4:2539073134430729651",
-      "lastPropertyId": "24:8299564898023582926",
+      "lastPropertyId": "27:4402194470650786626",
       "name": "TestResultModel",
       "properties": [
         {
@@ -205,6 +205,21 @@
           "id": "24:8299564898023582926",
           "name": "sampleType",
           "type": 5
+        },
+        {
+          "id": "25:1108246173935929874",
+          "name": "deliveryTime",
+          "type": 9
+        },
+        {
+          "id": "26:8649704385120281908",
+          "name": "deliveryDepartment",
+          "type": 9
+        },
+        {
+          "id": "27:4402194470650786626",
+          "name": "deliveryDoctor",
+          "type": 9
         }
       ],
       "relations": []

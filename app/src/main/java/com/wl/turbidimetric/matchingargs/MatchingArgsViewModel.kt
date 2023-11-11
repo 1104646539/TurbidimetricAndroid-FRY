@@ -276,6 +276,12 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
     var curProject: ProjectModel? = null
 
     /**
+     * 移动样本时检测到样本管的标记
+     */
+    var isDetectedSample = false
+
+
+    /**
      * 测试用的 start
      */
     //检测的值
@@ -404,7 +410,7 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
 
     private fun initState() {
         curProject = null
-
+        isDetectedSample = false
         resultTest1.clear()
         resultTest2.clear()
         resultTest3.clear()
@@ -540,7 +546,7 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
      * @param reply ReplyModel<MoveCuvetteShelfModel>
      */
     override fun readDataMoveCuvetteShelfModel(reply: ReplyModel<MoveCuvetteShelfModel>) {
-        if (testState == TestState.TestFinish) {
+        if (testState == TestState.TestFinish && testType.isMatchingArgs()) {
             cuvetteShelfMoveFinish = true
             if (isMatchingFinish()) {
                 showMatchingDialog()
@@ -612,6 +618,12 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
         i("接收到 移动样本 reply=$reply samplePos=$samplePos testState=$testState sampleStep=$sampleStep")
         sampleMoveFinish = true
 
+        //如果是样本管，直接检测结束，并报错，因为质控不允许使用样本管
+        if (reply.data.type.isSample()) {
+            isDetectedSample = true
+            matchingFinish()
+            return
+        }
         when (testState) {
             TestState.DripDiluentVolume,
             TestState.DripStandardVolume
@@ -729,7 +741,7 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
             testState = TestState.Test2
             cuvettePos = -1
             viewModelScope.launch {
-                delay(testShelfInterval)
+                delay((testShelfInterval))
                 moveCuvetteTest()
             }
         } else {
@@ -747,7 +759,7 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
      */
     override fun readDataMoveSampleShelfModel(reply: ReplyModel<MoveSampleShelfModel>) {
         i("接收到 移动样本架 reply=$reply testState=$testState")
-        if (testState == TestState.TestFinish) {
+        if (testState == TestState.TestFinish && testType.isMatchingArgs()) {
             sampleShelfMoveFinish = true
             if (isMatchingFinish()) {
                 showMatchingDialog()
@@ -1246,13 +1258,25 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
      * 显示拟合结束对话框
      */
     private fun showMatchingDialog() {
-        viewModelScope.launch {
-            _dialogUiState.emit(
-                MatchingArgsDialogUiState(
-                    DialogState.MatchingFinishMsg,
-                    testMsg.value ?: ""
+        if (isDetectedSample) {
+            isDetectedSample = false
+            viewModelScope.launch {
+                _dialogUiState.emit(
+                    MatchingArgsDialogUiState(
+                        DialogState.ACCIDENT,
+                        "检测到放入的是样本管，请在样本架上放置比色杯！"
+                    )
                 )
-            )
+            }
+        } else {
+            viewModelScope.launch {
+                _dialogUiState.emit(
+                    MatchingArgsDialogUiState(
+                        DialogState.MatchingFinishMsg,
+                        testMsg.value ?: ""
+                    )
+                )
+            }
         }
 //        matchingFinishMsg.postValue(testMsg.value)
         testState = TestState.Normal
@@ -1443,7 +1467,7 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
      * 是否正在拟合
      */
     fun runningMatching(): Boolean {
-        return testState.isRunning() && testType == TestType.MatchingArgs
+        return testState.isRunning() && testType.isMatchingArgs()
     }
 
     fun changeSelectProject(project: ProjectModel) {

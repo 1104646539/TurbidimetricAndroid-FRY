@@ -279,15 +279,15 @@ class HomeViewModel(
      */
     private var continueTestSampleState = false
 
-    /**比色皿不足
-     *
-     */
-    private var cuvetteDeficiency = false
-
-    /**样本不足
-     *
-     */
-    private var sampleDeficiency = false
+//    /**比色皿不足
+//     *
+//     */
+//    private var cuvetteDeficiency = false
+//
+//    /**样本不足
+//     *
+//     */
+//    private var sampleDeficiency = false
 
     /**正在检测
      *
@@ -520,6 +520,9 @@ class HomeViewModel(
         mCuvetteStates = initCuvetteStates()
         _cuvetteStates.update {
             mCuvetteStates
+        }
+        _samplesStates.update {
+            mSamplesStates
         }
 
 
@@ -1693,13 +1696,13 @@ class HomeViewModel(
     /**
      * 判断是否样本不足，是否需要提示
      */
-    private fun sampleDeficiencyShowHint() {
-        if (samplePos == sampleMax && sampleShelfPos == lastSampleShelfPos) {
-            i("sampleDeficiencyShowHint 样本不足")
-            sampleShelfPos = -1
-            showTestSampleDeficiencyDialog()
-        }
-    }
+//    private fun sampleDeficiencyShowHint() {
+//        if (samplePos == sampleMax && sampleShelfPos == lastSampleShelfPos) {
+//            i("sampleDeficiencyShowHint 样本不足")
+//            sampleShelfPos = -1
+////            showTestSampleDeficiencyDialog()
+//        }
+//    }
 
     /**
      * 接收到移动比色皿 检测位
@@ -1782,7 +1785,7 @@ class HomeViewModel(
      * 接收到移动比色皿架
      */
     override fun readDataMoveCuvetteShelfModel(reply: ReplyModel<MoveCuvetteShelfModel>) {
-        if (testState == TestState.TestFinish) {
+        if (testState == TestState.TestFinish&& testType.isTest()) {
             cuvetteShelfMoveFinish = true
             if (isTestFinish()) {
                 showFinishDialog()
@@ -1830,7 +1833,7 @@ class HomeViewModel(
     }
 
     private fun isTestFinish(): Boolean {
-        return testState == TestState.TestFinish && testType == TestType.Test && sampleShelfMoveFinish && cuvetteShelfMoveFinish
+        return testState == TestState.TestFinish && testType.isTest() && sampleShelfMoveFinish && cuvetteShelfMoveFinish
     }
 
 
@@ -1839,7 +1842,7 @@ class HomeViewModel(
      */
     override fun readDataMoveSampleShelfModel(reply: ReplyModel<MoveSampleShelfModel>) {
         c("接收到移动样本架 reply=$reply sampleShelfPos=$sampleShelfPos $testState")
-        if (testState == TestState.TestFinish) {
+        if (testState == TestState.TestFinish&& testType.isTest()) {
             sampleShelfMoveFinish = true
             if (isTestFinish()) {
                 showFinishDialog()
@@ -1926,7 +1929,7 @@ class HomeViewModel(
      * 显示样本不足的对话框
      */
     private fun showTestSampleDeficiencyDialog() {
-        sampleDeficiency = true
+//        sampleDeficiency = true
         moveSampleShelf(sampleShelfPos)
     }
 
@@ -1997,8 +2000,9 @@ class HomeViewModel(
             getInitCuvetteShelfPos()
             if (cuvetteShelfPos == -1) {
                 i("没有比色皿架")
-                cuvetteDeficiency = true
+//                cuvetteDeficiency = true
                 moveCuvetteShelfNext()
+
                 return
             }
             continueTestCuvetteState = false
@@ -2014,15 +2018,23 @@ class HomeViewModel(
             getInitSampleShelfPos()
             if (sampleShelfPos == -1) {
                 i("没有样本架")
-                sampleDeficiency = true
-                showTestSampleDeficiencyDialog()
+//                sampleDeficiency = true
+//                showTestSampleDeficiencyDialog()
+                viewModelScope.launch {
+                    _dialogUiState.emit(
+                        HomeDialogUiState(
+                            dialogState = DialogState.GET_STATE_NOT_EXIST,
+                            "样本不足，请添加"
+                        )
+                    )
+                }
                 return
             }
             continueTestSampleState = false
             moveSampleShelf(sampleShelfPos)
             return
         }
-        //开始下一排时R1|R2试剂不足|清洗液不足 才获取的状态
+//        //开始下一排时R1|R2试剂不足|清洗液不足 才获取的状态
         if (continueTestGetState) {
             continueTestGetState = false
             //还有比色皿。继续移动比色皿，检测
@@ -2099,7 +2111,7 @@ class HomeViewModel(
     private fun moveCuvetteShelfNext() {
         if (cuvetteShelfPos == lastCuvetteShelfPos) {
             i("已经是最后一排比色皿了")
-            cuvetteDeficiency = true
+//            cuvetteDeficiency = true
             cuvetteShelfPos = -1
             moveCuvetteShelf(cuvetteShelfPos)
             return
@@ -2494,7 +2506,7 @@ class HomeViewModel(
      * 是否正在检测
      */
     private fun runningTest(): Boolean {
-        return testState.isRunning() && testType == TestType.Test
+        return testState.isRunning() && testType.isTest()
     }
 
     fun clickTest1(view: View) {

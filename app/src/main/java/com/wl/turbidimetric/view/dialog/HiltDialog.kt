@@ -62,7 +62,7 @@ open class HiltDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_hin
         this.iconId = iconId
         this.showIcon = showIcon
 
-        if (isShow) {
+        if (isCreated) {
             setContent()
         }
 

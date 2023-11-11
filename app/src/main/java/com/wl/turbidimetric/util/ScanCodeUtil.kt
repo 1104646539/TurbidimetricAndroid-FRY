@@ -61,7 +61,7 @@ object ScanCodeUtil {
         GlobalScope.launch {
             while (true) {
                 delay(100)
-                val size = serialPort.read(temp)
+                val size = serialPort.read(temp, temp.size)
                 if (size > 0) {
                     val temp = temp.copyOf(size).toList()
                     i("temp=$temp")

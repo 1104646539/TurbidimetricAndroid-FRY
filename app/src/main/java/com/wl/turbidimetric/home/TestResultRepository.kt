@@ -31,7 +31,7 @@ class TestResultRepository() {
         DBManager.TestResultBox.remove(testResults)
     }
 
-    fun getAllTestResult(condition: Query<TestResultModel>): LazyList<TestResultModel> {
-        return condition.findLazy()
+    fun getAllTestResult(condition: Query<TestResultModel>): List<TestResultModel> {
+        return condition.find()
     }
 }

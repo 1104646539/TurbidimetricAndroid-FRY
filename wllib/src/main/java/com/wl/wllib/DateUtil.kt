@@ -38,6 +38,12 @@ object DateUtil {
     val PATTERN_DATE_1 = "yyyy-MM-dd"
 
     /**
+     * 例：20220520153050
+     */
+    @JvmStatic
+    val PATTERN_TIME_5 = "yyyyMMddHHmmss"
+
+    /**
      * @see PATTERN_TIME_1
      */
     @JvmStatic
@@ -60,6 +66,11 @@ object DateUtil {
      */
     @JvmStatic
     val Time4Format by lazy { SimpleDateFormat(PATTERN_TIME_4) }
+    /**
+     * @see PATTERN_TIME_5
+     */
+    @JvmStatic
+    val Time5Format by lazy { SimpleDateFormat(PATTERN_TIME_5) }
 
     /**
      * @see PATTERN_DATE_1

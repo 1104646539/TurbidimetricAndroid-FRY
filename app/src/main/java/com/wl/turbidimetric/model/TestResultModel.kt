@@ -45,6 +45,19 @@ data class TestResultModel(
      * 浓度
      */
     var concentration: Int = 0,
+
+    /**
+     * 送检时间
+     */
+    var deliveryTime: String = "",
+    /**
+     * 送检科室
+     */
+    var deliveryDepartment: String = "",
+    /**
+     * 送检医生
+     */
+    var deliveryDoctor: String = "",
     /**
      * 第一次检测值
      */
@@ -90,11 +103,8 @@ data class TestResultModel(
      */
     var testTime: Long = 0,
 
-    var deliveryTime: String = "", //送检时间
-    var deliveryDepartment: String = "",//送检科室
-    var deliveryDoctor: String = "",//送检医生
 
-) : BaseOBModel(0) {
+    ) : BaseOBModel(0) {
 
     lateinit var project: ToOne<ProjectModel>
 

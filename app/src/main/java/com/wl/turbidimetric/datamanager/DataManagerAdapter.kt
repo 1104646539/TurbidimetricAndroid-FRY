@@ -73,12 +73,18 @@ class DataManagerAdapter :
 
 
     fun getSelectedItems(): List<TestResultModel> {
+//        val items = mutableListOf<TestResultModel>().apply {
+//            for (i in 0 until itemCount) {
+//                getItem(i)?.let {
+//                    if (it.isSelect)
+//                        add(it)
+//                }
+//            }
+//        }
         val items = mutableListOf<TestResultModel>().apply {
-            for (i in 0 until itemCount) {
-                getItem(i)?.let {
-                    if (it.isSelect)
-                        add(it)
-                }
+            snapshot().items.forEach {
+                if (it.isSelect)
+                    add(it)
             }
         }
         return items
@@ -99,14 +105,9 @@ class DataManagerAdapter :
                         getItem(position)?.let {
                             if (it.isSelect) {
                                 holder.binding.root.setBackgroundResource(R.drawable.bg_item_select)
-                            } else
-//                                if (holder.absoluteAdapterPosition % 2 == 0)
-                            {
+                            } else {
                                 holder.binding.root.setBackgroundColor(Color.WHITE)
                             }
-//                            else {
-//                                holder.binding.root.setBackgroundResource(R.drawable.rip_item)
-//                            }
                             holder.binding.ivSelect.isSelected = it?.isSelect ?: false
                         }
                     }
@@ -128,18 +129,12 @@ class DataManagerAdapter :
                 }
             }
             holder.binding.ivSelect.isSelected = item?.isSelect ?: false
-//            i("onBindViewHolder position=$position item.id=${item?.id} isselect=${item?.isSelect} absoluteAdapterPosition=${holder.absoluteAdapterPosition} bindingAdapterPosition=${holder.bindingAdapterPosition} layoutPosition=${holder.layoutPosition}")
             item?.let {
                 if (it.isSelect) {
                     holder.binding.root.setBackgroundResource(R.drawable.bg_item_select)
-                } else
-//                    if (holder.absoluteAdapterPosition % 2 == 0)
-                {
+                } else {
                     holder.binding.root.setBackgroundColor(Color.WHITE)
                 }
-//                else {
-//                    holder.binding.root.setBackgroundResource(R.drawable.rip_item)
-//                }
             }
         }
     }

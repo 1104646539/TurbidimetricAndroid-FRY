@@ -62,7 +62,7 @@ class DataManagerViewModel(
         remove(results)
     }
 
-    fun getFilterAll(condition: ConditionModel): LazyList<TestResultModel> {
+    fun getFilterAll(condition: ConditionModel): List<TestResultModel> {
         return testResultRepository.getAllTestResult(condition.buildQuery())
     }
 

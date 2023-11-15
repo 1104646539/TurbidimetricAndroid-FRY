@@ -13,6 +13,10 @@ import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.SystemGlobal.obTestState
 import com.wl.turbidimetric.model.ProjectModel
+import com.wl.turbidimetric.upload.hl7.HL7Helper
+import com.wl.turbidimetric.upload.hl7.util.ConnectResult
+import com.wl.turbidimetric.upload.hl7.util.ConnectStatus
+import com.wl.turbidimetric.upload.service.OnConnectListener
 import com.wl.turbidimetric.view.dialog.*
 import com.wl.wwanandroid.base.BaseFragment
 import kotlinx.coroutines.launch
@@ -94,6 +98,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 
         initView()
         listener()
+        initUploadClient()
         vm.goGetMachineState()
 //        lifecycleScope.launch {
 //            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -110,6 +115,18 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         }
 
 
+    }
+
+    private fun initUploadClient() {
+        HL7Helper.connect(object :OnConnectListener{
+            override fun onConnectResult(connectResult: ConnectResult) {
+                i("onConnectResult connectResult=$connectResult")
+            }
+
+            override fun onConnectStatusChange(connectStatus: ConnectStatus) {
+                i("onConnectStatusChange connectStatus=$connectStatus")
+            }
+        })
     }
 
     private fun initView() {

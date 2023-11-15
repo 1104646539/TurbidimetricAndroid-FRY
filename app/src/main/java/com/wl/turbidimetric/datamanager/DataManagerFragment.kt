@@ -19,6 +19,8 @@ import com.wl.turbidimetric.model.ConditionModel
 import com.wl.turbidimetric.model.ProjectModel
 import com.wl.turbidimetric.model.TestResultModel
 import com.wl.turbidimetric.print.PrintUtil
+import com.wl.turbidimetric.upload.hl7.HL7Helper
+import com.wl.turbidimetric.upload.service.OnUploadCallback
 import com.wl.turbidimetric.util.ExportExcelHelper
 import com.wl.turbidimetric.view.dialog.*
 import com.wl.wllib.LogToFile.i
@@ -84,7 +86,6 @@ class DataManagerFragment :
 
         val loadStateAdapter = adapter.withLoadStateFooter(DataManagerLoadStateAdapter())
         vd.rv.adapter = loadStateAdapter
-
     }
 
     fun test() {
@@ -212,6 +213,7 @@ class DataManagerFragment :
     }
 
     private fun getBacklog() {
+
     }
 
     /**
@@ -219,13 +221,59 @@ class DataManagerFragment :
      */
     private fun upload() {
         val results = getSelectData()
-        if (results.isNullOrEmpty()) {
-            toast("请选择数据")
+        var verifyRet: String? = null
+        //验证上传数据
+        if (verifyUploadData(results).also { verifyRet = it } != null) {
+            toast("$verifyRet")
             return
         }
 
-        lifecycleScope.launch(Dispatchers.IO) {
+        //批量上传
+        waitDialog.showPop(requireContext(), isCancelable = false) { dialog ->
+            dialog.showDialog("请等待……", confirmText = "", confirmClick = {})
+
+            lifecycleScope.launch(Dispatchers.IO) {
+                if (HL7Helper.isConnected()) {
+                    HL7Helper.uploadTestResult(results!!) { count, success, failed ->
+                        lifecycleScope.launch(Dispatchers.Main) {
+                            dialog.showDialog(
+                                "上传结束，本次上传共${count}条，成功${success}条,失败${failed}条",
+                                confirmText = "我知道了",
+                                confirmClick = { d ->
+                                    d.dismiss()
+                                })
+                        }
+                    }
+                } else {
+                    dialog.dismiss()
+                    i("上传未连接")
+                }
+            }
         }
+    }
+
+    /**
+     * 验证上传的数据
+     * @param results List<TestResultModel>?
+     * @return String?
+     */
+    private fun verifyUploadData(results: List<TestResultModel>?): String? {
+        if (results.isNullOrEmpty()) {
+            return "请选择数据"
+        }
+
+        if (results.any {
+                it.project == null || it.project.target == null
+            }) {
+            return "没有检测项目"
+        }
+
+        if (results.any {
+                it.testResult.isNullOrEmpty()
+            }) {
+            return "未检测的数据"
+        }
+        return null
     }
 
     private fun listenerData() {
@@ -296,7 +344,7 @@ class DataManagerFragment :
     private fun exportExcel(exportAll: Boolean) {
         waitDialog.showPop(requireContext()) { dialog ->
             //step1、 显示等待对话框
-            dialog.showDialog("请等待……", confirmText = "", confirmClick = {})
+            dialog.showDialog("正在上传,请等待……", confirmText = "", confirmClick = {})
             lifecycleScope.launch(Dispatchers.IO) {
                 //step2、 获取数据
                 val data = if (exportAll) {

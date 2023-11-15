@@ -21,6 +21,10 @@ import com.wl.turbidimetric.model.TestState
 import com.wl.turbidimetric.util.CurveFitter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.io.DataInputStream
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
 import java.math.BigDecimal
 import java.math.RoundingMode
 import kotlin.math.log10
@@ -340,6 +344,7 @@ inline fun Fragment.launchAndRepeatWithViewLifecycle(
 fun SampleType.isSample(): Boolean {
     return this == SampleType.SAMPLE
 }
+
 /**
  * 不存在
  * @receiver SampleType
@@ -348,6 +353,7 @@ fun SampleType.isSample(): Boolean {
 fun SampleType.isNonexistent(): Boolean {
     return this == SampleType.NONEXISTENT
 }
+
 /**
  * 是比色杯
  * @receiver SampleType
@@ -355,4 +361,50 @@ fun SampleType.isNonexistent(): Boolean {
  */
 fun SampleType.isCuvette(): Boolean {
     return this == SampleType.CUVETTE
+}
+
+/**
+ * 保存字符串到文件
+ * @receiver File
+ * @param str String
+ * @param cover Boolean
+ * @return Boolean
+ */
+fun File.saveFile(str: String, cover: Boolean = true): Boolean {
+    if (isDirectory) {
+        return false
+    }
+    if (!exists()) {
+        if (!createNewFile()) {
+            return false
+        }
+    } else if (!cover) {//文件已存在，但不覆盖（cover=false）直接返回false
+        return false
+    }
+
+    FileOutputStream(this).apply {
+        write(str.toByteArray())
+        flush()
+        close()
+    }
+    return true
+}
+
+/**
+ * 到文件读取字符串
+ * @receiver File
+ * @param str String
+ * @param cover Boolean
+ * @return Boolean
+ */
+fun File.getContent(): String? {
+    if (isDirectory) {
+        return null
+    }
+    if (!exists()) {
+        return null
+    } else {//文件存在
+
+    }
+    return readText()
 }

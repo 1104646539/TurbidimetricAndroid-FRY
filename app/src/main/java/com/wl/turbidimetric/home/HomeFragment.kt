@@ -3,10 +3,8 @@ package com.wl.turbidimetric.home
 import android.app.ProgressDialog
 import android.os.Bundle
 import android.util.Log
-import android.view.Gravity
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.*
-import com.wl.turbidimetric.BuildConfig
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.FragmentHomeBinding
 import com.wl.turbidimetric.datastore.LocalData
@@ -16,12 +14,17 @@ import com.wl.turbidimetric.model.ProjectModel
 import com.wl.turbidimetric.upload.hl7.HL7Helper
 import com.wl.turbidimetric.upload.hl7.util.ConnectResult
 import com.wl.turbidimetric.upload.hl7.util.ConnectStatus
+import com.wl.turbidimetric.upload.model.GetPatientCondition
+import com.wl.turbidimetric.upload.model.GetPatientType
+import com.wl.turbidimetric.upload.model.Patient
 import com.wl.turbidimetric.upload.service.OnConnectListener
+import com.wl.turbidimetric.upload.service.OnGetPatientCallback
 import com.wl.turbidimetric.view.dialog.*
 import com.wl.wwanandroid.base.BaseFragment
 import kotlinx.coroutines.launch
 import com.wl.wllib.LogToFile.i
 import com.wl.wllib.toLongTimeStr
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import java.util.Date
 
@@ -61,11 +64,28 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
     private val dialog: HiltDialog by lazy {
         HiltDialog(requireContext())
     }
+
+    /**
+     * 获取待检信息
+     */
+    private val getTestPatientInfoDialog: GetTestPatientInfoDialog by lazy {
+        GetTestPatientInfoDialog(requireContext())
+    }
     private val dialogGetMachine: ProgressDialog by lazy {
         ProgressDialog(requireContext()).apply {
             setMessage("自检中")
             setCancelable(false)
         }
+    }
+    private val waitDialog: HiltDialog by lazy {
+        HiltDialog(requireContext())
+    }
+
+    /**
+     * 待检信息列表
+     */
+    private val patientInfoDialog: PatientInfoDialog by lazy {
+        PatientInfoDialog(requireContext())
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -118,7 +138,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
     }
 
     private fun initUploadClient() {
-        HL7Helper.connect(object :OnConnectListener{
+        HL7Helper.connect(object : OnConnectListener {
             override fun onConnectResult(connectResult: ConnectResult) {
                 i("onConnectResult connectResult=$connectResult")
             }
@@ -249,6 +269,84 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 
         vd.btnConfig.setOnClickListener {
             showConfigDialog()
+        }
+        vd.btnGetTestPatientInfo.setOnClickListener {
+            showGetTestPatientInfo()
+        }
+    }
+
+    private fun showGetTestPatientInfo() {
+        getTestPatientInfoDialog.showPop(
+            requireContext(),
+            width = 600,
+            maxWidth = 600
+        ) { tpiDialog ->
+            tpiDialog.show { condition1, condition2, type ->
+                tpiDialog.dismiss()
+                startGetTestPatientInfo(condition1, condition2, type)
+            }
+        }
+
+    }
+
+    private fun startGetTestPatientInfo(
+        condition1: String,
+        condition2: String,
+        type: GetPatientType
+    ) {
+        waitDialog.showPop(requireContext()) { hilt ->
+            hilt.showDialog("正在获取信息，请等待……")
+            HL7Helper.getPatientInfo(GetPatientCondition(condition1, condition2, type),
+                object : OnGetPatientCallback {
+                    override fun onGetPatientSuccess(patients: List<Patient>?) {
+                        lifecycleScope.launch(Dispatchers.Main) {
+                            hilt.dismiss()
+                            if (patients.isNullOrEmpty()) {
+                                dialog?.showPop(requireContext(), isCancelable = true) {
+                                    dialog?.showDialog(
+                                        msg = "没有待检信息",
+                                        confirmText = "我知道了",
+                                        confirmClick = {
+                                            it.dismiss()
+                                            vm.dialogGetStateNotExistConfirm()
+                                        },
+                                    )
+                                }
+                            } else {
+                                patientInfoDialog.showPop(
+                                    requireContext(),
+                                    width = 1000,
+                                    maxWidth = 1200,
+                                    isCancelable = false
+                                ) { pi ->
+                                    pi.showPatient(patients, {
+                                        toast("点击确定")
+                                        pi.dismiss()
+                                    }, {
+                                        toast("点击取消")
+                                        pi.dismiss()
+                                    })
+                                }
+                            }
+                        }
+                    }
+
+                    override fun onGetPatientFailed(code: Int, msg: String) {
+                        lifecycleScope.launch(Dispatchers.Main) {
+                            hilt.dismiss()
+                            dialog?.showPop(requireContext(), isCancelable = false) {
+                                dialog?.showDialog(
+                                    msg = "$code $msg",
+                                    confirmText = "我知道了",
+                                    confirmClick = {
+                                        it.dismiss()
+                                        vm.dialogGetStateNotExistConfirm()
+                                    },
+                                )
+                            }
+                        }
+                    }
+                })
         }
     }
 

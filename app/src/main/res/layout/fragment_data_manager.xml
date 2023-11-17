@@ -208,24 +208,6 @@
                     android:minWidth="150dp"
                     android:text="上传数据"
                     android:textAllCaps="false" />
-                <Button
-                    android:id="@+id/btnGetBacklog"
-                    style="@style/BtnPositive"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="20dp"
-                    android:minWidth="150dp"
-                    android:text="获取信息条码"
-                    android:textAllCaps="false" />
-                <Button
-                    android:id="@+id/btnGetBacklog2"
-                    style="@style/BtnPositive"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="20dp"
-                    android:minWidth="150dp"
-                    android:text="获取信息编号"
-                    android:textAllCaps="false" />
             </LinearLayout>
 
         </LinearLayout>

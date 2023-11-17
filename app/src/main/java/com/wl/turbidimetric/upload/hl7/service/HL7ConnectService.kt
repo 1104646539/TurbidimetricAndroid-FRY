@@ -64,6 +64,7 @@ class HL7ConnectService() : ConnectService {
 //                                            Log.d(TAG, "收到QCK^Q02:responseMsg=$responseMsg")
                                         }
                                     } else if (responseMsg is DSR_Q03) {
+                                        Log.d(TAG, "上传:接收 $response")
                                         parse(responseMsg)
                                     } else if (responseMsg is ACK) {
                                         responseMap?.give(ackID, response)

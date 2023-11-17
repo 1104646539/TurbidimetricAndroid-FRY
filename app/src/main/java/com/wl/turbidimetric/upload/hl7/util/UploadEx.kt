@@ -101,7 +101,7 @@ fun defaultConfig(): ConnectConfig {
         serialPortBaudRate = 9600,
         serialPortName = "COM4",
         isReconnection = true,
-        retryCount = 3,
+        retryCount = 1,
         reconnectionTimeout = 20000
     )
 }

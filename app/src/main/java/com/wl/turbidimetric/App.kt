@@ -6,7 +6,9 @@ import android.os.Debug
 import com.lxj.xpopup.XPopup
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.db.DBManager
+import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.ProjectModel
+import com.wl.turbidimetric.upload.hl7.util.getLocalConfig
 import com.wl.wllib.LogToFile
 import com.wl.wllib.ToastUtil
 import com.wl.wllib.ktxRunOnBgCache
@@ -54,7 +56,7 @@ class App : Application() {
             LocalData.CurrentVersion = packInfo.versionCode
         }
 //        SystemGlobal.machineTestModel = MachineTestModel.valueOf(CurMachineTestModel)
-
+        SystemGlobal.uploadConfig = getLocalConfig()
     }
 
     private fun initDataStore() {

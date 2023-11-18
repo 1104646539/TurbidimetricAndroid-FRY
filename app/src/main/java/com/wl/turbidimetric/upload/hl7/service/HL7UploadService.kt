@@ -18,6 +18,8 @@ import com.wl.turbidimetric.upload.model.ConnectConfig
 import com.wl.turbidimetric.upload.model.GetPatientCondition
 import com.wl.turbidimetric.upload.model.Patient
 
+typealias Hl7Log = (String) -> Any?
+
 /**
  * 实现了基于hl7协议的上传和获取或者信息的功能
  * @property TAG String
@@ -25,7 +27,7 @@ import com.wl.turbidimetric.upload.model.Patient
  * @property parser Parser?
  */
 class HL7UploadService : UploadService {
-    val TAG = "HL7Service"
+    val TAG = "HL7UploadService"
     var connectService: HL7ConnectService = HL7ConnectService()
     var parser: Parser? = null
         get() {
@@ -37,6 +39,11 @@ class HL7UploadService : UploadService {
      */
     var canSend = true
 
+    var hl7Log: Hl7Log? = null
+        set(value) {
+            field = value
+            connectService.hl7Log = value
+        }
     /**
      * 上传检测数据
      * @param testResult TestResult
@@ -65,7 +72,8 @@ class HL7UploadService : UploadService {
                         canSend = true
                         onUploadCallback.onUploadFailed(1, "上传数据为空")
                     } else {
-                        Log.d(TAG, "上传:发送 $msgStr")
+//                        Log.d(TAG, "上传:发送 $msgStr")
+//                        hl7Log?.invoke("发送 $msgStr")
                         val response =
                             connectService.sendWaitResponseRetry(
                                 msgStr!!,
@@ -82,10 +90,10 @@ class HL7UploadService : UploadService {
                                     }
 
                                     val status = getStatus(ackCode, errCode, ErrorEnum.SUCCESS.msg)
-                                    Log.d(
-                                        TAG,
-                                        "上传:接收 ackCode=$ackCode errCode=$errCode status=$status"
-                                    )
+//                                    Log.d(
+//                                        TAG,
+//                                        "上传:接收 ackCode=$ackCode errCode=$errCode status=$status"
+//                                    )
                                     return@sendWaitResponseRetry when (status) {
                                         is MsaStatus.Error -> {
                                             canSend = true

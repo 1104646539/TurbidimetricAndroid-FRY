@@ -74,7 +74,7 @@ fun ConnectConfig.save(): Boolean {
  * 保存配置到本地
  * @receiver ConnectConfig
  */
- fun getLocalConfig(): ConnectConfig {
+fun getLocalConfig(): ConnectConfig {
     val content = File(UploadGlobal.UploadConfigFileName).getContent()
 
     return if (content == null) {
@@ -82,7 +82,7 @@ fun ConnectConfig.save(): Boolean {
     } else {
         try {
             Gson().fromJson(content, ConnectConfig::class.java)
-        }catch (e:Exception){
+        } catch (e: Exception) {
             defaultConfig()
         }
     }
@@ -94,6 +94,7 @@ fun ConnectConfig.save(): Boolean {
  */
 fun defaultConfig(): ConnectConfig {
     return ConnectConfig(
+        autoUpload = false,
         "192.168.0.133",
         22222,
         "UTF-8",

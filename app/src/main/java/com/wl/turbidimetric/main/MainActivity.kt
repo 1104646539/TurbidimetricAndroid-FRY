@@ -94,7 +94,6 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     }
 
     override fun init() {
-        supportActionBar?.hide()
         listener()
         initNav()
         test()

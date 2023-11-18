@@ -10,6 +10,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:name=".App"
         android:allowBackup="true"
@@ -23,25 +24,29 @@
         android:theme="@style/Theme.Mvvmdemo"
         tools:replace="android:extractNativeLibs">
         <activity
+            android:name=".upload.view.UploadSettingsActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".test.TestActivity"
             android:configChanges="orientation|keyboardHidden|keyboard"
             android:exported="true"
-            android:windowSoftInputMode="adjustPan|stateAlwaysHidden"></activity>
-
-        <!--        android:windowSoftInputMode="adjustPan|stateAlwaysHidden|adjustNothing"-->
-        <!--        android:configChanges="orientation|keyboardHidden|keyboard"-->
-
+            android:windowSoftInputMode="adjustPan|stateAlwaysHidden" /> <!-- android:windowSoftInputMode="adjustPan|stateAlwaysHidden|adjustNothing" -->
+        <!-- android:configChanges="orientation|keyboardHidden|keyboard" -->
         <activity
             android:name=".main.MainActivity"
             android:configChanges="orientation|keyboardHidden|keyboard"
-            android:windowSoftInputMode="adjustPan|stateAlwaysHidden|adjustNothing"
-            android:exported="true">
+            android:exported="true"
+            android:windowSoftInputMode="adjustPan|stateAlwaysHidden|adjustNothing">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
-<!--                <category android:name="android.intent.category.HOME" />-->
-<!--                <category android:name="android.intent.category.DEFAULT" />-->
-<!--                <category android:name="android.intent.category.MONKEY" />-->
+                <!-- <category android:name="android.intent.category.HOME" /> -->
+                <!-- <category android:name="android.intent.category.DEFAULT" /> -->
+                <!-- <category android:name="android.intent.category.MONKEY" /> -->
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 

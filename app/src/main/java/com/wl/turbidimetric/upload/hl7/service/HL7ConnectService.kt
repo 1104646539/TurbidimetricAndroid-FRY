@@ -31,6 +31,7 @@ class HL7ConnectService() : ConnectService {
     var connectService: AbstractConnectService? = null
 
     private val threads = Executors.newCachedThreadPool()
+    var hl7Log: Hl7Log? = null
 
     private val gson = Gson()
 
@@ -57,19 +58,22 @@ class HL7ConnectService() : ConnectService {
                                     Log.d(TAG, "responseMsg == null")
                                 } else {
                                     if (responseMsg is QCK_Q02) {
-                                        Log.d(TAG, "上传:接收 $response")
+                                        log("接收:$response")
+//                                        Log.d(TAG, "上传:接收 $response")
                                         if (responseMsg.qak.qak2_QueryResponseStatus.value == ErrorEnum.NF.msg) {
                                             responseMap?.give(ackID, response)
                                         } else {
 //                                            Log.d(TAG, "收到QCK^Q02:responseMsg=$responseMsg")
                                         }
                                     } else if (responseMsg is DSR_Q03) {
-                                        Log.d(TAG, "上传:接收 $response")
+                                        log("接收:$response")
                                         parse(responseMsg)
                                     } else if (responseMsg is ACK) {
+                                        log("接收:$responseMsg")
                                         responseMap?.give(ackID, response)
                                     } else {
-                                        Log.d(TAG, "意外的消息 responseMsg == $response")
+                                        log("接收:意外的消息 responseMsg == $response")
+//                                        Log.d(TAG, "意外的消息 responseMsg == $response")
                                     }
                                 }
                             }
@@ -87,6 +91,9 @@ class HL7ConnectService() : ConnectService {
         }
     }
 
+    fun log(msg: String) {
+        hl7Log?.invoke(msg)
+    }
 
     val patients = mutableListOf<Patient>()
 
@@ -193,10 +200,13 @@ class HL7ConnectService() : ConnectService {
      */
     private fun sendAck(msg: Message) {
         threads.execute {
-            val msgStr = connectService?.pipeParser?.encode(msg)
-            connectService?.putMessage(msgStr)
+            connectService?.pipeParser?.encode(msg)?.let {
+                sendData(it)
+            }
+
 //            hl7Write?.putMessage(msgStr, output);
-            Log.d(TAG, "上传:发送 sendAck:msgStr=$msgStr ")
+//            Log.d(TAG, "上传:发送 sendAck:msgStr=$msgStr ")
+
         }
     }
 
@@ -263,6 +273,7 @@ class HL7ConnectService() : ConnectService {
     }
 
     private fun sendData(resp1: String): Int {
+        log("发送：$resp1")
         connectService?.putMessage(resp1)
         return 1
     }
@@ -304,7 +315,7 @@ class HL7ConnectService() : ConnectService {
     }
 
     override fun connect(config: ConnectConfig, onConnectListener: OnConnectListener?) {
-//        connectService?.disconnect()
+        disconnect()//连接前先断开以前的连接
         connectService = ConnectServiceFactory.create(config) { startListener() }
         connectService?.connect(config, onConnectListener)
     }

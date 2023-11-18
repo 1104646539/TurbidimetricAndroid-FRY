@@ -10,6 +10,7 @@ import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.model.MachineTestModel
 import com.wl.turbidimetric.test.TestActivity
+import com.wl.turbidimetric.upload.view.UploadSettingsActivity
 import com.wl.turbidimetric.view.*
 import com.wl.turbidimetric.view.dialog.*
 import com.wl.weiqianwllib.OrderUtil
@@ -78,8 +79,15 @@ class SettingsFragment :
             showLauncher()
             OrderUtil.showHideNav(requireActivity(), true)
         }
+        vd.tvUpload.setOnClickListener {
+            startUpload()
+        }
         vd.tvSoftVersion.text = "上位机版本:${getPackageInfo(requireContext())?.versionName} 发布版本:1"
 
+    }
+
+    private fun startUpload() {
+        startActivity(Intent(requireContext(),UploadSettingsActivity::class.java))
     }
 
     private fun showLauncher() {

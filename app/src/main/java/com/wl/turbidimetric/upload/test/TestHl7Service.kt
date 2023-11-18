@@ -24,7 +24,8 @@ class TestHl7Service : Service() {
             val testHl7Service =
                 TestHl7Thread(
                     ConnectConfig(
-                        "127.0.0.1",
+                        autoUpload = false,
+                        "192.168.0.1",
                         22222,
 //                        Charset.forName("UTF-8"),
                         "GBK",

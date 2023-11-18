@@ -18,6 +18,7 @@ abstract class BaseActivity<VM : BaseViewModel, VD : ViewDataBinding> : AppCompa
         super.onCreate(savedInstanceState)
         vm.init()
         vd.root
+        supportActionBar?.hide()
         EventBus.getDefault().register(this)
         init()
     }

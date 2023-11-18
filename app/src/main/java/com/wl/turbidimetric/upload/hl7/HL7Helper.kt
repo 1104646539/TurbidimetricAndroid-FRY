@@ -1,26 +1,30 @@
 package com.wl.turbidimetric.upload.hl7
 
+import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.TestResultModel
 import com.wl.turbidimetric.upload.hl7.service.HL7UploadService
-import com.wl.turbidimetric.upload.hl7.util.ConnectResult
-import com.wl.turbidimetric.upload.hl7.util.defaultConfig
+import com.wl.turbidimetric.upload.hl7.service.Hl7Log
+import com.wl.turbidimetric.upload.hl7.util.*
 import com.wl.turbidimetric.upload.model.ConnectConfig
 import com.wl.turbidimetric.upload.model.GetPatientCondition
 import com.wl.turbidimetric.upload.service.OnConnectListener
 import com.wl.turbidimetric.upload.service.OnGetPatientCallback
 import com.wl.turbidimetric.upload.service.OnUploadCallback
 import com.wl.turbidimetric.upload.service.UploadService
-import com.wl.turbidimetric.upload.hl7.util.getLocalConfig
-import com.wl.turbidimetric.upload.hl7.util.save
 import com.wl.wllib.LogToFile
 import java.util.concurrent.CountDownLatch
 
 typealias OnUploadTestResults = (count: Int, successCount: Int, failedCount: Int) -> Any?
 
 object HL7Helper : UploadService {
-    private var uploadService: UploadService = createUploadService()
+    private var uploadService: HL7UploadService = createUploadService()
+    var hl7Log: Hl7Log? = null
+        set(value) {
+            field = value
+            uploadService?.hl7Log = value
+        }
 
-    private fun createUploadService(): UploadService {
+    private fun createUploadService(): HL7UploadService {
         return HL7UploadService()
     }
 
@@ -90,7 +94,17 @@ object HL7Helper : UploadService {
         onConnectListener: OnConnectListener?
     ) {
         config.save()
-        uploadService.connect(config, onConnectListener)
+        SystemGlobal.uploadConfig = config
+        uploadService.connect(config, object : OnConnectListener {
+            override fun onConnectResult(connectResult: ConnectResult) {
+                onConnectListener?.onConnectResult(connectResult)
+            }
+
+            override fun onConnectStatusChange(connectStatus: ConnectStatus) {
+                onConnectListener?.onConnectStatusChange(connectStatus)
+                SystemGlobal.connectStatus = connectStatus
+            }
+        })
     }
 
     fun connect(onConnectListener: OnConnectListener?) {
@@ -102,7 +116,7 @@ object HL7Helper : UploadService {
     }
 
     fun getConfig(): ConnectConfig {
-        return defaultConfig()
+        return getLocalConfig()
     }
 
     override fun disconnect() {

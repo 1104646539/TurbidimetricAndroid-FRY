@@ -172,12 +172,6 @@ class DataManagerFragment :
         vd.btnUpload.setOnClickListener {
             upload()
         }
-        vd.btnGetBacklog.setOnClickListener {
-            getBacklog()
-        }
-        vd.btnGetBacklog2.setOnClickListener {
-            getBacklog2()
-        }
         lifecycleScope.launch {
             vm.resultSize.collectLatest {
                 vd.tvCount.text = "(${it}条)"

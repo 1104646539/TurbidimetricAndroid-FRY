@@ -1236,27 +1236,6 @@ class HomeViewModel(
 
     }
 
-//    /**
-//     * 检测下一排比色皿前的检测状态
-//     */
-//    private fun checkTestStateInContinueTest(
-//        r2Volume: Int = r2VolumeState.value ?: 0,
-//        r1Reagent: Boolean = r1State.value ?: false,
-//        r2Reagent: Boolean = r2State.value ?: false,
-//        cleanoutFluid: Boolean = cleanoutFluidState.value ?: false,
-//        accord: () -> Unit
-//    ) {
-//        checkTestState(
-//            r2Volume,
-//            r1Reagent,
-//            r2Reagent,
-//            cleanoutFluid,
-//            accord = accord,
-//            discrepancy = { str ->
-//                continueTestGetState = true
-//                getStateNotExistMsg.postValue(str)
-//            })
-//    }
 
     /**
      * 在开始检测下一排比色皿之前，检查试剂和清洗液的状态

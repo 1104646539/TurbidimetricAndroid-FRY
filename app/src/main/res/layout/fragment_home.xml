@@ -145,6 +145,7 @@
                         android:layout_width="220dp"
                         android:layout_height="70dp"
                         android:layout_marginTop="50dp"
+                        android:visibility="gone"
                         android:src="@drawable/icon_btn_analyse"
                         android:text="获取待检信息"
                         android:textColor="@color/white" />

@@ -92,9 +92,13 @@ class UploadSettingsActivity :
         vd.swAutoReconnection.setOnCheckedChangeListener { buttonView, isChecked ->
             vm.isReconnection.value = isChecked
         }
-        vd.swGetPatient.setOnCheckedChangeListener { buttonView, isChecked ->
-            vm.getPatient.value = isChecked
-        }
+//        vd.swGetPatient.setOnCheckedChangeListener { buttonView, isChecked ->
+//            vm.getPatient.value = isChecked
+//        }
+        //        vd.rbRealTime.setOnCheckedChangeListener { buttonView, isChecked ->
+//            vm.realTimeGetPatient.value = isChecked
+//        }
+
         vd.etRetryCount.addTextChangedListener {
             vm.retryCount.value = it.toString()
         }
@@ -106,9 +110,6 @@ class UploadSettingsActivity :
         }
         vd.etSocketPort.addTextChangedListener {
             vm.port.value = it.toString()
-        }
-        vd.rbRealTime.setOnCheckedChangeListener { buttonView, isChecked ->
-            vm.realTimeGetPatient.value = isChecked
         }
 
         vd.rbBc.setOnCheckedChangeListener { buttonView, isChecked ->
@@ -132,7 +133,7 @@ class UploadSettingsActivity :
         vd.btnSendResult.setOnClickListener {
             sendResult()
         }
-        vd.tvBack.setOnClickListener {
+        vd.llBack.setOnClickListener {
             finish()
         }
         vd.btnGetTestPatientInfo.setOnClickListener {

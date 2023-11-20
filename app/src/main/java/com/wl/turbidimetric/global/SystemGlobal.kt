@@ -67,6 +67,10 @@ object SystemGlobal {
     private val _obConnectStatus = MutableStateFlow(connectStatus)
     val obConnectStatus = _obConnectStatus.asStateFlow()
 
+    /**
+     * 下位机版本
+     */
+    var mcuVersion = ""
 
     /**
      * 首页的导航资源

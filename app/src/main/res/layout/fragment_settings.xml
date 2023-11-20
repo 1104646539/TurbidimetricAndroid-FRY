@@ -118,6 +118,16 @@
                 android:padding="8dp"
                 android:text="打开桌面"
                 android:textSize="26sp" />
+
+            <TextView
+                android:id="@+id/tv_export_log"
+                style="@style/TextTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:padding="8dp"
+                android:text="导出日志"
+                android:textSize="26sp" />
         </LinearLayout>
 
         <TextView
@@ -149,13 +159,23 @@
             android:textSize="26sp" />
 
         <TextView
-            android:id="@+id/tv_soft_version"
+            android:id="@+id/tv_soft_version_android"
             style="@style/TextTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
             android:padding="8dp"
-            android:text="软件版本"
+            android:text="上位机软件版本"
+            android:textSize="26sp" />
+
+        <TextView
+            android:id="@+id/tv_soft_version_mcu"
+            style="@style/TextTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:padding="8dp"
+            android:text="上位机软件版本"
             android:textSize="26sp" />
 
     </LinearLayout>

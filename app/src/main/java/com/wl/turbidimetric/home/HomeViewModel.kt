@@ -50,6 +50,9 @@ class HomeViewModel(
         getMachineState()
     }
 
+    fun goGetVersion() {
+        SerialPortUtil.getVersion()
+    }
 
     private fun listener() {
         SerialPortUtil.callback.add(this)
@@ -686,10 +689,10 @@ class HomeViewModel(
      * @param reply ReplyModel<GetVersionModel>
      */
     override fun readDataGetVersionModel(reply: ReplyModel<GetVersionModel>) {
-        if (!runningTest()) return
-        if (!machineStateNormal()) return
+//        if (!runningTest()) return
+//        if (!machineStateNormal()) return
         c("接收到 获取版本号 reply=$reply")
-
+        SystemGlobal.mcuVersion = reply.data.version
     }
 
     /**

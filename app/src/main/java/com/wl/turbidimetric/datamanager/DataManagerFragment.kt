@@ -347,7 +347,7 @@ class DataManagerFragment :
     private fun exportExcel(exportAll: Boolean) {
         waitDialog.showPop(requireContext()) { dialog ->
             //step1、 显示等待对话框
-            dialog.showDialog("正在上传,请等待……", confirmText = "", confirmClick = {})
+            dialog.showDialog("正在导出,请等待……", confirmText = "", confirmClick = {})
             lifecycleScope.launch(Dispatchers.IO) {
                 //step2、 获取数据
                 val data = if (exportAll) {

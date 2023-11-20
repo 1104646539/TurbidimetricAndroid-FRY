@@ -285,7 +285,7 @@ fun transitionGetVersionModel(data: UByteArray): ReplyModel<GetVersionModel> {
     return ReplyModel(
         SerialGlobal.CMD_GetVersion,
         data[1].toInt(),
-        GetVersionModel("${data[2].toInt()}.${data[3].toInt()}.${data[4].toInt()}.${data[5].toInt()}.")
+        GetVersionModel("${data[2].toInt()}.${data[3].toInt()}.${data[4].toInt()}.${data[5].toInt()}")
     )
 }
 

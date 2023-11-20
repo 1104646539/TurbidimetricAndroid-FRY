@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Message
 import android.view.View
+import androidx.lifecycle.lifecycleScope
 import com.lxj.xpopup.core.BasePopupView
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.FragmentSettings2Binding
@@ -15,13 +16,17 @@ import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.MachineTestModel
 import com.wl.turbidimetric.test.TestActivity
 import com.wl.turbidimetric.upload.view.UploadSettingsActivity
+import com.wl.turbidimetric.util.ExportExcelHelper
+import com.wl.turbidimetric.util.ExportLogHelper
 import com.wl.turbidimetric.view.*
 import com.wl.turbidimetric.view.dialog.*
 import com.wl.weiqianwllib.OrderUtil
 import com.wl.wwanandroid.base.BaseFragment
 import com.wl.wwanandroid.base.BaseViewModel
 import com.wl.wllib.LogToFile.i
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class SettingsFragment :
     BaseFragment<BaseViewModel, FragmentSettingsBinding>(R.layout.fragment_settings) {
@@ -50,6 +55,13 @@ class SettingsFragment :
 
     private val paramsDialog by lazy {
         ParamsDialog(requireContext())
+    }
+
+    /**
+     * 等待任务对话框
+     */
+    val waitDialog by lazy {
+        HiltDialog(requireContext())
     }
 
     override fun initViewModel() {
@@ -108,8 +120,41 @@ class SettingsFragment :
         vd.tvUpload.setOnClickListener {
             startUpload()
         }
-        vd.tvSoftVersion.text = "上位机版本:${getPackageInfo(requireContext())?.versionName} 发布版本:1"
+        vd.tvExportLog.setOnClickListener {
+            exportLog()
+        }
+        vd.tvSoftVersionAndroid.text =
+            "上位机版本:${getPackageInfo(requireContext())?.versionName} 发布版本:1"
+        vd.tvSoftVersionMcu.text = "MCU版本:${SystemGlobal.mcuVersion}"
 
+    }
+
+    /**
+     * 导出日志到文件
+     */
+    private fun exportLog() {
+        waitDialog.showPop(requireContext()) { dialog ->
+            //step1、 显示等待对话框
+            dialog.showDialog("正在导出,请等待……", confirmText = "", confirmClick = {})
+
+            lifecycleScope.launch(Dispatchers.IO) {
+                //step2、 导出 等待结果
+                ExportLogHelper.export(requireContext(), { file1, file2 ->
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        dialog.showDialog("导出成功,文件保存在\n$file1\n$file2", "确定", { d ->
+                            d.dismiss()
+                        })
+                    }
+                }, { err ->
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        dialog.showDialog("导出失败,$err", "确定", { d ->
+                            d.dismiss()
+                        })
+                    }
+                })
+
+            }
+        }
     }
 
     /**

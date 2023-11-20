@@ -120,6 +120,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         listener()
         initUploadClient()
         vm.goGetMachineState()
+        vm.goGetVersion()
 
         launchAndRepeatWithViewLifecycle {
             vm.projectDatas.collectLatest {

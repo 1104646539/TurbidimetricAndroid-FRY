@@ -21,17 +21,17 @@ import java.util.concurrent.LinkedBlockingQueue
  * 串口操作类
  */
 object SerialPortUtil {
-    val serialPort: BaseSerialPort = BaseSerialPort()
+    private val serialPort: BaseSerialPort = BaseSerialPort()
 
     //  lateinit var callback: Callback<ReplyModel<Any>>
     val callback: MutableList<Callback2> = mutableListOf()
-    var data: MutableList<UByte> = mutableListOf<UByte>()
-    val header = arrayOf<UByte>(0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u)
-    val hCount = header.size
-    val allCount = 8;
+    private var data: MutableList<UByte> = mutableListOf<UByte>()
+    private val header = arrayOf<UByte>(0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u)
+    private val hCount = header.size
+    private const val allCount = 8;
     var byteArray = ByteArray(100)
-    val responseCommand1: UByte = SerialGlobal.CMD_Response;
-    val sendQueue: BlockingQueue<UByteArray> = LinkedBlockingQueue()
+    private val responseCommand1: UByte = SerialGlobal.CMD_Response;
+    private val sendQueue: BlockingQueue<UByteArray> = LinkedBlockingQueue()
 
     private val sendMap = mutableMapOf<UByte, Int>()
 

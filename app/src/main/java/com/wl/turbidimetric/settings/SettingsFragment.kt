@@ -8,6 +8,7 @@ import com.wl.turbidimetric.databinding.FragmentSettings2Binding
 import com.wl.turbidimetric.databinding.FragmentSettingsBinding
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.ex.*
+import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.MachineTestModel
 import com.wl.turbidimetric.test.TestActivity
 import com.wl.turbidimetric.upload.view.UploadSettingsActivity
@@ -87,7 +88,7 @@ class SettingsFragment :
     }
 
     private fun startUpload() {
-        startActivity(Intent(requireContext(),UploadSettingsActivity::class.java))
+        startActivity(Intent(requireContext(), UploadSettingsActivity::class.java))
     }
 
     private fun showLauncher() {

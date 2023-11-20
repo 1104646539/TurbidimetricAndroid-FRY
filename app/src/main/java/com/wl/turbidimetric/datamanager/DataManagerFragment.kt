@@ -13,8 +13,10 @@ import com.wl.turbidimetric.databinding.FragmentDataManagerBinding
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.db.DBManager
 import com.wl.turbidimetric.ex.PD
+import com.wl.turbidimetric.ex.isTestRunning
 import com.wl.turbidimetric.ex.launchAndRepeatWithViewLifecycle
 import com.wl.turbidimetric.ex.toast
+import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.ConditionModel
 import com.wl.turbidimetric.model.ProjectModel
 import com.wl.turbidimetric.model.TestResultModel
@@ -254,8 +256,13 @@ class DataManagerFragment :
      * @return String?
      */
     private fun verifyUploadData(results: List<TestResultModel>?): String? {
+
         if (results.isNullOrEmpty()) {
             return "请选择数据"
+        }
+
+        if (isTestRunning() && SystemGlobal.uploadConfig.autoUpload) {
+            return "请等待检测结束后上传"
         }
 
         if (results.any {

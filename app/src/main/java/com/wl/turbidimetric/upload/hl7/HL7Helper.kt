@@ -63,7 +63,7 @@ object HL7Helper : UploadService {
         onUploadTestResults = callback
         testResults.add(testResult)
         lastIndex = testResults.lastIndex;
-        handler.sendEmptyMessageDelayed(WHAT_NEXT, 500)
+        handler.sendEmptyMessageDelayed(WHAT_NEXT, 1000)
     }
 
     private fun uploadNextTestResult(testResult: TestResultModel) {
@@ -77,7 +77,7 @@ object HL7Helper : UploadService {
                     onUploadTestResults?.invoke(testResults.size, successCount, failedCount)
                     clearUploadInfo()
                 } else {
-                    handler.sendEmptyMessageDelayed(WHAT_NEXT, 500)
+                    handler.sendEmptyMessageDelayed(WHAT_NEXT, 1000)
                 }
             }
 
@@ -90,7 +90,7 @@ object HL7Helper : UploadService {
                     onUploadTestResults?.invoke(testResults.size, successCount, failedCount)
                     clearUploadInfo()
                 } else {
-                    handler.sendEmptyMessageDelayed(WHAT_NEXT, 500)
+                    handler.sendEmptyMessageDelayed(WHAT_NEXT, 1000)
                 }
             }
         })

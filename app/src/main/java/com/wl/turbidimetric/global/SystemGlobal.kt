@@ -12,47 +12,65 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 object SystemGlobal {
-    //检测模式状态
+    /**
+     * 检测模式状态
+     */
     var testState = TestState.None
         set(value) {
             field = value
             _obTestState.value = value
         }
-
-    //检测类型
-    var testType = TestType.None
-
-    var isCodeDebug = true
-
-    //可监听的检测状态
     private val _obTestState = MutableStateFlow(TestState.None)
     val obTestState = _obTestState.asStateFlow()
 
-    //上传配置
+    /**
+     * 检测类型
+     */
+    var testType = TestType.None
+
+    /**
+     * 是否是在只使用安卓板时调试用的
+     */
+    var isCodeDebug = true
+
+
+    /**
+     * 是否是调试模式
+     */
+    var isDebugMode = false
+        set(value) {
+            field = value
+            _obDebugMode.value = value
+        }
+    private val _obDebugMode = MutableStateFlow(false)
+    val obDebugMode = _obDebugMode.asStateFlow()
+
+    /**
+     * 上传配置
+     */
     var uploadConfig = defaultConfig()
         set(value) {
             field = value
             _obUploadConfig.value = value
         }
-
-    //可监听的上传配置
     private val _obUploadConfig = MutableStateFlow(uploadConfig)
     val obUploadConfig = _obUploadConfig.asStateFlow()
 
-
+    /**
+     * 上传连接状态
+     */
     var connectStatus: ConnectStatus = ConnectStatus.NONE
         set(value) {
             field = value
             _obConnectStatus.value = value
         }
-    //可监听的上传连接状态
     private val _obConnectStatus = MutableStateFlow(connectStatus)
     val obConnectStatus = _obConnectStatus.asStateFlow()
 
-//    //可监听的拟合状态
-//    val obMatchingTestState = MutableLiveData(MatchingArgState.None)
 
-    //首页的导航资源
+    /**
+     * 首页的导航资源
+     */
     val navItems = mutableListOf(
         NavigationView.NavItem(
             R.drawable.icon_analyse,

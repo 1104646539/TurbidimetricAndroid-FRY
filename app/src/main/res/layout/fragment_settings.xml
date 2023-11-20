@@ -34,10 +34,21 @@
         </androidx.cardview.widget.CardView>
 
         <TextView
+            android:id="@+id/tv_order_settings"
+            style="@style/TextTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="其他设置"
+            android:textColor="@color/themePositiveColor"
+            android:textSize="26sp" />
+
+        <TextView
             android:id="@+id/tvParamsSetting"
             style="@style/TextTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
             android:padding="8dp"
             android:text="参数设置"
             android:textSize="26sp" />
@@ -47,6 +58,7 @@
             style="@style/TextTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
             android:padding="8dp"
             android:text="编号设置"
             android:textSize="26sp" />
@@ -57,43 +69,83 @@
             style="@style/TextTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
             android:padding="8dp"
             android:text="检测模式设置"
             android:textSize="26sp" />
 
-        <TextView
-            android:id="@+id/tv_repeatability"
-            style="@style/TextTitle"
+        <LinearLayout
+            android:id="@+id/ll_debug_mode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:text="重复性测试"
-            android:textSize="26sp" />
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/TextTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="调试功能"
+                android:textColor="@color/themePositiveColor"
+                android:textSize="26sp" />
+
+            <TextView
+                android:id="@+id/tv_repeatability"
+                style="@style/TextTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:padding="8dp"
+                android:text="重复性测试"
+                android:textSize="26sp" />
+
+            <TextView
+                android:id="@+id/tv_nav"
+                style="@style/TextTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:padding="8dp"
+                android:text="隐藏和显示导航栏"
+                android:textSize="26sp" />
+
+            <TextView
+                android:id="@+id/tv_launcher"
+                style="@style/TextTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:padding="8dp"
+                android:text="打开桌面"
+                android:textSize="26sp" />
+        </LinearLayout>
 
         <TextView
-            android:id="@+id/tv_nav"
-            style="@style/TextTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:text="隐藏和显示导航栏"
-            android:textSize="26sp" />
-
-        <TextView
-            android:id="@+id/tv_launcher"
-            style="@style/TextTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:text="打开桌面"
-            android:textSize="26sp" />
-        <TextView
-            android:id="@+id/tv_upload"
             style="@style/TextTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="8dp"
             android:text="上传设置"
+            android:textColor="@color/themePositiveColor"
+            android:textSize="26sp" />
+
+        <TextView
+            android:id="@+id/tv_upload"
+            style="@style/TextTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:padding="8dp"
+            android:text="上传参数设置"
+            android:textSize="26sp" />
+
+        <TextView
+            style="@style/TextTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="软件版本"
+            android:textColor="@color/themePositiveColor"
             android:textSize="26sp" />
 
         <TextView
@@ -101,6 +153,7 @@
             style="@style/TextTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
             android:padding="8dp"
             android:text="软件版本"
             android:textSize="26sp" />

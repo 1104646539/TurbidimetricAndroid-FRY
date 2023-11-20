@@ -2,6 +2,9 @@ package com.wl.turbidimetric.settings
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Message
+import android.view.View
 import com.lxj.xpopup.core.BasePopupView
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.FragmentSettings2Binding
@@ -18,11 +21,21 @@ import com.wl.weiqianwllib.OrderUtil
 import com.wl.wwanandroid.base.BaseFragment
 import com.wl.wwanandroid.base.BaseViewModel
 import com.wl.wllib.LogToFile.i
+import kotlinx.coroutines.flow.collectLatest
 
 class SettingsFragment :
     BaseFragment<BaseViewModel, FragmentSettingsBinding>(R.layout.fragment_settings) {
     private val TAG = "SettingsFragment"
     private var show = false
+
+    /**
+     * 点击显示调试模式的功能
+     */
+    var clickOrderCount = 5
+    var clickOrder = 0
+
+    val handler = object : Handler() {
+    }
 
     companion object {
         @JvmStatic
@@ -55,9 +68,21 @@ class SettingsFragment :
 
     private fun listener() {
         listenerView()
+        listenerOb()
+    }
+
+    private fun listenerOb() {
+        launchAndRepeatWithViewLifecycle {
+            SystemGlobal.obDebugMode.collectLatest {
+                vd.llDebugMode.visibility = if (it) View.VISIBLE else View.GONE
+            }
+        }
     }
 
     private fun listenerView() {
+        vd.tvOrderSettings.setOnClickListener {
+            showDebugModeView()
+        }
         vd.tvParamsSetting.setOnClickListener {
             showParamsSettingDialog()
 
@@ -85,6 +110,30 @@ class SettingsFragment :
         }
         vd.tvSoftVersion.text = "上位机版本:${getPackageInfo(requireContext())?.versionName} 发布版本:1"
 
+    }
+
+    /**
+     * 清零任务
+     */
+    private val runnable_order: Runnable = Runnable {
+        clickOrder = 0
+        i("clickOrder = 0")
+    }
+
+    /**
+     * 5s内连续点击几次其他设置后，打开调试模式
+     */
+    private fun showDebugModeView() {
+        handler.removeCallbacks(runnable_order)
+        clickOrder++.let {
+            handler.postDelayed(runnable_order, 5000)
+            if (clickOrder >= clickOrderCount) {
+                LocalData.DebugMode = !LocalData.DebugMode
+                SystemGlobal.isDebugMode = LocalData.DebugMode
+                clickOrder = 0
+                return
+            }
+        }
     }
 
     private fun startUpload() {

@@ -23,6 +23,9 @@ object LocalData {
      */
     var SamplingVolume by IntDataStoreProperty(LocalDataGlobal.Default.SamplingVolume)
 
+    /**
+     * 最后一次进入的版本号
+     */
     var CurrentVersion by IntDataStoreProperty(0)
 
     /**
@@ -60,6 +63,11 @@ object LocalData {
      */
     var SelectProjectID by LongDataStoreProperty(LocalDataGlobal.Default.SelectProjectID)
 
+    /**
+     * 调试模式
+     */
+    var DebugMode by BooleanDataStoreProperty(LocalDataGlobal.Default.DebugMode)
+
 
     /**
      * 编号自增并保存
@@ -69,7 +77,6 @@ object LocalData {
     fun getDetectionNumInc(num: String = DetectionNum): String {
         if (num.isNullOrEmpty()) return "1";
         val newNum = java.lang.String.format("%0" + num.length + "d", num.toLong() + 1)
-//        putDetectionNum(newNum)
         DetectionNum = newNum
         return num
     }

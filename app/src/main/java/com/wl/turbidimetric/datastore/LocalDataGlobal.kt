@@ -43,6 +43,7 @@ object LocalDataGlobal {
         val SampleExist = true
         val ScanCode = false
         val SelectProjectID = 0L
+        val DebugMode = false
     }
 
 

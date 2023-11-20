@@ -5,6 +5,7 @@ import android.app.Application
 import android.content.Context
 import com.lxj.xpopup.XPopup
 import com.wl.turbidimetric.datastore.LocalData
+import com.wl.turbidimetric.datastore.LocalDataGlobal
 import com.wl.turbidimetric.db.DBManager
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.ProjectModel
@@ -59,13 +60,12 @@ class App : Application() {
         if (LocalData.CurrentVersion < packInfo.versionCode) {
             LocalData.CurrentVersion = packInfo.versionCode
         }
-//        SystemGlobal.machineTestModel = MachineTestModel.valueOf(CurMachineTestModel)
-        SystemGlobal.uploadConfig = getLocalConfig()
+
     }
 
     private fun initDataStore() {
-
-
+        SystemGlobal.uploadConfig = getLocalConfig()
+        SystemGlobal.isDebugMode = LocalData.DebugMode
     }
 
     companion object {

@@ -1,5 +1,7 @@
 package com.wl.turbidimetric.upload.hl7
 
+import android.os.Handler
+import android.os.Message
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.TestResultModel
 import com.wl.turbidimetric.upload.hl7.service.HL7UploadService
@@ -12,7 +14,6 @@ import com.wl.turbidimetric.upload.service.OnGetPatientCallback
 import com.wl.turbidimetric.upload.service.OnUploadCallback
 import com.wl.turbidimetric.upload.service.UploadService
 import com.wl.wllib.LogToFile
-import java.util.concurrent.CountDownLatch
 
 typealias OnUploadTestResults = (count: Int, successCount: Int, failedCount: Int) -> Any?
 
@@ -23,6 +24,16 @@ object HL7Helper : UploadService {
             field = value
             uploadService?.hl7Log = value
         }
+    val WHAT_NEXT = 1000
+    val handler = object : Handler() {
+        override fun handleMessage(msg: Message) {
+            super.handleMessage(msg)
+            if (WHAT_NEXT == msg.what) {
+                removeMessages(WHAT_NEXT)
+                uploadNextTestResult(testResults[index])
+            }
+        }
+    }
 
     private fun createUploadService(): HL7UploadService {
         return HL7UploadService()
@@ -32,19 +43,27 @@ object HL7Helper : UploadService {
     private var successCount = 0;
     private var failedCount = 0;
     private var lastIndex = 0;
-    private var testResults: List<TestResultModel> = mutableListOf()
+    private var testResults = mutableListOf<TestResultModel>()
     private var onUploadTestResults: OnUploadTestResults? = null
+
     fun uploadTestResult(
-        testResults: List<TestResultModel>,
-        onUploadTestResults: OnUploadTestResults
+        datas: List<TestResultModel>,
+        callback: OnUploadTestResults
     ) {
-        this.testResults = testResults
-        this.onUploadTestResults = onUploadTestResults
-        index = 0;
-        successCount = 0;
-        failedCount = 0;
+        testResults.addAll(datas)
+        onUploadTestResults = callback
         lastIndex = testResults.lastIndex;
         uploadNextTestResult(testResults.first())
+    }
+
+    fun uploadSingleTestResult(
+        testResult: TestResultModel,
+        callback: OnUploadTestResults
+    ) {
+        onUploadTestResults = callback
+        testResults.add(testResult)
+        lastIndex = testResults.lastIndex;
+        handler.sendEmptyMessageDelayed(WHAT_NEXT, 500)
     }
 
     private fun uploadNextTestResult(testResult: TestResultModel) {
@@ -56,9 +75,9 @@ object HL7Helper : UploadService {
                 if (index > lastIndex) {
                     LogToFile.i("index=$index successCount=$successCount failedCount=$failedCount lastIndex=$lastIndex")
                     onUploadTestResults?.invoke(testResults.size, successCount, failedCount)
+                    clearUploadInfo()
                 } else {
-                    Thread.sleep(500)
-                    uploadNextTestResult(testResults[index])
+                    handler.sendEmptyMessageDelayed(WHAT_NEXT, 500)
                 }
             }
 
@@ -69,12 +88,20 @@ object HL7Helper : UploadService {
                 if (index > lastIndex) {
                     LogToFile.i("index=$index successCount=$successCount failedCount=$failedCount lastIndex=$lastIndex")
                     onUploadTestResults?.invoke(testResults.size, successCount, failedCount)
+                    clearUploadInfo()
                 } else {
-                    Thread.sleep(500)
-                    uploadNextTestResult(testResults[index])
+                    handler.sendEmptyMessageDelayed(WHAT_NEXT, 500)
                 }
             }
         })
+    }
+
+    fun clearUploadInfo() {
+        index = 0
+        successCount = 0
+        failedCount = 0
+        lastIndex = -1
+        testResults.clear()
     }
 
     override fun uploadTestResult(testResult: TestResultModel, onUploadCallback: OnUploadCallback) {

@@ -1182,15 +1182,9 @@ class HomeViewModel(
      */
     private fun singleTestResultFinish(testResultModel: TestResultModel) {
         if (HL7Helper.getConfig().autoUpload && HL7Helper.isConnected()) {
-            HL7Helper.uploadTestResult(testResultModel, object : OnUploadCallback {
-                override fun onUploadSuccess(msg: String) {
-                    i("onUploadSuccess msg=$msg")
-                }
-
-                override fun onUploadFailed(code: Int, msg: String) {
-                    i("onUploadFailed code=$code msg=$msg")
-                }
-            })
+            HL7Helper.uploadSingleTestResult(testResultModel) { count, success, failed ->
+                i("singleTestResultFinish count=$count success=$success failed=$failed")
+            }
         }
 
 

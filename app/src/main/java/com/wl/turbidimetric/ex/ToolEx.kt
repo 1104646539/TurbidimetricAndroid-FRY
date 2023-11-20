@@ -149,6 +149,9 @@ fun calcShowTestResult(con: Int, ljz: Int): String {
 fun calcAbsorbance(
     resultTest: BigDecimal
 ): BigDecimal {
+    if (resultTest.toInt() <= 0) {
+        return 0.toBigDecimal()
+    }
     return log10(
         65535.toBigDecimal().divide(resultTest, 5, RoundingMode.HALF_UP).toDouble()
     ).toBigDecimal()

@@ -38,6 +38,7 @@ object TestSerialPort {
                 reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x2u))//0不存在 1样本管 2比色杯
             }
             SerialGlobal.CMD_Test -> {
+//                delay(2000)//测试上传时需要
                 reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x23u, 0x0u))
             }
             SerialGlobal.CMD_SampleDoor -> {

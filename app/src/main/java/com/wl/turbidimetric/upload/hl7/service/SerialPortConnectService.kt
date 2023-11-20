@@ -37,13 +37,29 @@ class SerialPortConnectService(successListener: () -> Unit) :
         thread {
             try {
                 serialPort = BaseSerialPort()
-                serialPort!!.openSerial(config.serialPortName, config.serialPortBaudRate, 8)
-                output = SerialPortOutputStream(serialPort!!)
-                input = SerialPortInputStream(serialPort!!)
-                initSuccess()
-                onConnectListener?.onConnectStatusChange(ConnectStatus.CONNECTED)
-                onConnectListener?.onConnectResult(ConnectResult.Success())
-                isConnect = true
+                serialPort!!.openSerial(
+                    config.serialPortName,
+                    config.serialPortBaudRate,
+                    config.serialPortDataBit
+                )
+                if (serialPort!!.isOpen()) {
+                    output = SerialPortOutputStream(serialPort!!)
+                    input = SerialPortInputStream(serialPort!!)
+                    initSuccess()
+                    onConnectListener?.onConnectStatusChange(ConnectStatus.CONNECTED)
+                    onConnectListener?.onConnectResult(ConnectResult.Success())
+                    isConnect = true
+                }else{
+                    isConnect = false
+                    onConnectListener?.onConnectStatusChange(ConnectStatus.DISCONNECTED)
+                    onConnectListener?.onConnectResult(
+                        ConnectResult.OrderError(
+                            100,
+                            "连接失败 串口打开失败"
+                        )
+                    )
+                    reconnection()
+                }
             } catch (e: Exception) {
                 isConnect = false
                 onConnectListener?.onConnectStatusChange(ConnectStatus.DISCONNECTED)

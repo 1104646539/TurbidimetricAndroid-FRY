@@ -6,6 +6,7 @@ import com.google.gson.Gson
 import com.wl.turbidimetric.ex.getContent
 import com.wl.turbidimetric.ex.saveFile
 import com.wl.turbidimetric.upload.model.ConnectConfig
+import com.wl.weiqianwllib.serialport.WQSerialGlobal
 import com.wl.wllib.DateUtil
 import com.wl.wllib.toTimeStr
 import java.io.File
@@ -100,7 +101,7 @@ fun defaultConfig(): ConnectConfig {
         "UTF-8",
         serialPort = false,
         serialPortBaudRate = 9600,
-        serialPortName = "COM4",
+        serialPortName = WQSerialGlobal.COM4,
         isReconnection = true,
         retryCount = 1,
         reconnectionTimeout = 20000

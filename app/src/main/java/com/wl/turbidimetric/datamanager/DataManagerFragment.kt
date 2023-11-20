@@ -239,7 +239,9 @@ class DataManagerFragment :
                         }
                     }
                 } else {
-                    dialog.dismiss()
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        dialog.dismiss()
+                    }
                     i("上传未连接")
                 }
             }

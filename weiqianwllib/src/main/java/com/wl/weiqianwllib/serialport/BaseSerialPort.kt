@@ -54,6 +54,10 @@ class BaseSerialPort {
         serialPort?.close()
     }
 
+    fun isOpen(): Boolean {
+        return serialPort?.isOpen ?: false
+    }
+
     fun read(byteArray: ByteArray, size: Int): Int {
         return serialPort?.read(byteArray, size) ?: 0
     }

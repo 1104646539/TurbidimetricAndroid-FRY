@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.os.PersistableBundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.ViewDataBinding
+import com.wl.turbidimetric.App
 import com.wl.turbidimetric.global.EventMsg
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -16,6 +17,7 @@ abstract class BaseActivity<VM : BaseViewModel, VD : ViewDataBinding> : AppCompa
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        App.instance?.addActivity(this)
         vm.init()
         vd.root
         supportActionBar?.hide()
@@ -25,6 +27,7 @@ abstract class BaseActivity<VM : BaseViewModel, VD : ViewDataBinding> : AppCompa
 
     override fun onDestroy() {
         super.onDestroy()
+        App.instance?.removeActivity(this)
         EventBus.getDefault().unregister(this)
     }
 

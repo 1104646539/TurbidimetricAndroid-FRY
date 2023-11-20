@@ -116,7 +116,7 @@ object HL7Helper : UploadService {
     }
 
     fun getConfig(): ConnectConfig {
-        return getLocalConfig()
+        return SystemGlobal.uploadConfig
     }
 
     override fun disconnect() {

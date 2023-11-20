@@ -11,6 +11,9 @@ import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.global.SystemGlobal.testState
 import com.wl.turbidimetric.global.SystemGlobal.testType
 import com.wl.turbidimetric.model.*
+import com.wl.turbidimetric.upload.hl7.HL7Helper
+import com.wl.turbidimetric.upload.hl7.OnUploadTestResults
+import com.wl.turbidimetric.upload.service.OnUploadCallback
 import com.wl.turbidimetric.util.Callback2
 import com.wl.turbidimetric.util.OnScanResult
 import com.wl.turbidimetric.util.ScanCodeUtil
@@ -1107,11 +1110,7 @@ class HomeViewModel(
                 resultModels[pos]?.testOriginalValue1 = resultOriginalTest1[pos]
 
                 mCuvetteStates[cuvetteShelfPos]?.get(pos)?.testResult = resultModels[pos]
-//                cuvetteStates.postValue(mCuvetteStates)
                 _cuvetteStates.value = mCuvetteStates;
-//                _testUiState.update {
-//                    it.copy(cuvetteStates = mCuvetteStates)
-//                }
             }
             CuvetteState.Test2 -> {
                 if (SystemGlobal.isCodeDebug) {
@@ -1161,6 +1160,11 @@ class HomeViewModel(
                         resultModels[pos]?.project?.target?.projectLjz ?: 100
                     )
                 }
+                //单个检测完毕
+                resultModels[pos]?.let {
+                    singleTestResultFinish(it)
+                }
+
             }
             else -> {}
         }
@@ -1168,6 +1172,28 @@ class HomeViewModel(
             testResultRepository.updateTestResult(it)
         }
         i("updateTestResultModel resultModels=$resultModels")
+    }
+
+    /**
+     * 单个检测完毕
+     * 自动打印
+     * 自动上传 等
+     * @param testResultModel TestResultModel?
+     */
+    private fun singleTestResultFinish(testResultModel: TestResultModel) {
+        if (HL7Helper.getConfig().autoUpload && HL7Helper.isConnected()) {
+            HL7Helper.uploadTestResult(testResultModel, object : OnUploadCallback {
+                override fun onUploadSuccess(msg: String) {
+                    i("onUploadSuccess msg=$msg")
+                }
+
+                override fun onUploadFailed(code: Int, msg: String) {
+                    i("onUploadFailed code=$code msg=$msg")
+                }
+            })
+        }
+
+
     }
 
 
@@ -1785,7 +1811,7 @@ class HomeViewModel(
      * 接收到移动比色皿架
      */
     override fun readDataMoveCuvetteShelfModel(reply: ReplyModel<MoveCuvetteShelfModel>) {
-        if (testState == TestState.TestFinish&& testType.isTest()) {
+        if (testState == TestState.TestFinish && testType.isTest()) {
             cuvetteShelfMoveFinish = true
             if (isTestFinish()) {
                 showFinishDialog()
@@ -1842,7 +1868,7 @@ class HomeViewModel(
      */
     override fun readDataMoveSampleShelfModel(reply: ReplyModel<MoveSampleShelfModel>) {
         c("接收到移动样本架 reply=$reply sampleShelfPos=$sampleShelfPos $testState")
-        if (testState == TestState.TestFinish&& testType.isTest()) {
+        if (testState == TestState.TestFinish && testType.isTest()) {
             sampleShelfMoveFinish = true
             if (isTestFinish()) {
                 showFinishDialog()

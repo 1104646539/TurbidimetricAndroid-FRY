@@ -1,20 +1,24 @@
 package com.wl.turbidimetric
 
+import android.app.Activity
 import android.app.Application
 import android.content.Context
-import android.os.Debug
 import com.lxj.xpopup.XPopup
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.db.DBManager
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.ProjectModel
 import com.wl.turbidimetric.upload.hl7.util.getLocalConfig
+import com.wl.turbidimetric.util.CrashHandler
 import com.wl.wllib.LogToFile
 import com.wl.wllib.ToastUtil
 import com.wl.wllib.ktxRunOnBgCache
+import java.util.*
 
 
 class App : Application() {
+    private val activityList = mutableListOf<Activity>()
+
     override fun attachBaseContext(base: Context?) {
         super.attachBaseContext(base)
     }
@@ -23,7 +27,7 @@ class App : Application() {
         super.onCreate()
         instance = this
         ToastUtil.init(this)
-
+        Thread.setDefaultUncaughtExceptionHandler(CrashHandler())
         initData()
         ktxRunOnBgCache {
             DBManager.init(this)
@@ -66,6 +70,24 @@ class App : Application() {
 
     companion object {
         var instance: App? = null
+    }
+
+    //添加Activity到容器中
+    fun addActivity(activity: Activity) {
+        activityList.add(activity)
+    }
+
+    //删除Activity到容器中
+    fun removeActivity(activity: Activity?) {
+        activityList.remove(activity)
+    }
+
+    //遍历所有Activity并finish
+    fun exit() {
+        for (activity in activityList) {
+            activity.finish()
+        }
+        activityList.clear()
     }
 
 }

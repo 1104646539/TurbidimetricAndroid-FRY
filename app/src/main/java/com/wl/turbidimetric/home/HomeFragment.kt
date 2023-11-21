@@ -258,7 +258,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             debugShowDetailsDialog.showPop(requireContext()) {
                 it.showDialog(vm.testMsg.value ?: "",
                     "确定",
-                    confirmClick = { it.dismiss() }
+                    confirmClick = { it.dismiss() },
+                    scMaxHeight = 600,
                 )
             }
 

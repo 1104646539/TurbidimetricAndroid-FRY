@@ -2,8 +2,10 @@ package com.wl.turbidimetric.view.dialog
 
 import android.content.Context
 import android.view.View
+import android.widget.ScrollView
 import android.widget.TextView
 import com.wl.turbidimetric.R
+import com.wl.turbidimetric.view.MyScrollView
 
 const val ICON_HINT = R.drawable.icon_dialog_hint
 const val ICON_FINISH = R.drawable.icon_dialog_detection_finish
@@ -16,11 +18,23 @@ const val ICON_FINISH = R.drawable.icon_dialog_detection_finish
 open class HiltDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_hint) {
     var tvMsg: TextView? = null
     var msg: String? = null
+    var sv: MyScrollView? = null
+    var scMaxHeight:Int = 0
+    var scMaxWidth:Int = 0
+//    override fun getMaxWidth(): Int {
+//        return 0
+//    }
+//
+//    override fun getPopupWidth(): Int {
+//        return 0
+//    }
 
     override fun initDialogView() {
         tvMsg = findViewById(R.id.tv_msg)
-
+        sv = findViewById(R.id.sv)
     }
+
+
 
     var iconId: Int = 0;
     var showIcon = false
@@ -42,6 +56,8 @@ open class HiltDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_hin
                 it.visibility = View.VISIBLE
             }
         }
+        this.sv?.setMaxHeight(scMaxHeight)
+//        this.sv?.setMaxWidth(scMaxWidth)
     }
 
     fun showDialog(
@@ -51,8 +67,10 @@ open class HiltDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_hin
         cancelText: String = "",
         cancelClick: onClick? = null,
         showIcon: Boolean = false,
-        iconId: Int = 0
+        iconId: Int = 0,
+        scMaxHeight:Int = 0,
     ) {
+        this.scMaxHeight = scMaxHeight
         this.msg = msg;
         this.confirmText = confirmText
         this.confirmClick = confirmClick

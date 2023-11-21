@@ -16,16 +16,24 @@ import com.lxj.xpopup.core.BasePopupView
  */
 inline fun <T : BasePopupView> T.showPop(
     context: Context,
-    width: Int = 800,
+    width: Int = 1800,
     height: Int = 0,
-    maxWidth: Int = 800,
+    maxWidth: Int = 0,
     maxHeight: Int = 0,
     isCancelable: Boolean = true,
     la: ((popup: T) -> Unit)
 ) {
+//    var w = width
+//    if (width < 500) {
+//        w = 500
+//    }else if (maxWidth in 1 until width){
+//        w = maxWidth
+//    }
     val d = XPopup.Builder(context)
-        .popupWidth(width).popupHeight(height)
-        .maxWidth(maxWidth).maxHeight(maxHeight)
+        .popupWidth(width)
+//        .popupHeight(height)
+        .maxWidth(width)
+//        .maxHeight(maxHeight)
         .dismissOnTouchOutside(isCancelable)
         .dismissOnBackPressed(isCancelable)
         .autoOpenSoftInput(false)

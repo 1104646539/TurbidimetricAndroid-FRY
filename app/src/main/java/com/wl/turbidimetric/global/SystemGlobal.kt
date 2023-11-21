@@ -44,7 +44,6 @@ object SystemGlobal {
         }
     private val _obDebugMode = MutableStateFlow(false)
     val obDebugMode = _obDebugMode.asStateFlow()
-
     /**
      * 上传配置
      */

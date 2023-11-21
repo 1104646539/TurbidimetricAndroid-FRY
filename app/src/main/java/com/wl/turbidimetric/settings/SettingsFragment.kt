@@ -24,9 +24,11 @@ import com.wl.weiqianwllib.OrderUtil
 import com.wl.wwanandroid.base.BaseFragment
 import com.wl.wwanandroid.base.BaseViewModel
 import com.wl.wllib.LogToFile.i
+import com.wl.wllib.toLongTimeStr
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import java.util.Date
 
 class SettingsFragment :
     BaseFragment<BaseViewModel, FragmentSettingsBinding>(R.layout.fragment_settings) {
@@ -86,6 +88,7 @@ class SettingsFragment :
     private fun listenerOb() {
         launchAndRepeatWithViewLifecycle {
             SystemGlobal.obDebugMode.collectLatest {
+                i("obDebugMode $it")
                 vd.llDebugMode.visibility = if (it) View.VISIBLE else View.GONE
             }
         }
@@ -169,16 +172,16 @@ class SettingsFragment :
      * 5s内连续点击几次其他设置后，打开调试模式
      */
     private fun showDebugModeView() {
+        i("start=${Date().toLongTimeStr()}")
         handler.removeCallbacks(runnable_order)
-        clickOrder++.let {
-            handler.postDelayed(runnable_order, 5000)
-            if (clickOrder >= clickOrderCount) {
-                LocalData.DebugMode = !LocalData.DebugMode
-                SystemGlobal.isDebugMode = LocalData.DebugMode
-                clickOrder = 0
-                return
-            }
+        clickOrder++
+        handler.postDelayed(runnable_order, 5000)
+        if (clickOrder >= clickOrderCount) {
+            LocalData.DebugMode = !LocalData.DebugMode
+            SystemGlobal.isDebugMode = LocalData.DebugMode
+            clickOrder = 0
         }
+        i("end=${Date().toLongTimeStr()}")
     }
 
     private fun startUpload() {

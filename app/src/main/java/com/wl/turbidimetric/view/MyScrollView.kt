@@ -4,9 +4,13 @@ import android.content.Context
 import android.util.AttributeSet
 import android.widget.ScrollView
 
+/**
+ * 自定义的可以修改最大高度的
+ * ScrollView
+ * @property maxHeight Int
+ */
 class MyScrollView : ScrollView {
     private var maxHeight = 0
-    private var maxWidth = 0
 
     constructor(context: Context?) : super(context) {}
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {}
@@ -28,16 +32,7 @@ class MyScrollView : ScrollView {
     protected override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         val height: Int = measuredHeight
-        val width: Int = measuredWidth
-        var h = height
-        if (maxHeight in 1 until height) {
-            h = maxHeight
-        }
-        var w = width
-        if (w in 1 until width) {
-            w = maxWidth
-        }
-        if (h == maxHeight || w == maxWidth) {
+        if (height == maxHeight) {
             setMeasuredDimension(width, maxHeight)
         }
     }
@@ -46,11 +41,4 @@ class MyScrollView : ScrollView {
         maxHeight = height
     }
 
-    fun setMaxWidth(width: Int) {
-        maxWidth = width
-    }
-
-    companion object {
-        const val TAG = "MyScrollView"
-    }
 }

@@ -72,6 +72,7 @@ abstract class CustomBtn3Popup(val ctx: Context, val viewId: Int) : CenterPopupV
 
     open fun setContent() {
         btnConfirm?.visibility = confirmText?.isNotEmpty().isShow()
+
         confirmClick?.let { click -> btnConfirm?.setOnClickListener { click.invoke(this) } }
 
         btnConfirm2?.visibility = confirmText2?.isNotEmpty().isShow()
@@ -80,6 +81,9 @@ abstract class CustomBtn3Popup(val ctx: Context, val viewId: Int) : CenterPopupV
         btnCancel?.visibility = cancelText?.isNotEmpty().isShow()
         cancelClick?.let { click -> btnCancel?.setOnClickListener { click.invoke(this) } }
 
+        btnConfirm?.text = confirmText
+        btnConfirm2?.text = confirmText2
+        btnCancel?.text = cancelText
 
         ivIcon?.visibility = showIcon().isShow()
         if (showIcon() && getResId() != 0) {

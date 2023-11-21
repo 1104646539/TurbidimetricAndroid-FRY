@@ -255,11 +255,13 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             }
         }
         vd.btnDebugDialog.setOnClickListener {
-            debugShowDetailsDialog.showPop(requireContext()) {
+            debugShowDetailsDialog.showPop(requireContext(), width = 1000) {
                 it.showDialog(vm.testMsg.value ?: "",
                     "确定",
                     confirmClick = { it.dismiss() },
                     scMaxHeight = 600,
+                    cancelText = "fasd",
+                    cancelClick = { it.dismiss() }
                 )
             }
 
@@ -277,7 +279,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         getTestPatientInfoDialog.showPop(
             requireContext(),
             width = 600,
-            maxWidth = 600
         ) { tpiDialog ->
             tpiDialog.show { condition1, condition2, type ->
                 tpiDialog.dismiss()
@@ -314,7 +315,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                                 patientInfoDialog.showPop(
                                     requireContext(),
                                     width = 1000,
-                                    maxWidth = 1200,
                                     isCancelable = false
                                 ) { pi ->
                                     pi.showPatient(patients, {
@@ -353,7 +353,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
      */
     private fun showConfigDialog() {
         i("showConfigDialog before")
-        homeConfigDialog?.showPop(requireContext(), width = 1000, maxWidth = 1000) {
+        homeConfigDialog?.showPop(requireContext(), width = 1000) {
             it?.showDialog(vm.selectProjectEnable.value ?: true,
                 vm.editDetectionNumEnable.value ?: true,
                 vm.skipCuvetteEnable.value ?: true,
@@ -418,7 +418,10 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     if (dialog.isShow()) {
                         dialog?.showPop(requireContext()) { d ->
                             d.showDialog(
-                                it, "确定", confirmClick = { it.dismiss() }, showIcon = false
+                                it, "确定", confirmClick = { it.dismiss() },
+                                cancelText = "fasd",
+                                cancelClick = { it.dismiss() },
+                                showIcon = false
                             )
                         }
                     }

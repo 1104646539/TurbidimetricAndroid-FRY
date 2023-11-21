@@ -226,7 +226,6 @@ class MatchingArgsFragment :
             requireContext(),
             isCancelable = false,
             width = 1000,
-            maxWidth = 1000
         ) {
             it.show(adapter.items, onConfirm = { projectModel, baseDialog ->
                 if (projectModel == null) {
@@ -309,7 +308,6 @@ class MatchingArgsFragment :
                         finishCoverDialog.showPop(
                             requireContext(),
                             width = 1500,
-                            maxWidth = 1500,
                             isCancelable = false
                         ) { dialog ->
                             dialog.showDialog(
@@ -350,7 +348,6 @@ class MatchingArgsFragment :
             if (debugShowDetailsDialog.isShow()) {
                 debugShowDetailsDialog.showPop(
                     requireContext(), width = 1500,
-                    maxWidth = 1500,
                     isCancelable = true
                 ) { d ->
                     d.showDialog(it, "确定", confirmClick = { d.dismiss() })

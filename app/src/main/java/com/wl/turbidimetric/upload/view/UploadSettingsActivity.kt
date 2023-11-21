@@ -156,7 +156,6 @@ class UploadSettingsActivity :
         getTestPatientInfoDialog.showPop(
             this,
             width = 600,
-            maxWidth = 600
         ) { tpiDialog ->
             tpiDialog.show { condition1, condition2, type ->
                 tpiDialog.dismiss()
@@ -194,7 +193,6 @@ class UploadSettingsActivity :
                                 patientInfoDialog.showPop(
                                     this@UploadSettingsActivity,
                                     width = 1000,
-                                    maxWidth = 1200,
                                     isCancelable = false
                                 ) { pi ->
                                     pi.showPatient(patients, {

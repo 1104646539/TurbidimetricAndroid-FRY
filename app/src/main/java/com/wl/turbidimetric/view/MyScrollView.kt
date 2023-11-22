@@ -32,7 +32,8 @@ class MyScrollView : ScrollView {
     protected override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         val height: Int = measuredHeight
-        if (height == maxHeight) {
+        val width: Int = measuredWidth
+        if (maxHeight in 1 until height) {
             setMeasuredDimension(width, maxHeight)
         }
     }

@@ -255,13 +255,11 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             }
         }
         vd.btnDebugDialog.setOnClickListener {
-            debugShowDetailsDialog.showPop(requireContext(), width = 1000) {
+            debugShowDetailsDialog.showPop(requireContext(), width = 1500) {
                 it.showDialog(vm.testMsg.value ?: "",
                     "确定",
                     confirmClick = { it.dismiss() },
                     scMaxHeight = 600,
-                    cancelText = "fasd",
-                    cancelClick = { it.dismiss() }
                 )
             }
 
@@ -416,11 +414,9 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             vm.testMsg.observe(viewLifecycleOwner) {
                 debugShowDetailsDialog?.let { dialog ->
                     if (dialog.isShow()) {
-                        dialog?.showPop(requireContext()) { d ->
+                        dialog?.showPop(requireContext(),width = 1500) { d ->
                             d.showDialog(
                                 it, "确定", confirmClick = { it.dismiss() },
-                                cancelText = "fasd",
-                                cancelClick = { it.dismiss() },
                                 showIcon = false
                             )
                         }

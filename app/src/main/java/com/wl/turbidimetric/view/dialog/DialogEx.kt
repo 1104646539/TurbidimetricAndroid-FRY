@@ -16,7 +16,7 @@ import com.lxj.xpopup.core.BasePopupView
  */
 inline fun <T : BasePopupView> T.showPop(
     context: Context,
-    width: Int = 500,
+    width: Int = 800,
     isCancelable: Boolean = true,
     la: ((popup: T) -> Unit)
 ) {

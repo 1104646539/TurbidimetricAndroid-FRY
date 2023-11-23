@@ -52,11 +52,13 @@ object LogToFile {
         return if (file1!!.length() > MaxSize) {
             if (file2!!.length() > MaxSize / 3) {
                 file1!!.delete()
+                file1!!.createNewFile()
             }
             file2!!
         } else {
             if (file1!!.length() > MaxSize / 3) {
                 file2!!.delete()
+                file2!!.createNewFile()
             }
             file1!!
         }

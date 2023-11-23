@@ -405,20 +405,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 
 
     private fun test() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            repeat(3000) {
-                i("2023-11-23 15:06:00.874 9898-9927/com.wl.turbidimetric D/mali_winsys: EGLint new_window_surface(egl_winsys_display *, void *, EGLSurface, EGLConfig, egl_winsys_surface **, egl_color_buffer_format *, EGLBoolean) returns 0x3000\n")
-                i("2023-11-23 15:06:00.874 9898-9927/com.wl.turbidimetric D/mali_winsys: EGLint new_window_surface(egl_winsys_display *, void *, EGLSurface, EGLConfig, egl_winsys_surface **, egl_color_buffer_format *, EGLBoolean) returns 0x3000\n")
-                i("2023-11-23 15:06:00.874 9898-9927/com.wl.turbidimetric D/mali_winsys: EGLint new_window_surface(egl_winsys_display *, void *, EGLSurface, EGLConfig, egl_winsys_surface **, egl_color_buffer_format *, EGLBoolean) returns 0x3000\n")
-                i("2023-11-23 15:06:00.874 9898-9927/com.wl.turbidimetric D/mali_winsys: EGLint new_window_surface(egl_winsys_display *, void *, EGLSurface, EGLConfig, egl_winsys_surface **, egl_color_buffer_format *, EGLBoolean) returns 0x3000\n")
-                i("2023-11-23 15:06:00.874 9898-9927/com.wl.turbidimetric D/mali_winsys: EGLint new_window_surface(egl_winsys_display *, void *, EGLSurface, EGLConfig, egl_winsys_surface **, egl_color_buffer_format *, EGLBoolean) returns 0x3000\n")
-                i("2023-11-23 15:06:00.874 9898-9927/com.wl.turbidimetric D/mali_winsys: EGLint new_window_surface(egl_winsys_display *, void *, EGLSurface, EGLConfig, egl_winsys_surface **, egl_color_buffer_format *, EGLBoolean) returns 0x3000\n")
-                i("2023-11-23 15:06:00.874 9898-9927/com.wl.turbidimetric D/mali_winsys: EGLint new_window_surface(egl_winsys_display *, void *, EGLSurface, EGLConfig, egl_winsys_surface **, egl_color_buffer_format *, EGLBoolean) returns 0x3000\n")
-                i("2023-11-23 15:06:00.874 9898-9927/com.wl.turbidimetric D/mali_winsys: EGLint new_window_surface(egl_winsys_display *, void *, EGLSurface, EGLConfig, egl_winsys_surface **, egl_color_buffer_format *, EGLBoolean) returns 0x3000\n")
-                i("2023-11-23 15:06:00.874 9898-9927/com.wl.turbidimetric D/mali_winsys: EGLint new_window_surface(egl_winsys_display *, void *, EGLSurface, EGLConfig, egl_winsys_surface **, egl_color_buffer_format *, EGLBoolean) returns 0x3000\n")
-                i("2023-11-23 15:06:00.874 9898-9927/com.wl.turbidimetric D/mali_winsys: EGLint new_window_surface(egl_winsys_display *, void *, EGLSurface, EGLConfig, egl_winsys_surface **, egl_color_buffer_format *, EGLBoolean) returns 0x3000\n")
-            }
-        }
     }
 
     private fun listenerDialog() {

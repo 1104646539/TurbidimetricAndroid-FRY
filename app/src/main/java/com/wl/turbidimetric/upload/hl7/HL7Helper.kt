@@ -63,7 +63,9 @@ object HL7Helper : UploadService {
         onUploadTestResults = callback
         testResults.add(testResult)
         lastIndex = testResults.lastIndex;
-        handler.sendEmptyMessageDelayed(WHAT_NEXT, 1000)
+        if (testResults.size == 1) {
+            handler.sendEmptyMessageDelayed(WHAT_NEXT, 1000)
+        }
     }
 
     private fun uploadNextTestResult(testResult: TestResultModel) {

@@ -341,7 +341,7 @@ object SerialPortUtil {
     }
 
     private fun writeAsync(data: UByteArray) {
-        c("writeAsync ${data.toHex()}")
+//        c("writeAsync ${data.toHex()}")
         if (SystemGlobal.isCodeDebug) {
             GlobalScope.launch(Dispatchers.IO) {
                 TestSerialPort.testReply(data)

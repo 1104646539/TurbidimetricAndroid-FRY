@@ -172,7 +172,7 @@ class SettingsFragment :
      * 5s内连续点击几次其他设置后，打开调试模式
      */
     private fun showDebugModeView() {
-        i("start=${Date().toLongTimeStr()}")
+        i("start=${Date().toLongTimeStr()} LocalData.DebugMode=${LocalData.DebugMode} SystemGlobal.isDebugMode=${SystemGlobal.isDebugMode}")
         handler.removeCallbacks(runnable_order)
         clickOrder++
         handler.postDelayed(runnable_order, 5000)

@@ -68,8 +68,7 @@ abstract class DataStoreProperty<T>(
 
     abstract fun getKey(keyName: String): Preferences.Key<T>
 
-    override fun setValue(thisRef: Any, property: KProperty<*>, value: T): Unit {
-        GlobalScope.launch {
+    override fun setValue(thisRef: Any, property: KProperty<*>, value: T)= runBlocking {
             datas.edit {
                 if (value != null) {
                     it[getKey(property.name)] = value
@@ -78,6 +77,6 @@ abstract class DataStoreProperty<T>(
                 }
             }
             c = value
-        }
+
     }
 }

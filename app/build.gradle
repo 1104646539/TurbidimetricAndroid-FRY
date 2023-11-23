@@ -7,33 +7,6 @@ plugins {
     id("io.objectbox")
 }
 
-def synchronized getVersionProperty(propName, defValue) {
-    def file = file("version.properties")
-    def ret = defValue
-    if (file.exists() && file.canRead()) {
-        FileInputStream input = new FileInputStream(file)
-        Properties props = new Properties()
-        props.load(input)
-        ret = props.get(propName);
-        input.close()
-    }
-    return ret
-}
-
-def getAppVersionName() {
-    String versionName = getVersionProperty("VERSION_NAME", "1.0.0.0")
-    return versionName
-}
-
-def getAppVersionCode() {
-    String versionCodeTxt = getVersionProperty("VERSION_CODE", "1")
-    int versionCode = versionCodeTxt as Integer
-    return versionCode
-}
-
-
-def appVersionName = getAppVersionName()
-def appVersionCode = getAppVersionCode()
 android {
     signingConfigs {
 //        debug {
@@ -59,8 +32,8 @@ android {
         applicationId "com.wl.turbidimetric"
         minSdk 21
         targetSdk 25
-        versionCode appVersionCode
-        versionName appVersionName
+        versionCode 1
+        versionName "1.0.0.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 
@@ -70,9 +43,10 @@ android {
         variant ->
             variant.outputs.all {
                 //只处理生产版本
-//                if (buildType.name == 'release') {
-                def createTime = new Date().format("YYYY-MM-dd", TimeZone.getTimeZone("GMT+08:00"))
-                outputFileName = "乳胶比浊" + defaultConfig.versionName + "_" + createTime + "_" + buildType.name + ".apk"
+                if (buildType.name == 'release') {
+                    def createTime = new Date().format("YYYY-MM-dd", TimeZone.getTimeZone("GMT+08:00"))
+                    outputFileName = "乳胶比浊" + defaultConfig.versionName + "_" + createTime + "_" + buildType.name + ".apk"
+                }
             }
     }
     sourceSets {

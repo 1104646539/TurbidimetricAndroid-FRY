@@ -126,8 +126,12 @@ class SettingsFragment :
         vd.tvExportLog.setOnClickListener {
             exportLog()
         }
+        val versionAndroid =String(((getPackageInfo(requireContext())?.versionName)?:"").toByteArray(),
+            charset("UTF-8")
+        )
+
         vd.tvSoftVersionAndroid.text =
-            "上位机版本:${getPackageInfo(requireContext())?.versionName} 发布版本:1"
+            "上位机版本:${versionAndroid} 发布版本:1"
         vd.tvSoftVersionMcu.text = "MCU版本:${SystemGlobal.mcuVersion}"
 
     }
@@ -165,14 +169,12 @@ class SettingsFragment :
      */
     private val runnable_order: Runnable = Runnable {
         clickOrder = 0
-        i("clickOrder = 0")
     }
 
     /**
      * 5s内连续点击几次其他设置后，打开调试模式
      */
     private fun showDebugModeView() {
-        i("start=${Date().toLongTimeStr()} LocalData.DebugMode=${LocalData.DebugMode} SystemGlobal.isDebugMode=${SystemGlobal.isDebugMode}")
         handler.removeCallbacks(runnable_order)
         clickOrder++
         handler.postDelayed(runnable_order, 5000)
@@ -181,7 +183,6 @@ class SettingsFragment :
             SystemGlobal.isDebugMode = LocalData.DebugMode
             clickOrder = 0
         }
-        i("end=${Date().toLongTimeStr()}")
     }
 
     private fun startUpload() {

@@ -46,15 +46,17 @@ object LogToFile {
         fos = FileOutputStream(curFile, true)
     }
 
+    //1满  2>1/3   删除1 返回2
+    //1不满 但是1>1/3 删除2 返回1
     fun getFile(): File {
         return if (file1!!.length() > MaxSize) {
-            if (file1!!.length() > MaxSize / 3) {
-                file2!!.delete()
+            if (file2!!.length() > MaxSize / 3) {
+                file1!!.delete()
             }
             file2!!
         } else {
-            if (file2!!.length() > MaxSize / 3) {
-                file1!!.delete()
+            if (file1!!.length() > MaxSize / 3) {
+                file2!!.delete()
             }
             file1!!
         }

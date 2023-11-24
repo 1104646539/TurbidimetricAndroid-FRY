@@ -636,7 +636,18 @@ class RepeatabilityViewModel(
             stir()
         }
         if (cuvettePos > 4 && cuvetteNeedTest(cuvettePos - 5)) {
-            test()
+            testFinish = false
+            val testInterval = if (cuvettePos == 13) {
+                10 * 1000
+            } else if (cuvettePos == 14) {
+                10 * 1000
+            } else {
+                0.toLong()
+            }
+            viewModelScope.launch {
+                delay(testInterval)
+                test()
+            }
         }
     }
 
@@ -662,8 +673,11 @@ class RepeatabilityViewModel(
             //最后一个也检测结束了
             testState = TestState.Test2
             cuvettePos = -1
+            val intervalTemp =
+                (((240 - 40) * 1000) - (10 * 11 * 1000)).toLong()
+            i("intervalTemp=$intervalTemp")
             viewModelScope.launch {
-                delay(testShelfInterval)
+                delay(intervalTemp)
                 moveCuvetteTest()
             }
         } else {
@@ -771,7 +785,7 @@ class RepeatabilityViewModel(
                     calcMatchingArg()
                 } else {
                     viewModelScope.launch {
-                        delay(testPosInterval)
+                        delay(0)
                         moveCuvetteTest()
                     }
                 }

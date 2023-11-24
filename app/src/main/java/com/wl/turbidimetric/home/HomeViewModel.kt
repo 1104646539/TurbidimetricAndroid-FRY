@@ -1029,8 +1029,8 @@ class HomeViewModel(
     private fun calcTestResult(value: Int) {
         when (testState) {
             TestState.DripReagent -> {
-                updateCuvetteState(cuvettePos - 3, CuvetteState.Test1)
-                updateTestResultModel(value, cuvettePos - 3, CuvetteState.Test1)
+                updateCuvetteState(cuvettePos - 5, CuvetteState.Test1)
+                updateTestResultModel(value, cuvettePos - 5, CuvetteState.Test1)
                 nextDripReagent()
             }
             TestState.Test2 -> {
@@ -1075,7 +1075,7 @@ class HomeViewModel(
                     showResultFinishAndNext()
                 } else {
                     viewModelScope.launch {
-                        delay(testPosInterval)
+                        delay(0)
                         moveCuvetteTest()
                     }
                 }
@@ -1149,7 +1149,7 @@ class HomeViewModel(
                 resultModels[pos]?.testOriginalValue4 = resultOriginalTest4[pos]
                 resultModels[pos]?.testTime = Date().time
                 //计算单个结果浓度
-                val abs = calcAbsorbanceDifference(resultTest1[pos], resultTest4[pos])
+                val abs = calcAbsorbanceDifference(resultTest1[pos], resultTest2[pos])
                 absorbances.add(abs)
                 selectProject?.let { project ->
 //                    resultModels[pos]?.project?.target = project
@@ -1368,7 +1368,7 @@ class HomeViewModel(
     private fun nextDripReagent() {
         if (testState != TestState.DripReagent) return;
         i("nextDripReagent cuvettePos=$cuvettePos dripReagentFinish=$dripReagentFinish testFinish=$testFinish stirFinish=$stirFinish stirProbeCleaningFinish=$stirProbeCleaningFinish takeReagentFinish=$takeReagentFinish cuvetteMoveFinish=$cuvetteMoveFinish");
-        if (cuvettePos < 13) {
+        if (cuvettePos < 15) {
             //当取试剂完成，检测完成，搅拌完成，加试剂完成，移动比色皿完成时，
             //去取试剂，移动比色皿
             if (dripReagentFinish && testFinish && stirFinish && takeReagentFinish && cuvetteMoveFinish && stirProbeCleaningFinish) {
@@ -1379,16 +1379,20 @@ class HomeViewModel(
                     //取试剂，移动比色皿
                     takeReagent()
                 }
-                if (cuvettePos >= 3 && lastNeedTest1(cuvettePos - 3)) {
+                if (cuvettePos >= 5 && lastNeedTest1(cuvettePos - 5)) {
                     i("重新计算间隔时间  之前 testShelfInterval=$testShelfInterval")
-                    if (!SystemGlobal.isCodeDebug) {
-                        testShelfInterval =
-                            ((10 - (cuvettePos - cuvetteStartPos - 2)) * 10 * 1000).toLong()
-                    }
+//                    if (!SystemGlobal.isCodeDebug) {
+//                        testShelfInterval =
+//                            ((10 - (cuvettePos - cuvetteStartPos - 2)) * 10 * 1000).toLong()
+//                    }
+                    testShelfInterval = 0
                     i("重新计算间隔时间 之后 testShelfInterval=$testShelfInterval cuvettePos=$cuvettePos cuvetteStartPos=$cuvetteStartPos")
                     i("已经检测最后一个了,进行下一个步骤，检测第二次 testShelfInterval=$testShelfInterval")
+                    val intervalTemp =
+                        ((240 - 40) * 1000 - (((cuvettePos - cuvetteStartPos - 4)) * 11 * 1000)).toLong()
+                    i("intervalTemp=$intervalTemp")
                     viewModelScope.launch {
-                        delay(testShelfInterval)
+                        delay(intervalTemp)
                         stepTest(TestState.Test2)
                     }
                     return
@@ -1397,7 +1401,7 @@ class HomeViewModel(
                 }
             }
         } else {
-            i("cuvettePos >= 13 $cuvettePos")
+            i("cuvettePos >= 15 $cuvettePos")
         }
     }
 
@@ -1752,8 +1756,20 @@ class HomeViewModel(
      * 去检测
      */
     private fun goTest() {
-        if (cuvettePos > 2 && cuvetteNeedTest1(cuvettePos - 3)) {
-            test()
+        if (cuvettePos > 4 && cuvetteNeedTest1(cuvettePos - 5)) {
+            testFinish = false //先置为未检测完成
+            val testInterval = if (cuvettePos == 13) {
+                10 * 1000
+            } else if (cuvettePos == 14) {
+                10 * 1000
+            } else {
+                0.toLong()
+            }
+            viewModelScope.launch {
+                delay(testInterval)
+                test()
+            }
+
         }
     }
 

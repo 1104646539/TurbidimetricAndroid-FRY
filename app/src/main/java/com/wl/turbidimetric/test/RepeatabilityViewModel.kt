@@ -635,7 +635,7 @@ class RepeatabilityViewModel(
         if (cuvettePos > 1 && cuvetteNeedStir(cuvettePos - 2) && stirFinish) {
             stir()
         }
-        if (cuvettePos > 2 && cuvetteNeedTest(cuvettePos - 3)) {
+        if (cuvettePos > 4 && cuvetteNeedTest(cuvettePos - 5)) {
             test()
         }
     }
@@ -654,11 +654,11 @@ class RepeatabilityViewModel(
         if (cuvettePos > 1 && ((cuvetteNeedStir(cuvettePos - 2) && !stirFinish) || !stirProbeCleaningFinish)) {
             return
         }
-        if (cuvettePos > 2 && (cuvetteNeedTest(cuvettePos - 3) && !testFinish)) {
+        if (cuvettePos > 4 && (cuvetteNeedTest(cuvettePos - 5) && !testFinish)) {
             return
         }
 
-        if (cuvettePos == 12) {
+        if (cuvettePos == 14) {
             //最后一个也检测结束了
             testState = TestState.Test2
             cuvettePos = -1
@@ -713,7 +713,7 @@ class RepeatabilityViewModel(
     private fun calcTestResult(value: Int) {
         when (testState) {
             TestState.DripReagent -> {
-                updateCuvetteState(cuvettePos - 3, CuvetteState.Test1)
+                updateCuvetteState(cuvettePos - 5, CuvetteState.Test1)
                 resultTest1.add(calcAbsorbance(value.toBigDecimal()))
                 resultOriginalTest1.add(value)
                 updateResult()

@@ -33,7 +33,7 @@ android {
         minSdk 21
         targetSdk 25
         versionCode 1
-        versionName "1.0.0.0"
+        versionName "1.0.0.0检测往后2个位置"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 

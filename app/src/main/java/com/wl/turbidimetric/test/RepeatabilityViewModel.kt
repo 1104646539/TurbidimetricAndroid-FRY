@@ -674,7 +674,7 @@ class RepeatabilityViewModel(
             testState = TestState.Test2
             cuvettePos = -1
             val intervalTemp =
-                (((240 - 40) * 1000) - (10 * 11 * 1000)).toLong()
+                (((220 - 40) * 1000) - (10 * 11 * 1000)).toLong()
             i("intervalTemp=$intervalTemp")
             viewModelScope.launch {
                 delay(intervalTemp)

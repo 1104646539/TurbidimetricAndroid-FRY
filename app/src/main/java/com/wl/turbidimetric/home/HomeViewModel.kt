@@ -1389,7 +1389,7 @@ class HomeViewModel(
                     i("重新计算间隔时间 之后 testShelfInterval=$testShelfInterval cuvettePos=$cuvettePos cuvetteStartPos=$cuvetteStartPos")
                     i("已经检测最后一个了,进行下一个步骤，检测第二次 testShelfInterval=$testShelfInterval")
                     val intervalTemp =
-                        ((240 - 40) * 1000 - (((cuvettePos - cuvetteStartPos - 4)) * 11 * 1000)).toLong()
+                        ((220 - 40) * 1000 - (((cuvettePos - cuvetteStartPos - 4)) * 11 * 1000)).toLong()
                     i("intervalTemp=$intervalTemp")
                     viewModelScope.launch {
                         delay(intervalTemp)

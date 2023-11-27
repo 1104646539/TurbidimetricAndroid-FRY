@@ -221,31 +221,12 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
      */
     private var cuvetteShelfStates: IntArray = IntArray(4)
 
-//    /**
-//     * 开始检测 比色皿，样本，试剂,清洗液不存在
-//     */
-//    val getStateNotExistMsg = MutableLiveData("")
-//
-//    /**
-//     * 拟合质控结束提示
-//     */
-//    val matchingFinishMsg = MutableLiveData("")
-
     private val _dialogUiState = MutableSharedFlow<MatchingArgsDialogUiState>()
     val dialogUiState: SharedFlow<MatchingArgsDialogUiState> = _dialogUiState.asSharedFlow()
 
     private val _curveUiState = MutableStateFlow(MatchingArgsCurveUiState("", ""))
     val curveUiState = _curveUiState.asStateFlow()
 
-//    /**
-//     * 显示选中项目的拟合公式
-//     */
-//    val equationText = MutableLiveData("")
-//
-//    /**
-//     * 显示选中项目的拟合度 R²
-//     */
-//    val fitGoodnessText = MutableLiveData("")
 
     val testMsg = MutableLiveData("")
 //    val toastMsg = MutableLiveData("")
@@ -253,7 +234,7 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
     /**
      * 每排之间的检测间隔
      */
-    var testShelfInterval: Long = 1000 * 60;
+    var testShelfInterval: Long = 1000;
 
     /**
      * 每个比色皿之间的检测间隔
@@ -318,8 +299,6 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
 
     }
 
-//    val datas = projectRepository.paginDatas.flow.cachedIn(viewModelScope)
-
     val datas = projectRepository.allDatas.flow()
 
 
@@ -372,12 +351,7 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
      * 点击开始拟合
      */
     fun clickStart(projectModel: ProjectModel?) {
-//        if (DoorAllOpen()) {
-//            toast("舱门未关")
-//            return
-//        }
         if (!machineStateNormal()) {
-//            toastMsg.postValue("请重新自检或重启仪器！")
             viewModelScope.launch {
                 _dialogUiState.emit(
                     MatchingArgsDialogUiState(
@@ -389,7 +363,6 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
             return
         }
         if (testState != TestState.Normal) {
-//            toastMsg.postValue("正在检测，请勿操作！")
             viewModelScope.launch {
                 _dialogUiState.emit(
                     MatchingArgsDialogUiState(
@@ -432,11 +405,11 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
             testPosInterval = testP;
 
         } else {
-            testShelfInterval = if (quality) {
-                33 * 1000
-            } else {
-                55 * 1000
-            }
+//            testShelfInterval = if (quality) {
+//                33 * 1000
+//            } else {
+//                55 * 1000
+//            }
         }
     }
 
@@ -713,8 +686,18 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
         if (cuvettePos > 1 && cuvetteNeedStir(cuvettePos - 2) && stirFinish) {
             stir()
         }
-        if (cuvettePos > 2 && cuvetteNeedTest(cuvettePos - 3)) {
-            test()
+        if (cuvettePos > 4 && cuvetteNeedTest(cuvettePos - 5)) {
+            testFinish = false
+            val testInterval =
+                if (((cuvettePos == 8 || cuvettePos == 9) && !quality) || (quality && (cuvettePos == 10 || cuvettePos == 11))) {
+                    10 * 1000
+                } else {
+                    0.toLong()
+                }
+            viewModelScope.launch {
+                delay(testInterval)
+                test()
+            }
         }
     }
 
@@ -732,16 +715,19 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
         if (cuvettePos > 1 && ((cuvetteNeedStir(cuvettePos - 2) && !stirFinish) || !stirProbeCleaningFinish)) {
             return
         }
-        if (cuvettePos > 2 && (cuvetteNeedTest(cuvettePos - 3) && !testFinish)) {
+        if (cuvettePos > 4 && (cuvetteNeedTest(cuvettePos - 5) && !testFinish)) {
             return
         }
 
-        if ((cuvettePos == 9 && quality) || (cuvettePos == 7 && !quality)) {
+        if ((cuvettePos == 11 && quality) || (cuvettePos == 9 && !quality)) {
             //最后一个也检测结束了
             testState = TestState.Test2
             cuvettePos = -1
+            val intervalTemp =
+                (((225 - 40) * 1000) - ((if (!quality) 5 else 7) * 11 * 1000)).toLong()
+            i("intervalTemp=$intervalTemp")
             viewModelScope.launch {
-                delay((testShelfInterval))
+                delay(intervalTemp)
                 moveCuvetteTest()
             }
         } else {
@@ -791,7 +777,7 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
     private fun calcTestResult(value: Int) {
         when (testState) {
             TestState.DripReagent -> {
-                updateCuvetteState(cuvettePos - 3, CuvetteState.Test1)
+                updateCuvetteState(cuvettePos - 5, CuvetteState.Test1)
                 resultTest1.add(calcAbsorbance(value.toBigDecimal()))
                 resultOriginalTest1.add(value)
                 updateResult()
@@ -1091,6 +1077,7 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
     }
 
     private fun cuvetteNeed(cuvettePos: Int, state: CuvetteState): Boolean {
+        if (cuvettePos < 0 || cuvettePos >= cuvetteStates.size) return false
         return cuvetteStates[cuvettePos] == state
     }
 

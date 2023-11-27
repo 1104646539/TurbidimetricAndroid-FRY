@@ -2262,6 +2262,8 @@ class HomeViewModel(
         sampleShelfPos = -1
         cuvetteShelfPos = -1
         cuvetteStartPos = 0
+        cuvettePos = -1
+        samplePos = -1
         moveCuvetteShelf(cuvetteShelfPos)
         moveSampleShelf(sampleShelfPos)
     }

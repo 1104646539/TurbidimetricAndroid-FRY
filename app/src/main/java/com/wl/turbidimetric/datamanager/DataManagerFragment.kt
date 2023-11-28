@@ -73,7 +73,7 @@ class DataManagerFragment :
     override fun init(savedInstanceState: Bundle?) {
         initView()
         listener()
-        test()
+//        test()
     }
 
     private fun initView() {
@@ -141,6 +141,7 @@ class DataManagerFragment :
                     deliveryTime = "",
                     deliveryDepartment = "",
                     deliveryDoctor = "",
+                    sampleBarcode = "ABCD$i"
                 ).apply {
                     project.target = ProjectModel()
                 }

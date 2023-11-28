@@ -27,7 +27,8 @@ object ExportExcelHelper {
         "值2",
         "值3",
         "值4",
-        "检测时间"
+        "检测时间",
+        "条码"
     )
 
     @JvmStatic
@@ -113,6 +114,7 @@ object ExportExcelHelper {
                 add("${it.testValue3}")
                 add("${it.testValue4}")
                 add("${it.testTime.toTimeStr()}")
+                add("${it.sampleBarcode}")
             }
         }
     }

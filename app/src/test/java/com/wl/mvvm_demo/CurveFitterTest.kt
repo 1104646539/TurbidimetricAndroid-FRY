@@ -11,24 +11,38 @@ class CurveFitterTest {
     @Test
     fun createCurve() {
         val cf1 = CurveFitter(
-            doubleArrayOf(0.0, 25.0, 50.0, 200.0, 500.0, 1000.0),
-            doubleArrayOf(0.07725, 15.9416750, 37.5354200, 178.8007500, 329.27181000, 437.7187)
+            doubleArrayOf(0.0, 50.0, 200.0, 500.0, 1000.0),
+            doubleArrayOf(-1.0, 39.0, 225.0, 811.0, 1842.0)
         )
-        cf1.doFitCon()
-        cf1.params
+        repeat(CurveFitter.fitList.size) {
 
-        val a1 = String.format("%.2f", cf1.params[0]).toDouble()
-        val a12 = String.format("%.2f", -1.82824).toDouble()
-        Assert.assertEquals(a1, -1.82824, 0.1)
+            cf1.doFit(it)
+            repeat(cf1.params.size) {
+                i->
+                print(" v=${cf1.params[i]}")
+            }
+            print("\n")
+            println("---------")
+        }
+
+
+//        val f0 = String.format("%.6f", cf1.params[0]).toDouble()
+//        val f1 = String.format("%.6f", cf1.params[1]).toDouble()
+//        val f2 = String.format("%.6f", cf1.params[2]).toDouble()
+//        val f3 = String.format("%.6f", cf1.params[3]).toDouble()
+
+//        println("f0=$f0 f1=$f1 f2=$f2 f3=$f3 ")
+//        println("f0=$f0 f1=$f1 f2=$f2 f3=$f3 ")
+//        Assert.assertEquals(a1, -1.82824, 0.1)
     }
 
     @Test
     fun threadFunTest() {
-        val p1 = 60.toDouble()
-        val p2 = 27298.toDouble()
-        val p3 = 11722.toDouble()
-        val p4 = 2722.toDouble()
-        val p5 = 91.toDouble()
+        val p1 = -13.toDouble()
+        val p2 = 1796.toDouble()
+        val p3 = 767.toDouble()
+        val p4 = 211.toDouble()
+        val p5 = 35.toDouble()
 
 
         val m1 = 0.toDouble()

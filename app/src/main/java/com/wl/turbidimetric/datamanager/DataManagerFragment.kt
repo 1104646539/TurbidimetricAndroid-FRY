@@ -73,7 +73,7 @@ class DataManagerFragment :
     override fun init(savedInstanceState: Bundle?) {
         initView()
         listener()
-//        test()
+        test()
     }
 
     private fun initView() {
@@ -120,7 +120,7 @@ class DataManagerFragment :
 
     private fun createTestData(): List<TestResultModel> {
         return mutableListOf<TestResultModel>().apply {
-            for (i in 0..600) {
+            for (i in 0..100) {
                 val dr = TestResultModel(
                     testResult = (i % 2 == 0).PD("阳性", "阴性"),
                     concentration = 66 + i,

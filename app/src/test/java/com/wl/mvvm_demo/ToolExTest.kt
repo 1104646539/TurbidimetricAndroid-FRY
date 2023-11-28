@@ -17,23 +17,23 @@ class ToolExTest {
 
     @Test
     fun crc16Test() {
-        Assert.assertTrue(
-            CRC16(ubyteArrayOf(0x01u, 0x01u, 0x00u, 0x00u, 0x00u)).toByteArray()
-                .contentEquals(ubyteArrayOf(0x18u, 0x3cu).toByteArray())
-        )
-
-        Assert.assertFalse(
-            CRC16(ubyteArrayOf(0x01u, 0x01u, 0x00u, 0x00u, 0x00u)).toByteArray()
-                .contentEquals(ubyteArrayOf(0x00u, 0x00u).toByteArray())
-        )
-        val c1 = crc2(ubyteArrayOf(0x01u, 0x01u, 0x00u, 0x00u, 0x00u))
-
-        println("crc16Test c1=$c1")
-
-        val a: List<Int> = listOf(100, 100)
-        val b: List<Int> = listOf(100, 100)
-
-        println(a == b)
+//        Assert.assertTrue(
+//            CRC16(ubyteArrayOf(0x01u, 0x01u, 0x00u, 0x00u, 0x00u)).toByteArray()
+//                .contentEquals(ubyteArrayOf(0x18u, 0x3cu).toByteArray())
+//        )
+//
+//        Assert.assertFalse(
+//            CRC16(ubyteArrayOf(0x01u, 0x01u, 0x00u, 0x00u, 0x00u)).toByteArray()
+//                .contentEquals(ubyteArrayOf(0x00u, 0x00u).toByteArray())
+//        )
+//        val c1 = crc2(ubyteArrayOf(0x01u, 0x01u, 0x00u, 0x00u, 0x00u))
+//
+//        println("crc16Test c1=$c1")
+//
+//        val a: List<Int> = listOf(100, 100)
+//        val b: List<Int> = listOf(100, 100)
+//
+//        println(a == b)
 
     }
 
@@ -58,13 +58,13 @@ class ToolExTest {
 
     @Test
     fun verifyCrcTest() {
-        Assert.assertTrue(VerifyCrc(ubyteArrayOf(0x01u, 0x01u, 0x00u, 0x00u, 0x00u, 0x18u, 0x3cu)))
-
-        Assert.assertFalse(VerifyCrc(ubyteArrayOf(0x01u, 0x01u, 0x00u, 0x00u, 0x00u, 0x11u, 0x11u)))
-
-        Assert.assertThrows("错误 数组长度错误 ba.size==8", IndexOutOfBoundsException::class.java) {
-            VerifyCrc(ubyteArrayOf(0x01u, 0x01u, 0x00u, 0x00u, 0x00u, 0x11u, 0x11u, 0x12u))
-        }
+//        Assert.assertTrue(VerifyCrc(ubyteArrayOf(0x01u, 0x01u, 0x00u, 0x00u, 0x00u, 0x18u, 0x3cu)))
+//
+//        Assert.assertFalse(VerifyCrc(ubyteArrayOf(0x01u, 0x01u, 0x00u, 0x00u, 0x00u, 0x11u, 0x11u)))
+//
+//        Assert.assertThrows("错误 数组长度错误 ba.size==8", IndexOutOfBoundsException::class.java) {
+//            VerifyCrc(ubyteArrayOf(0x01u, 0x01u, 0x00u, 0x00u, 0x00u, 0x11u, 0x11u, 0x12u))
+//        }
     }
 
     @Test

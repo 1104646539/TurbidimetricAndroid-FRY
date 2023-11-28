@@ -6,6 +6,7 @@ import jxl.format.Border
 import jxl.format.BorderLineStyle
 import jxl.format.Colour
 import jxl.write.*
+import kotlinx.coroutines.delay
 import java.io.OutputStream
 
 object ExcelUtils {
@@ -86,19 +87,14 @@ object ExcelUtils {
                 }
                 workbook.write()
                 os.flush()
+                workbook.close()
+                Thread.sleep(5000)
                 return true
             }
         } catch (e: Exception) {
             e.printStackTrace()
+            workbook?.close()
             return false
-        } finally {
-            if (workbook != null) {
-                try {
-                    workbook.close()
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }
         }
         return false
     }

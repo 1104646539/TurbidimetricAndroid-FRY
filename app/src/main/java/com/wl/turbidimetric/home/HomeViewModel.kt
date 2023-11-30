@@ -438,6 +438,11 @@ class HomeViewModel(
         }
 
     /**
+     * 这排比色皿的第一次搅拌完成的时间，用来计算检测到搅拌时间的间隔
+     */
+    var firstStirTime = 0L
+
+    /**
      * 测试用的 start
      */
     //检测的值
@@ -461,8 +466,7 @@ class HomeViewModel(
 //  val tempSampleState = intArrayOf(1, 0, 1, 0, 1, 0, 0, 0, 0, 1)
 
     //测试用，样本是否存在
-    val sampleExists =
-        mutableListOf(true, true, true, true, true, true, true, true, true, true)
+    val sampleExists = mutableListOf(true, true, true, true, true, true, true, true, true, true)
 
     //测试用 每排之间的检测间隔
     val testS: Long = 100;
@@ -704,8 +708,7 @@ class HomeViewModel(
 
         _testMachineUiState.update {
             it.copy(
-                reactionTemp = reply.data.reactionTemp / 10.0,
-                r1Temp = reply.data.r1Temp / 10.0
+                reactionTemp = reply.data.reactionTemp / 10.0, r1Temp = reply.data.r1Temp / 10.0
             )
         }
     }
@@ -1039,7 +1042,7 @@ class HomeViewModel(
                 if (lastNeed(cuvettePos, CuvetteState.Test1)) {
                     //检测结束，下一个步骤，检测第三次
                     viewModelScope.launch {
-                        delay(testShelfInterval)
+                        delay(0)
                         stepTest(TestState.Test3)
                     }
                 } else {
@@ -1056,13 +1059,13 @@ class HomeViewModel(
                 if (lastNeed(cuvettePos, CuvetteState.Test2)) {
                     //检测结束，下一个步骤，检测第四次
                     viewModelScope.launch {
-                        delay(testShelfInterval)
+                        delay(0)
                         stepTest(TestState.Test4)
                     }
                 } else {
                     //继续检测
                     viewModelScope.launch {
-                        delay(testPosInterval)
+                        delay(0)
                         moveCuvetteTest()
                     }
                 }
@@ -1159,8 +1162,7 @@ class HomeViewModel(
                     resultModels[pos]?.absorbances = abs
                     resultModels[pos]?.concentration = con
                     resultModels[pos]?.testResult = calcShowTestResult(
-                        con,
-                        resultModels[pos]?.project?.target?.projectLjz ?: 100
+                        con, resultModels[pos]?.project?.target?.projectLjz ?: 100
                     )
                 }
                 //单个检测完毕
@@ -1229,7 +1231,7 @@ class HomeViewModel(
         absorbances.clear()
         cuvetteStartPos = 0
         resultModels.clear()
-
+        firstStirTime = 0
 
     }
 
@@ -1296,8 +1298,7 @@ class HomeViewModel(
                     viewModelScope.launch {
                         _dialogUiState.emit(
                             HomeDialogUiState(
-                                dialogState = DialogState.CUVETTE_DEFICIENCY,
-                                ""
+                                dialogState = DialogState.CUVETTE_DEFICIENCY, ""
                             )
                         )
                     }
@@ -1315,8 +1316,7 @@ class HomeViewModel(
                         viewModelScope.launch {
                             _dialogUiState.emit(
                                 HomeDialogUiState(
-                                    dialogState = DialogState.GET_STATE_NOT_EXIST,
-                                    str
+                                    dialogState = DialogState.GET_STATE_NOT_EXIST, str
                                 )
                             )
                         }
@@ -1334,8 +1334,7 @@ class HomeViewModel(
                 viewModelScope.launch {
                     _dialogUiState.emit(
                         HomeDialogUiState(
-                            dialogState = DialogState.CUVETTE_DEFICIENCY,
-                            ""
+                            dialogState = DialogState.CUVETTE_DEFICIENCY, ""
                         )
                     )
                 }
@@ -1350,8 +1349,7 @@ class HomeViewModel(
                     viewModelScope.launch {
                         _dialogUiState.emit(
                             HomeDialogUiState(
-                                dialogState = DialogState.GET_STATE_NOT_EXIST,
-                                "试剂和清洗液不足"
+                                dialogState = DialogState.GET_STATE_NOT_EXIST, "试剂和清洗液不足"
                             )
                         )
                     }
@@ -1380,17 +1378,12 @@ class HomeViewModel(
                     takeReagent()
                 }
                 if (cuvettePos >= 5 && lastNeedTest1(cuvettePos - 5)) {
-                    i("重新计算间隔时间  之前 testShelfInterval=$testShelfInterval")
-//                    if (!SystemGlobal.isCodeDebug) {
-//                        testShelfInterval =
-//                            ((10 - (cuvettePos - cuvetteStartPos - 2)) * 10 * 1000).toLong()
-//                    }
                     testShelfInterval = 0
                     i("重新计算间隔时间 之后 testShelfInterval=$testShelfInterval cuvettePos=$cuvettePos cuvetteStartPos=$cuvetteStartPos")
-                    i("已经检测最后一个了,进行下一个步骤，检测第二次 testShelfInterval=$testShelfInterval")
-                    val intervalTemp =
-                        ((220 - 40) * 1000 - (((cuvettePos - cuvetteStartPos - 4)) * 11 * 1000)).toLong()
-                    i("intervalTemp=$intervalTemp")
+                    //第二次检测到搅拌结束的间隔时间要保持220s
+                    val stirInterval = (Date().time - firstStirTime)
+                    val intervalTemp = (220 * 1000) - stirInterval
+                    i("intervalTemp=$intervalTemp stirInterval=$stirInterval")
                     viewModelScope.launch {
                         delay(intervalTemp)
                         stepTest(TestState.Test2)
@@ -1440,8 +1433,7 @@ class HomeViewModel(
                 }
             }
             //获取第一个需要检测的下标，计算当前位置到该位置的下标
-            val prevState =
-                if (state == TestState.Test3) CuvetteState.Test2 else CuvetteState.Test3
+            val prevState = if (state == TestState.Test3) CuvetteState.Test2 else CuvetteState.Test3
             val firstIndex =
                 mCuvetteStates[cuvetteShelfPos]!!.indexOfFirst { it.state == prevState }
             moveCuvetteTest(firstIndex - cuvettePos)
@@ -1497,12 +1489,29 @@ class HomeViewModel(
     }
 
     /**
+     * 获取最后一个状态和 state 一样的index
+     * @param state CuvetteState
+     * @return Int
+     */
+    private fun getLastNeedIndex(state: CuvetteState): Int {
+        for (i in mCuvetteStates[cuvetteShelfPos]!!.size - 1 downTo 0) {
+            if (mCuvetteStates[cuvetteShelfPos]!![i].state == state) {
+                return i
+            }
+        }
+        return -1
+    }
+
+    /**
      * 接收到搅拌
      */
     override fun readDataStirModel(reply: ReplyModel<StirModel>) {
         if (!runningTest()) return
         if (!machineStateNormal()) return
         c("接收到 搅拌 reply=$reply cuvettePos=$cuvettePos")
+        if (firstStirTime <= 0) {
+            firstStirTime = Date().time
+        }
         stirFinish = true
         updateCuvetteState(cuvettePos - 2, CuvetteState.Stir)
         stirProbeCleaning()
@@ -1556,8 +1565,7 @@ class HomeViewModel(
 
         dripSampleFinish = true
         val result = createResultModel(
-            scanResults[samplePos - 1],
-            mSamplesStates[sampleShelfPos]?.get(samplePos - 1)
+            scanResults[samplePos - 1], mSamplesStates[sampleShelfPos]?.get(samplePos - 1)
         )
         updateCuvetteState(
             cuvettePos, CuvetteState.DripSample, result, "${sampleShelfPos + 1}- $samplePos"
@@ -1739,7 +1747,10 @@ class HomeViewModel(
         if (takeReagentFinish && dripReagentFinish && stirFinish && testFinish) {//如果这一步，没有进行加样|搅拌|检测。又有需要加样|搅拌|检测的比色皿。说明还没到位置，继续移动
             if (mCuvetteStates[cuvetteShelfPos]?.filter { it.state == CuvetteState.DripReagent || it.state == CuvetteState.Stir }
                     ?.isNotEmpty() == true) {
-                moveCuvetteDripReagent()
+                i("继续移动")
+                viewModelScope.launch {
+                    moveCuvetteDripReagent()
+                }
             }
         }
 
@@ -1758,13 +1769,17 @@ class HomeViewModel(
     private fun goTest() {
         if (cuvettePos > 4 && cuvetteNeedTest1(cuvettePos - 5)) {
             testFinish = false //先置为未检测完成
-            val testInterval = if (cuvettePos == 13) {
-                10 * 1000
-            } else if (cuvettePos == 14) {
-                10 * 1000
-            } else {
-                0.toLong()
+            var testInterval = 0L
+            //倒数第二个需要检测的
+            val index = getLastNeedIndex(CuvetteState.Stir)
+            val isPenult = index != -1 && index == cuvettePos - 4
+            if (cuvettePos >= 4 && lastNeed(cuvettePos - 4, CuvetteState.Stir)) {
+                testInterval = testPosInterval
+            } else if (isPenult) {
+                testInterval = testPosInterval
             }
+
+            i("goTest testInterval=$testInterval cuvettePos=$cuvettePos")
             viewModelScope.launch {
                 delay(testInterval)
                 test()
@@ -1859,7 +1874,7 @@ class HomeViewModel(
      * 接收到移动样本架
      */
     override fun readDataMoveSampleShelfModel(reply: ReplyModel<MoveSampleShelfModel>) {
-        c("接收到移动样本架 reply=$reply sampleShelfPos=$sampleShelfPos $testState")
+        c("接收到 移动样本架 reply=$reply sampleShelfPos=$sampleShelfPos $testState")
         if (testState == TestState.TestFinish && testType.isTest()) {
             sampleShelfMoveFinish = true
             if (isTestFinish()) {
@@ -1981,8 +1996,7 @@ class HomeViewModel(
             viewModelScope.launch {
                 _dialogUiState.emit(
                     HomeDialogUiState(
-                        DialogState.GET_MACHINE_FAILED_SHOW,
-                        sb.toString()
+                        DialogState.GET_MACHINE_FAILED_SHOW, sb.toString()
                     )
                 )
             }
@@ -2041,8 +2055,7 @@ class HomeViewModel(
                 viewModelScope.launch {
                     _dialogUiState.emit(
                         HomeDialogUiState(
-                            dialogState = DialogState.GET_STATE_NOT_EXIST,
-                            "样本不足，请添加"
+                            dialogState = DialogState.GET_STATE_NOT_EXIST, "样本不足，请添加"
                         )
                     )
                 }
@@ -2083,8 +2096,7 @@ class HomeViewModel(
             viewModelScope.launch {
                 _dialogUiState.emit(
                     HomeDialogUiState(
-                        dialogState = DialogState.GET_STATE_NOT_EXIST,
-                        "比色皿不足，请添加"
+                        dialogState = DialogState.GET_STATE_NOT_EXIST, "比色皿不足，请添加"
                     )
                 )
             }
@@ -2096,8 +2108,7 @@ class HomeViewModel(
             viewModelScope.launch {
                 _dialogUiState.emit(
                     HomeDialogUiState(
-                        dialogState = DialogState.GET_STATE_NOT_EXIST,
-                        "样本不足，请添加"
+                        dialogState = DialogState.GET_STATE_NOT_EXIST, "样本不足，请添加"
                     )
                 )
             }
@@ -2113,8 +2124,7 @@ class HomeViewModel(
             viewModelScope.launch {
                 _dialogUiState.emit(
                     HomeDialogUiState(
-                        dialogState = DialogState.GET_STATE_NOT_EXIST,
-                        str
+                        dialogState = DialogState.GET_STATE_NOT_EXIST, str
                     )
                 )
             }
@@ -2264,6 +2274,7 @@ class HomeViewModel(
         cuvetteStartPos = 0
         cuvettePos = -1
         samplePos = -1
+        firstStirTime = 0
         moveCuvetteShelf(cuvetteShelfPos)
         moveSampleShelf(sampleShelfPos)
     }

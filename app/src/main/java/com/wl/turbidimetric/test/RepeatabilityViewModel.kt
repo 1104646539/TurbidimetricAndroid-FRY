@@ -226,6 +226,11 @@ class RepeatabilityViewModel(
     var isDetectedSample = false
 
     /**
+     * 这排比色皿的第一次搅拌完成的时间，用来计算检测到搅拌时间的间隔
+     */
+    var firstStirTime = 0L
+
+    /**
      * 测试用的 start
      */
     //检测的值
@@ -374,6 +379,7 @@ class RepeatabilityViewModel(
         cuvettePos = -1;
         sampleShelfPos = -1;
         cuvetteShelfPos = -1;
+        firstStirTime = 0
 
         if (SystemGlobal.isCodeDebug) {
             testShelfInterval = testS;
@@ -673,9 +679,11 @@ class RepeatabilityViewModel(
             //最后一个也检测结束了
             testState = TestState.Test2
             cuvettePos = -1
-            val intervalTemp =
-                (((220 - 40) * 1000) - (10 * 11 * 1000)).toLong()
-            i("intervalTemp=$intervalTemp")
+            i("重新计算间隔时间 之后 testShelfInterval=$testShelfInterval cuvettePos=$cuvettePos")
+            //第二次检测到搅拌结束的间隔时间要保持220s
+            val stirInterval = (Date().time - firstStirTime)
+            val intervalTemp = (220 * 1000) - stirInterval
+            i("intervalTemp=$intervalTemp stirInterval=$stirInterval")
             viewModelScope.launch {
                 delay(intervalTemp)
                 moveCuvetteTest()
@@ -922,7 +930,9 @@ class RepeatabilityViewModel(
         if (!runningRepeatability()) return
         if (!machineStateNormal()) return
         i("接收到 搅拌 reply=$reply cuvettePos=$cuvettePos")
-
+        if (firstStirTime <= 0) {
+            firstStirTime = Date().time
+        }
         stirFinish = true
         updateCuvetteState(cuvettePos - 2, CuvetteState.Stir)
         stirProbeCleaning()

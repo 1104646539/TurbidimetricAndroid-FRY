@@ -170,6 +170,11 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
      */
     private fun listener() {
         listenerSDCard()
+        listenerView()
+    }
+
+    private fun listenerView() {
+
 
     }
 
@@ -242,6 +247,12 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     fun changeStorageState(state: StorageState?) {
         StorageUtil.state = state!!
         i("U盘状态=${StorageUtil.state.stateName}")
+
+        if (state != StorageState.NONE) {
+            vd.rnv.setUpanResId(if (state.isExist()) R.drawable.upan_enable_true else R.drawable.upan_enable_false)
+        }else{
+            vd.rnv.setUpanResId(0)
+        }
 //        vd.tvState!!.text = "U盘状态:" + StorageUtil.state.stateName
     }
 

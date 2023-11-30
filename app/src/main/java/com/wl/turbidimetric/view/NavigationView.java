@@ -35,14 +35,12 @@ public class NavigationView extends View {
     //logo下方与第一个导航的间隔
     private int logoSpace = 80;
 
-    //    //导航资源id
-//    private int resIds[];
-//    //导航名
-//    private String names[];
     //logo资源id
     private int icon_logo_id;
     //关机资源id
     private int icon_shutdown_id;
+    //u盘是否有效的资源id
+    private int icon_upan_id;
     //移动动画的持续时间
     private int moveAnimDuration = 100;
 
@@ -163,6 +161,17 @@ public class NavigationView extends View {
         drawLogo(canvas);
         drawIcon(canvas);
         drawName(canvas);
+        drawUpan(canvas);
+    }
+
+    private void drawUpan(Canvas canvas) {
+        if (upanResIsNull()) return;
+        if (rectUpan == null || rectUpan.bottom < 0) {
+            initUPanIcon();
+        }
+        if (rectUpan != null) {
+            canvas.drawBitmap(bitmapUpan, rectUpanRange, rectUpan, paintShutdownBg);
+        }
     }
 
     /**
@@ -213,6 +222,15 @@ public class NavigationView extends View {
         this.navItems = navItems;
         this.icon_logo_id = logoId;
 //        selectIndex = -1;
+    }
+
+    public void setUpanResId(int icon_upan_id) {
+        if (this.icon_upan_id == icon_upan_id) {
+            return;
+        }
+        this.icon_upan_id = icon_upan_id;
+        initUPanIcon();
+        invalidate();
     }
 
 
@@ -338,6 +356,11 @@ public class NavigationView extends View {
         return icon_shutdown_id == 0;
     }
 
+    private boolean upanResIsNull() {
+        return icon_upan_id == 0;
+    }
+
+
     /**
      * 绘制被选中的背景
      *
@@ -384,6 +407,31 @@ public class NavigationView extends View {
         initLogo();
         initBitmapRect();//必须要在logo后面，因为要知道logo的高度
         initShutdown();
+        initUPanIcon();//必须要在shutdown后面，因为要知道shutdown的高度，以便保持在shutdown按钮的上方
+    }
+
+    RectF rectUpan;
+    Rect rectUpanRange;
+    Bitmap bitmapUpan;
+
+    /**
+     * 初始化u盘状态的icon
+     */
+    private void initUPanIcon() {
+        if (upanResIsNull()) {
+            return;
+        }
+        if (height <= 0 || shutdownResIsNull() || rectShutdown == null) {
+            return;
+        }
+        bitmapUpan = ((BitmapDrawable) getResources().getDrawable(icon_upan_id)).getBitmap();
+        rectUpan = new RectF();
+        rectUpan.bottom = rectShutdownBg.top - 10;
+        rectUpan.top = rectUpan.bottom - bitmapUpan.getHeight();
+        rectUpan.left = 40;
+        rectUpan.right = rectUpan.left + bitmapUpan.getWidth();
+
+        rectUpanRange = new Rect(0, 0, bitmapUpan.getWidth(), bitmapUpan.getHeight());
     }
 
 

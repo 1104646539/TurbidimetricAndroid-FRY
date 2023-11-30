@@ -1774,7 +1774,11 @@ class HomeViewModel(
             val index = getLastNeedIndex(CuvetteState.Stir)
             val isPenult = index != -1 && index == cuvettePos - 4
             if (cuvettePos >= 4 && lastNeed(cuvettePos - 4, CuvetteState.Stir)) {
-                testInterval = testPosInterval
+                if (cuvetteOnlyOne()) {//如果只有一个比色皿,特殊情况需要等待两个比色皿的时间来让检测时间为搅拌后的30s
+                    testInterval = testPosInterval * 2
+                } else {
+                    testInterval = testPosInterval
+                }
             } else if (isPenult) {
                 testInterval = testPosInterval
             }
@@ -1786,6 +1790,22 @@ class HomeViewModel(
             }
 
         }
+    }
+
+    /**
+     * 如果这排只有一个比色皿
+     * @return Boolean
+     */
+    private fun cuvetteOnlyOne(): Boolean {
+        var count = 0
+        for (i in 0 until mCuvetteStates[cuvetteShelfPos]!!.size) {
+            if (mCuvetteStates[cuvetteShelfPos]!![i].state == CuvetteState.None
+                || mCuvetteStates[cuvetteShelfPos]!![i].state == CuvetteState.Skip
+            ) {
+                count++
+            }
+        }
+        return count == 9
     }
 
     /**

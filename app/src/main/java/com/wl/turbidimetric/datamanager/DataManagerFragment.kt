@@ -141,7 +141,7 @@ class DataManagerFragment :
                     deliveryTime = "",
                     deliveryDepartment = "",
                     deliveryDoctor = "",
-                    sampleBarcode = "ABCD$i"
+                    sampleBarcode = "ABCD$i",
                 ).apply {
                     project.target = ProjectModel()
                 }
@@ -267,7 +267,7 @@ class DataManagerFragment :
         }
 
         if (results.any {
-                it.project == null || it.project.target == null
+                it.project == null || it.project?.target == null
             }) {
             return "没有检测项目"
         }

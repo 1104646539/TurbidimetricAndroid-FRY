@@ -33,7 +33,7 @@ android {
         minSdk 21
         targetSdk 25
         versionCode 1
-        versionName "1.0.0.0检测往后2个位置"
+        versionName "1.0.0.0修复曲线拟合的问题"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 
@@ -97,6 +97,7 @@ dependencies {
     implementation files('libs\\log4j-1.2.17.jar')
     implementation files('libs\\hapi-base-2.2.jar')
     implementation files('libs\\hapi-structures-v231-2.2.jar')
+    implementation files('libs\\commons-math3-3.6.1.jar')
     //test
     testImplementation 'org.mockito:mockito-core:4.4.0'
     androidTestImplementation "org.mockito:mockito-android:4.4.0"

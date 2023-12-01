@@ -942,7 +942,31 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
             val yz = cf.f(res, it).scale(2)
             yz
         }
+        //**修正start**
+        var dif50 = 50 - yzs[1]
+        println("50差值：$dif50")
+        dif50 = if (dif50 >= 0) {
+            dif50 * 2
+        } else {
+            dif50 / 2
+        }
+        println("50差值计算后：$dif50")
 
+        val dif0 = absorbancys[0] - dif50
+        println("0原始吸光度-50差值计算后：$dif0")
+
+        val np1 = dif0.toDouble()
+        var absorbancys2 = absorbancys.toMutableList()
+        absorbancys2[0] = np1
+
+        val cf2 = matchingArg(absorbancys2)
+        val res2 = cf2.params
+        val yzs2 = absorbancys2.map {
+            val yz2 = cf2.f(res2, it).scale(2)
+            yz2
+        }
+
+        //**修正end**
         var msg: StringBuilder = StringBuilder(
             "第一次原始:$resultOriginalTest1 \n" +
                     "第一次:$resultTest1 \n" +
@@ -955,30 +979,24 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
                     "吸光度:$result \n" +
                     "拟合度：${cf.fitGoodness} \n" +
                     "四参数：f0=${f0} f1=${f1} f2=${f2} f3=${f3} \n " +
-                    "验算 ${yzs}\n"
+                    "验算 ${yzs}\n"+
+                    "吸光度2:$absorbancys2 \n" +
+                    "拟合度2：${cf2.fitGoodness} \n" +
+                    "四参数2：f0=${cf2.params[0]} f1=${cf2.params[1]} f2=${cf2.params[2]} f3=${cf2.params[3]} \n " +
+                    "验算2 ${yzs2}\n"
         )
         curProject = ProjectModel().apply {
-            this.f0 = f0
-            this.f1 = f1
-            this.f2 = f2
-            this.f3 = f3
-            this.fitGoodness = cf.fitGoodness
+            this.f0 = cf2.params[0]
+            this.f1 = cf2.params[1]
+            this.f2 = cf2.params[2]
+            this.f3 = cf2.params[3]
+            this.fitGoodness = cf2.fitGoodness
             this.createTime = Date().toTimeStr()
             this.projectLjz = 100
             this.reagentNO = reagentNOStr
-            this.reactionValues = absorbancys.subList(0, 5).map { it.toInt() }.toIntArray()
+            this.reactionValues = absorbancys2.subList(0, 5).map { it.toInt() }.toIntArray()
         }
         print()
-//        if (quality) {
-//            val hValue = result[5];
-//            val lValue = result[6];
-//
-//            val hCon = calcCon(hValue, project);
-//            val lCon = calcCon(lValue, project);
-//            msg.append("质控(H):$hCon\n")
-//            msg.append("质控(L):$lCon\n")
-//        }
-
         testMsg.postValue(msg.toString())
 
         //添加到参数列表，刷新

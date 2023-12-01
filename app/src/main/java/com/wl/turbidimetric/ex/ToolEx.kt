@@ -19,6 +19,7 @@ import com.wl.turbidimetric.model.ProjectModel
 import com.wl.turbidimetric.model.SampleType
 import com.wl.turbidimetric.model.TestState
 import com.wl.turbidimetric.util.CurveFitter
+import com.wl.turbidimetric.util.CurveFitterUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.io.DataInputStream
@@ -163,10 +164,10 @@ fun calcAbsorbance(
  * 计算4参数
  * @return CurveFitter
  */
-fun matchingArg(absorbances: List<Double>): CurveFitter {
+fun matchingArg(absorbances: List<Double>): CurveFitterUtil {
     val xs = absorbances.toDoubleArray().copyOfRange(0, nds.size)
-    val curveFitter = CurveFitter(xs, nds)
-    curveFitter.doFitCon()
+    val curveFitter = CurveFitterUtil()
+    curveFitter.calcParams(xs, nds)
     return curveFitter
 }
 

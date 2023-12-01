@@ -1380,10 +1380,13 @@ class HomeViewModel(
                 if (cuvettePos >= 5 && lastNeedTest1(cuvettePos - 5)) {
                     testShelfInterval = 0
                     i("重新计算间隔时间 之后 testShelfInterval=$testShelfInterval cuvettePos=$cuvettePos cuvetteStartPos=$cuvetteStartPos")
+                    var intervalTemp = 0L
+                    if (!SystemGlobal.isCodeDebug){
                     //第二次检测到搅拌结束的间隔时间要保持220s
                     val stirInterval = (Date().time - firstStirTime)
-                    val intervalTemp = (220 * 1000) - stirInterval
+                        intervalTemp = (220 * 1000) - stirInterval
                     i("intervalTemp=$intervalTemp stirInterval=$stirInterval")
+                    }
                     viewModelScope.launch {
                         delay(intervalTemp)
                         stepTest(TestState.Test2)

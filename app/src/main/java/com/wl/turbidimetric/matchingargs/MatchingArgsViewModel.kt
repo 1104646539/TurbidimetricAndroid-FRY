@@ -729,10 +729,13 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
             testState = TestState.Test2
             cuvettePos = -1
             i("重新计算间隔时间 之后 testShelfInterval=$testShelfInterval cuvettePos=$cuvettePos")
-            //第二次检测到搅拌结束的间隔时间要保持220s
-            val stirInterval = (Date().time - firstStirTime)
-            val intervalTemp = (220 * 1000) - stirInterval
-            i("intervalTemp=$intervalTemp stirInterval=$stirInterval")
+            var intervalTemp = 0L
+            if (!SystemGlobal.isCodeDebug) {
+                //第二次检测到搅拌结束的间隔时间要保持220s
+                val stirInterval = (Date().time - firstStirTime)
+                intervalTemp = (220 * 1000) - stirInterval
+                i("intervalTemp=$intervalTemp stirInterval=$stirInterval")
+            }
             viewModelScope.launch {
                 delay(intervalTemp)
                 moveCuvetteTest()

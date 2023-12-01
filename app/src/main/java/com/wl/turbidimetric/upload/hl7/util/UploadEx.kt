@@ -102,7 +102,7 @@ fun defaultConfig(): ConnectConfig {
         serialPort = false,
         serialPortBaudRate = 9600,
         serialPortName = WQSerialGlobal.COM4,
-        isReconnection = true,
+        isReconnection = false,
         retryCount = 1,
         reconnectionTimeout = 20000
     )

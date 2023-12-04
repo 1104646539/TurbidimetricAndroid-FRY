@@ -285,12 +285,13 @@ class SettingsFragment :
                 LocalData.SamplingVolume,
                 LocalData.SamplingProbeCleaningDuration,
                 LocalData.StirProbeCleaningDuration,
-                { takeR1: Int, takeR2: Int, samplingVolume: Int, samplingProbeCleaningDuration: Int, stirProbeCleaningDuration: Int, baseDialog: BasePopupView ->
+                LocalData.StirDuration,
+                { takeR1: Int, takeR2: Int, samplingVolume: Int, samplingProbeCleaningDuration: Int, stirProbeCleaningDuration: Int, stirDuration: Int, baseDialog: BasePopupView ->
                     LocalData.TakeReagentR1 = takeR1
                     LocalData.TakeReagentR2 = takeR2
                     LocalData.SamplingVolume = samplingVolume
                     LocalData.SamplingProbeCleaningDuration = samplingProbeCleaningDuration
-                    LocalData.StirProbeCleaningDuration = stirProbeCleaningDuration
+                    LocalData.StirDuration = stirDuration
                     baseDialog.dismiss()
                 },
                 {

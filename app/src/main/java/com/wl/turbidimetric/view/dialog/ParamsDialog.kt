@@ -25,19 +25,22 @@ class ParamsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_params
     var etSampling: EditText? = null
     var etSamplingProbeCleaningTime: EditText? = null
     var etStirProbeCleaningTime: EditText? = null
+    var etStirDuration: EditText? = null
 
     var takeR1: Int? = null
     var takeR2: Int? = null
     var sampling: Int? = null
     var samplingProbeCleaningTime: Int? = null
     var stirProbeCleaningTime: Int? = null
+    var stirDuration: Int? = null
     fun showDialog(
         takeR1: Int,
         takeR2: Int,
         sampling: Int,
         samplingProbeCleaningTime: Int,
         stirProbeCleaningTime: Int,
-        onConfirm: ((Int, Int, Int, Int, Int, BasePopupView) -> Unit)?,
+        stirDuration: Int,
+        onConfirm: ((Int, Int, Int, Int, Int, Int, BasePopupView) -> Unit)?,
         onCancel: onClick?
     ) {
         this.takeR1 = takeR1
@@ -45,6 +48,7 @@ class ParamsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_params
         this.sampling = sampling
         this.samplingProbeCleaningTime = samplingProbeCleaningTime
         this.stirProbeCleaningTime = stirProbeCleaningTime
+        this.stirDuration = stirDuration
         this.confirmText = "确定"
         this.confirmClick = {
             confirm(onConfirm)
@@ -55,12 +59,13 @@ class ParamsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_params
 
     }
 
-    fun confirm(onConfirm: ((Int, Int, Int, Int, Int, BasePopupView) -> Unit)?) {
+    fun confirm(onConfirm: ((Int, Int, Int, Int, Int, Int, BasePopupView) -> Unit)?) {
         val takeR1 = etTakeR1?.text.toString()
         val takeR2 = etTakeR2?.text.toString()
         val sampling = etSampling?.text.toString()
         val samplingProbeCleaningTime = etSamplingProbeCleaningTime?.text.toString()
         val stirProbeCleaningTime = etStirProbeCleaningTime?.text.toString()
+        val stirDuration = etStirDuration?.text.toString()
 
         if (takeR1.trim().isNullOrEmpty() || takeR2.trim().isNullOrEmpty() || sampling.trim()
                 .isNullOrEmpty() || samplingProbeCleaningTime.trim()
@@ -79,7 +84,9 @@ class ParamsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_params
             takeR2.toIntOrNull() ?: 0,
             sampling.toIntOrNull() ?: 0,
             samplingProbeCleaningTime.toIntOrNull() ?: 0,
-            stirProbeCleaningTime.toIntOrNull() ?: 0, this
+            stirProbeCleaningTime.toIntOrNull() ?: 0,
+            stirDuration.toIntOrNull() ?: 0,
+            this
         )
     }
 
@@ -89,6 +96,7 @@ class ParamsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_params
         etSampling = findViewById(R.id.et_sampling)
         etSamplingProbeCleaningTime = findViewById(R.id.et_sampling_probe_cleaning_time)
         etStirProbeCleaningTime = findViewById(R.id.et_stir_probe_cleaning_time)
+        etStirDuration = findViewById(R.id.et_stir_time)
     }
 
     override fun setContent() {
@@ -98,12 +106,14 @@ class ParamsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_params
         etSampling?.setText(sampling.toString())
         etSamplingProbeCleaningTime?.setText(samplingProbeCleaningTime.toString())
         etStirProbeCleaningTime?.setText(stirProbeCleaningTime.toString())
+        etStirDuration?.setText(stirDuration.toString())
 
         etTakeR1?.selectionLast()
         etTakeR2?.selectionLast()
         etSampling?.selectionLast()
         etSamplingProbeCleaningTime?.selectionLast()
         etStirProbeCleaningTime?.selectionLast()
+        etStirDuration?.selectionLast()
     }
 
     override fun getResId(): Int {

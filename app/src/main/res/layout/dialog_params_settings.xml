@@ -85,6 +85,21 @@
         android:inputType="numberDecimal"
         android:numeric="decimal"
         android:textSize="24sp" />
+    <TextView
+        style="@style/TextTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:text="搅拌时间(ms)" />
+
+    <EditText
+        android:id="@+id/et_stir_time"
+        style="@style/EtDefault"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="numberDecimal"
+        android:numeric="decimal"
+        android:textSize="24sp" />
 
 
 </LinearLayout>

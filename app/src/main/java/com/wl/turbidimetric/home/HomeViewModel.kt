@@ -446,12 +446,22 @@ class HomeViewModel(
      * 测试用的 start
      */
     //检测的值
-    private val testValues1 = doubleArrayOf(
-        0.5441, 0.5555, 0.2525, 0.22492, 0.46042, 0.24542, 0.66332, 0.74412, 0.0122, 0.12142
+    private val testValues1 =
+        doubleArrayOf(0.0006, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+    private val testValues2 = doubleArrayOf(
+        0.0,
+        0.12410,
+        0.06702,
+        0.01834,
+        0.00327,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
     )
-    private val testValues2 = doubleArrayOf(0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3)
     private val testValues3 = doubleArrayOf(0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3)
-    private val testValues4 = doubleArrayOf(0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4)
+    private val testValues4 = doubleArrayOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
     private val testOriginalValues1 =
         intArrayOf(65532, 65532, 65532, 65532, 65532, 65532, 65532, 65532, 65532, 65532)
     private val testOriginalValues2 =
@@ -1381,11 +1391,11 @@ class HomeViewModel(
                     testShelfInterval = 0
                     i("重新计算间隔时间 之后 testShelfInterval=$testShelfInterval cuvettePos=$cuvettePos cuvetteStartPos=$cuvetteStartPos")
                     var intervalTemp = 0L
-                    if (!SystemGlobal.isCodeDebug){
-                    //第二次检测到搅拌结束的间隔时间要保持220s
-                    val stirInterval = (Date().time - firstStirTime)
+                    if (!SystemGlobal.isCodeDebug) {
+                        //第二次检测到搅拌结束的间隔时间要保持220s
+                        val stirInterval = (Date().time - firstStirTime)
                         intervalTemp = (220 * 1000) - stirInterval
-                    i("intervalTemp=$intervalTemp stirInterval=$stirInterval")
+                        i("intervalTemp=$intervalTemp stirInterval=$stirInterval")
                     }
                     viewModelScope.launch {
                         delay(intervalTemp)
@@ -2585,6 +2595,7 @@ class HomeViewModel(
         selectProject?.let {
             LocalData.SelectProjectID = it.projectId
         }
+        i("changeConfig project=$projectModel")
     }
 
     /**

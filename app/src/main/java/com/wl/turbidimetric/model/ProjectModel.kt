@@ -27,6 +27,9 @@ data class ProjectModel(
     )
     var reactionValues: IntArray? = intArrayOf()
 ) : BaseOBModel(0) {
+    override fun toString(): String {
+        return "TestResultModel(id=$projectId,projectName=$projectName,projectCode=$projectCode,projectLjz=$projectLjz,projectUnit=$projectUnit,f0=$f0,f1=$f1,f2=$f2,f3=$f3,fitGoodness=$fitGoodness,createTime=$createTime,reagentNO=$reagentNO)"
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

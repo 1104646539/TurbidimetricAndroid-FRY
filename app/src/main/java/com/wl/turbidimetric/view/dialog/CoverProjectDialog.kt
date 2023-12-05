@@ -42,7 +42,11 @@ class CoverProjectDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_
         } else {
             projectAdapter?.notifyDataSetChanged()
         }
-
+        spnProject?.let { spn ->
+            if(!items?.contains(spn.selectedItem)){
+                spn.setSelection(0)
+            }
+        }
         spnProject?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>?, view: View?, position: Int, id: Long
@@ -69,6 +73,9 @@ class CoverProjectDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_
         this.confirmClick = { onConfirm?.invoke(selectProject, it) }
         this.cancelText = "取消"
         this.cancelClick = onCancel
+        if(isCreated){
+            setContent()
+        }
         super.show()
     }
 

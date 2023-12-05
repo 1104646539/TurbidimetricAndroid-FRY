@@ -23,7 +23,13 @@ public class CurveFitterUtil {
 
     }
 
-    public double f(double[] p, double x) {
+    /**
+     * 根据参数和吸光度计算浓度
+     * @param p
+     * @param x
+     * @return
+     */
+    public static double f(double[] p, double x) {
         return p[0] + p[1] * x + p[2] * x * x + p[3] * x * x * x;
     }
 

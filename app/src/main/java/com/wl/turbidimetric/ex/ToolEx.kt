@@ -213,8 +213,7 @@ fun calcCon(absorbance: BigDecimal, project: ProjectModel): Int {
 //    var con: Double = x0 * ((a2 - a1) / (a2 - absorbance) - 1).pow(1 / p)
 
 //    return con.scale(2)
-    var con = CurveFitter.f(
-        2,
+    var con = CurveFitterUtil.f(
         doubleArrayOf(f0, f1, f2, f3),
         absorbance.multiply(10000.toBigDecimal()).toDouble()
     )

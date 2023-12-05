@@ -37,6 +37,7 @@ class MatchingArgsFragment :
     private val bgGray = getResource().getColor(R.color.bg_gray)
     private val textColor = getResource().getColor(R.color.textColor)
     private val lineColor = getResource().getColor(R.color.themePositiveColor)
+    var projects: List<ProjectModel>? = null
 
     companion object {
         @JvmStatic
@@ -147,11 +148,21 @@ class MatchingArgsFragment :
 
         launchAndRepeatWithViewLifecycle(Lifecycle.State.CREATED) {
             vm.datas.collectLatest {
-                adapter.submit(it)
+                it.filterIndexed { index, _ ->
+                    index < 10
+                }.let { ret ->
+                    projects = ret
+                    adapter.submit(ret.toMutableList())
+                    if (ret.isNotEmpty()) {
+                        adapter.setSelectIndex(ret.lastIndex)
+                        adapter.notifyItemChanged(ret.lastIndex)
+                    }
+                }
+//                adapter.submit(it)
                 //默认选择最近一个
 //                if (adapter.selectPos < 0 && adapter.items.isNotEmpty()) {
-                adapter.setSelectIndex(0)
-                adapter.notifyItemChanged(0)
+//                adapter.setSelectIndex(0)
+//                adapter.notifyItemChanged(0)
 
 //                }
             }

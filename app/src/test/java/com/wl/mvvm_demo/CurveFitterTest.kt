@@ -1,6 +1,9 @@
 package com.wl.mvvm_demo
 
+import com.wl.turbidimetric.ex.calcCon
 import com.wl.turbidimetric.ex.matchingArg
+import com.wl.turbidimetric.ex.scale
+import com.wl.turbidimetric.model.ProjectModel
 import com.wl.turbidimetric.util.CurveFitter
 import com.wl.turbidimetric.util.CurveFitterUtil
 import org.apache.commons.math3.analysis.polynomials.PolynomialFunction
@@ -248,11 +251,11 @@ class CurveFitterTest {
     @Test
     fun testkk() {
         val function = PolynomialFunction.Parametric();/*多项式函数*/
-        val p1 = (-29.5).toDouble()
-        val p2 = 28.8.toDouble()
-        val p3 = 239.6.toDouble()
-        val p4 = 975.6.toDouble()
-        val p5 = 1979.toDouble()
+        val p1 = (-12.34).toDouble()
+        val p2 = 31.8.toDouble()
+        val p3 = 187.2.toDouble()
+        val p4 = 667.3.toDouble()
+        val p5 = 1329.1.toDouble()
 
         val xs = doubleArrayOf(p1, p2, p3, p4, p5)
 
@@ -265,6 +268,20 @@ class CurveFitterTest {
         curveFitter2.yss.forEach {
             println("p4=$it")
         }
+
+        val newAbs = arrayListOf(0.00251, 0.01838, 0.06686, 0.12513, -0.00025)
+        val project = ProjectModel(
+            f0 = curveFitter2.params[0],
+            f1 = curveFitter2.params[1],
+            f2 = curveFitter2.params[2],
+            f3 = curveFitter2.params[3]
+        )
+        newAbs.forEach {
+            val v = curveFitter2.f(curveFitter2.params, it * 10000).scale(2)
+            val v2 = calcCon(it.toBigDecimal(), project)
+            println("v=$v v2=$v2")
+        }
+
     }
 
     @Test

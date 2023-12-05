@@ -39,9 +39,13 @@ class App : Application() {
 //
             //没有项目参数的时候，添加一个默认参数
             if (DBManager.ProjectBox.all.isNullOrEmpty()) {
-                repeat(1) {
+                repeat(10) {
                     DBManager.ProjectBox.put(ProjectModel().apply {
                         reagentNO = it.toString()
+                        f0 = 14.32525697891957
+                        f1 = 1.1568311508309208
+                        f2 = -9.761226454206153E-4
+                        f3 = 4.993717916686672E-7
                     })
                 }
             }

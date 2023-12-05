@@ -68,7 +68,9 @@ class HomeConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_ho
         items.clear()
         items.addAll(projectModels)
 //        projectAdapter?.notifyDataSetChanged()
-
+        if(isCreated){
+            setContent()
+        }
         super.show()
     }
 
@@ -91,6 +93,7 @@ class HomeConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_ho
         spnProject?.setSelection(selectedIndex)
 
         llSampleNum?.visibility = if (isAuto()) View.GONE else View.VISIBLE
+
 
         spnProject?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(

@@ -125,10 +125,15 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 
         launchAndRepeatWithViewLifecycle {
             vm.projectDatas.collectLatest {
-                projects.clear()
-                projects.addAll(it)
+                it.filterIndexed { index, projectModel ->
+                    index < 10
+                }.let {
+                    ret->
+                    projects.clear()
+                    projects.addAll(ret.toMutableList())
 
-                vm.recoverSelectProject(projects)
+                    vm.recoverSelectProject(projects)
+                }
             }
         }
 

@@ -5,9 +5,11 @@ import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.*
+import com.wl.turbidimetric.App
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.FragmentHomeBinding
 import com.wl.turbidimetric.datastore.LocalData
+import com.wl.turbidimetric.db.DBManager
 import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.global.SystemGlobal.obTestState
@@ -127,8 +129,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             vm.projectDatas.collectLatest {
                 it.filterIndexed { index, projectModel ->
                     index < 10
-                }.let {
-                    ret->
+                }.let { ret ->
                     projects.clear()
                     projects.addAll(ret.toMutableList())
 
@@ -410,6 +411,14 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 
 
     private fun test() {
+//        val project = ProjectModel().apply {
+//            f0 = 22.834258698728
+//            f1 = 0.835288925322
+//            f2 = -0.000596016621
+//            f3 = 2.491525485E-07
+//            reagentNO = "99"
+//        }
+//        DBManager.ProjectBox.put(project)
     }
 
     private fun listenerDialog() {

@@ -13,6 +13,7 @@ import com.wl.turbidimetric.home.ProjectRepository
 import com.wl.turbidimetric.model.*
 import com.wl.turbidimetric.print.PrintUtil
 import com.wl.turbidimetric.util.Callback2
+import com.wl.turbidimetric.util.CurveFitterUtil
 import com.wl.turbidimetric.util.SerialPortUtil
 import com.wl.wwanandroid.base.BaseViewModel
 import io.objectbox.kotlin.flow
@@ -663,7 +664,7 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
      */
     private fun goDripSample() {
         if (cuvetteMoveFinish && samplingFinish) {
-            dripSample(autoBlending = false, inplace = false, moveSampleVolume)
+            dripSample(autoBlending = false, inplace = false, LocalData.SamplingVolume)
         }
     }
 
@@ -939,7 +940,7 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
         i("四参数：f0=${f0} f1=${f1} f2=${f2} f3=${f3}")
 
         yzs = absorbancys.map {
-            val yz = cf.f(res, it).scale(2)
+            val yz = CurveFitterUtil.f(res, it).scale(2)
             yz
         }
         //**修正start**
@@ -962,7 +963,7 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
         val cf2 = matchingArg(absorbancys2)
         val res2 = cf2.params
         val yzs2 = absorbancys2.map {
-            val yz2 = cf2.f(res2, it).scale(2)
+            val yz2 = CurveFitterUtil.f(res2, it).scale(2)
             yz2
         }
 

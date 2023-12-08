@@ -9,16 +9,12 @@ import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.global.SystemGlobal.testState
 import com.wl.turbidimetric.global.SystemGlobal.testType
-import com.wl.turbidimetric.home.ProjectRepository
+import com.wl.turbidimetric.home.CurveRepository
 import com.wl.turbidimetric.home.TestResultRepository
-import com.wl.turbidimetric.matchingargs.DialogState
-import com.wl.turbidimetric.matchingargs.MatchingArgsDialogUiState
 import com.wl.turbidimetric.model.*
 import com.wl.turbidimetric.util.Callback2
 import com.wl.turbidimetric.util.SerialPortUtil
-import com.wl.wllib.LogToFile
 import com.wl.wwanandroid.base.BaseViewModel
-import io.objectbox.kotlin.flow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -34,7 +30,7 @@ import com.wl.wllib.LogToFile.i
  * @property quality Boolean
  */
 class RepeatabilityViewModel(
-    val projectRepository: ProjectRepository,
+    val curveRepository: CurveRepository,
     val testResultRepository: TestResultRepository
 ) : BaseViewModel(),
     Callback2 {
@@ -206,19 +202,19 @@ class RepeatabilityViewModel(
     val testMsg = MutableLiveData("")
     val toastMsg = MutableLiveData("")
 
-    val projectDatas = projectRepository.allDatas.flow()
+    val projectDatas = curveRepository.allDatas
 
-    var selectProject: ProjectModel? = null
+    var selectProject: CurveModel? = null
 
     /**
      * 每排之间的检测间隔
      */
-    var testShelfInterval: Long = 1000 * 0;
+    var testShelfInterval: Long = 1000 * 0
 
     /**
      * 每个比色皿之间的检测间隔
      */
-    var testPosInterval: Long = 1000 * 10;
+    var testPosInterval: Long = 1000 * 10
 
     /**
      * 移动样本时检测到样本管的标记
@@ -258,15 +254,6 @@ class RepeatabilityViewModel(
 
     //测试用 每个比色皿之间的检测间隔
     val testP: Long = 1000
-
-
-    /**
-     * 测试用的 end
-     */
-    override fun init() {
-        super.init()
-
-    }
 
 
     /**
@@ -321,7 +308,7 @@ class RepeatabilityViewModel(
             return
         }
         initState()
-        testState = TestState.GetState;
+        testState = TestState.GetState
         testType = TestType.Repeatability
         getState()
     }
@@ -350,9 +337,8 @@ class RepeatabilityViewModel(
                         testOriginalValue2 = resultOriginalTest2[index],
                         testOriginalValue3 = resultOriginalTest3[index],
                         testOriginalValue4 = resultOriginalTest4[index],
-                    ).apply {
-                        project.target = selectProject
-                    }
+                        curveOwnerId = selectProject?.curveId?:0
+                    )
                 )
             }
             with(Dispatchers.Main) {
@@ -375,15 +361,15 @@ class RepeatabilityViewModel(
         testState = TestState.None
         sampleStep = 0
         testMsg.postValue("")
-        samplePos = -1;
-        cuvettePos = -1;
-        sampleShelfPos = -1;
-        cuvetteShelfPos = -1;
+        samplePos = -1
+        cuvettePos = -1
+        sampleShelfPos = -1
+        cuvetteShelfPos = -1
         firstStirTime = 0
 
         if (SystemGlobal.isCodeDebug) {
-            testShelfInterval = testS;
-            testPosInterval = testP;
+            testShelfInterval = testS
+            testPosInterval = testP
 
         }
     }
@@ -1372,13 +1358,13 @@ class RepeatabilityViewModel(
 }
 
 class RepeatabilityViewModelFactory(
-    private val projectRepository: ProjectRepository = ProjectRepository(),
+    private val curveRepository: CurveRepository=CurveRepository(),
     private val testResultRepository: TestResultRepository = TestResultRepository()
 ) :
     ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(RepeatabilityViewModel::class.java)) {
-            return RepeatabilityViewModel(projectRepository, testResultRepository) as T
+            return RepeatabilityViewModel(curveRepository, testResultRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

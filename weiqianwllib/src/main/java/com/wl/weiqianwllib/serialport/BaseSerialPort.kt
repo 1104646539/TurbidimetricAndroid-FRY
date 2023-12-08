@@ -8,7 +8,7 @@ import kotlin.concurrent.thread
  * 基础的串口库
  */
 class BaseSerialPort {
-    private var serialPort: SerialPort? = null;
+    private var serialPort: SerialPort? = null
 //    private val BUFSIZE = 500
 //    private val buf = ByteArray(BUFSIZE)
 //    var readInterval:Long = 100

@@ -11,18 +11,17 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.FragmentDataManagerBinding
 import com.wl.turbidimetric.datastore.LocalData
-import com.wl.turbidimetric.db.DBManager
 import com.wl.turbidimetric.ex.PD
 import com.wl.turbidimetric.ex.isTestRunning
 import com.wl.turbidimetric.ex.launchAndRepeatWithViewLifecycle
 import com.wl.turbidimetric.ex.toast
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.ConditionModel
-import com.wl.turbidimetric.model.ProjectModel
+import com.wl.turbidimetric.model.CurveModel
+import com.wl.turbidimetric.model.TestResultAndCurveModel
 import com.wl.turbidimetric.model.TestResultModel
 import com.wl.turbidimetric.print.PrintUtil
 import com.wl.turbidimetric.upload.hl7.HL7Helper
-import com.wl.turbidimetric.upload.service.OnUploadCallback
 import com.wl.turbidimetric.util.ExportExcelHelper
 import com.wl.turbidimetric.view.dialog.*
 import com.wl.wllib.LogToFile.i
@@ -92,7 +91,7 @@ class DataManagerFragment :
 
     fun test() {
         val testdatas = createTestData()
-        DBManager.TestResultBox.put(testdatas)
+        vm.add(testdatas)
     }
 
     private fun createPrintData(): List<List<String>> {
@@ -142,9 +141,8 @@ class DataManagerFragment :
                     deliveryDepartment = "",
                     deliveryDoctor = "",
                     sampleBarcode = "ABCD$i",
-                ).apply {
-                    project.target = ProjectModel()
-                }
+                    curveOwnerId = 0
+                )
                 add(dr)
             }
         }
@@ -183,7 +181,7 @@ class DataManagerFragment :
 
         adapter.onLongClick = { id ->
             if (id > 0) {
-                val result = DBManager.TestResultBox.get(id)
+                val result = vm.getTestResultAndCurveModelById(id)
                 result?.let {
                     resultDialog.showPop(requireContext(), isCancelable = false) {
                         it.showDialog(result) {
@@ -256,7 +254,7 @@ class DataManagerFragment :
      * @param results List<TestResultModel>?
      * @return String?
      */
-    private fun verifyUploadData(results: List<TestResultModel>?): String? {
+    private fun verifyUploadData(results: List<TestResultAndCurveModel>?): String? {
 
         if (results.isNullOrEmpty()) {
             return "请选择数据"
@@ -267,13 +265,13 @@ class DataManagerFragment :
         }
 
         if (results.any {
-                it.project == null || it.project?.target == null
+                it.result.curveOwnerId <= 0
             }) {
             return "没有检测项目"
         }
 
         if (results.any {
-                it.testResult.isNullOrEmpty()
+                it.result.testResult.isNullOrEmpty()
             }) {
             return "未检测的数据"
         }
@@ -292,7 +290,7 @@ class DataManagerFragment :
                         val results = getSelectData()
                         it.dismiss()
                         if (!results.isNullOrEmpty()) {
-                            vm.clickDeleteDialogConfirm(results)
+                            vm.clickDeleteDialogConfirm(results.map { it.result })
                         }
                     }, "取消", {
                         it.dismiss()
@@ -304,11 +302,11 @@ class DataManagerFragment :
         launchAndRepeatWithViewLifecycle {
             adapter.loadStateFlow.collectLatest { loadState ->
                 if (loadState.source.refresh is LoadState.NotLoading && loadState.append.endOfPaginationReached && adapter.itemCount < 1) {
-                    vd.rv?.isVisible = false
-                    vd.empty?.isVisible = true
+                    vd.rv.isVisible = false
+                    vd.empty.isVisible = true
                 } else {
-                    vd.rv?.isVisible = true
-                    vd.empty?.isVisible = false
+                    vd.rv.isVisible = true
+                    vd.empty.isVisible = false
                 }
             }
         }
@@ -391,7 +389,7 @@ class DataManagerFragment :
     /**
      * 验证
      */
-    private fun exportExcelVerify(items: List<TestResultModel>?): String {
+    private fun exportExcelVerify(items: List<TestResultAndCurveModel>?): String {
         return if (items.isNullOrEmpty()) {
             "请选择数据"
         } else if (items.size > 4000) {
@@ -402,7 +400,7 @@ class DataManagerFragment :
     }
 
 
-    private fun getSelectData(): List<TestResultModel>? {
+    private fun getSelectData(): List<TestResultAndCurveModel> {
         return adapter.getSelectedItems()
     }
 
@@ -428,7 +426,7 @@ class DataManagerFragment :
             vm.item(condition).collectLatest {
                 i("---监听到了变化---condition=$condition")
                 vm.conditionChange(condition)
-                adapter?.submitData(it)
+                adapter.submitData(it)
 
                 withContext(Dispatchers.Main) {
                     vd.rv.scrollToPosition(0)
@@ -445,23 +443,23 @@ class DataManagerFragment :
     val TAG = "DataManagerFragment"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d(TAG, "onCreate");
+        Log.d(TAG, "onCreate")
     }
 
 
     override fun onDestroyView() {
         super.onDestroyView()
-        Log.d(TAG, "onDestroyView");
+        Log.d(TAG, "onDestroyView")
     }
 
     override fun onHiddenChanged(hidden: Boolean) {
         super.onHiddenChanged(hidden)
-        Log.d(TAG, "hidden=$hidden｝");
+        Log.d(TAG, "hidden=$hidden｝")
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.d(TAG, "onDestroy");
+        Log.d(TAG, "onDestroy")
     }
 
 

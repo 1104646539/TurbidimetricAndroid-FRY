@@ -237,11 +237,11 @@ public class Easing {
             if (input < 1f) {
                 return -0.5f
                         * ((float) Math.pow(2f, 10f * (input -= 1f))
-                        * (float) Math.sin((input * 1f - s) * DOUBLE_PI * p));
+                        * (float) Math.sin((input - s) * DOUBLE_PI * p));
             }
             return 1f + 0.5f
                     * (float) Math.pow(2f, -10f * (input -= 1f))
-                    * (float) Math.sin((input * 1f - s) * DOUBLE_PI * p);
+                    * (float) Math.sin((input - s) * DOUBLE_PI * p);
         }
     };
 

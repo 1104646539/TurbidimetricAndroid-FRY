@@ -1,14 +1,13 @@
 package com.wl.turbidimetric.model
 
-import com.wl.turbidimetric.ob.BigDecimalConverter
-import io.objectbox.annotation.*
-import io.objectbox.relation.ToOne
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import java.math.BigDecimal
 
 @Entity
 data class TestResultModel(
-    @Id
-    var id: Long = 0,
+    @PrimaryKey(autoGenerate = true)
+    var resultId: Long = 0,
     var isSelect: Boolean = false,
     var name: String = "",
     var gender: String = "",
@@ -39,7 +38,6 @@ data class TestResultModel(
     /**
      * 吸光度
      */
-    @Convert(dbType = String::class, converter = BigDecimalConverter::class)
     var absorbances: BigDecimal = BigDecimal("0.0"),
     /**
      * 浓度
@@ -61,22 +59,18 @@ data class TestResultModel(
     /**
      * 第一次检测值
      */
-    @Convert(dbType = String::class, converter = BigDecimalConverter::class)
     var testValue1: BigDecimal = BigDecimal("0.0"),
     /**
      * 第二次检测值
      */
-    @Convert(dbType = String::class, converter = BigDecimalConverter::class)
     var testValue2: BigDecimal = BigDecimal("0.0"),
     /**
      * 第三次检测值
      */
-    @Convert(dbType = String::class, converter = BigDecimalConverter::class)
     var testValue3: BigDecimal = BigDecimal("0.0"),
     /**
      * 第四次检测值
      */
-    @Convert(dbType = String::class, converter = BigDecimalConverter::class)
     var testValue4: BigDecimal = BigDecimal("0.0"),
     /**
      * 第一次检测值
@@ -103,22 +97,24 @@ data class TestResultModel(
      */
     var testTime: Long = 0,
 
+    /**
+     * 曲线ID
+     */
+    var curveOwnerId: Long = 0
 
-    ) : BaseOBModel(0) {
+)  {
 
-    lateinit var project: ToOne<ProjectModel>
 
     @Suppress("UNCHECKED_CAST")
     @Override
     fun copy(): TestResultModel {
         val tr = TestResultModel(
-            id,
+            resultId,
             false,
             name,
             gender,
             age,
         )
-        tr.project.target = if (project.target == null) null else project.target.copy()
         return tr
     }
 
@@ -126,7 +122,7 @@ data class TestResultModel(
         if (this === other) return true
         if (other !is TestResultModel) return false
 
-        if (id != other.id) return false
+        if (resultId != other.resultId) return false
         if (isSelect != other.isSelect) return false
         if (name != other.name) return false
         if (gender != other.gender) return false
@@ -147,17 +143,14 @@ data class TestResultModel(
         if (testOriginalValue4 != other.testOriginalValue4) return false
         if (createTime != other.createTime) return false
         if (testTime != other.testTime) return false
-        if (project != other.project) return false
         if (sampleType != other.sampleType) return false
         if (deliveryTime != other.deliveryTime) return false
         if (deliveryDepartment != other.deliveryDepartment) return false
-        if (deliveryDoctor != other.deliveryDoctor) return false
-
-        return true
+        return deliveryDoctor == other.deliveryDoctor
     }
 
     override fun hashCode(): Int {
-        var result = id.hashCode()
+        var result = resultId.hashCode()
         result = 31 * result + isSelect.hashCode()
         result = 31 * result + name.hashCode()
         result = 31 * result + gender.hashCode()
@@ -178,7 +171,6 @@ data class TestResultModel(
         result = 31 * result + testOriginalValue4
         result = 31 * result + createTime.hashCode()
         result = 31 * result + testTime.hashCode()
-        result = 31 * result + project.hashCode()
         result = 31 * result + sampleType.hashCode()
         result = 31 * result + deliveryTime.hashCode()
         result = 31 * result + deliveryDepartment.hashCode()
@@ -187,7 +179,7 @@ data class TestResultModel(
     }
 
     override fun toString(): String {
-        return "TestResultModel(id=$id, isSelect=$isSelect, name='$name', sampleType='$sampleType',gender='$gender', age='$age', sampleBarcode='$sampleBarcode', detectionNum='$detectionNum', testState=$testState, testResult='$testResult', absorbances=$absorbances, concentration=$concentration, testValue1=$testValue1, testValue2=$testValue2, testValue3=$testValue3, testValue4=$testValue4, testOriginalValue1=$testOriginalValue1, testOriginalValue2=$testOriginalValue2, testOriginalValue3=$testOriginalValue3, testOriginalValue4=$testOriginalValue4, createTime='$createTime', testTime='$testTime', project=$project)"
+        return "TestResultModel(resultId=$resultId, isSelect=$isSelect, name='$name', sampleType='$sampleType',gender='$gender', age='$age', sampleBarcode='$sampleBarcode', detectionNum='$detectionNum', testState=$testState, testResult='$testResult', absorbances=$absorbances, concentration=$concentration, testValue1=$testValue1, testValue2=$testValue2, testValue3=$testValue3, testValue4=$testValue4, testOriginalValue1=$testOriginalValue1, testOriginalValue2=$testOriginalValue2, testOriginalValue3=$testOriginalValue3, testOriginalValue4=$testOriginalValue4, createTime='$createTime', testTime='$testTime',)"
     }
 
 }

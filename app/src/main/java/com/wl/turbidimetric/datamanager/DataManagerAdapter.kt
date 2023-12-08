@@ -10,70 +10,74 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.ItemDatamanagerResultBinding
+import com.wl.turbidimetric.model.TestResultAndCurveModel
 import com.wl.turbidimetric.model.TestResultModel
 import com.wl.wllib.LogToFile.i
 import com.wl.wllib.toLongTimeStr
 import com.wl.wllib.toTimeStr
+import java.math.RoundingMode
 
 class DataManagerAdapter :
-    PagingDataAdapter<TestResultModel, DataManagerAdapter.DataManagerViewHolder>(diffCallback = MyDiff()) {
+    PagingDataAdapter<TestResultAndCurveModel, DataManagerAdapter.DataManagerViewHolder>(
+        diffCallback = MyDiff()
+    ) {
     //局部刷新 选择改变
     val REFRESH_SELECT_CHANGE = 100
 
-    class MyDiff : DiffUtil.ItemCallback<TestResultModel>() {
+    class MyDiff : DiffUtil.ItemCallback<TestResultAndCurveModel>() {
         override fun areItemsTheSame(
-            oldItem: TestResultModel,
-            newItem: TestResultModel
+            oldItem: TestResultAndCurveModel,
+            newItem: TestResultAndCurveModel
         ): Boolean {
-            return oldItem.id == newItem.id;
+            return oldItem.result?.resultId == newItem.result?.resultId && oldItem.curve?.curveId == newItem.curve?.curveId
         }
 
         override fun areContentsTheSame(
-            oldItem: TestResultModel,
-            newItem: TestResultModel
+            oldItem: TestResultAndCurveModel,
+            newItem: TestResultAndCurveModel
         ): Boolean {
-            return oldItem == newItem;
+            return oldItem == newItem
         }
     }
 
-    public var onLongClick: ((pos: Long) -> Unit)? = null
-    public var onSelectChange: ((pos: Int, selected: Boolean) -> Unit)? = null
+    var onLongClick: ((pos: Long) -> Unit)? = null
+    var onSelectChange: ((pos: Int, selected: Boolean) -> Unit)? = null
 
 
     class DataManagerViewHolder(val binding: ItemDatamanagerResultBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bindData(item: TestResultModel?, onLongClick: ((pos: Long) -> Unit)?) {
-            binding.setVariable(BR.item, item)
-            binding.tvID.text = item?.id.toString()
-            binding.tvDetectionNum.text = item?.detectionNum ?: "-"
-            binding.tvName.text = item?.name ?: "-"
-            binding.tvGender.text = item?.gender ?: "-"
-            binding.tvAge.text = item?.age ?: "-"
-            binding.tvAbsorbances.text = item?.absorbances?.toString() ?: "-"
-            binding.tvResult.text = item?.testResult ?: "-"
-            binding.tvConcentration.text = item?.concentration?.toString() ?: "-"
+        fun bindData(item: TestResultAndCurveModel?, onLongClick: ((pos: Long) -> Unit)?) {
+//            binding.setVariable(BR.item, item)
+            binding.tvID.text = item?.result?.resultId.toString()
+            binding.tvDetectionNum.text = item?.result?.detectionNum ?: "-"
+            binding.tvName.text = item?.result?.name ?: "-"
+            binding.tvGender.text = item?.result?.gender ?: "-"
+            binding.tvAge.text = item?.result?.age ?: "-"
+            binding.tvAbsorbances.text = item?.result?.absorbances?.setScale(6, RoundingMode.HALF_UP).toString() ?: "-"
+            binding.tvResult.text = item?.result?.testResult ?: "-"
+            binding.tvConcentration.text = item?.result?.concentration?.toString() ?: "-"
             binding.tvTestTime.text =
-                if (item?.testTime == 0L) "-" else item?.testTime?.toTimeStr() ?: "-"
-            binding.tvTestValue1.text = item?.testValue1?.toString() ?: "-"
-            binding.tvTestValue2.text = item?.testValue2?.toString() ?: "-"
-            binding.tvTestValue3.text = item?.testValue3?.toString() ?: "-"
-            binding.tvTestValue4.text = item?.testValue4?.toString() ?: "-"
-            binding.tvTestOriginalValue1.text = item?.testOriginalValue1?.toString() ?: "-"
-            binding.tvTestOriginalValue2.text = item?.testOriginalValue2?.toString() ?: "-"
-            binding.tvTestOriginalValue3.text = item?.testOriginalValue3?.toString() ?: "-"
-            binding.tvTestOriginalValue4.text = item?.testOriginalValue4?.toString() ?: "-"
+                if (item?.result?.testTime == 0L) "-" else item?.result?.testTime?.toTimeStr() ?: "-"
+            binding.tvTestValue1.text = item?.result?.testValue1?.setScale(6, RoundingMode.HALF_UP).toString() ?: "-"
+            binding.tvTestValue2.text = item?.result?.testValue2?.setScale(6, RoundingMode.HALF_UP).toString() ?: "-"
+            binding.tvTestValue3.text = item?.result?.testValue3?.setScale(6, RoundingMode.HALF_UP).toString() ?: "-"
+            binding.tvTestValue4.text = item?.result?.testValue4?.setScale(6, RoundingMode.HALF_UP).toString() ?: "-"
+            binding.tvTestOriginalValue1.text = item?.result?.testOriginalValue1?.toString() ?: "-"
+            binding.tvTestOriginalValue2.text = item?.result?.testOriginalValue2?.toString() ?: "-"
+            binding.tvTestOriginalValue3.text = item?.result?.testOriginalValue3?.toString() ?: "-"
+            binding.tvTestOriginalValue4.text = item?.result?.testOriginalValue4?.toString() ?: "-"
 
 
             binding.root.setOnLongClickListener {
-                onLongClick?.invoke(item?.id ?: 0)
+                onLongClick?.invoke(item?.result?.resultId ?: 0)
                 true
             }
         }
     }
 
 
-    fun getSelectedItems(): List<TestResultModel> {
-//        val items = mutableListOf<TestResultModel>().apply {
+    fun getSelectedItems(): List<TestResultAndCurveModel> {
+//        val items = mutableListOf<TestResultAndCurveModel>().apply {
 //            for (i in 0 until itemCount) {
 //                getItem(i)?.let {
 //                    if (it.isSelect)
@@ -81,9 +85,9 @@ class DataManagerAdapter :
 //                }
 //            }
 //        }
-        val items = mutableListOf<TestResultModel>().apply {
+        val items = mutableListOf<TestResultAndCurveModel>().apply {
             snapshot().items.forEach {
-                if (it.isSelect)
+                if (it!!.result!!.isSelect)
                     add(it)
             }
         }
@@ -103,12 +107,12 @@ class DataManagerAdapter :
                 when (tem) {
                     REFRESH_SELECT_CHANGE -> {
                         getItem(position)?.let {
-                            if (it.isSelect) {
+                            if (it!!.result!!.isSelect) {
                                 holder.binding.root.setBackgroundResource(R.drawable.bg_item_select)
                             } else {
                                 holder.binding.root.setBackgroundColor(Color.WHITE)
                             }
-                            holder.binding.ivSelect.isSelected = it?.isSelect ?: false
+                            holder.binding.ivSelect.isSelected = it.result!!.isSelect
                         }
                     }
                 }
@@ -122,14 +126,14 @@ class DataManagerAdapter :
             holder.bindData(item, onLongClick)
 
             holder.binding.root.setOnClickListener {
-                item?.let { item ->
+                item?.result?.let { item ->
                     item.isSelect = !item.isSelect
-                    snapshot()[holder.absoluteAdapterPosition]?.isSelect = item.isSelect
+                    snapshot()[holder.absoluteAdapterPosition]?.result?.isSelect = item.isSelect
                     notifyItemChanged(holder.absoluteAdapterPosition, REFRESH_SELECT_CHANGE)
                 }
             }
-            holder.binding.ivSelect.isSelected = item?.isSelect ?: false
-            item?.let {
+            holder.binding.ivSelect.isSelected = item?.result?.isSelect ?: false
+            item?.result?.let {
                 if (it.isSelect) {
                     holder.binding.root.setBackgroundResource(R.drawable.bg_item_select)
                 } else {

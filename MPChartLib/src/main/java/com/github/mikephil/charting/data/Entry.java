@@ -11,7 +11,7 @@ import com.github.mikephil.charting.utils.Utils;
 /**
  * Class representing one entry in the chart. Might contain multiple values.
  * Might only contain a single value depending on the used constructor.
- * 
+ *
  * @author Philipp Jahoda
  */
 public class Entry extends BaseEntry implements Parcelable {
@@ -73,7 +73,7 @@ public class Entry extends BaseEntry implements Parcelable {
 
     /**
      * Returns the x-value of this Entry object.
-     * 
+     *
      * @return
      */
     public float getX() {
@@ -82,7 +82,7 @@ public class Entry extends BaseEntry implements Parcelable {
 
     /**
      * Sets the x-value of this Entry object.
-     * 
+     *
      * @param x
      */
     public void setX(float x) {
@@ -91,7 +91,7 @@ public class Entry extends BaseEntry implements Parcelable {
 
     /**
      * returns an exact copy of the entry
-     * 
+     *
      * @return
      */
     public Entry copy() {
@@ -103,7 +103,7 @@ public class Entry extends BaseEntry implements Parcelable {
      * Compares value, xIndex and data of the entries. Returns true if entries
      * are equal in those points, false if not. Does not check by hash-code like
      * it's done by the "equals" method.
-     * 
+     *
      * @param e
      * @return
      */
@@ -118,10 +118,7 @@ public class Entry extends BaseEntry implements Parcelable {
         if (Math.abs(e.x - this.x) > Utils.FLOAT_EPSILON)
             return false;
 
-        if (Math.abs(e.getY() - this.getY()) > Utils.FLOAT_EPSILON)
-            return false;
-
-        return true;
+        return !(Math.abs(e.getY() - this.getY()) > Utils.FLOAT_EPSILON);
     }
 
     /**

@@ -2,7 +2,6 @@ package com.wl.turbidimetric.view.dialog
 
 import android.content.Context
 import android.view.View
-import android.view.WindowManager
 import android.widget.AdapterView
 import android.widget.EditText
 import android.widget.Spinner
@@ -13,7 +12,7 @@ import com.wl.turbidimetric.ex.isAuto
 import com.wl.turbidimetric.ex.selectionLast
 import com.wl.turbidimetric.ex.toast
 import com.wl.turbidimetric.home.HomeProjectAdapter
-import com.wl.turbidimetric.model.ProjectModel
+import com.wl.turbidimetric.model.CurveModel
 
 /**
  * 首页设置检测参数对话框
@@ -29,14 +28,14 @@ class HomeConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_ho
     var etSampleNum: EditText? = null
     var llSampleNum: View? = null
 
-    var selectProject: ProjectModel? = null
+    var selectProject: CurveModel? = null
     var projectAdapter: HomeProjectAdapter? = null
-    val items: MutableList<ProjectModel> = mutableListOf()
+    val items: MutableList<CurveModel> = mutableListOf()
 
     var selectProjectEnable: Boolean? = null
     var editDetectionNumEnable: Boolean? = null
     var skipCuvetteEnable: Boolean? = null
-    var projectModel: ProjectModel?? = null
+    var curveModel: CurveModel?? = null
     var skipNum: Int? = null
     var detectionNum: String? = null
     var sampleNum: Int? = null
@@ -44,12 +43,12 @@ class HomeConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_ho
         selectProjectEnable: Boolean,
         editDetectionNumEnable: Boolean,
         skipCuvetteEnable: Boolean,
-        projectModels: MutableList<ProjectModel>,
-        projectModel: ProjectModel?,
+        curveModels: MutableList<CurveModel>,
+        curveModel: CurveModel?,
         skipNum: Int,
         detectionNum: String,
         sampleNum: Int,
-        onConfirm: ((ProjectModel?, Int, String, Int, BasePopupView) -> Unit)? = null,
+        onConfirm: ((CurveModel?, Int, String, Int, BasePopupView) -> Unit)? = null,
         onCancel: onClick,
     ) {
         this.confirmText = "确定"
@@ -60,13 +59,13 @@ class HomeConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_ho
         this.selectProjectEnable = selectProjectEnable
         this.editDetectionNumEnable = editDetectionNumEnable
         this.skipCuvetteEnable = skipCuvetteEnable
-        this.projectModel = projectModel
+        this.curveModel = curveModel
         this.skipNum = skipNum
         this.detectionNum = detectionNum
         this.sampleNum = sampleNum
 
         items.clear()
-        items.addAll(projectModels)
+        items.addAll(curveModels)
 //        projectAdapter?.notifyDataSetChanged()
         if(isCreated){
             setContent()
@@ -89,7 +88,7 @@ class HomeConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_ho
         spnProject?.isEnabled = selectProjectEnable ?: false
         etDetectionNum?.isEnabled = editDetectionNumEnable ?: false
 
-        val selectedIndex = items.indexOf(projectModel)
+        val selectedIndex = items.indexOf(curveModel)
         spnProject?.setSelection(selectedIndex)
 
         llSampleNum?.visibility = if (isAuto()) View.GONE else View.VISIBLE
@@ -99,7 +98,7 @@ class HomeConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_ho
             override fun onItemSelected(
                 parent: AdapterView<*>?, view: View?, position: Int, id: Long
             ) {
-                selectProject = items?.get(position)
+                selectProject = items[position]
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -108,7 +107,7 @@ class HomeConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_ho
         }
     }
 
-    private fun confirm(onConfirm: ((ProjectModel?, Int, String, Int, BasePopupView) -> Unit)?) {
+    private fun confirm(onConfirm: ((CurveModel?, Int, String, Int, BasePopupView) -> Unit)?) {
         if (selectProject == null) {
             toast("请选择标曲")
             return

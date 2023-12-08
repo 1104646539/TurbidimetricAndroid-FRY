@@ -13,11 +13,11 @@ import java.util.Arrays;
 import ca.uhn.hl7v2.llp.LLPException;
 
 public class HL7Reader {
-    private static String TAG = "HL7Reader";
+    private static final String TAG = "HL7Reader";
     protected Charset charset;
-    private static char END_OF_BLOCK = '\u001c';
-    private static char START_OF_BLOCK = '\u000b';
-    private static char CARRIAGE_RETURN = (char) 13;
+    private static final char END_OF_BLOCK = '\u001c';
+    private static final char START_OF_BLOCK = '\u000b';
+    private static final char CARRIAGE_RETURN = (char) 13;
 
     public HL7Reader(Charset charset) {
         this.charset = charset;
@@ -56,10 +56,6 @@ public class HL7Reader {
     }
 
     protected static String asString(byte[] data, Charset charset) {
-        try {
-            return new String(data, charset.name());
-        } catch (UnsupportedEncodingException var3) {
-            return null;
-        }
+        return new String(data, charset);
     }
 }

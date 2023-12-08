@@ -21,14 +21,14 @@ import java.util.ArrayList;
  */
 public class PieRadarChartTouchListener extends ChartTouchListener<PieRadarChartBase<?>> {
 
-    private MPPointF mTouchStartPoint = MPPointF.getInstance(0,0);
+    private final MPPointF mTouchStartPoint = MPPointF.getInstance(0,0);
 
     /**
      * the angle where the dragging started
      */
     private float mStartAngle = 0f;
 
-    private ArrayList<AngularVelocitySample> _velocitySamples = new ArrayList<AngularVelocitySample>();
+    private final ArrayList<AngularVelocitySample> _velocitySamples = new ArrayList<AngularVelocitySample>();
 
     private long mDecelerationLastTime = 0;
     private float mDecelerationAngularVelocity = 0.f;

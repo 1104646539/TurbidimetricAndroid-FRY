@@ -31,13 +31,13 @@ class HomeDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_h
         this.confirmClick = { dismiss() }
 
         show(
-            (item.testResult?.id ?: "-").toString(),
+            (item.testResult?.resultId ?: "-").toString(),
             item.testResult?.detectionNum ?: "-",
             item.testResult?.sampleBarcode ?: "-",
             item.sampleID ?: "-",
             "对应样本序号:",
             getState(item.state),
-            item?.testResult?.testResult ?: "-",
+            item.testResult?.testResult ?: "-",
             null,
             item.testResult
         )
@@ -67,14 +67,14 @@ class HomeDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_h
         this.confirmText = "确定"
         this.confirmClick = { dismiss() }
         show(
-            (item.testResult?.id ?: "-").toString(),
+            (item.testResult?.resultId ?: "-").toString(),
             item.testResult?.detectionNum ?: "-",
             item.testResult?.sampleBarcode ?: "-",
             item.cuvetteID ?: "-",
             "对应比色皿序号:",
             getState(item.state),
-            item?.testResult?.testResult ?: "-",
-            item?.sampleType ?: SampleType.NONEXISTENT,
+            item.testResult?.testResult ?: "-",
+            item.sampleType ?: SampleType.NONEXISTENT,
             item.testResult
         )
     }

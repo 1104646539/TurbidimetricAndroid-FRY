@@ -2,6 +2,7 @@ package com.wl.turbidimetric.upload.msg
 
 import ca.uhn.hl7v2.HapiContext
 import ca.uhn.hl7v2.model.Message
+import com.wl.turbidimetric.model.TestResultAndCurveModel
 import com.wl.turbidimetric.model.TestResultModel
 import com.wl.turbidimetric.upload.hl7.util.*
 import com.wl.wllib.DateUtil
@@ -13,7 +14,7 @@ import com.wl.wllib.toTimeStr
 object OruMsg {
 
     @JvmStatic
-    fun create(charset: String, t: TestResultModel, msgId: Long): String {
+    fun create(charset: String, t: TestResultAndCurveModel, msgId: Long): String {
         val sb = StringBuffer()
 
         sb.append(createMSH(charset, "ORU^R01", msgId))
@@ -48,8 +49,8 @@ object OruMsg {
         return arrayToString(arr, "|").plus("\r")
     }
 
-    fun createPID(t: TestResultModel): String {
-        val sex = when (t.gender) {
+    fun createPID(t: TestResultAndCurveModel): String {
+        val sex = when (t.result.gender) {
             "男" -> {
                 "M"
             }
@@ -62,31 +63,31 @@ object OruMsg {
         }
         val arr = createArray(
             31, hashMapOf(
-                0 to "PID", 5 to t.name, 7 to t.age, 8 to sex
+                0 to "PID", 5 to t.result.name, 7 to t.result.age, 8 to sex
             )
         )
         return arrayToString(arr, "|").plus("\r")
     }
 
-    fun createOBR(t: TestResultModel): String {
+    fun createOBR(t: TestResultAndCurveModel): String {
         val arr = createArray(
             46, hashMapOf(
                 0 to "OBR",
-                2 to t.sampleBarcode,
-                3 to t.detectionNum,
-                14 to t.deliveryTime,
-                16 to t.deliveryDepartment,
-                20 to t.deliveryDoctor
+                2 to t.result.sampleBarcode,
+                3 to t.result.detectionNum,
+                14 to t.result.deliveryTime,
+                16 to t.result.deliveryDepartment,
+                20 to t.result.deliveryDoctor
             )
         )
         return arrayToString(arr, "|").plus("\r")
     }
 
-    fun createOBX(t: TestResultModel): String {
-        val range = if (t.project?.target?.projectLjz == null) {
+    fun createOBX(t: TestResultAndCurveModel): String {
+        val range = if (t.curve?.projectLjz == null) {
             return "0-100"
         } else {
-            "0-${t.project?.target?.projectLjz}"
+            "0-${t.curve?.projectLjz}"
         }
 //        val arr = createArray(
 //            18, hashMapOf(
@@ -106,14 +107,14 @@ object OruMsg {
             18, hashMapOf(
                 0 to "OBX",
                 2 to "NM",
-                3 to t.project.target.projectCode,
-                4 to t.project.target.projectName,
-                5 to t.concentration.toString(),
-                6 to t.project.target.projectUnit,
+                3 to t.curve?.projectCode,
+                4 to t.curve?.projectName,
+                5 to t.result.concentration.toString(),
+                6 to t.curve?.projectUnit,
                 7 to range,
-                9 to t.testResult,
-                13 to t.absorbances.setScale(5).toString(),
-                14 to t.testTime.toTimeStr(DateUtil.Time5Format),
+                9 to t.result.testResult,
+                13 to t.result.absorbances.setScale(5).toString(),
+                14 to t.result.testTime.toTimeStr(DateUtil.Time5Format),
             )
         )
         return arrayToString(arr, "|")

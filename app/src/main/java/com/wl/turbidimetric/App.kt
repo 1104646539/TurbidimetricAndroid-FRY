@@ -5,20 +5,19 @@ import android.app.Application
 import android.content.Context
 import com.lxj.xpopup.XPopup
 import com.wl.turbidimetric.datastore.LocalData
-import com.wl.turbidimetric.datastore.LocalDataGlobal
-import com.wl.turbidimetric.db.DBManager
+import com.wl.turbidimetric.db.MainRoomDatabase
 import com.wl.turbidimetric.global.SystemGlobal
-import com.wl.turbidimetric.model.ProjectModel
 import com.wl.turbidimetric.upload.hl7.util.getLocalConfig
 import com.wl.turbidimetric.util.CrashHandler
 import com.wl.wllib.LogToFile
 import com.wl.wllib.ToastUtil
 import com.wl.wllib.ktxRunOnBgCache
-import java.util.*
 
 
 class App : Application() {
     private val activityList = mutableListOf<Activity>()
+    val database by lazy { MainRoomDatabase.getDatabase(this) }
+    val mainDao by lazy { database.mainDao() }
 
     override fun attachBaseContext(base: Context?) {
         super.attachBaseContext(base)
@@ -31,24 +30,24 @@ class App : Application() {
         Thread.setDefaultUncaughtExceptionHandler(CrashHandler())
         initData()
         ktxRunOnBgCache {
-            DBManager.init(this)
-            initDataStore();
+//            DBManager.init(this)
+            initDataStore()
             LogToFile.init()
 //            UploadUtil.open()
             initPop()
 //
             //没有项目参数的时候，添加一个默认参数
-            if (DBManager.ProjectBox.all.isNullOrEmpty()) {
-                repeat(10) {
-                    DBManager.ProjectBox.put(ProjectModel().apply {
-                        reagentNO = it.toString()
-                        f0 = 14.32525697891957
-                        f1 = 1.1568311508309208
-                        f2 = -9.761226454206153E-4
-                        f3 = 4.993717916686672E-7
-                    })
-                }
-            }
+//            if (DBManager.ProjectBox.all.isNullOrEmpty()) {
+//                repeat(10) {
+//                    DBManager.ProjectBox.put(ProjectModel().apply {
+//                        reagentNO = it.toString()
+//                        f0 = 14.32525697891957
+//                        f1 = 1.1568311508309208
+//                        f2 = -9.761226454206153E-4
+//                        f3 = 4.993717916686672E-7
+//                    })
+//                }
+//            }
         }
     }
 

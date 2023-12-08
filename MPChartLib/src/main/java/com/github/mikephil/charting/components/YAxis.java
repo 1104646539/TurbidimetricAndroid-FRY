@@ -21,7 +21,7 @@ public class YAxis extends AxisBase {
     /**
      * indicates if the bottom y-label entry is drawn or not
      */
-    private boolean mDrawBottomYLabelEntry = true;
+    private final boolean mDrawBottomYLabelEntry = true;
 
     /**
      * indicates if the top y-label entry is drawn or not
@@ -88,7 +88,7 @@ public class YAxis extends AxisBase {
     /**
      * the side this axis object represents
      */
-    private AxisDependency mAxisDependency;
+    private final AxisDependency mAxisDependency;
 
     /**
      * the minimum width that the axis should take (in dp).
@@ -381,11 +381,8 @@ public class YAxis extends AxisBase {
      * @return
      */
     public boolean needsOffset() {
-        if (isEnabled() && isDrawLabelsEnabled() && getLabelPosition() == YAxisLabelPosition
-                .OUTSIDE_CHART)
-            return true;
-        else
-            return false;
+        return isEnabled() && isDrawLabelsEnabled() && getLabelPosition() == YAxisLabelPosition
+                .OUTSIDE_CHART;
     }
 
     /**

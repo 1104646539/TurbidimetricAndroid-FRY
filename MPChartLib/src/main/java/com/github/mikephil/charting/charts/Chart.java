@@ -337,10 +337,7 @@ public abstract class Chart<T extends ChartData<? extends IDataSet<? extends Ent
             return true;
         else {
 
-            if (mData.getEntryCount() <= 0)
-                return true;
-            else
-                return false;
+            return mData.getEntryCount() <= 0;
         }
     }
 
@@ -526,9 +523,8 @@ public abstract class Chart<T extends ChartData<? extends IDataSet<? extends Ent
      * @return
      */
     public boolean valuesToHighlight() {
-        return mIndicesToHighlight == null || mIndicesToHighlight.length <= 0
-                || mIndicesToHighlight[0] == null ? false
-                : true;
+        return mIndicesToHighlight != null && mIndicesToHighlight.length > 0
+                && mIndicesToHighlight[0] != null;
     }
 
     /**
@@ -692,7 +688,7 @@ public abstract class Chart<T extends ChartData<? extends IDataSet<? extends Ent
         else {
 
             if (mLogEnabled)
-                Log.i(LOG_TAG, "Highlighted: " + high.toString());
+                Log.i(LOG_TAG, "Highlighted: " + high);
 
             e = mData.getEntryForHighlight(high);
             if (e == null) {

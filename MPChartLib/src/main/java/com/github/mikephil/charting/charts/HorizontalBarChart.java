@@ -58,7 +58,7 @@ public class HorizontalBarChart extends BarChart {
         mXAxisRenderer = new XAxisRendererHorizontalBarChart(mViewPortHandler, mXAxis, mLeftAxisTransformer, this);
     }
 
-    private RectF mOffsetsBuffer = new RectF();
+    private final RectF mOffsetsBuffer = new RectF();
 
     protected void calculateLegendOffsets(RectF offsets) {
 

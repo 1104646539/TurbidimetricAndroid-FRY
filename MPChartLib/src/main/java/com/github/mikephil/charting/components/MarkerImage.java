@@ -26,15 +26,15 @@ import java.lang.ref.WeakReference;
  */
 public class MarkerImage implements IMarker {
 
-    private Context mContext;
-    private Drawable mDrawable;
+    private final Context mContext;
+    private final Drawable mDrawable;
 
     private MPPointF mOffset = new MPPointF();
-    private MPPointF mOffset2 = new MPPointF();
+    private final MPPointF mOffset2 = new MPPointF();
     private WeakReference<Chart> mWeakChart;
 
     private FSize mSize = new FSize();
-    private Rect mDrawableBoundsCache = new Rect();
+    private final Rect mDrawableBoundsCache = new Rect();
 
     /**
      * Constructor. Sets up the MarkerView with a custom layout resource.

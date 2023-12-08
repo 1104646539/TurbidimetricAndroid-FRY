@@ -27,10 +27,10 @@ class OneEditDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_one_e
         this.title = title
         this.content = content
         this.confirmText = confirmMsg
-        this.confirmClick = { onConfirm?.invoke(this) }
+        this.confirmClick = { onConfirm.invoke(this) }
         this.cancelText = cancelMsg
         this.cancelClick = onCancel
-        super.show();
+        super.show()
     }
 
     open fun setEditType(editType: EditType) {
@@ -67,7 +67,7 @@ class OneEditDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_one_e
         if (!content.isNullOrEmpty()) {
             etContent?.let {
                 it.setText(content)
-                it.setSelection(content!!.length);
+                it.setSelection(content!!.length)
             }
         }
     }

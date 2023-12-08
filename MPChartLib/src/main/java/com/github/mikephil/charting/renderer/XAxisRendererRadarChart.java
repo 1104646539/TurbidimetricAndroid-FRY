@@ -12,7 +12,7 @@ import com.github.mikephil.charting.utils.ViewPortHandler;
 
 public class XAxisRendererRadarChart extends XAxisRenderer {
 
-    private RadarChart mChart;
+    private final RadarChart mChart;
 
     public XAxisRendererRadarChart(ViewPortHandler viewPortHandler, XAxis xAxis, RadarChart chart) {
         super(viewPortHandler, xAxis, null);

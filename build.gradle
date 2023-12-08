@@ -2,7 +2,7 @@
 buildscript {
     ext.kotlin_version = "1.6.10"
 //    ext.kotlin_version = "1.7.0"
-    ext.objectboxVersion = "3.5.0"
+//    ext.objectboxVersion = "3.5.0"
     repositories {
         google()
         jcenter()
@@ -15,7 +15,7 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-android-extensions:$kotlin_version"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'com.google.dagger:hilt-android-gradle-plugin:2.42'
-        classpath("io.objectbox:objectbox-gradle-plugin:$objectboxVersion")
+//        classpath("io.objectbox:objectbox-gradle-plugin:$objectboxVersion")
     }
 }
 //plugins {

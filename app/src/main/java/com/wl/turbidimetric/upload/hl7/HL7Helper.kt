@@ -3,6 +3,7 @@ package com.wl.turbidimetric.upload.hl7
 import android.os.Handler
 import android.os.Message
 import com.wl.turbidimetric.global.SystemGlobal
+import com.wl.turbidimetric.model.TestResultAndCurveModel
 import com.wl.turbidimetric.model.TestResultModel
 import com.wl.turbidimetric.upload.hl7.service.HL7UploadService
 import com.wl.turbidimetric.upload.hl7.service.Hl7Log
@@ -22,7 +23,7 @@ object HL7Helper : UploadService {
     var hl7Log: Hl7Log? = null
         set(value) {
             field = value
-            uploadService?.hl7Log = value
+            uploadService.hl7Log = value
         }
     val WHAT_NEXT = 1000
     val handler = object : Handler() {
@@ -39,36 +40,36 @@ object HL7Helper : UploadService {
         return HL7UploadService()
     }
 
-    private var index = 0;
-    private var successCount = 0;
-    private var failedCount = 0;
-    private var lastIndex = 0;
-    private var testResults = mutableListOf<TestResultModel>()
+    private var index = 0
+    private var successCount = 0
+    private var failedCount = 0
+    private var lastIndex = 0
+    private var testResults = mutableListOf<TestResultAndCurveModel>()
     private var onUploadTestResults: OnUploadTestResults? = null
 
     fun uploadTestResult(
-        datas: List<TestResultModel>,
+        datas: List<TestResultAndCurveModel>,
         callback: OnUploadTestResults
     ) {
         testResults.addAll(datas)
         onUploadTestResults = callback
-        lastIndex = testResults.lastIndex;
+        lastIndex = testResults.lastIndex
         uploadNextTestResult(testResults.first())
     }
 
     fun uploadSingleTestResult(
-        testResult: TestResultModel,
+        testResult: TestResultAndCurveModel,
         callback: OnUploadTestResults
     ) {
         onUploadTestResults = callback
         testResults.add(testResult)
-        lastIndex = testResults.lastIndex;
+        lastIndex = testResults.lastIndex
         if (testResults.size == 1) {
             handler.sendEmptyMessageDelayed(WHAT_NEXT, 1000)
         }
     }
 
-    private fun uploadNextTestResult(testResult: TestResultModel) {
+    private fun uploadNextTestResult(testResult: TestResultAndCurveModel) {
         uploadTestResult(testResult, object : OnUploadCallback {
             override fun onUploadSuccess(msg: String) {
                 LogToFile.i("onUploadSuccess msg=$msg index=$index")
@@ -106,7 +107,7 @@ object HL7Helper : UploadService {
         testResults.clear()
     }
 
-    override fun uploadTestResult(testResult: TestResultModel, onUploadCallback: OnUploadCallback) {
+    override fun uploadTestResult(testResult: TestResultAndCurveModel, onUploadCallback: OnUploadCallback) {
         uploadService.uploadTestResult(testResult, onUploadCallback)
     }
 

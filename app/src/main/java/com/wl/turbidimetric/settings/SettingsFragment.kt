@@ -201,10 +201,10 @@ class SettingsFragment :
         //设置广播发送隐藏虚拟按键命令
         if (show) {
             OrderUtil.showHideNav(requireActivity(), false)
-            show = false;
+            show = false
         } else {
             OrderUtil.showHideNav(requireActivity(), true)
-            show = true;
+            show = true
         }
     }
 

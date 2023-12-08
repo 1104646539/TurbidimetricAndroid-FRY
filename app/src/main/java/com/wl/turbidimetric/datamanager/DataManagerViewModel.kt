@@ -6,17 +6,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.wl.turbidimetric.db.DBManager
 import com.wl.turbidimetric.home.ProjectRepository
 import com.wl.turbidimetric.home.TestResultRepository
 import com.wl.turbidimetric.model.ConditionModel
+import com.wl.turbidimetric.model.TestResultAndCurveModel
 import com.wl.turbidimetric.model.TestResultModel
-import com.wl.turbidimetric.model.TestResultModel_
 import com.wl.wwanandroid.base.BaseViewModel
-import io.objectbox.kotlin.toFlow
-import io.objectbox.query.LazyList
-import io.objectbox.query.Query
-import io.objectbox.query.QueryBuilder
 import kotlinx.coroutines.flow.*
 
 
@@ -41,17 +36,29 @@ class DataManagerViewModel(
     private val _resultSize = MutableStateFlow(0L)
     val resultSize: StateFlow<Long> = _resultSize.asStateFlow()
 
-    public fun item(condition: ConditionModel): Flow<PagingData<TestResultModel>> {
-        _resultSize.value = condition.buildQuery().count()
-        return testResultRepository.datas(condition.buildQuery()).cachedIn(viewModelScope)
+    fun item(condition: ConditionModel): Flow<PagingData<TestResultAndCurveModel>> {
+        _resultSize.value = testResultRepository.countTestResultAndCurveModels(condition)
+        return testResultRepository.datas(condition).cachedIn(viewModelScope)
     }
 
-    fun update(testResult: TestResultModel): Long {
+    fun update(testResult: TestResultModel): Int {
         return testResultRepository.updateTestResult(testResult)
+    }
+
+    fun update(model: TestResultAndCurveModel): Int {
+        return testResultRepository.updateTestResult(model.result)
+    }
+
+    fun getTestResultAndCurveModelById(id: Long): TestResultAndCurveModel? {
+        return testResultRepository.getTestResultAndCurveModelById(id)
     }
 
     fun add(testResult: TestResultModel): Long {
         return testResultRepository.addTestResult(testResult)
+    }
+
+    fun add(testResult: List<TestResultModel>) {
+        testResultRepository.addTestResults(testResult)
     }
 
     fun remove(testResults: List<TestResultModel>) {
@@ -62,58 +69,58 @@ class DataManagerViewModel(
         remove(results)
     }
 
-    fun getFilterAll(condition: ConditionModel): List<TestResultModel> {
-        return testResultRepository.getAllTestResult(condition.buildQuery())
+    fun getFilterAll(condition: ConditionModel): List<TestResultAndCurveModel> {
+        return testResultRepository.getAllTestResult(condition)
     }
 
     fun conditionChange(conditionModel: ConditionModel) {
         _conditionModel.value = conditionModel
-        _resultSize.value = conditionModel.buildQuery().count()
+        _resultSize.value = testResultRepository.countTestResultAndCurveModels(conditionModel)
     }
 
-    open fun ConditionModel.buildQuery(): Query<TestResultModel> {
-        val condition: QueryBuilder<TestResultModel> = DBManager.TestResultBox.query().orderDesc(
-            TestResultModel_.id
-        )
-
-        if (name.isNotEmpty()) {
-            condition.contains(
-                TestResultModel_.name,
-                name,
-                QueryBuilder.StringOrder.CASE_INSENSITIVE
-            )
-        }
-        if (qrcode.isNotEmpty()) {
-            condition.contains(
-                TestResultModel_.sampleBarcode,
-                qrcode,
-                QueryBuilder.StringOrder.CASE_INSENSITIVE
-            )
-        }
-        if (conMin != 0) {
-            condition.greaterOrEqual(TestResultModel_.concentration, conMin.toLong())
-        }
-        if (conMax != 0) {
-            condition.lessOrEqual(TestResultModel_.concentration, conMax.toLong())
-        }
-        if (testTimeMin != 0L) {
-            condition.greaterOrEqual(TestResultModel_.testTime, testTimeMin)
-        }
-        if (testTimeMax != 0L) {
-            condition.lessOrEqual(TestResultModel_.testTime, testTimeMax)
-        }
-
-
-        if (results.isNotEmpty()) {
-            condition.`in`(
-                TestResultModel_.testResult,
-                results,
-                QueryBuilder.StringOrder.CASE_INSENSITIVE
-            )
-        }
-
-        return condition.build()
-    }
+//    open fun ConditionModel.buildQuery(): Query<TestResultModel> {
+//        val condition: QueryBuilder<TestResultModel> = DBManager.TestResultBox.query().orderDesc(
+//            TestResultModel_.id
+//        )
+//
+//        if (name.isNotEmpty()) {
+//            condition.contains(
+//                TestResultModel_.name,
+//                name,
+//                QueryBuilder.StringOrder.CASE_INSENSITIVE
+//            )
+//        }
+//        if (qrcode.isNotEmpty()) {
+//            condition.contains(
+//                TestResultModel_.sampleBarcode,
+//                qrcode,
+//                QueryBuilder.StringOrder.CASE_INSENSITIVE
+//            )
+//        }
+//        if (conMin != 0) {
+//            condition.greaterOrEqual(TestResultModel_.concentration, conMin.toLong())
+//        }
+//        if (conMax != 0) {
+//            condition.lessOrEqual(TestResultModel_.concentration, conMax.toLong())
+//        }
+//        if (testTimeMin != 0L) {
+//            condition.greaterOrEqual(TestResultModel_.testTime, testTimeMin)
+//        }
+//        if (testTimeMax != 0L) {
+//            condition.lessOrEqual(TestResultModel_.testTime, testTimeMax)
+//        }
+//
+//
+//        if (results.isNotEmpty()) {
+//            condition.`in`(
+//                TestResultModel_.testResult,
+//                results,
+//                QueryBuilder.StringOrder.CASE_INSENSITIVE
+//            )
+//        }
+//
+//        return condition.build()
+//    }
 }
 
 class DataManagerViewModelFactory(

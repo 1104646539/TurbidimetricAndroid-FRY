@@ -14,7 +14,7 @@ enum class Status(val msg: String) {
 /**
  * 根据返回的错误码和错误信息包装为统一的响应结果信息
  */
-sealed class MsaStatus() {
+sealed class MsaStatus {
     data class Success(val msg: String) : MsaStatus()
     data class Error(val code: Int, val msg: String) : MsaStatus()
 }

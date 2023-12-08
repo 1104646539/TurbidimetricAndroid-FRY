@@ -2,7 +2,7 @@ package com.wl.turbidimetric.test.cmd
 
 import com.wl.turbidimetric.model.*
 
-class CmdProxy() : CmdIF() {
+class CmdProxy : CmdIF() {
     var cmd: CmdIF? = null
 
     override fun exec() {

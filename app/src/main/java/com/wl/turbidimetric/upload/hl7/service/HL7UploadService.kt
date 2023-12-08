@@ -6,6 +6,7 @@ import ca.uhn.hl7v2.model.v231.message.QCK_Q02
 import ca.uhn.hl7v2.parser.Parser
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.wl.turbidimetric.model.TestResultAndCurveModel
 import com.wl.turbidimetric.model.TestResultModel
 import com.wl.turbidimetric.upload.msg.OruMsg
 import com.wl.turbidimetric.upload.msg.QryMsg
@@ -49,7 +50,7 @@ class HL7UploadService : UploadService {
      * @param testResult TestResult
      * @param onUploadCallback OnUploadCallback
      */
-    override fun uploadTestResult(testResult: TestResultModel, onUploadCallback: OnUploadCallback) {
+    override fun uploadTestResult(testResult: TestResultAndCurveModel, onUploadCallback: OnUploadCallback) {
         if (!canSend) {
             onUploadCallback.onUploadFailed(
                 ErrorEnum.BE_COMMUNICATION.code,
@@ -62,7 +63,7 @@ class HL7UploadService : UploadService {
             val msgId = UploadGlobal.MSG_ID++
             val msgStr =
                 OruMsg.create(
-                    connectService!!.connectService!!.config!!.charset,
+                    connectService.connectService!!.config!!.charset,
                     testResult,
                     msgId
                 )
@@ -76,7 +77,7 @@ class HL7UploadService : UploadService {
 //                        hl7Log?.invoke("发送 $msgStr")
                         val response =
                             connectService.sendWaitResponseRetry(
-                                msgStr!!,
+                                msgStr,
                                 msgId.toString()
                             ) { str ->
                                 val m = parser?.parse(str)
@@ -177,7 +178,7 @@ class HL7UploadService : UploadService {
         val msgId = UploadGlobal.MSG_ID++
         val queryId = UploadGlobal.QUERY_ID++
         val msg = QryMsg.create(
-            connectService!!.connectService!!.config!!.charset,
+            connectService.connectService!!.config!!.charset,
             condition,
             msgId,
             queryId
@@ -209,7 +210,7 @@ class HL7UploadService : UploadService {
                     Log.d(TAG, "上传:发送 $msgStr")
                     val response =
                         connectService.sendWaitResponseRetry(
-                            msgStr!!,
+                            msgStr,
                             msgId.toString()
                         ) { str ->
                             Log.d(TAG, "上传:接收 $str")

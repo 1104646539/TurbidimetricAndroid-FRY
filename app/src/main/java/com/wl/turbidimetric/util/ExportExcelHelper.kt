@@ -1,6 +1,7 @@
 package com.wl.turbidimetric.util
 
 import android.content.Context
+import com.wl.turbidimetric.model.TestResultAndCurveModel
 import com.wl.turbidimetric.model.TestResultModel
 import com.wl.weiqianwllib.upan.StorageUtil
 import com.wl.wllib.toTimeStr
@@ -34,7 +35,7 @@ object ExportExcelHelper {
     @JvmStatic
     fun export(
         context: Context,
-        datas: List<TestResultModel>,
+        datas: List<TestResultAndCurveModel>,
         onSuccess: (String) -> Unit,
         onFailed: (String) -> Unit
     ) {
@@ -89,32 +90,32 @@ object ExportExcelHelper {
      * @return String
      */
     private fun getFileName(): String {
-        return "${Date().toTimeStr()}.xls";
+        return "${Date().toTimeStr()}.xls"
     } /**
      * 数据转换成导出的格式
      * @param datas List<TestResultModel>
      * @return List<List<String>>
      */
-    private fun getExportArray(datas: List<TestResultModel>): List<List<String>> {
+    private fun getExportArray(datas: List<TestResultAndCurveModel>): List<List<String>> {
         return datas.map { it ->
             mutableListOf<String>().apply {
-                add("${it.name}")
-                add("${it.gender}")
-                add("${it.age}")
-                add("${it.detectionNum}")
-                add("${it.concentration}")
-                add("${it.testResult}")
-                add("${it.absorbances}")
-                add("${it.testOriginalValue1}")
-                add("${it.testOriginalValue2}")
-                add("${it.testOriginalValue3}")
-                add("${it.testOriginalValue4}")
-                add("${it.testValue1}")
-                add("${it.testValue2}")
-                add("${it.testValue3}")
-                add("${it.testValue4}")
-                add("${it.testTime.toTimeStr()}")
-                add("${it.sampleBarcode}")
+                add("${it.result.name}")
+                add("${it.result.gender}")
+                add("${it.result.age}")
+                add("${it.result.detectionNum}")
+                add("${it.result.concentration}")
+                add("${it.result.testResult}")
+                add("${it.result.absorbances}")
+                add("${it.result.testOriginalValue1}")
+                add("${it.result.testOriginalValue2}")
+                add("${it.result.testOriginalValue3}")
+                add("${it.result.testOriginalValue4}")
+                add("${it.result.testValue1}")
+                add("${it.result.testValue2}")
+                add("${it.result.testValue3}")
+                add("${it.result.testValue4}")
+                add("${it.result.testTime.toTimeStr()}")
+                add("${it.result.sampleBarcode}")
             }
         }
     }

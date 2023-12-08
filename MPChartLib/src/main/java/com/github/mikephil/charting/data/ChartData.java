@@ -10,6 +10,7 @@ import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.IDataSet;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -81,9 +82,7 @@ public abstract class ChartData<T extends IDataSet<? extends Entry>> {
 
         List<T> list = new ArrayList<>();
 
-        for (T set : array) {
-            list.add(set);
-        }
+        Collections.addAll(list, array);
 
         return list;
     }
@@ -660,8 +659,8 @@ public abstract class ChartData<T extends IDataSet<? extends Entry>> {
      * @param f
      */
     public void setValueFormatter(IValueFormatter f) {
-        if (f == null)
-            return;
+        if (f == null) {
+        }
         else {
             for (IDataSet set : mDataSets) {
                 set.setValueFormatter(f);

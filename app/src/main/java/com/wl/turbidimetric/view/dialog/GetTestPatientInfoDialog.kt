@@ -21,9 +21,9 @@ class GetTestPatientInfoDialog(val ct: Context) :
         tb = findViewById(R.id.tb)
 
         tb?.apply {
-            addTab(newTab()?.setText("编号"));
-            addTab(newTab()?.setText("条码"));
-            addTab(newTab()?.setText("时间"));
+            addTab(newTab().setText("编号"))
+            addTab(newTab().setText("条码"))
+            addTab(newTab().setText("时间"))
 
             addOnTabSelectedListener(object : OnTabSelectedListener {
                 override fun onTabSelected(tab: TabLayout.Tab?) {

@@ -276,7 +276,7 @@ object NetworkUtil {
                 while (en_ip.hasMoreElements()) {
                     ip = en_ip.nextElement() as InetAddress
                     ip =
-                        if (!ip.isLoopbackAddress && ip!!.hostAddress.indexOf(":") == -1) break else null
+                        if (!ip.isLoopbackAddress && ip.hostAddress.indexOf(":") == -1) break else null
                 }
                 if (ip != null) {
                     break

@@ -23,7 +23,7 @@ public class ObjectPool<T extends ObjectPool.Poolable> {
     private int desiredCapacity;
     private Object[] objects;
     private int objectsPointer;
-    private T modelObject;
+    private final T modelObject;
     private float replenishPercentage;
 
 
@@ -180,9 +180,7 @@ public class ObjectPool<T extends ObjectPool.Poolable> {
         final int oldCapacity = this.desiredCapacity;
         this.desiredCapacity *= 2;
         Object[] temp = new Object[this.desiredCapacity];
-        for(int i = 0 ; i < oldCapacity ; i++){
-            temp[i] = this.objects[i];
-        }
+        if (oldCapacity >= 0) System.arraycopy(this.objects, 0, temp, 0, oldCapacity);
         this.objects = temp;
     }
 

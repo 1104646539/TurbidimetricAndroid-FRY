@@ -1,28 +1,20 @@
 package com.wl.turbidimetric.upload.view
 
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.widget.addTextChangedListener
-import androidx.databinding.DataBindingUtil.setContentView
-import androidx.databinding.adapters.TextViewBindingAdapter.OnTextChanged
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.ActivityUploadSettingsBinding
 import com.wl.turbidimetric.datastore.LocalData
-import com.wl.turbidimetric.ex.PD
 import com.wl.turbidimetric.ex.toast
 import com.wl.turbidimetric.global.SystemGlobal
-import com.wl.turbidimetric.model.ProjectModel
+import com.wl.turbidimetric.model.CurveModel
+import com.wl.turbidimetric.model.TestResultAndCurveModel
 import com.wl.turbidimetric.model.TestResultModel
 import com.wl.turbidimetric.upload.hl7.HL7Helper
 import com.wl.turbidimetric.upload.hl7.util.ConnectResult
 import com.wl.turbidimetric.upload.hl7.util.ConnectStatus
-import com.wl.turbidimetric.upload.model.ConnectConfig
 import com.wl.turbidimetric.upload.model.GetPatientCondition
 import com.wl.turbidimetric.upload.model.GetPatientType
 import com.wl.turbidimetric.upload.model.Patient
@@ -37,11 +29,9 @@ import com.wl.turbidimetric.view.dialog.showPop
 import com.wl.wllib.LogToFile.i
 import com.wl.wllib.isIP
 import com.wl.wwanandroid.base.BaseActivity
-import com.wl.wwanandroid.base.BaseViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.*
 
 /**
@@ -141,7 +131,7 @@ class UploadSettingsActivity :
         }
 
         vd.btnClear.setOnClickListener {
-            vd.tvLog.setText("")
+            vd.tvLog.text = ""
         }
         HL7Helper.hl7Log = {
             lifecycleScope.launch(Dispatchers.Main) {
@@ -179,8 +169,8 @@ class UploadSettingsActivity :
                         lifecycleScope.launch(Dispatchers.Main) {
                             hilt.dismiss()
                             if (patients.isNullOrEmpty()) {
-                                dialog?.showPop(this@UploadSettingsActivity, isCancelable = true) {
-                                    dialog?.showDialog(
+                                dialog.showPop(this@UploadSettingsActivity, isCancelable = true) {
+                                    dialog.showDialog(
                                         msg = "没有待检信息",
                                         confirmText = "我知道了",
                                         confirmClick = {
@@ -210,8 +200,8 @@ class UploadSettingsActivity :
                     override fun onGetPatientFailed(code: Int, msg: String) {
                         lifecycleScope.launch(Dispatchers.Main) {
                             hilt.dismiss()
-                            dialog?.showPop(this@UploadSettingsActivity, isCancelable = false) {
-                                dialog?.showDialog(
+                            dialog.showPop(this@UploadSettingsActivity, isCancelable = false) {
+                                dialog.showDialog(
                                     msg = "$code $msg",
                                     confirmText = "我知道了",
                                     confirmClick = {
@@ -230,8 +220,8 @@ class UploadSettingsActivity :
      */
     private fun sendResult() {
         HL7Helper.uploadTestResult(
-            TestResultModel(
-                id = 0L,
+            TestResultAndCurveModel(result = TestResultModel(
+                resultId = 0L,
                 testResult = "阴性",
                 concentration = 66,
                 absorbances = "121120".toBigDecimal(),
@@ -244,14 +234,12 @@ class UploadSettingsActivity :
                 deliveryTime = "20220202020202",
                 deliveryDepartment = "体检科",
                 deliveryDoctor = "w医生",
-            ).apply {
-                project.target = ProjectModel().apply {
-                    projectName = "便潜血"
-                    projectLjz = 100
-                    projectCode = "FOB"
-                    projectUnit = "ul"
-                }
-            }, object : OnUploadCallback {
+            ), curve = CurveModel().apply {
+                projectName = "便潜血"
+                projectLjz = 100
+                projectCode = "FOB"
+                projectUnit = "ul"
+            }), object : OnUploadCallback {
                 override fun onUploadSuccess(msg: String) {
                     i("onUploadSuccess $msg")
                 }
@@ -385,7 +373,7 @@ class UploadSettingsActivity :
         }
         lifecycleScope.launchWhenCreated {
             SystemGlobal.obConnectStatus.collectLatest {
-                vd.tvConnectStatus.setText(it.msg)
+                vd.tvConnectStatus.text = it.msg
             }
         }
         lifecycleScope.launchWhenCreated {

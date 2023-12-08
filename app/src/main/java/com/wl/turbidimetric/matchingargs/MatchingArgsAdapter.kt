@@ -8,17 +8,16 @@ import androidx.databinding.library.baseAdapters.BR
 import androidx.recyclerview.widget.RecyclerView
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.ItemMatchingargsBinding
-import com.wl.turbidimetric.ex.scale
 import com.wl.turbidimetric.ex.scaleStr
-import com.wl.turbidimetric.model.ProjectModel
+import com.wl.turbidimetric.model.CurveModel
 import com.wl.wllib.LogToFile.i
-class MatchingArgsAdapter() :
+class MatchingArgsAdapter :
     RecyclerView.Adapter<MatchingArgsAdapter.MatchingArgsViewHolder>() {
-    var onSelectChange: ((ProjectModel) -> Unit)? = null
+    var onSelectChange: ((CurveModel) -> Unit)? = null
 
 
-    val items: MutableList<ProjectModel> = mutableListOf()
-    fun submit(items: MutableList<ProjectModel>) {
+    val items: MutableList<CurveModel> = mutableListOf()
+    fun submit(items: MutableList<CurveModel>) {
         this.items.clear()
         this.items.addAll(items)
         notifyDataSetChanged()
@@ -28,7 +27,7 @@ class MatchingArgsAdapter() :
         val binding: ItemMatchingargsBinding
     ) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bindData(item: ProjectModel?) {
+        fun bindData(item: CurveModel?) {
             binding.setVariable(BR.item, item)
             binding.tvID.text = (item?.reagentNO ?: "-").toString()
             binding.tvA1.text = (item?.f0 ?: 0.0).scaleStr(6).toString()
@@ -50,7 +49,7 @@ class MatchingArgsAdapter() :
             holder.binding.root.setOnClickListener {
                 val item = items[holder.absoluteAdapterPosition]
                 i("holder.absoluteAdapterPosition2=${holder.absoluteAdapterPosition} bindingAdapterPosition=${holder.bindingAdapterPosition} oldPosition=${holder.oldPosition} adapterPosition=${holder.adapterPosition} layoutPosition=${holder.layoutPosition}")
-                item?.let { item ->
+                item.let { item ->
                     it?.let { view ->
                         if (item.isSelect) {
                             return@setOnClickListener
@@ -64,8 +63,8 @@ class MatchingArgsAdapter() :
                     }
                 }
             }
-            holder.binding.ivSelect.isSelected = item?.isSelect ?: false
-            item?.let {
+            holder.binding.ivSelect.isSelected = item.isSelect
+            item.let {
                 if (it.isSelect) {
                     holder.binding.root.setBackgroundResource(R.drawable.bg_item_select)
                 } else if (holder.absoluteAdapterPosition % 2 == 0) {
@@ -77,8 +76,8 @@ class MatchingArgsAdapter() :
         }
     }
 
-    var selectPos = -1;
-    var oldSelectPos = -1;
+    var selectPos = -1
+    var oldSelectPos = -1
     override fun getItemViewType(position: Int): Int {
         return position
     }

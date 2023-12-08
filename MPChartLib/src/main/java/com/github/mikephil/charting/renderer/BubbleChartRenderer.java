@@ -55,8 +55,8 @@ public class BubbleChartRenderer extends BarLineScatterCandleBubbleRenderer {
         }
     }
 
-    private float[] sizeBuffer = new float[4];
-    private float[] pointBuffer = new float[2];
+    private final float[] sizeBuffer = new float[4];
+    private final float[] pointBuffer = new float[2];
 
     protected float getShapeSize(float entrySize, float maxSize, float reference, boolean normalizeSize) {
         final float factor = normalizeSize ? ((maxSize == 0f) ? 1f : (float) Math.sqrt(entrySize / maxSize)) :
@@ -199,7 +199,7 @@ public class BubbleChartRenderer extends BarLineScatterCandleBubbleRenderer {
     public void drawExtras(Canvas c) {
     }
 
-    private float[] _hsvBuffer = new float[3];
+    private final float[] _hsvBuffer = new float[3];
 
     @Override
     public void drawHighlighted(Canvas c, Highlight[] indices) {

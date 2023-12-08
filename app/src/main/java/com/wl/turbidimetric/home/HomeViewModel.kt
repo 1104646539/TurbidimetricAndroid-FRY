@@ -12,15 +12,12 @@ import com.wl.turbidimetric.global.SystemGlobal.testState
 import com.wl.turbidimetric.global.SystemGlobal.testType
 import com.wl.turbidimetric.model.*
 import com.wl.turbidimetric.upload.hl7.HL7Helper
-import com.wl.turbidimetric.upload.hl7.OnUploadTestResults
-import com.wl.turbidimetric.upload.service.OnUploadCallback
 import com.wl.turbidimetric.util.Callback2
 import com.wl.turbidimetric.util.OnScanResult
 import com.wl.turbidimetric.util.ScanCodeUtil
 import com.wl.turbidimetric.util.SerialPortUtil
 import com.wl.wllib.LogToFile.c
 import com.wl.wwanandroid.base.BaseViewModel
-import io.objectbox.kotlin.flow
 import kotlinx.coroutines.*
 import java.math.BigDecimal
 import java.util.*
@@ -31,6 +28,7 @@ import kotlinx.coroutines.flow.*
 
 class HomeViewModel(
     private val projectRepository: ProjectRepository,
+    private val curveRepository: CurveRepository,
     private val testResultRepository: TestResultRepository
 ) : BaseViewModel(), Callback2, OnScanResult {
 
@@ -64,7 +62,7 @@ class HomeViewModel(
     /**
      * 检测结果
      */
-    val resultModels = arrayListOf<TestResultModel?>()
+    val resultModels = arrayListOf<TestResultAndCurveModel?>()
 
     /**
      * 四次检测的吸光度值
@@ -272,7 +270,7 @@ class HomeViewModel(
     /**
      *比色皿起始的位置，只限于第一排比色皿用来跳过前面的几个已经使用过的比色皿
      */
-    var cuvetteStartPos = 0;
+    var cuvetteStartPos = 0
 
 
     /**继续检测后获取状态 判断是否是来自比色皿不足
@@ -347,13 +345,13 @@ class HomeViewModel(
     private var takeReagentFinish = false
 
 
-    val testMsg = MutableLiveData("");
-    val projectDatas = projectRepository.allDatas.flow()
+    val testMsg = MutableLiveData("")
+    val projectDatas = curveRepository.allDatas
 
     /**
      * 选择的检测项目
      */
-    var selectProject: ProjectModel? = null
+    var selectProject: CurveModel? = null
 
     /**
      * 输入的起始编号，在第一次开始的时候才赋值 ,使用过就会为空
@@ -411,9 +409,6 @@ class HomeViewModel(
      * r2试剂
      */
     var r2Reagent: Boolean = false
-        set(value) {
-            field = value
-        }
 
     /**
      * r2试剂量
@@ -479,10 +474,10 @@ class HomeViewModel(
     val sampleExists = mutableListOf(true, true, true, true, true, true, true, true, true, true)
 
     //测试用 每排之间的检测间隔
-    val testS: Long = 100;
+    val testS: Long = 100
 
     //测试用 每个比色皿之间的检测间隔
-    val testP: Long = 100;
+    val testP: Long = 100
 
     /**
      * 一直获取温度状态
@@ -549,8 +544,8 @@ class HomeViewModel(
         i("跳过 $cuvetteStartPos 个比色皿")
 
         if (SystemGlobal.isCodeDebug) {
-            testShelfInterval = testS;
-            testPosInterval = testP;
+            testShelfInterval = testS
+            testPosInterval = testP
         }
         resultTest1.clear()
         resultTest2.clear()
@@ -897,7 +892,7 @@ class HomeViewModel(
         testResult?.let {
             mSamplesStates[sampleShelfPos]!![samplePos].testResult = testResult
         }
-        samplePos?.let {
+        samplePos.let {
             mSamplesStates[sampleShelfPos]!![samplePos].cuvetteID = cuvettePos
         }
         sampleType?.let {
@@ -970,7 +965,7 @@ class HomeViewModel(
         updateSampleState(samplePos, SampleState.ScanSuccess, sampleType = sampleType)
         scanFinish = true
         pierced()
-        scanResults.add(str ?: "")
+        scanResults.add(str)
         i("scanResults=$scanResults")
     }
 
@@ -1003,12 +998,12 @@ class HomeViewModel(
             sampleBarcode = str ?: "",
             createTime = Date().time,
             detectionNum = LocalData.getDetectionNumInc(),
-            sampleType = sampleItem?.sampleType?.ordinal ?: SampleType.NONEXISTENT.ordinal
-        ).apply {
-            project.target = selectProject
-        }
-
-        resultModels.add(resultModel)
+            sampleType = sampleItem?.sampleType?.ordinal ?: SampleType.NONEXISTENT.ordinal,
+            curveOwnerId = selectProject?.curveId ?: 0
+        )
+        val id = testResultRepository.addTestResult(resultModel)
+        resultModel.resultId = id
+        resultModels.add(TestResultAndCurveModel(resultModel, selectProject))
         return resultModel
     }
 
@@ -1017,7 +1012,7 @@ class HomeViewModel(
      */
     private fun pierced() {
         val type =
-            mSamplesStates?.get(sampleShelfPos)?.get(samplePos)?.sampleType ?: SampleType.CUVETTE
+            mSamplesStates.get(sampleShelfPos)?.get(samplePos)?.sampleType ?: SampleType.CUVETTE
         c("发送 刺破 type=$type")
         piercedFinish = false
         SerialPortUtil.pierced(type)
@@ -1046,6 +1041,7 @@ class HomeViewModel(
                 updateTestResultModel(value, cuvettePos - 5, CuvetteState.Test1)
                 nextDripReagent()
             }
+
             TestState.Test2 -> {
                 updateCuvetteState(cuvettePos, CuvetteState.Test2)
                 updateTestResultModel(value, cuvettePos, CuvetteState.Test2)
@@ -1063,6 +1059,7 @@ class HomeViewModel(
                     }
                 }
             }
+
             TestState.Test3 -> {
                 updateCuvetteState(cuvettePos, CuvetteState.Test3)
                 updateTestResultModel(value, cuvettePos, CuvetteState.Test3)
@@ -1080,6 +1077,7 @@ class HomeViewModel(
                     }
                 }
             }
+
             TestState.Test4 -> {
                 updateCuvetteState(cuvettePos, CuvetteState.Test4)
                 updateTestResultModel(value, cuvettePos, CuvetteState.Test4)
@@ -1122,12 +1120,13 @@ class HomeViewModel(
                     resultOriginalTest1.add(value)
                     resultTest1.add(calcAbsorbance(value.toBigDecimal()))
                 }
-                resultModels[pos]?.testValue1 = resultTest1[pos]
-                resultModels[pos]?.testOriginalValue1 = resultOriginalTest1[pos]
+                resultModels[pos]?.result?.testValue1 = resultTest1[pos]
+                resultModels[pos]?.result?.testOriginalValue1 = resultOriginalTest1[pos]
 
-                mCuvetteStates[cuvetteShelfPos]?.get(pos)?.testResult = resultModels[pos]
-                _cuvetteStates.value = mCuvetteStates;
+                mCuvetteStates[cuvetteShelfPos]?.get(pos)?.testResult = resultModels[pos]?.result
+                _cuvetteStates.value = mCuvetteStates
             }
+
             CuvetteState.Test2 -> {
                 if (SystemGlobal.isCodeDebug) {
                     resultTest2.add(testValues2[pos].toBigDecimal())
@@ -1136,9 +1135,10 @@ class HomeViewModel(
                     resultOriginalTest2.add(value)
                     resultTest2.add(calcAbsorbance(value.toBigDecimal()))
                 }
-                resultModels[pos]?.testValue2 = resultTest2[pos]
-                resultModels[pos]?.testOriginalValue2 = resultOriginalTest2[pos]
+                resultModels[pos]?.result?.testValue2 = resultTest2[pos]
+                resultModels[pos]?.result?.testOriginalValue2 = resultOriginalTest2[pos]
             }
+
             CuvetteState.Test3 -> {
                 if (SystemGlobal.isCodeDebug) {
                     resultTest3.add(testValues3[pos].toBigDecimal())
@@ -1147,9 +1147,10 @@ class HomeViewModel(
                     resultOriginalTest3.add(value)
                     resultTest3.add(calcAbsorbance(value.toBigDecimal()))
                 }
-                resultModels[pos]?.testValue3 = resultTest3[pos]
-                resultModels[pos]?.testOriginalValue3 = resultOriginalTest3[pos]
+                resultModels[pos]?.result?.testValue3 = resultTest3[pos]
+                resultModels[pos]?.result?.testOriginalValue3 = resultOriginalTest3[pos]
             }
+
             CuvetteState.Test4 -> {
                 if (SystemGlobal.isCodeDebug) {
                     resultTest4.add(testValues4[pos].toBigDecimal())
@@ -1158,21 +1159,23 @@ class HomeViewModel(
                     resultOriginalTest4.add(value)
                     resultTest4.add(calcAbsorbance(value.toBigDecimal()))
                 }
-                resultModels[pos]?.testValue4 = resultTest4[pos]
-                resultModels[pos]?.testOriginalValue4 = resultOriginalTest4[pos]
-                resultModels[pos]?.testTime = Date().time
+                resultModels[pos]?.result?.testValue4 = resultTest4[pos]
+                resultModels[pos]?.result?.testOriginalValue4 = resultOriginalTest4[pos]
+                resultModels[pos]?.result?.testTime = Date().time
                 //计算单个结果浓度
                 val abs = calcAbsorbanceDifference(resultTest1[pos], resultTest2[pos])
                 absorbances.add(abs)
                 selectProject?.let { project ->
-//                    resultModels[pos]?.project?.target = project
+//                    resultModels[pos]?.result?.project?.target = project
                     var con = calcCon(abs, project)
                     con = if (con.toDouble() < 0.0) 0 else con
                     cons.add(con)
-                    resultModels[pos]?.absorbances = abs
-                    resultModels[pos]?.concentration = con
-                    resultModels[pos]?.testResult = calcShowTestResult(
-                        con, resultModels[pos]?.project?.target?.projectLjz ?: 100
+                    resultModels[pos]?.result?.absorbances = abs
+                    resultModels[pos]?.result?.concentration = con
+
+
+                    resultModels[pos]?.result?.testResult = calcShowTestResult(
+                        con, resultModels[pos]?.curve?.projectLjz ?: 100
                     )
                 }
                 //单个检测完毕
@@ -1181,9 +1184,10 @@ class HomeViewModel(
                 }
 
             }
+
             else -> {}
         }
-        resultModels[pos]?.let {
+        resultModels[pos]?.result?.let {
             testResultRepository.updateTestResult(it)
         }
         i("updateTestResultModel resultModels=$resultModels")
@@ -1195,7 +1199,7 @@ class HomeViewModel(
      * 自动上传 等
      * @param testResultModel TestResultModel?
      */
-    private fun singleTestResultFinish(testResultModel: TestResultModel) {
+    private fun singleTestResultFinish(testResultModel: TestResultAndCurveModel) {
         if (HL7Helper.getConfig().autoUpload && HL7Helper.isConnected()) {
             HL7Helper.uploadSingleTestResult(testResultModel) { count, success, failed ->
                 i("singleTestResultFinish count=$count success=$success failed=$failed")
@@ -1298,10 +1302,10 @@ class HomeViewModel(
         if ((isAuto() && lastSamplePos(samplePos)) || !isAuto()) {//这排最后一个样本
             if (!isAuto() && manualModelSamplingFinish()) {
                 //手动模式，检测完了
-                testFinishAction();
+                testFinishAction()
             } else if (lastSampleShelf(sampleShelfPos)) {//最后一排
                 //结束检测，样本已经取完样了
-                testFinishAction();
+                testFinishAction()
             } else {
                 if (lastCuvetteShelf(cuvetteShelfPos)) {//最后一排比色皿
                     //提示，比色皿不足了
@@ -1374,8 +1378,8 @@ class HomeViewModel(
      * 判断是否进行下一次加试剂
      */
     private fun nextDripReagent() {
-        if (testState != TestState.DripReagent) return;
-        i("nextDripReagent cuvettePos=$cuvettePos dripReagentFinish=$dripReagentFinish testFinish=$testFinish stirFinish=$stirFinish stirProbeCleaningFinish=$stirProbeCleaningFinish takeReagentFinish=$takeReagentFinish cuvetteMoveFinish=$cuvetteMoveFinish");
+        if (testState != TestState.DripReagent) return
+        i("nextDripReagent cuvettePos=$cuvettePos dripReagentFinish=$dripReagentFinish testFinish=$testFinish stirFinish=$stirFinish stirProbeCleaningFinish=$stirProbeCleaningFinish takeReagentFinish=$takeReagentFinish cuvetteMoveFinish=$cuvetteMoveFinish")
         if (cuvettePos < 15) {
             //当取试剂完成，检测完成，搅拌完成，加试剂完成，移动比色皿完成时，
             //去取试剂，移动比色皿
@@ -1421,7 +1425,7 @@ class HomeViewModel(
         i(" ———————— stepTest state=$state  cuvettePos=$cuvettePos————————————————————————————————————————————————————————————————————————————————————————————————=")
         testState = state
         //获取跳过的步数
-        val needMoveStep = getFirstCuvetteStartPos();
+        val needMoveStep = getFirstCuvetteStartPos()
         //切换到TestState.Test2时，当前下位机的比色皿位置cuvettePos == 0，则不需要计算需要回退多少格，直接往前移动
         if (state == TestState.Test2) {
             i("stepTest cuvettePos=$cuvettePos needMoveStep=$needMoveStep")
@@ -1491,7 +1495,7 @@ class HomeViewModel(
      */
     private fun lastNeed(pos: Int, state: CuvetteState): Boolean {
         if (pos > mCuvetteStates[cuvetteShelfPos]!!.size) {
-            return true;
+            return true
         }
         for (i in pos + 1 until mCuvetteStates[cuvetteShelfPos]!!.size) {
             if (mCuvetteStates[cuvetteShelfPos]!![i].state == state) {
@@ -1735,7 +1739,7 @@ class HomeViewModel(
      * 接收到移动比色皿 检测位
      */
     override fun readDataMoveCuvetteTestModel(reply: ReplyModel<MoveCuvetteTestModel>) {
-        if (!runningTest()) return;
+        if (!runningTest()) return
         if (!machineStateNormal()) return
         c("接收到 移动比色皿 检测位 reply=$reply")
         cuvetteMoveFinish = true
@@ -1864,7 +1868,7 @@ class HomeViewModel(
         cuvetteShelfMoveFinish = true
 
         if (testState != TestState.TestFinish) {
-            val needMoveStep = getFirstCuvetteStartPos();
+            val needMoveStep = getFirstCuvetteStartPos()
             if (needMoveStep > -1) {
                 moveCuvetteDripSample(needMoveStep + 2)
             } else {
@@ -1890,7 +1894,7 @@ class HomeViewModel(
     /**
      * 检测结束动作完成后提示
      */
-    public fun showFinishDialog() {
+    fun showFinishDialog() {
 //        dialogTestFinish.postValue(true)
         viewModelScope.launch {
             _dialogUiState.emit(HomeDialogUiState(dialogState = DialogState.TEST_FINISH, ""))
@@ -1920,8 +1924,8 @@ class HomeViewModel(
         sampleShelfMoveFinish = true
 
         if (testState != TestState.TestFinish) {
-            samplePos = -1;
-            scanResults?.clear()
+            samplePos = -1
+            scanResults.clear()
 //            samplesStates = initSampleStates()
             moveSample()
         }
@@ -2285,7 +2289,7 @@ class HomeViewModel(
                 return i
             }
         }
-        return -1;
+        return -1
     }
 
     override fun onMessageEvent(event: EventMsg<Any>) {
@@ -2293,6 +2297,7 @@ class HomeViewModel(
         when (event.what) {
             EventGlobal.WHAT_INIT_QRCODE -> {
             }
+
             else -> {}
         }
     }
@@ -2352,7 +2357,7 @@ class HomeViewModel(
     fun dialogTestFinishCuvetteDeficiencyCancel() {
         i("dialogTestFinishCuvetteDeficiencyCancel 点击结束检测")
 
-        testFinishAction();
+        testFinishAction()
     }
 
     /**
@@ -2373,7 +2378,7 @@ class HomeViewModel(
      */
     fun dialogTestSampleDeficiencyCancel() {
         i("dialogDripSampleSampleDeficiencyCancel 点击结束检测")
-        testFinishAction();
+        testFinishAction()
     }
 
     /**
@@ -2398,7 +2403,7 @@ class HomeViewModel(
      */
     fun dialogGetStateNotExistCancel() {
         i("dialogGetStateNotExistCancel 点击结束检测")
-        testFinishAction();
+        testFinishAction()
     }
 
     /**
@@ -2445,7 +2450,7 @@ class HomeViewModel(
     private fun moveSample(step: Int = 1) {
         c("发送 移动样本 step=$step samplePos=$samplePos")
         sampleMoveFinish = false
-        samplePos += step;
+        samplePos += step
         SerialPortUtil.moveSample(step > 0, step.absoluteValue)
     }
 
@@ -2485,7 +2490,7 @@ class HomeViewModel(
      * 取样
      */
     private fun sampling() {
-        val type = mSamplesStates?.get(sampleShelfPos)?.get(samplePos - 1)?.sampleType
+        val type = mSamplesStates.get(sampleShelfPos)?.get(samplePos - 1)?.sampleType
             ?: SampleType.CUVETTE
         c("发送 取样 type=$type")
         samplingFinish = false
@@ -2579,23 +2584,23 @@ class HomeViewModel(
 
     /**
      * 更改了配置
-     * @param projectModel ProjectModel
+     * @param curveModel ProjectModel
      * @param skipNum Int
      * @param detectionNum String
      * @param sampleNum Int
      */
     fun changeConfig(
-        projectModel: ProjectModel, skipNum: Int, detectionNum: String, sampleNum: Int
+        curveModel: CurveModel, skipNum: Int, detectionNum: String, sampleNum: Int
     ) {
-        selectProject = projectModel
+        selectProject = curveModel
         detectionNumInput = detectionNum
         cuvetteStartPos = skipNum
         needSamplingNum = sampleNum
 
         selectProject?.let {
-            LocalData.SelectProjectID = it.projectId
+            LocalData.SelectProjectID = it.curveId
         }
-        i("changeConfig project=$projectModel")
+        i("changeConfig project=$curveModel")
     }
 
     /**
@@ -2611,11 +2616,11 @@ class HomeViewModel(
     /**
      * 恢复上次选择的项目
      */
-    fun recoverSelectProject(projects: MutableList<ProjectModel>) {
+    fun recoverSelectProject(projects: MutableList<CurveModel>) {
         val selectId = LocalData.SelectProjectID
         if (projects.isNotEmpty()) {
             if (selectId > 0) {
-                val fps = projects.filter { it.projectId == selectId }
+                val fps = projects.filter { it.curveId == selectId }
                 if (fps.isNotEmpty()) {
                     selectProject = fps.first()
                 } else {
@@ -2641,11 +2646,12 @@ class HomeViewModel(
 
 class HomeViewModelFactory(
     private val projectRepository: ProjectRepository = ProjectRepository(),
+    private val curveRepository: CurveRepository = CurveRepository(),
     private val testResultRepository: TestResultRepository = TestResultRepository()
 ) : ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(HomeViewModel::class.java)) {
-            return HomeViewModel(projectRepository, testResultRepository) as T
+            return HomeViewModel(projectRepository, curveRepository, testResultRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

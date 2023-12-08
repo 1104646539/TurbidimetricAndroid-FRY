@@ -19,13 +19,13 @@ class OrderUnitTest {
 
     class TextDelegate : ReadOnlyProperty<Any, String> {
         override fun getValue(thisRef: Any, property: KProperty<*>): String {
-            return "委托只读属性$thisRef $property";
+            return "委托只读属性$thisRef $property"
         }
     }
 
     class TextDelegate2 : ReadWriteProperty<Any, String> {
         override fun getValue(thisRef: Any, property: KProperty<*>): String {
-            return "委托可写属性$thisRef $property";
+            return "委托可写属性$thisRef $property"
         }
 
         override fun setValue(thisRef: Any, property: KProperty<*>, value: String) {

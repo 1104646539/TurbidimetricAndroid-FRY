@@ -1,6 +1,7 @@
 package com.wl.turbidimetric.print
 
 import com.wl.turbidimetric.ex.scale
+import com.wl.turbidimetric.model.TestResultAndCurveModel
 import com.wl.turbidimetric.model.TestResultModel
 import com.wl.turbidimetric.print.PrintUtil.serialPort
 import com.wl.weiqianwllib.serialport.BaseSerialPort
@@ -29,7 +30,7 @@ object PrintUtil {
         send("test\n\n\n\n")
     }
 
-    fun printTest(results: List<TestResultModel?>) {
+    fun printTest(results: List<TestResultAndCurveModel?>) {
         results.forEach {
             it?.let {
                 val msg = getTestResultMsg(it)
@@ -38,7 +39,7 @@ object PrintUtil {
         }
     }
 
-    private fun getTestResultMsg(result: TestResultModel): String {
+    private fun getTestResultMsg(result: TestResultAndCurveModel): String {
 
         val sb = StringBuilder()
 
@@ -49,15 +50,15 @@ object PrintUtil {
         sb.append("\n")
         sb.append("\n")
 
-        sb.append("编号:${result.detectionNum ?: ""}\n")
-        sb.append("条码:${result.sampleBarcode ?: ""}\n")
-        sb.append("姓名:${result.name ?: ""}\n")
-        sb.append("性别:${result.gender ?: ""}\n")
-        sb.append("年龄:${result.age ?: ""}\n")
+        sb.append("编号:${result.result.detectionNum}\n")
+        sb.append("条码:${result.result.sampleBarcode}\n")
+        sb.append("姓名:${result.result.name}\n")
+        sb.append("性别:${result.result.gender}\n")
+        sb.append("年龄:${result.result.age}\n")
 //        sb.append("吸光度:${result.absorbances?.setScale(5, RoundingMode.HALF_UP) ?: ""}\n")
-        sb.append("浓度值:${result.concentration ?: ""} ${result.project.target?.projectUnit ?: ""}\n")
-        sb.append("检测结论:${result.testResult ?: ""}\n")
-        sb.append("检测日期:${result.testTime.toTimeStr() ?: ""}\n")
+        sb.append("浓度值:${result.result.concentration} ${result.curve?.projectUnit ?: ""}\n")
+        sb.append("检测结论:${result.result.testResult}\n")
+        sb.append("检测日期:${result.result.testTime.toTimeStr()}\n")
 
         sb.append("\n")
         sb.append("\n")

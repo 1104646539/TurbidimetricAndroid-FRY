@@ -611,12 +611,12 @@ public class LineChartRenderer extends LineRadarRenderer {
     /**
      * cache for the circle bitmaps of all datasets
      */
-    private HashMap<IDataSet, DataSetImageCache> mImageCaches = new HashMap<>();
+    private final HashMap<IDataSet, DataSetImageCache> mImageCaches = new HashMap<>();
 
     /**
      * buffer for drawing the circles
      */
-    private float[] mCirclesBuffer = new float[2];
+    private final float[] mCirclesBuffer = new float[2];
 
     protected void drawCircles(Canvas c) {
 
@@ -764,7 +764,7 @@ public class LineChartRenderer extends LineRadarRenderer {
 
     private class DataSetImageCache {
 
-        private Path mCirclePathBuffer = new Path();
+        private final Path mCirclePathBuffer = new Path();
 
         private Bitmap[] circleBitmaps;
 

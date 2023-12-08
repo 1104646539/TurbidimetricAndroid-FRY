@@ -14,7 +14,7 @@ import com.github.mikephil.charting.utils.ViewPortHandler;
 @SuppressLint("NewApi")
 public class AnimatedMoveViewJob extends AnimatedViewPortJob {
 
-    private static ObjectPool<AnimatedMoveViewJob> pool;
+    private static final ObjectPool<AnimatedMoveViewJob> pool;
 
     static {
         pool = ObjectPool.create(4, new AnimatedMoveViewJob(null,0,0,null,null,0,0,0));

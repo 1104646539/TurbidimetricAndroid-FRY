@@ -167,7 +167,7 @@ object StorageUtil {
         val documentFile = if (file.isNullOrEmpty() || !file.first().exists()) {
             root.createDirectory(dirName)
         } else {
-            file!!.first()
+            file.first()
         }
         return documentFile
     }
@@ -204,10 +204,10 @@ object StorageUtil {
     fun createFile(path: String, context: Context, cover: Boolean = false): DocumentFile? {
         if (!isExist()) {
             Log.d(TAG, "U盘不存在")
-            return null;
+            return null
         }
         val names = path.split("/")
-        var df = DocumentsUtils.getDocumentFile(File(curPath), true, context);
+        var df = DocumentsUtils.getDocumentFile(File(curPath), true, context)
         if (df == null) return null
         for (i in names.indices) {
             var tempDf = df.findFile(names[i])
@@ -222,12 +222,12 @@ object StorageUtil {
                     tempDf.delete()
                     df = df.createFile("", names[i])
                 } else {
-                    df = tempDf;
+                    df = tempDf
                 }
             }
         }
 
-        return df;
+        return df
     }
 
     /**
@@ -239,10 +239,10 @@ object StorageUtil {
     fun getFile(path: String, context: Context): DocumentFile? {
         if (!isExist()) {
             Log.d(TAG, "U盘不存在")
-            return null;
+            return null
         }
         val names = path.split("/")
-        var df = DocumentsUtils.getDocumentFile(File(curPath), true, context);
+        var df = DocumentsUtils.getDocumentFile(File(curPath), true, context)
 
         for (i in names.indices) {
             df = df.findFile(names[i])
@@ -322,7 +322,7 @@ object StorageUtil {
             onFailed("文件创建失败")
             return
         }
-        val targetOs = getOutputStream(targetDoc!!, context)
+        val targetOs = getOutputStream(targetDoc, context)
         val sourceIs = FileInputStream(file)
 
         try {
@@ -331,7 +331,7 @@ object StorageUtil {
             onFailed("文件复制失败")
         } finally {
             targetOs?.close()
-            sourceIs?.close()
+            sourceIs.close()
         }
 
         onSuccess()

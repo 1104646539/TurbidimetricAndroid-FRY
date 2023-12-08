@@ -36,7 +36,7 @@ public class DefaultAxisValueFormatter implements IAxisValueFormatter
             b.append("0");
         }
 
-        mFormat = new DecimalFormat("###,###,###,##0" + b.toString());
+        mFormat = new DecimalFormat("###,###,###,##0" + b);
     }
 
     @Override

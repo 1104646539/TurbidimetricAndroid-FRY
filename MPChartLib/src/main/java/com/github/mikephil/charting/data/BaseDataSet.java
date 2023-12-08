@@ -276,8 +276,8 @@ public abstract class BaseDataSet<T extends Entry> implements IDataSet<T> {
     @Override
     public void setValueFormatter(IValueFormatter f) {
 
-        if (f == null)
-            return;
+        if (f == null) {
+        }
         else
             mValueFormatter = f;
     }

@@ -1,13 +1,11 @@
 package com.wl.turbidimetric.model
 
-import com.wl.turbidimetric.db.IntArrayConverter
-import io.objectbox.annotation.Convert
-import io.objectbox.annotation.Entity
-import io.objectbox.annotation.Id
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
 @Entity
 data class ProjectModel(
-    @Id
+    @PrimaryKey(autoGenerate = true)
     var projectId: Long = 0,
     var projectName: String = "",
     var projectCode: String = "",
@@ -21,14 +19,10 @@ data class ProjectModel(
     var createTime: String = "",
     var isSelect: Boolean = false,
     var reagentNO: String = "",
-    @Convert(
-        converter = IntArrayConverter::class,
-        dbType = String::class
-    )
     var reactionValues: IntArray? = intArrayOf()
-) : BaseOBModel(0) {
+)  {
     override fun toString(): String {
-        return "TestResultModel(id=$projectId,projectName=$projectName,projectCode=$projectCode,projectLjz=$projectLjz,projectUnit=$projectUnit,f0=$f0,f1=$f1,f2=$f2,f3=$f3,fitGoodness=$fitGoodness,createTime=$createTime,reagentNO=$reagentNO)"
+        return "ProjectModel(id=$projectId,projectName=$projectName,projectCode=$projectCode,projectLjz=$projectLjz,projectUnit=$projectUnit,f0=$f0,f1=$f1,f2=$f2,f3=$f3,fitGoodness=$fitGoodness,createTime=$createTime,reagentNO=$reagentNO)"
     }
 
     override fun equals(other: Any?): Boolean {

@@ -15,21 +15,17 @@ import com.wl.turbidimetric.R
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.MachineTestModel
-import com.wl.turbidimetric.model.ProjectModel
+import com.wl.turbidimetric.model.CurveModel
 import com.wl.turbidimetric.model.SampleType
 import com.wl.turbidimetric.model.TestState
-import com.wl.turbidimetric.util.CurveFitter
 import com.wl.turbidimetric.util.CurveFitterUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import java.io.DataInputStream
 import java.io.File
-import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.math.BigDecimal
 import java.math.RoundingMode
 import kotlin.math.log10
-import kotlin.math.min
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -205,11 +201,11 @@ fun matchingArg(absorbances: List<Double>): CurveFitterUtil {
  * @param absorbance Double
  * @param project 四参数
  */
-fun calcCon(absorbance: BigDecimal, project: ProjectModel): Int {
-    val f0 = project.f0;
-    val f1 = project.f1;
-    val f2 = project.f2;
-    val f3 = project.f3;
+fun calcCon(absorbance: BigDecimal, project: CurveModel): Int {
+    val f0 = project.f0
+    val f1 = project.f1
+    val f2 = project.f2
+    val f3 = project.f3
 //    var con: Double = x0 * ((a2 - a1) / (a2 - absorbance) - 1).pow(1 / p)
 
 //    return con.scale(2)

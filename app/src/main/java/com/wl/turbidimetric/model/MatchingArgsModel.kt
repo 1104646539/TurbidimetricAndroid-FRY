@@ -1,4 +1,3 @@
 package com.wl.turbidimetric.model
 
-class MatchingArgsModel {
-}
+class MatchingArgsModel

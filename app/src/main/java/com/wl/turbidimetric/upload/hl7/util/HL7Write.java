@@ -31,11 +31,7 @@ public  class HL7Write {
     }
 
     protected static byte[] asByteArray(String message, Charset charset, boolean omitBOM) {
-        try {
-            byte[] b = message.getBytes(charset.name());
-            return omitBOM ? CharSetUtil.withoutBOM(b) : b;
-        } catch (UnsupportedEncodingException var4) {
-            return null;
-        }
+        byte[] b = message.getBytes(charset);
+        return omitBOM ? CharSetUtil.withoutBOM(b) : b;
     }
 }

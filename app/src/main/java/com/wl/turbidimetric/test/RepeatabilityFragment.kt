@@ -9,7 +9,7 @@ import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.FragmentRepeatabilityBinding
 import com.wl.turbidimetric.ex.snack
 import com.wl.turbidimetric.home.HomeProjectAdapter
-import com.wl.turbidimetric.model.ProjectModel
+import com.wl.turbidimetric.model.CurveModel
 import com.wl.turbidimetric.view.dialog.HiltDialog
 import com.wl.turbidimetric.view.dialog.showPop
 import com.wl.wwanandroid.base.BaseFragment
@@ -23,7 +23,7 @@ import com.wl.wllib.LogToFile.i
  */
 class RepeatabilityFragment :
     BaseFragment<RepeatabilityViewModel, FragmentRepeatabilityBinding>(R.layout.fragment_repeatability) {
-    val items: MutableList<ProjectModel> = mutableListOf()
+    val items: MutableList<CurveModel> = mutableListOf()
     lateinit var projectAdapter: HomeProjectAdapter
     override val vm: RepeatabilityViewModel by viewModels {
         RepeatabilityViewModelFactory()
@@ -81,7 +81,7 @@ class RepeatabilityFragment :
             override fun onItemSelected(
                 parent: AdapterView<*>?, view: View?, position: Int, id: Long
             ) {
-                vm.selectProject = items?.get(position)
+                vm.selectProject = items.get(position)
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {

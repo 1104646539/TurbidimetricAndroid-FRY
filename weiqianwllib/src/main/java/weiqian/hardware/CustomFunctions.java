@@ -11,12 +11,12 @@ import android.view.Window;
 
 public class CustomFunctions {
 
-	static private String UseStaticIP = "ethernet_use_static_ip";
-	static private String StaticIP = "ethernet_static_ip";
-	static private String StaticGateway = "ethernet_static_gateway";
-	static private String StaticNetMask = "ethernet_static_netmask";
-	static private String StaticDNS1 = "ethernet_static_dns1";
-	static private String StaticDNS2 = "ethernet_static_dns2";
+	static private final String UseStaticIP = "ethernet_use_static_ip";
+	static private final String StaticIP = "ethernet_static_ip";
+	static private final String StaticGateway = "ethernet_static_gateway";
+	static private final String StaticNetMask = "ethernet_static_netmask";
+	static private final String StaticDNS1 = "ethernet_static_dns1";
+	static private final String StaticDNS2 = "ethernet_static_dns2";
 
 	static public void UseStaticIp(ContentResolver contentResolver, String ip, String gateway, String netmask, String dns1, String dns2) {
 		Settings.System.putInt(contentResolver, UseStaticIP, 1);

@@ -161,10 +161,10 @@ open class ConditionDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
         etQRCode?.setText("")
         etConMin?.setText("")
         etConMax?.setText("")
-        tvResults?.setText("请选择")
+        tvResults?.text = "请选择"
         resultAdapter?.clearSelectedInfo()
-        tvTestTimeMin?.setText("")
-        tvTestTimeMax?.setText("")
+        tvTestTimeMin?.text = ""
+        tvTestTimeMax?.text = ""
         testTimeMin = ""
         testTimeMax = ""
     }

@@ -91,22 +91,7 @@ abstract class CustomBtn3Popup(val ctx: Context, val viewId: Int) : CenterPopupV
         }
     }
 
-    // 设置最大宽度，看需要而定，
-    override fun getMaxWidth(): Int {
-        return super.getMaxWidth()
-    }
-
-    // 设置最大高度，看需要而定
-    override fun getMaxHeight(): Int {
-        return super.getMaxHeight()
-    }
-
-    // 设置自定义动画器，看需要而定
-    override fun getPopupAnimator(): PopupAnimator {
-        return super.getPopupAnimator()
-    }
-
-//    /**
+    //    /**
 //     * 弹窗的宽度，用来动态设定当前弹窗的宽度，受getMaxWidth()限制
 //     *
 //     * @return

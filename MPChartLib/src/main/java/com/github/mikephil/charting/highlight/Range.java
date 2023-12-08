@@ -16,16 +16,13 @@ public final class Range {
 
 	/**
 	 * Returns true if this range contains (if the value is in between) the given value, false if not.
-	 * 
+	 *
 	 * @param value
 	 * @return
 	 */
 	public boolean contains(float value) {
 
-		if (value > from && value <= to)
-			return true;
-		else
-			return false;
+        return value > from && value <= to;
 	}
 
 	public boolean isLarger(float value) {

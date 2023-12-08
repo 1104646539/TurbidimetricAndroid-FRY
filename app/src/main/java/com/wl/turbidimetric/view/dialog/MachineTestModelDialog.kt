@@ -2,16 +2,11 @@ package com.wl.turbidimetric.view.dialog
 
 import android.content.Context
 import android.view.View
-import android.view.WindowManager
-import android.widget.AdapterView
 import android.widget.CheckBox
 import android.widget.RadioButton
-import android.widget.Spinner
 import com.lxj.xpopup.core.BasePopupView
 import com.wl.turbidimetric.R
-import com.wl.turbidimetric.home.HomeProjectAdapter
 import com.wl.turbidimetric.model.MachineTestModel
-import com.wl.turbidimetric.model.ProjectModel
 
 /**
  * 检测模式选择对话框

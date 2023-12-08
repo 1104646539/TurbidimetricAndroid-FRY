@@ -38,7 +38,7 @@ public class Highlight {
     /**
      * the index of the dataset the highlighted value is in
      */
-    private int mDataSetIndex;
+    private final int mDataSetIndex;
 
     /**
      * index which value of a stacked bar entry is highlighted, default -1
@@ -227,11 +227,8 @@ public class Highlight {
         if (h == null)
             return false;
         else {
-            if (this.mDataSetIndex == h.mDataSetIndex && this.mX == h.mX
-                    && this.mStackIndex == h.mStackIndex && this.mDataIndex == h.mDataIndex)
-                return true;
-            else
-                return false;
+            return this.mDataSetIndex == h.mDataSetIndex && this.mX == h.mX
+                    && this.mStackIndex == h.mStackIndex && this.mDataIndex == h.mDataIndex;
         }
     }
 

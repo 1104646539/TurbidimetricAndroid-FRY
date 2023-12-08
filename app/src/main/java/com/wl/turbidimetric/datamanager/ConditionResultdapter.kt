@@ -1,18 +1,13 @@
 package com.wl.turbidimetric.datamanager
 
 import android.content.Context
-import android.database.DataSetObserver
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
-import android.widget.ImageView
 import android.widget.SpinnerAdapter
 import android.widget.TextView
 import com.wl.turbidimetric.R
-import com.wl.turbidimetric.ex.scale
-import com.wl.turbidimetric.model.ProjectModel
 
 
 class ConditionResultdapter @JvmOverloads constructor(

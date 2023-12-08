@@ -69,7 +69,7 @@ class SampleShelfView :
             strokeWidth = 1.0f
             textSize = 14.0f
         }
-    };
+    }
     val paintCircle by lazy {
         Paint().apply {
             isAntiAlias = true
@@ -77,7 +77,7 @@ class SampleShelfView :
             style = Paint.Style.FILL
 
         }
-    };
+    }
 
     private var labelWidth = 0.0f
     private var labelHeight = 0.0f
@@ -137,7 +137,7 @@ class SampleShelfView :
 
     private fun initText() {
         val rectfLabel = Rect()
-        paintLabel.getTextBounds(label, 0, label.length, rectfLabel);
+        paintLabel.getTextBounds(label, 0, label.length, rectfLabel)
         labelWidth = rectfLabel.width().toFloat()
         labelHeight = rectfLabel.height().toFloat()
 
@@ -162,7 +162,7 @@ class SampleShelfView :
 
         var top = labelSpace * 2 + labelHeight
         var x = measuredWidth / 2.0f
-        var y = top + circleTopSpace + circleRadius;
+        var y = top + circleTopSpace + circleRadius
         sampleStates?.let { sts ->
             repeat(size) {
                 paintCircle.color = getSampleColor(sts[it].state)

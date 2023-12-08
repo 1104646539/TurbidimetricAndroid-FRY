@@ -18,14 +18,14 @@ public class StackedValueFormatter implements IValueFormatter
     /**
      * if true, all stack values of the stacked bar entry are drawn, else only top
      */
-    private boolean mDrawWholeStack;
+    private final boolean mDrawWholeStack;
 
     /**
      * a string that should be appended behind the value
      */
-    private String mAppendix;
+    private final String mAppendix;
 
-    private DecimalFormat mFormat;
+    private final DecimalFormat mFormat;
 
     /**
      * Constructor.
@@ -45,7 +45,7 @@ public class StackedValueFormatter implements IValueFormatter
             b.append("0");
         }
 
-        this.mFormat = new DecimalFormat("###,###,###,##0" + b.toString());
+        this.mFormat = new DecimalFormat("###,###,###,##0" + b);
     }
 
     @Override

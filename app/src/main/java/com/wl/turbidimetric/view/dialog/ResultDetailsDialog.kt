@@ -3,6 +3,7 @@ package com.wl.turbidimetric.view.dialog
 import android.content.Context
 import android.widget.TextView
 import com.wl.turbidimetric.R
+import com.wl.turbidimetric.model.TestResultAndCurveModel
 import com.wl.turbidimetric.model.TestResultModel
 import com.wl.wllib.toTimeStr
 
@@ -31,19 +32,19 @@ class ResultDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog
     var etSampleBarcode: TextView? = null
 
 
-    var result: TestResultModel? = null
+    var result: TestResultAndCurveModel? = null
     open fun showDialog(
-        result: TestResultModel,
-        onConfirm: (result: TestResultModel) -> Boolean,
+        result: TestResultAndCurveModel,
+        onConfirm: (result: TestResultAndCurveModel) -> Boolean,
     ) {
         this.confirmText = "确定"
         this.confirmClick = {
-            result.name = etName?.text.toString()
-            result.gender = etGender?.text.toString()
-            result.absorbances = (etAbs?.text.toString().toDoubleOrNull() ?: 0.0).toBigDecimal()
-            result.concentration = etCon?.text.toString().toIntOrNull() ?: 0
-            result.testResult = etResult?.text.toString()
-            result.sampleBarcode = etSampleBarcode?.text.toString()
+            result?.result?.name = etName?.text.toString()
+            result?.result?.gender = etGender?.text.toString()
+            result?.result?.absorbances = (etAbs?.text.toString().toDoubleOrNull() ?: 0.0).toBigDecimal()
+            result?.result?.concentration = etCon?.text.toString().toIntOrNull() ?: 0
+            result?.result?.testResult = etResult?.text.toString()
+            result?.result?.sampleBarcode = etSampleBarcode?.text.toString()
             dismiss().takeIf {
                 onConfirm.invoke(result)
             }
@@ -73,16 +74,16 @@ class ResultDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog
 
     override fun setContent() {
         super.setContent()
-        tvID?.text = result?.id.toString()
-        tvDetectionNum?.text = result?.detectionNum
-        tvTestTime?.text = result?.testTime?.toTimeStr()
+        tvID?.text = result?.result?.resultId.toString()
+        tvDetectionNum?.text = result?.result?.detectionNum
+        tvTestTime?.text = result?.result?.testTime?.toTimeStr()
 
-        etName?.text = result?.name
-        etGender?.text = result?.gender
-        etAbs?.text = result?.absorbances.toString()
-        etCon?.text = result?.concentration.toString()
-        etResult?.text = result?.testResult
-        etSampleBarcode?.text = result?.sampleBarcode
+        etName?.text = result?.result?.name
+        etGender?.text = result?.result?.gender
+        etAbs?.text = result?.result?.absorbances.toString()
+        etCon?.text = result?.result?.concentration.toString()
+        etResult?.text = result?.result?.testResult
+        etSampleBarcode?.text = result?.result?.sampleBarcode
     }
 
     override fun getResId(): Int {

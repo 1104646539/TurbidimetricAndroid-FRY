@@ -67,7 +67,7 @@ class CuvetteShelfView :
             strokeWidth = 1.0f
             textSize = 14.0f
         }
-    };
+    }
     val paintCircle by lazy {
         Paint().apply {
             isAntiAlias = true
@@ -75,7 +75,7 @@ class CuvetteShelfView :
             style = Paint.Style.FILL
 
         }
-    };
+    }
 
     private var labelWidth = 0.0f
     private var labelHeight = 0.0f
@@ -138,7 +138,7 @@ class CuvetteShelfView :
 
     private fun initText() {
         val rectfLabel = Rect()
-        paintLabel.getTextBounds(label, 0, label.length, rectfLabel);
+        paintLabel.getTextBounds(label, 0, label.length, rectfLabel)
         labelWidth = rectfLabel.width().toFloat()
         labelHeight = rectfLabel.height().toFloat()
 

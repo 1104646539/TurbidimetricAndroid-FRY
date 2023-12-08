@@ -5,15 +5,12 @@ import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.*
-import com.wl.turbidimetric.App
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.FragmentHomeBinding
 import com.wl.turbidimetric.datastore.LocalData
-import com.wl.turbidimetric.db.DBManager
 import com.wl.turbidimetric.ex.*
-import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.global.SystemGlobal.obTestState
-import com.wl.turbidimetric.model.ProjectModel
+import com.wl.turbidimetric.model.CurveModel
 import com.wl.turbidimetric.upload.hl7.HL7Helper
 import com.wl.turbidimetric.upload.hl7.util.ConnectResult
 import com.wl.turbidimetric.upload.hl7.util.ConnectStatus
@@ -37,7 +34,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
     /**
      * 最新的项目
      */
-    private val projects: MutableList<ProjectModel> = mutableListOf()
+    private val projects: MutableList<CurveModel> = mutableListOf()
     private val r2VolumeIds = intArrayOf(
         R.drawable.icon_r2_0,
         R.drawable.icon_r2_1,
@@ -93,7 +90,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d(TAG, "onCreate");
+        Log.d(TAG, "onCreate")
     }
 
     override fun onStart() {
@@ -165,14 +162,14 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
     private fun listenerView() {
         launchAndRepeatWithViewLifecycle {
             vm.testMachineUiState.collectLatest {
-                vd.ivR1.setImageResource(if (it?.r1State.not()) R.drawable.icon_r1_empty else R.drawable.icon_r1_full)
-                if ((it.r2State ?: 0) in r2VolumeIds.indices) {
+                vd.ivR1.setImageResource(if (it.r1State.not()) R.drawable.icon_r1_empty else R.drawable.icon_r1_full)
+                if (it.r2State in r2VolumeIds.indices) {
                     vd.ivR2.setImageResource(r2VolumeIds[it.r2State])
                 } else {
                     vd.ivR2.setImageResource(r2VolumeIds[0])
                 }
                 vd.ivCleanoutFluid.setImageResource(if (it.cleanoutFluidState.not() == true) R.drawable.icon_cleanout_fluid_empty else R.drawable.icon_cleanout_fluid_full)
-                vd.tvTemp.text = (it.reactionTemp?.toString() ?: "0").plus("℃")
+                vd.tvTemp.text = it.reactionTemp.toString().plus("℃")
             }
         }
         vd.ssv.label = "1"
@@ -307,8 +304,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                         lifecycleScope.launch(Dispatchers.Main) {
                             hilt.dismiss()
                             if (patients.isNullOrEmpty()) {
-                                dialog?.showPop(requireContext(), isCancelable = true) {
-                                    dialog?.showDialog(
+                                dialog.showPop(requireContext(), isCancelable = true) {
+                                    dialog.showDialog(
                                         msg = "没有待检信息",
                                         confirmText = "我知道了",
                                         confirmClick = {
@@ -338,8 +335,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     override fun onGetPatientFailed(code: Int, msg: String) {
                         lifecycleScope.launch(Dispatchers.Main) {
                             hilt.dismiss()
-                            dialog?.showPop(requireContext(), isCancelable = false) {
-                                dialog?.showDialog(
+                            dialog.showPop(requireContext(), isCancelable = false) {
+                                dialog.showDialog(
                                     msg = "$code $msg",
                                     confirmText = "我知道了",
                                     confirmClick = {
@@ -359,8 +356,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
      */
     private fun showConfigDialog() {
         i("showConfigDialog before")
-        homeConfigDialog?.showPop(requireContext(), width = 1000) {
-            it?.showDialog(vm.selectProjectEnable.value ?: true,
+        homeConfigDialog.showPop(requireContext(), width = 1000) {
+            it.showDialog(vm.selectProjectEnable.value ?: true,
                 vm.editDetectionNumEnable.value ?: true,
                 vm.skipCuvetteEnable.value ?: true,
                 projects,
@@ -394,8 +391,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
      * @param item SampleItem?
      */
     private fun showDetailsDialog(item: HomeViewModel.SampleItem?) {
-        homeDetailsDialog?.showPop(requireContext()) {
-            it?.showDialog(item)
+        homeDetailsDialog.showPop(requireContext()) {
+            it.showDialog(item)
         }
     }
 
@@ -404,8 +401,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
      * @param item SampleItem?
      */
     private fun showDetailsDialog(item: HomeViewModel.CuvetteItem?) {
-        homeDetailsDialog?.showPop(requireContext()) {
-            it?.showDialog(item)
+        homeDetailsDialog.showPop(requireContext()) {
+            it.showDialog(item)
         }
     }
 
@@ -427,9 +424,9 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
              * 显示调试的数据
              */
             vm.testMsg.observe(viewLifecycleOwner) {
-                debugShowDetailsDialog?.let { dialog ->
-                    if (dialog.isShow()) {
-                        dialog?.showPop(requireContext(), width = 1500) { d ->
+                debugShowDetailsDialog.let { dialog ->
+                    if (dialog.isShow) {
+                        dialog.showPop(requireContext(), width = 1500) { d ->
                             d.showDialog(
                                 it, "确定", confirmClick = { it.dismiss() },
                                 showIcon = false
@@ -447,17 +444,17 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                      * 自检中
                      */
                     DialogState.GET_MACHINE_SHOW -> {
-                        dialogGetMachine?.show()
+                        dialogGetMachine.show()
                     }
                     DialogState.GET_MACHINE_DISMISS -> {
-                        dialogGetMachine?.dismiss()
+                        dialogGetMachine.dismiss()
                     }
                     /**
                      * 自检失败对话框
                      */
                     DialogState.GET_MACHINE_FAILED_SHOW -> {
-                        dialog?.showPop(requireContext(), isCancelable = false) {
-                            it?.showDialog(
+                        dialog.showPop(requireContext(), isCancelable = false) {
+                            it.showDialog(
                                 msg = state.dialogMsg,
                                 confirmText = "重新自检",
                                 confirmClick = {
@@ -477,8 +474,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                      * 检测结束后 比色皿不足
                      */
                     DialogState.CUVETTE_DEFICIENCY -> {
-                        dialog?.showPop(requireContext(), isCancelable = false) {
-                            it?.showDialog(
+                        dialog.showPop(requireContext(), isCancelable = false) {
+                            it.showDialog(
                                 msg = "比色皿检测结束，是否添加？",
                                 confirmText = "我已添加",
                                 confirmClick = {
@@ -497,8 +494,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                      * 开始检测 比色皿,样本，试剂不足
                      */
                     DialogState.GET_STATE_NOT_EXIST -> {
-                        dialog?.showPop(requireContext(), isCancelable = false) {
-                            dialog?.showDialog(
+                        dialog.showPop(requireContext(), isCancelable = false) {
+                            dialog.showDialog(
                                 msg = state.dialogMsg,
                                 confirmText = "我已添加",
                                 confirmClick = {
@@ -518,8 +515,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                      * 正常检测 样本不足
                      */
                     DialogState.SAMPLE_DEFICIENCY -> {
-                        dialog?.showPop(requireContext(), isCancelable = false) {
-                            it?.showDialog(
+                        dialog.showPop(requireContext(), isCancelable = false) {
+                            it.showDialog(
                                 msg = "样本不足，是否添加？",
                                 confirmText = "我已添加",
                                 confirmClick = {
@@ -537,8 +534,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                      * 检测结束 正常样本取样完成的提示
                      */
                     DialogState.TEST_FINISH -> {
-                        dialog?.showPop(requireContext(), isCancelable = false) {
-                            it?.showDialog(msg = "检测结束", confirmText = "确定", confirmClick = {
+                        dialog.showPop(requireContext(), isCancelable = false) {
+                            it.showDialog(msg = "检测结束", confirmText = "确定", confirmClick = {
                                 it.dismiss()
                             }, showIcon = true, iconId = ICON_FINISH)
                         }

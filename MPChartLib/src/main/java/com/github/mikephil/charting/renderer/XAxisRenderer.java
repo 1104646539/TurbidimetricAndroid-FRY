@@ -338,7 +338,7 @@ public class XAxisRenderer extends AxisRenderer {
     }
 
     float[] mLimitLineSegmentsBuffer = new float[4];
-    private Path mLimitLinePath = new Path();
+    private final Path mLimitLinePath = new Path();
 
     public void renderLimitLineLine(Canvas c, LimitLine limitLine, float[] position) {
         mLimitLineSegmentsBuffer[0] = position[0];

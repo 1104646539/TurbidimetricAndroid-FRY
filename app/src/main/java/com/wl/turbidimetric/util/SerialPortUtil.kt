@@ -28,9 +28,9 @@ object SerialPortUtil {
     private var data: MutableList<UByte> = mutableListOf<UByte>()
     private val header = arrayOf<UByte>(0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u)
     private val hCount = header.size
-    private const val allCount = 8;
+    private const val allCount = 8
     var byteArray = ByteArray(100)
-    private val responseCommand1: UByte = SerialGlobal.CMD_Response;
+    private val responseCommand1: UByte = SerialGlobal.CMD_Response
     private val sendQueue: BlockingQueue<UByteArray> = LinkedBlockingQueue()
 
     private val sendMap = mutableMapOf<UByte, Int>()
@@ -289,7 +289,7 @@ object SerialPortUtil {
                     }
                     i@ for (i in data.indices) {
                         if (data.size >= hCount + allCount && data[i] == header[0]) {
-                            var k = i;
+                            var k = i
                             var count = 0
                             j@ for (element in header) {
                                 if (data[k] == element) {
@@ -708,7 +708,7 @@ object SerialPortUtil {
     /**
      * 设置温度
      */
-    public fun setTemp(reactionTemp: Int = 0, r1Temp: Int = 0) {
+    fun setTemp(reactionTemp: Int = 0, r1Temp: Int = 0) {
         writeAsync(
             createCmd(
                 SerialGlobal.CMD_GetSetTemp,
@@ -723,7 +723,7 @@ object SerialPortUtil {
     /**
      * 关机
      */
-    public fun shutdown() {
+    fun shutdown() {
         writeAsync(
             createCmd(SerialGlobal.CMD_Shutdown)
         )
@@ -733,7 +733,7 @@ object SerialPortUtil {
      * 挤压
      * @param enable 是否挤压 比色杯不挤压
      */
-    public fun squeezing(enable: Boolean = true) {
+    fun squeezing(enable: Boolean = true) {
         writeAsync(
             createCmd(SerialGlobal.CMD_Squeezing, data4 = if (enable) 0x1u else 0x0u)
         )
@@ -742,7 +742,7 @@ object SerialPortUtil {
     /**
      * 获取当前温度
      */
-    public fun getTemp() {
+    fun getTemp() {
         setTemp(0, 0)
     }
 

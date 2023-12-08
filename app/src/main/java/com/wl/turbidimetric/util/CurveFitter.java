@@ -36,7 +36,7 @@ public class CurveFitter {
 
     private int fit;
     private double[] xData, yData;
-    private int numPoints;
+    private final int numPoints;
     private int numParams;
     private int numVertices;
     private int worst;
@@ -50,7 +50,7 @@ public class CurveFitter {
 
     private static int defaultRestarts = 2;
     private int nRestarts;
-    private static double maxError = 1e-10;
+    private static final double maxError = 1e-10;
     private double[] initialParams;
     private long time;
     private String customFormula;
@@ -89,8 +89,7 @@ public class CurveFitter {
         fit = fitType;
         initialize();
         if (initialParams != null) {
-            for (int i = 0; i < numParams; i++)
-                simp[0][i] = initialParams[i];
+            if (numParams >= 0) System.arraycopy(initialParams, 0, simp[0], 0, numParams);
             initialParams = null;
         }
         if (showSettings)
@@ -285,8 +284,7 @@ public class CurveFitter {
             case CUSTOM:
 
                 if (initialValues != null && initialValues.length >= numParams) {
-                    for (int i = 0; i < numParams; i++)
-                        simp[0][i] = initialValues[i];
+                    if (numParams >= 0) System.arraycopy(initialValues, 0, simp[0], 0, numParams);
                 } else {
                     for (int i = 0; i < numParams; i++)
                         simp[0][i] = 1.0;
@@ -298,9 +296,7 @@ public class CurveFitter {
 
     void restart(int n) {
 
-        for (int i = 0; i < numParams; i++) {
-            simp[0][i] = simp[n][i];
-        }
+        if (numParams >= 0) System.arraycopy(simp[n], 0, simp[0], 0, numParams);
         sumResiduals(simp[0]);
         double[] step = new double[numParams];
         for (int i = 0; i < numParams; i++) {
@@ -583,7 +579,7 @@ public class CurveFitter {
                 sf[9] = new DecimalFormat("0.000000000E0", dfs);
             }
             if (Double.isInfinite(n))
-                return "" + n;
+                return String.valueOf(n);
             else
                 return sf[decimalPlaces].format(n);
         }
@@ -608,8 +604,7 @@ public class CurveFitter {
 
 
     void newVertex() {
-        for (int i = 0; i < numVertices; i++)
-            simp[worst][i] = next[i];
+        if (numVertices >= 0) System.arraycopy(next, 0, simp[worst], 0, numVertices);
     }
 
 

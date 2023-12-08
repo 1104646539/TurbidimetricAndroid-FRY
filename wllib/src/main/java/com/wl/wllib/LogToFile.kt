@@ -12,9 +12,9 @@ object LogToFile {
 
     @JvmStatic
     var fileName2 = "/sdcard/MyLog11.txt"
-    private var file1: File? = null;
-    private var file2: File? = null;
-    private var curFile: File? = null;
+    private var file1: File? = null
+    private var file2: File? = null
+    private var curFile: File? = null
     var MaxSize = 300 * 1024 * 1024
 
     val DateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss SSS")
@@ -35,11 +35,11 @@ object LogToFile {
         file1 = File(fileName1)
         file2 = File(fileName2)
         if (!file1!!.exists()) {
-            file1!!.getParentFile().mkdirs()
+            file1!!.parentFile.mkdirs()
             file1!!.createNewFile()
         }
         if (!file2!!.exists()) {
-            file2!!.getParentFile().mkdirs()
+            file2!!.parentFile.mkdirs()
             file2!!.createNewFile()
         }
         curFile = getFile()
@@ -121,7 +121,7 @@ object LogToFile {
     @JvmStatic
     fun write(msg: String) {
         fos?.write(msg.toByteArray())
-        fos?.flush();
+        fos?.flush()
     }
 
 

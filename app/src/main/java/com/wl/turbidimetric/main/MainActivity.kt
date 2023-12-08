@@ -1,6 +1,5 @@
 package com.wl.turbidimetric.main
 
-import android.app.Dialog
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -10,17 +9,13 @@ import android.hardware.usb.UsbManager
 import android.os.Handler
 import android.os.Message
 import android.util.Log
-import android.widget.Spinner
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
-import com.lxj.xpopup.XPopup
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.ActivityMainBinding
 import com.wl.turbidimetric.global.EventGlobal
 import com.wl.turbidimetric.global.EventMsg
 import com.wl.turbidimetric.global.SystemGlobal
-import com.wl.turbidimetric.home.HomeProjectAdapter
-import com.wl.turbidimetric.model.ProjectModel
 import com.wl.turbidimetric.util.ActivityDataBindingDelegate
 import com.wl.turbidimetric.util.SerialPortUtil
 import com.wl.turbidimetric.view.dialog.HiltDialog
@@ -60,10 +55,6 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     }
 
 
-    override fun onStart() {
-        super.onStart()
-    }
-
     private fun showOpenDocumentTree() {
         StorageUtil.showOpenDocumentTree(this, OPEN_DOCUMENT_TREE_CODE)
     }
@@ -75,7 +66,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
 
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (StorageUtil.OPEN_DOCUMENT_TREE_CODE == requestCode) {
+        if (OPEN_DOCUMENT_TREE_CODE == requestCode) {
             if (data != null && data.data != null) {
                 val uri = data.data
                 StorageUtil.saveTreeUri(this, StorageUtil.curPath!!, uri!!)

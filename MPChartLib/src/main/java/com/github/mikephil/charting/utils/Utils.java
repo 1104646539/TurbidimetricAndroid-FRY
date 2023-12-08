@@ -148,7 +148,7 @@ public abstract class Utils {
         return (int) paint.measureText(demoText);
     }
 
-    private static Rect mCalcTextHeightRect = new Rect();
+    private static final Rect mCalcTextHeightRect = new Rect();
     /**
      * calculates the approximate height of a text, depending on a demo text
      * avoid repeated calls (e.g. inside drawing methods)
@@ -165,7 +165,7 @@ public abstract class Utils {
         return r.height();
     }
 
-    private static Paint.FontMetrics mFontMetrics = new Paint.FontMetrics();
+    private static final Paint.FontMetrics mFontMetrics = new Paint.FontMetrics();
 
     public static float getLineHeight(Paint paint) {
         return getLineHeight(paint, mFontMetrics);
@@ -201,7 +201,7 @@ public abstract class Utils {
         return result;
     }
 
-    private static Rect mCalcTextSizeRect = new Rect();
+    private static final Rect mCalcTextSizeRect = new Rect();
     /**
      * calculates the approximate size of a text, depending on a demo text
      * avoid repeated calls (e.g. inside drawing methods)
@@ -225,11 +225,11 @@ public abstract class Utils {
      * Math.pow(...) is very expensive, so avoid calling it and create it
      * yourself.
      */
-    private static final int POW_10[] = {
+    private static final int[] POW_10 = {
             1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000
     };
 
-    private static IValueFormatter mDefaultValueFormatter = generateDefaultValueFormatter();
+    private static final IValueFormatter mDefaultValueFormatter = generateDefaultValueFormatter();
 
     private static IValueFormatter generateDefaultValueFormatter() {
         final DefaultValueFormatter formatter = new DefaultValueFormatter(1);
@@ -276,10 +276,7 @@ public abstract class Utils {
             return "0";
         }
 
-        boolean zero = false;
-        if (number < 1 && number > -1) {
-            zero = true;
-        }
+        boolean zero = number < 1 && number > -1;
 
         if (number < 0) {
             neg = true;
@@ -353,11 +350,11 @@ public abstract class Utils {
      * @return
      */
     public static float roundToNextSignificant(double number) {
-        if (Double.isInfinite(number) || 
-            Double.isNaN(number) || 
+        if (Double.isInfinite(number) ||
+            Double.isNaN(number) ||
             number == 0.0)
             return 0;
-        
+
         final float d = (float) Math.ceil((float) Math.log10(number < 0 ? -number : number));
         final int pw = 1 - (int) d;
         final float magnitude = (float) Math.pow(10, pw);
@@ -375,10 +372,10 @@ public abstract class Utils {
     public static int getDecimals(float number) {
 
         float i = roundToNextSignificant(number);
-        
+
         if (Float.isInfinite(i))
             return 0;
-        
+
         return (int) Math.ceil(-Math.log10(i)) + 2;
     }
 
@@ -525,7 +522,7 @@ public abstract class Utils {
         return angle % 360.f;
     }
 
-    private static Rect mDrawableBoundsCache = new Rect();
+    private static final Rect mDrawableBoundsCache = new Rect();
 
     public static void drawImage(Canvas canvas,
                                  Drawable drawable,
@@ -550,8 +547,8 @@ public abstract class Utils {
         canvas.restoreToCount(saveId);
     }
 
-    private static Rect mDrawTextRectBuffer = new Rect();
-    private static Paint.FontMetrics mFontMetricsBuffer = new Paint.FontMetrics();
+    private static final Rect mDrawTextRectBuffer = new Rect();
+    private static final Paint.FontMetrics mFontMetricsBuffer = new Paint.FontMetrics();
 
     public static void drawXAxisValue(Canvas c, String text, float x, float y,
                                       Paint paint,

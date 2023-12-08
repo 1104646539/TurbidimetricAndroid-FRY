@@ -7,7 +7,8 @@ data class ReplyModel<T>(val what: UByte, val state: Int, val data: T)
  * @property errorInfo MutableList<ErrorInfo> 错误信息
  * @constructor
  */
-data class GetMachineStateModel(val errorInfo: MutableList<ErrorInfo> = mutableListOf());
+data class GetMachineStateModel(val errorInfo: MutableList<ErrorInfo> = mutableListOf())
+
 /**
  * 错误信息
  * @property errorMsg String

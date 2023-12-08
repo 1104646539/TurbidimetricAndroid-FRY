@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit
 /**
  * 实现了hl7协议的基本响应、连接、解析接收的数据、发送数据、重发、超时等功能
  */
-class HL7ConnectService() : ConnectService {
+class HL7ConnectService : ConnectService {
     private val TAG = "HL7ConnectService"
 
     private var responseMap: BlockingHashMap<String, String>? =
@@ -46,11 +46,11 @@ class HL7ConnectService() : ConnectService {
                         connectService?.reconnection()
                         return@submitThread
                     }
-                    response?.let {
+                    response.let {
                         val responseMsg = connectService?.pipeParser?.parse(response)
                         responseMsg?.let {
                             val ackID = getMsgId(responseMsg)
-//                            Log.d(TAG, "run: ackID==$ackID response=$response")
+                //                            Log.d(TAG, "run: ackID==$ackID response=$response")
                             if (ackID == null) {
                                 Log.d(TAG, "ackID == null")
                             } else {
@@ -59,11 +59,11 @@ class HL7ConnectService() : ConnectService {
                                 } else {
                                     if (responseMsg is QCK_Q02) {
                                         log("接收:$response")
-//                                        Log.d(TAG, "上传:接收 $response")
+                //                                        Log.d(TAG, "上传:接收 $response")
                                         if (responseMsg.qak.qak2_QueryResponseStatus.value == ErrorEnum.NF.msg) {
                                             responseMap?.give(ackID, response)
                                         } else {
-//                                            Log.d(TAG, "收到QCK^Q02:responseMsg=$responseMsg")
+                //                                            Log.d(TAG, "收到QCK^Q02:responseMsg=$responseMsg")
                                         }
                                     } else if (responseMsg is DSR_Q03) {
                                         log("接收:$response")
@@ -73,7 +73,7 @@ class HL7ConnectService() : ConnectService {
                                         responseMap?.give(ackID, response)
                                     } else {
                                         log("接收:意外的消息 responseMsg == $response")
-//                                        Log.d(TAG, "意外的消息 responseMsg == $response")
+                //                                        Log.d(TAG, "意外的消息 responseMsg == $response")
                                     }
                                 }
                             }

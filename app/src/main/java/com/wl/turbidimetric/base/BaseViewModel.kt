@@ -15,10 +15,6 @@ open class BaseViewModel : ViewModel() {
     init {
 //        EventBus.getDefault().register(this)
     }
-    override fun onCleared() {
-//        EventBus.getDefault().unregister(this)
-        super.onCleared()
-    }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     open fun onMessageEvent(event: EventMsg<Any>) {

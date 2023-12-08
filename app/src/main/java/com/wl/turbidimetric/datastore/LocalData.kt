@@ -75,7 +75,7 @@ object LocalData {
      * @return String
      */
     fun getDetectionNumInc(num: String = DetectionNum): String {
-        if (num.isNullOrEmpty()) return "1";
+        if (num.isNullOrEmpty()) return "1"
         val newNum = java.lang.String.format("%0" + num.length + "d", num.toLong() + 1)
         DetectionNum = newNum
         return num

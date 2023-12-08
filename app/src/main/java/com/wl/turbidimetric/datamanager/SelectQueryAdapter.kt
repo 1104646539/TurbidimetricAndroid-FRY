@@ -31,7 +31,7 @@ class SelectQueryAdapter(
         return items!!.size
     }
 
-    override fun getItem(position: Int): Any? {
+    override fun getItem(position: Int): Any {
         return position
     }
 
@@ -73,7 +73,7 @@ class SelectQueryAdapter(
         return false
     }
 
-    fun getSelectItems(): List<Item>? {
+    fun getSelectItems(): List<Item> {
         val selectItems: MutableList<Item> = ArrayList()
         for (i in items!!.indices) {
             if (items!![i].isSelect) {
@@ -122,7 +122,7 @@ class SelectQueryAdapter(
 
     var onItemSelectChange: ((position: Int, selected: Boolean) -> Unit)? = null
 
-    fun getSelectText(): String? {
+    fun getSelectText(): String {
         var str = ""
         for (i in items!!.indices) {
             if (items!![i].isSelect) {

@@ -13,9 +13,7 @@ import com.wl.wllib.LogToFile.i
 class DataManagerLoadStateAdapter :
     LoadStateAdapter<DataManagerLoadStateAdapter.DataManagerFooter>() {
     class DataManagerFooter(val bd: ItemDatamanagerFooterBinding) :
-        RecyclerView.ViewHolder(bd.root) {
-
-    }
+        RecyclerView.ViewHolder(bd.root)
 
     override fun onBindViewHolder(holder: DataManagerFooter, loadState: LoadState) {
         i("loadState=$loadState" )

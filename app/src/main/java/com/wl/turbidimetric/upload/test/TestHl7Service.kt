@@ -48,7 +48,7 @@ class TestHl7Service : Service() {
         Log.d(TAG, "onCreate: TestService stop")
     }
 
-    override fun onBind(intent: Intent): IBinder? {
+    override fun onBind(intent: Intent): IBinder {
         return mBinder
     }
 

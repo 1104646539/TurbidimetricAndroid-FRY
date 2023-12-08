@@ -19,7 +19,7 @@ open class DrawableCenterButton(context: Context, attrs: AttributeSet?) :
     }
 
     open fun getTopCanvas(canvas: Canvas): Canvas {
-        val drawables = compoundDrawables ?: return canvas
+        val drawables = compoundDrawables
         var drawable = drawables[0] // 左面的drawable
         if (drawable == null) {
             drawable = drawables[2] // 右面的drawable

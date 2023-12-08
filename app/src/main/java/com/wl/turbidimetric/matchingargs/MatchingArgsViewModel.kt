@@ -9,14 +9,13 @@ import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.global.SystemGlobal.testState
 import com.wl.turbidimetric.global.SystemGlobal.testType
-import com.wl.turbidimetric.home.ProjectRepository
+import com.wl.turbidimetric.home.CurveRepository
 import com.wl.turbidimetric.model.*
 import com.wl.turbidimetric.print.PrintUtil
 import com.wl.turbidimetric.util.Callback2
 import com.wl.turbidimetric.util.CurveFitterUtil
 import com.wl.turbidimetric.util.SerialPortUtil
 import com.wl.wwanandroid.base.BaseViewModel
-import io.objectbox.kotlin.flow
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
@@ -32,7 +31,7 @@ import kotlin.random.Random
  *
  * @property quality Boolean
  */
-class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : BaseViewModel(),
+class MatchingArgsViewModel(private val curveRepository: CurveRepository) : BaseViewModel(),
     Callback2 {
 
     init {
@@ -235,12 +234,12 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
     /**
      * 每排之间的检测间隔
      */
-    var testShelfInterval: Long = 1000;
+    var testShelfInterval: Long = 1000
 
     /**
      * 每个比色皿之间的检测间隔
      */
-    var testPosInterval: Long = 1000 * 10;
+    var testPosInterval: Long = 1000 * 10
 
     /**
      * 试剂序号
@@ -250,12 +249,12 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
     /**
      * 要覆盖的项目  只有在项目超过最大限制时使用
      */
-    var coverProjectModel: ProjectModel? = null
+    var coverCurveModel: CurveModel? = null
 
     /**
      * 当前拟合好的项目参数
      */
-    var curProject: ProjectModel? = null
+    var curProject: CurveModel? = null
 
     /**
      * 移动样本时检测到样本管的标记
@@ -291,20 +290,12 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
         intArrayOf(56000, 56000, 56000, 56000, 56000, 56000, 56000, 56000, 56000, 56000)
 
     //测试用 每排之间的检测间隔
-    val testS: Long = 100;
+    val testS: Long = 100
 
     //测试用 每个比色皿之间的检测间隔
-    val testP: Long = 1000;
+    val testP: Long = 1000
 
-    /**
-     * 测试用的 end
-     */
-    override fun init() {
-        super.init()
-
-    }
-
-    val datas = projectRepository.allDatas.flow()
+    val datas = curveRepository.allDatas
 
 
     /**
@@ -355,7 +346,7 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
     /**
      * 点击开始拟合
      */
-    fun clickStart(projectModel: ProjectModel?) {
+    fun clickStart(curveModel: CurveModel?) {
         if (!machineStateNormal()) {
             viewModelScope.launch {
                 _dialogUiState.emit(
@@ -379,9 +370,9 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
             return
         }
 
-        this.coverProjectModel = projectModel
+        this.coverCurveModel = curveModel
         initState()
-        testState = TestState.GetState;
+        testState = TestState.GetState
         testType = TestType.MatchingArgs
         getState()
     }
@@ -400,15 +391,15 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
         testState = TestState.None
         sampleStep = 0
         testMsg.postValue("")
-        samplePos = -1;
-        cuvettePos = -1;
-        sampleShelfPos = -1;
-        cuvetteShelfPos = -1;
+        samplePos = -1
+        cuvettePos = -1
+        sampleShelfPos = -1
+        cuvetteShelfPos = -1
         firstStirTime = 0
 
         if (SystemGlobal.isCodeDebug) {
-            testShelfInterval = testS;
-            testPosInterval = testP;
+            testShelfInterval = testS
+            testPosInterval = testP
 
         } else {
 //            testShelfInterval = if (quality) {
@@ -986,7 +977,7 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
                     "四参数2：f0=${cf2.params[0]} f1=${cf2.params[1]} f2=${cf2.params[2]} f3=${cf2.params[3]} \n " +
                     "验算2 ${yzs2}\n"
         )
-        curProject = ProjectModel().apply {
+        curProject = CurveModel().apply {
             this.f0 = cf2.params[0]
             this.f1 = cf2.params[1]
             this.f2 = cf2.params[2]
@@ -1307,10 +1298,10 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
     fun saveProject() {
         //添加到参数列表，刷新
         curProject?.let {
-            projectRepository.addProject(it)
-            coverProjectModel?.let {
-                projectRepository.removeProject(it)
-                coverProjectModel = null
+            curveRepository.addCurve(it)
+            coverCurveModel?.let {
+                curveRepository.removeCurve(it)
+                coverCurveModel = null
             }
 
         }
@@ -1489,7 +1480,7 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
         return testState.isRunning() && testType.isMatchingArgs()
     }
 
-    fun changeSelectProject(project: ProjectModel) {
+    fun changeSelectProject(project: CurveModel) {
         _curveUiState.update {
             it.copy(
                 equationText = "Y=${project.f0.scale(8)}+${project.f1.scale(8)}x+${
@@ -1511,11 +1502,11 @@ class MatchingArgsViewModel(private val projectRepository: ProjectRepository) : 
     }
 }
 
-class MatchingArgsViewModelFactory(private val projectRepository: ProjectRepository = ProjectRepository()) :
+class MatchingArgsViewModelFactory(private val curveRepository: CurveRepository= CurveRepository()) :
     ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MatchingArgsViewModel::class.java)) {
-            return MatchingArgsViewModel(projectRepository) as T
+            return MatchingArgsViewModel(curveRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

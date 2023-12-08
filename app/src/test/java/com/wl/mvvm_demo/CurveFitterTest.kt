@@ -3,12 +3,11 @@ package com.wl.mvvm_demo
 import com.wl.turbidimetric.ex.calcCon
 import com.wl.turbidimetric.ex.matchingArg
 import com.wl.turbidimetric.ex.scale
-import com.wl.turbidimetric.model.ProjectModel
+import com.wl.turbidimetric.model.CurveModel
 import com.wl.turbidimetric.util.CurveFitter
 import com.wl.turbidimetric.util.CurveFitterUtil
 import org.apache.commons.math3.analysis.polynomials.PolynomialFunction
 import org.apache.commons.math3.fitting.PolynomialCurveFitter
-import org.apache.commons.math3.fitting.SimpleCurveFitter
 import org.apache.commons.math3.fitting.WeightedObservedPoints
 import org.junit.Test
 
@@ -233,14 +232,14 @@ class CurveFitterTest {
 
         val xs = doubleArrayOf(p1, p2, p3, p4, p5)
         val ys = doubleArrayOf(m1, m2, m3, m4, m5)
-        val points = WeightedObservedPoints();
+        val points = WeightedObservedPoints()
 
         for (i in xs.indices) {
             points.add(xs[i], ys[i])
         }
 
-        val fitter = PolynomialCurveFitter.create(3);  //指定多项式阶数
-        val result = fitter.fit(points.toList());  // 曲线拟合，结果保存于数组
+        val fitter = PolynomialCurveFitter.create(3)  //指定多项式阶数
+        val result = fitter.fit(points.toList())  // 曲线拟合，结果保存于数组
 
 
         result.forEach {
@@ -250,7 +249,7 @@ class CurveFitterTest {
 
     @Test
     fun testkk() {
-        val function = PolynomialFunction.Parametric();/*多项式函数*/
+        val function = PolynomialFunction.Parametric()/*多项式函数*/
         val p1 = (-12.34).toDouble()
         val p2 = 31.8.toDouble()
         val p3 = 187.2.toDouble()
@@ -270,7 +269,7 @@ class CurveFitterTest {
         }
 
         val newAbs = arrayListOf(0.00251, 0.01838, 0.06686, 0.12513, -0.00025)
-        val project = ProjectModel(
+        val project = CurveModel(
             f0 = curveFitter2.params[0],
             f1 = curveFitter2.params[1],
             f2 = curveFitter2.params[2],
@@ -303,7 +302,7 @@ class CurveFitterTest {
         val guess = doubleArrayOf(m1, m2, m3, m4, m5)
 
         val CORR = CurveFitterUtil.calcRSquared(xs, guess)
-        System.out.println("运算结果是：");
-        System.out.printf("CORR = " + CORR);
+        System.out.println("运算结果是：")
+        System.out.printf("CORR = " + CORR)
     }
 }

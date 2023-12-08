@@ -626,9 +626,9 @@ public class Legend extends ComponentBase {
         mMaxSizePercent = maxSize;
     }
 
-    private List<FSize> mCalculatedLabelSizes = new ArrayList<>(16);
-    private List<Boolean> mCalculatedLabelBreakPoints = new ArrayList<>(16);
-    private List<FSize> mCalculatedLineSizes = new ArrayList<>(16);
+    private final List<FSize> mCalculatedLabelSizes = new ArrayList<>(16);
+    private final List<Boolean> mCalculatedLabelBreakPoints = new ArrayList<>(16);
+    private final List<FSize> mCalculatedLineSizes = new ArrayList<>(16);
 
     public List<FSize> getCalculatedLabelSizes() {
         return mCalculatedLabelSizes;

@@ -24,7 +24,7 @@ public class LargeValueFormatter implements IValueFormatter, IAxisValueFormatter
             "", "k", "m", "b", "t"
     };
     private int mMaxLength = 5;
-    private DecimalFormat mFormat;
+    private final DecimalFormat mFormat;
     private String mText = "";
 
     public LargeValueFormatter() {
@@ -86,7 +86,7 @@ public class LargeValueFormatter implements IValueFormatter, IAxisValueFormatter
 
         int numericValue1 = Character.getNumericValue(r.charAt(r.length() - 1));
         int numericValue2 = Character.getNumericValue(r.charAt(r.length() - 2));
-        int combined = Integer.valueOf(numericValue2 + "" + numericValue1);
+        int combined = Integer.valueOf(numericValue2 + String.valueOf(numericValue1));
 
         r = r.replaceAll("E[0-9][0-9]", mSuffix[combined / 3]);
 

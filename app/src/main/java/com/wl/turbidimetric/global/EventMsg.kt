@@ -9,5 +9,5 @@ object EventGlobal {
     /**
      * 扫码模块初始化
      */
-    const val WHAT_INIT_QRCODE = 100;
+    const val WHAT_INIT_QRCODE = 100
 }

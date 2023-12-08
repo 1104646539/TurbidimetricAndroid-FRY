@@ -475,7 +475,7 @@ public class LegendRenderer extends Renderer {
         }
     }
 
-    private Path mLineFormPath = new Path();
+    private final Path mLineFormPath = new Path();
 
     /**
      * Draws the Legend-form at the given position with the color at the given

@@ -61,9 +61,9 @@ class TestHl7Thread(private val config: ConnectConfig) : Thread() {
     var pipeParser: PipeParser? = null
     private fun initContext() {
         context = DefaultHapiContext().apply {
-            val mllp = MinLowerLayerProtocol();
-            mllp.setCharset(config.charset);
-            lowerLayerProtocol = mllp;
+            val mllp = MinLowerLayerProtocol()
+            mllp.setCharset(config.charset)
+            lowerLayerProtocol = mllp
             validationContext = ValidationContextFactory.noValidation()
         }
 
@@ -89,7 +89,7 @@ class TestHl7Thread(private val config: ConnectConfig) : Thread() {
             if (serverSocket != null) {
                 val socket = serverSocket?.accept()
                 ops = socket!!.getOutputStream()
-                ips = socket!!.getInputStream()
+                ips = socket.getInputStream()
 
             }
 
@@ -101,7 +101,7 @@ class TestHl7Thread(private val config: ConnectConfig) : Thread() {
         try {
             var msgStr: String? = ""
             while (true) {
-                if (hl7Reader?.getMessage(ips).also { msgStr = it } != null) {
+                if (hl7Reader.getMessage(ips).also { msgStr = it } != null) {
                     val msg = pipeParser!!.parse(msgStr)
 //                    Log.d(TAG, "服务器接收到的 msg=$msg")
 
@@ -128,7 +128,7 @@ class TestHl7Thread(private val config: ConnectConfig) : Thread() {
         ack?.let {
             val resp1 = pipeParser!!.encode(it)
             Log.d(TAG, "服务器回复的响应码 sendAck: ack=$resp1")
-            hl7Write?.putMessage(resp1, ops)
+            hl7Write.putMessage(resp1, ops)
         }
     }
 
@@ -153,7 +153,7 @@ class TestHl7Thread(private val config: ConnectConfig) : Thread() {
             parseDSRAckMsg(ackMsg)
             null
         } else {
-            msg!!.generateACK()
+            msg.generateACK()
         }
     }
 
@@ -474,7 +474,7 @@ class TestHl7Thread(private val config: ConnectConfig) : Thread() {
     }
 
     fun sendData(resp1: String): Int {
-        hl7Write?.putMessage(resp1, ops)
+        hl7Write.putMessage(resp1, ops)
         return 1
     }
 

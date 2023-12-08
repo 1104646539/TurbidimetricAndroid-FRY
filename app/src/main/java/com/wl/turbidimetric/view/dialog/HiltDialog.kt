@@ -36,7 +36,7 @@ open class HiltDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_hin
 
 
 
-    var iconId: Int = 0;
+    var iconId: Int = 0
     var showIcon = false
     override fun getResId(): Int {
         return iconId
@@ -71,7 +71,7 @@ open class HiltDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_hin
         scMaxHeight:Int = 0,
     ) {
         this.scMaxHeight = scMaxHeight
-        this.msg = msg;
+        this.msg = msg
         this.confirmText = confirmText
         this.confirmClick = confirmClick
         this.cancelText = cancelText

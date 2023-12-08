@@ -1,22 +1,18 @@
 package com.wl.turbidimetric.home
 
 import android.content.Context
-import android.database.DataSetObserver
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import com.wl.turbidimetric.R
-import com.wl.turbidimetric.ex.scale
 import com.wl.turbidimetric.ex.scaleStr
-import com.wl.turbidimetric.model.ProjectModel
-import com.wl.wllib.LogToFile.i
+import com.wl.turbidimetric.model.CurveModel
 
 
 class HomeProjectAdapter @JvmOverloads constructor(
     private val context: Context,
-    private val items: MutableList<ProjectModel>?
+    private val items: MutableList<CurveModel>?
 ) :
     BaseAdapter() {
 
@@ -33,7 +29,7 @@ class HomeProjectAdapter @JvmOverloads constructor(
     }
 
     override fun getView(position: Int, view: View?, parent: ViewGroup): View? {
-        var root: View? = view;
+        var root: View? = view
         if (root == null) {
             root = LayoutInflater.from(context).inflate(R.layout.item_select_project, null)
         }
@@ -74,7 +70,7 @@ class HomeProjectAdapter @JvmOverloads constructor(
 
 
     override fun getDropDownView(position: Int, view: View?, parent: ViewGroup): View? {
-        var root: View? = view;
+        var root: View? = view
         if (root == null) {
             root = LayoutInflater.from(context).inflate(R.layout.item_select_project, null)
         }

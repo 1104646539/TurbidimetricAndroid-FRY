@@ -40,5 +40,4 @@ class PatientInfoAdapter(private val patients: List<Patient>) :
 }
 
 class PatientInfoViewHolder(var binding: ItemPatientInfoBinding) :
-    RecyclerView.ViewHolder(binding.root) {
-}
+    RecyclerView.ViewHolder(binding.root)

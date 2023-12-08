@@ -15,7 +15,7 @@ import com.github.mikephil.charting.utils.ViewPortHandler;
  */
 public class ZoomJob extends ViewPortJob {
 
-    private static ObjectPool<ZoomJob> pool;
+    private static final ObjectPool<ZoomJob> pool;
 
     static {
         pool = ObjectPool.create(1, new ZoomJob(null, 0, 0, 0, 0, null, null, null));

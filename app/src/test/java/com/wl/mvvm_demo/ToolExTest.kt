@@ -2,8 +2,7 @@ package com.wl.mvvm_demo
 
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.ex.*
-import com.wl.turbidimetric.model.ProjectModel
-import com.wl.wllib.longStrToDate
+import com.wl.turbidimetric.model.CurveModel
 import com.wl.wllib.toLongTimeStr
 import org.junit.Assert
 import org.junit.Test
@@ -181,10 +180,10 @@ class ToolExTest {
 
     @Test
     fun newCalcBigD() {
-        val a1 = 9.702673786;
-        val a2 = 0.7425860767;
-        val x0 = -4.513632E-4;
-        val p = 1.406E-7;
+        val a1 = 9.702673786
+        val a2 = 0.7425860767
+        val x0 = -4.513632E-4
+        val p = 1.406E-7
         val absorbance = 0.2253
         var d1 = a2 - absorbance
         var d2 = p
@@ -234,7 +233,7 @@ class ToolExTest {
 
     @Test
     fun testCon() {
-        val pm = ProjectModel().apply {
+        val pm = CurveModel().apply {
             reagentNO = "5452"
             reactionValues = intArrayOf(60, 91, 2722, 11722, 27298)
             f0 = 9.702673786
@@ -284,8 +283,8 @@ class ToolExTest {
         val str = tst1.joinToString()
         println("str=$str")
 
-        val newValue = str?.replace(" ", "")
-        val st = newValue!!.split(",").toTypedArray()
+        val newValue = str.replace(" ", "")
+        val st = newValue.split(",").toTypedArray()
         val res = if (st.isEmpty()) {
             null
         } else {

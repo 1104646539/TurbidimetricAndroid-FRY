@@ -68,14 +68,14 @@ abstract class AbstractConnectService(private val successListener: () -> Unit) :
     var isConnect: Boolean = false
 
     open fun initSuccess() {
-        successListener?.invoke()
+        successListener.invoke()
     }
 
     fun initContext(charset: Charset) {
         context = DefaultHapiContext().apply {
-            val mllp = MinLowerLayerProtocol();
-            mllp.setCharset(charset);
-            lowerLayerProtocol = mllp;
+            val mllp = MinLowerLayerProtocol()
+            mllp.setCharset(charset)
+            lowerLayerProtocol = mllp
             validationContext = ValidationContextFactory.noValidation()
         }
 

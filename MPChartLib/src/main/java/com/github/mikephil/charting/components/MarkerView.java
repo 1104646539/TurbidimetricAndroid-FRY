@@ -23,7 +23,7 @@ import java.lang.ref.WeakReference;
 public class MarkerView extends RelativeLayout implements IMarker {
 
     private MPPointF mOffset = new MPPointF();
-    private MPPointF mOffset2 = new MPPointF();
+    private final MPPointF mOffset2 = new MPPointF();
     private WeakReference<Chart> mWeakChart;
 
     /**

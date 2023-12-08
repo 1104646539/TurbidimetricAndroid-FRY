@@ -12,7 +12,7 @@ import com.github.mikephil.charting.utils.ViewPortHandler;
  */
 public class MoveViewJob extends ViewPortJob {
 
-    private static ObjectPool<MoveViewJob> pool;
+    private static final ObjectPool<MoveViewJob> pool;
 
     static {
         pool = ObjectPool.create(2, new MoveViewJob(null,0,0,null,null));
@@ -46,7 +46,7 @@ public class MoveViewJob extends ViewPortJob {
         mTrans.pointValuesToPixel(pts);
         mViewPortHandler.centerViewPort(pts, view);
 
-        this.recycleInstance(this);
+        recycleInstance(this);
     }
 
     @Override

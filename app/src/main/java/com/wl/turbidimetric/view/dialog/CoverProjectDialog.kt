@@ -1,36 +1,31 @@
 package com.wl.turbidimetric.view.dialog
 
 import android.content.Context
-import android.media.Image
 import android.view.View
-import android.view.WindowManager
 import android.widget.AdapterView
-import android.widget.ImageView
 import android.widget.Spinner
 import com.lxj.xpopup.core.BasePopupView
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.home.HomeProjectAdapter
-import com.wl.turbidimetric.model.ProjectModel
-import com.wl.wllib.LogToFile.i
-import com.wl.wllib.toLongTimeStr
+import com.wl.turbidimetric.model.CurveModel
 import java.util.*
 
 class CoverProjectDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_cover_project) {
     var spnProject: Spinner? = null
-    var selectProject: ProjectModel? = null
+    var selectProject: CurveModel? = null
 
     var projectAdapter: HomeProjectAdapter? = null
-    val items: MutableList<ProjectModel> = mutableListOf()
+    val items: MutableList<CurveModel> = mutableListOf()
 
-    fun projectStr(projectModel: ProjectModel): String {
+    fun projectStr(curveModel: CurveModel): String {
         return String.format(
             "序号:%9s  检测时间:%s\n%-1.3f  %-1.3f  %-1.3f  %-1.3f  ",
-            projectModel.reagentNO,
-            projectModel.createTime,
-            projectModel.f0,
-            projectModel.f1,
-            projectModel.f2,
-            projectModel.f3
+            curveModel.reagentNO,
+            curveModel.createTime,
+            curveModel.f0,
+            curveModel.f1,
+            curveModel.f2,
+            curveModel.f3
         )
     }
 
@@ -43,7 +38,7 @@ class CoverProjectDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_
             projectAdapter?.notifyDataSetChanged()
         }
         spnProject?.let { spn ->
-            if(!items?.contains(spn.selectedItem)){
+            if(!items.contains(spn.selectedItem)){
                 spn.setSelection(0)
             }
         }
@@ -51,7 +46,7 @@ class CoverProjectDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_
             override fun onItemSelected(
                 parent: AdapterView<*>?, view: View?, position: Int, id: Long
             ) {
-                selectProject = items?.get(position)
+                selectProject = items.get(position)
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -61,12 +56,12 @@ class CoverProjectDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_
     }
 
     fun show(
-        projectModels: MutableList<ProjectModel>,
-        onConfirm: ((ProjectModel?, BasePopupView) -> Unit)? = null,
+        curveModels: MutableList<CurveModel>,
+        onConfirm: ((CurveModel?, BasePopupView) -> Unit)? = null,
         onCancel: onClick
     ) {
         items.clear()
-        items.addAll(projectModels)
+        items.addAll(curveModels)
 //        projectAdapter.notifyDataSetChanged()
 
         this.confirmText = "确定"

@@ -18,7 +18,7 @@ import com.github.mikephil.charting.utils.ViewPortHandler;
 @SuppressLint("NewApi")
 public class AnimatedZoomJob extends AnimatedViewPortJob implements Animator.AnimatorListener {
 
-    private static ObjectPool<AnimatedZoomJob> pool;
+    private static final ObjectPool<AnimatedZoomJob> pool;
 
     static {
         pool = ObjectPool.create(8, new AnimatedZoomJob(null,null,null,null,0,0,0,0,0,0,0,0,0,0));

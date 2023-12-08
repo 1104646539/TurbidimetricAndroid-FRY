@@ -15,7 +15,7 @@ import java.util.List;
 
 public class YAxisRendererRadarChart extends YAxisRenderer {
 
-    private RadarChart mChart;
+    private final RadarChart mChart;
 
     public YAxisRendererRadarChart(ViewPortHandler viewPortHandler, YAxis yAxis, RadarChart chart) {
         super(viewPortHandler, yAxis, null);
@@ -179,7 +179,7 @@ public class YAxisRendererRadarChart extends YAxisRenderer {
         MPPointF.recycleInstance(pOut);
     }
 
-    private Path mRenderLimitLinesPathBuffer = new Path();
+    private final Path mRenderLimitLinesPathBuffer = new Path();
     @Override
     public void renderLimitLines(Canvas c) {
 

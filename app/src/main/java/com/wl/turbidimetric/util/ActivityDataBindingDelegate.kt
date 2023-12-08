@@ -10,7 +10,7 @@ import kotlin.reflect.KProperty
 
 class ActivityDataBindingDelegate<out VD : ViewDataBinding>(@LayoutRes val layoutId: Int) :
     ReadOnlyProperty<Activity, VD> {
-    private var viewBinding: VD? = null;
+    private var viewBinding: VD? = null
     override fun getValue(thisRef: Activity, property: KProperty<*>): VD =
         viewBinding ?: DataBindingUtil.setContentView<VD>(thisRef, layoutId).also {
             viewBinding = it

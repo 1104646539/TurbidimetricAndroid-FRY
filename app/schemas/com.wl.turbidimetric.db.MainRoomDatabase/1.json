@@ -1,0 +1,380 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "f10e81e1d86561b61cf632f132aaf4ce",
+    "entities": [
+      {
+        "tableName": "TestResultModel",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`resultId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `isSelect` INTEGER NOT NULL, `name` TEXT NOT NULL, `gender` TEXT NOT NULL, `age` TEXT NOT NULL, `sampleBarcode` TEXT NOT NULL, `sampleType` INTEGER NOT NULL, `detectionNum` TEXT NOT NULL, `testState` INTEGER NOT NULL, `testResult` TEXT NOT NULL, `absorbances` REAL NOT NULL, `concentration` INTEGER NOT NULL, `deliveryTime` TEXT NOT NULL, `deliveryDepartment` TEXT NOT NULL, `deliveryDoctor` TEXT NOT NULL, `testValue1` REAL NOT NULL, `testValue2` REAL NOT NULL, `testValue3` REAL NOT NULL, `testValue4` REAL NOT NULL, `testOriginalValue1` INTEGER NOT NULL, `testOriginalValue2` INTEGER NOT NULL, `testOriginalValue3` INTEGER NOT NULL, `testOriginalValue4` INTEGER NOT NULL, `createTime` INTEGER NOT NULL, `testTime` INTEGER NOT NULL, `curveOwnerId` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "resultId",
+            "columnName": "resultId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isSelect",
+            "columnName": "isSelect",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "gender",
+            "columnName": "gender",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "age",
+            "columnName": "age",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sampleBarcode",
+            "columnName": "sampleBarcode",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sampleType",
+            "columnName": "sampleType",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "detectionNum",
+            "columnName": "detectionNum",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "testState",
+            "columnName": "testState",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "testResult",
+            "columnName": "testResult",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "absorbances",
+            "columnName": "absorbances",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "concentration",
+            "columnName": "concentration",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "deliveryTime",
+            "columnName": "deliveryTime",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "deliveryDepartment",
+            "columnName": "deliveryDepartment",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "deliveryDoctor",
+            "columnName": "deliveryDoctor",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "testValue1",
+            "columnName": "testValue1",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "testValue2",
+            "columnName": "testValue2",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "testValue3",
+            "columnName": "testValue3",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "testValue4",
+            "columnName": "testValue4",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "testOriginalValue1",
+            "columnName": "testOriginalValue1",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "testOriginalValue2",
+            "columnName": "testOriginalValue2",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "testOriginalValue3",
+            "columnName": "testOriginalValue3",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "testOriginalValue4",
+            "columnName": "testOriginalValue4",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createTime",
+            "columnName": "createTime",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "testTime",
+            "columnName": "testTime",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "curveOwnerId",
+            "columnName": "curveOwnerId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "resultId"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "ProjectModel",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`projectId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `projectName` TEXT NOT NULL, `projectCode` TEXT NOT NULL, `projectLjz` INTEGER NOT NULL, `projectUnit` TEXT NOT NULL, `f0` REAL NOT NULL, `f1` REAL NOT NULL, `f2` REAL NOT NULL, `f3` REAL NOT NULL, `fitGoodness` REAL NOT NULL, `createTime` TEXT NOT NULL, `isSelect` INTEGER NOT NULL, `reagentNO` TEXT NOT NULL, `reactionValues` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "projectId",
+            "columnName": "projectId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "projectName",
+            "columnName": "projectName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "projectCode",
+            "columnName": "projectCode",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "projectLjz",
+            "columnName": "projectLjz",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "projectUnit",
+            "columnName": "projectUnit",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "f0",
+            "columnName": "f0",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "f1",
+            "columnName": "f1",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "f2",
+            "columnName": "f2",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "f3",
+            "columnName": "f3",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fitGoodness",
+            "columnName": "fitGoodness",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createTime",
+            "columnName": "createTime",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isSelect",
+            "columnName": "isSelect",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reagentNO",
+            "columnName": "reagentNO",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reactionValues",
+            "columnName": "reactionValues",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "projectId"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "CurveModel",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`curveId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `projectName` TEXT NOT NULL, `projectCode` TEXT NOT NULL, `projectLjz` INTEGER NOT NULL, `projectUnit` TEXT NOT NULL, `f0` REAL NOT NULL, `f1` REAL NOT NULL, `f2` REAL NOT NULL, `f3` REAL NOT NULL, `fitGoodness` REAL NOT NULL, `createTime` TEXT NOT NULL, `isSelect` INTEGER NOT NULL, `reagentNO` TEXT NOT NULL, `reactionValues` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "curveId",
+            "columnName": "curveId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "projectName",
+            "columnName": "projectName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "projectCode",
+            "columnName": "projectCode",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "projectLjz",
+            "columnName": "projectLjz",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "projectUnit",
+            "columnName": "projectUnit",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "f0",
+            "columnName": "f0",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "f1",
+            "columnName": "f1",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "f2",
+            "columnName": "f2",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "f3",
+            "columnName": "f3",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fitGoodness",
+            "columnName": "fitGoodness",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createTime",
+            "columnName": "createTime",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isSelect",
+            "columnName": "isSelect",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reagentNO",
+            "columnName": "reagentNO",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reactionValues",
+            "columnName": "reactionValues",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "curveId"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f10e81e1d86561b61cf632f132aaf4ce')"
+    ]
+  }
+}

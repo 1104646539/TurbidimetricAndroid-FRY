@@ -30,7 +30,7 @@ class TextImageButton : LinearLayout {
         if (attrs == null) return
         tv = TextView(context)
         iv = ImageView(context)
-        val ta = context!!.obtainStyledAttributes(
+        val ta = context.obtainStyledAttributes(
             attrs, R.styleable.TextImageButton
         )
         val text = ta.getString(R.styleable.TextImageButton_android_text)
@@ -44,12 +44,12 @@ class TextImageButton : LinearLayout {
             R.styleable.TextImageButton_android_textSize,
             context.resources.getDimension(R.dimen.text_size_default)
         )
-        tv?.text = text
-        tv?.setTextColor(textColor)
-        tv?.textSize = textSize
-        tv?.setPadding(interval.toInt(), 0, 0, 0)
+        tv.text = text
+        tv.setTextColor(textColor)
+        tv.textSize = textSize
+        tv.setPadding(interval.toInt(), 0, 0, 0)
         if (src != -1) {
-            iv?.setImageResource(src)
+            iv.setImageResource(src)
         }
         addView(iv)
         addView(tv)

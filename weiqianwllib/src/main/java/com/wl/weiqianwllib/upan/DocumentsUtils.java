@@ -31,7 +31,7 @@ public class DocumentsUtils {
 
     public static String root;
 
-    private static List<String> sExtSdCardPaths = new ArrayList<>();
+    private static final List<String> sExtSdCardPaths = new ArrayList<>();
 
     private DocumentsUtils() {
 

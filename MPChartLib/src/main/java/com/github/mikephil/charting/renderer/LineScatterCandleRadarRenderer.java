@@ -15,7 +15,7 @@ public abstract class LineScatterCandleRadarRenderer extends BarLineScatterCandl
     /**
      * path that is used for drawing highlight-lines (drawLines(...) cannot be used because of dashes)
      */
-    private Path mHighlightLinePath = new Path();
+    private final Path mHighlightLinePath = new Path();
 
     public LineScatterCandleRadarRenderer(ChartAnimator animator, ViewPortHandler viewPortHandler) {
         super(animator, viewPortHandler);

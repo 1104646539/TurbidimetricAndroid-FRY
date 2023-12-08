@@ -1,7 +1,6 @@
 package com.wl.turbidimetric.matchingargs
 
 import android.os.Bundle
-import android.view.Gravity
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -9,14 +8,12 @@ import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
-import com.lxj.xpopup.XPopup
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.FragmentMatchingArgsBinding
 import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.SystemGlobal.obTestState
 import com.wl.turbidimetric.global.SystemGlobal.testState
-import com.wl.turbidimetric.home.HomeProjectAdapter
-import com.wl.turbidimetric.model.ProjectModel
+import com.wl.turbidimetric.model.CurveModel
 import com.wl.turbidimetric.model.TestState
 import com.wl.turbidimetric.view.dialog.CoverProjectDialog
 import com.wl.turbidimetric.view.dialog.HiltDialog
@@ -37,7 +34,7 @@ class MatchingArgsFragment :
     private val bgGray = getResource().getColor(R.color.bg_gray)
     private val textColor = getResource().getColor(R.color.textColor)
     private val lineColor = getResource().getColor(R.color.themePositiveColor)
-    var projects: List<ProjectModel>? = null
+    var projects: List<CurveModel>? = null
 
     companion object {
         @JvmStatic
@@ -199,7 +196,7 @@ class MatchingArgsFragment :
             }
         }
         vd.btnStart.setOnClickListener {
-            startMatching();
+            startMatching()
         }
         vd.btnPrint.setOnClickListener {
             vm.print()
@@ -258,7 +255,7 @@ class MatchingArgsFragment :
      * 显示选中标曲的详情
      * @param project ProjectModel
      */
-    private fun changeCurve(project: ProjectModel) {
+    private fun changeCurve(project: CurveModel) {
         val values = ArrayList<Entry>()
 
         if (project.reactionValues != null && project.reactionValues!!.isNotEmpty() && project.reactionValues!!.size == 5) {
@@ -356,7 +353,7 @@ class MatchingArgsFragment :
          */
         vm.testMsg.observe(this) {
             i("it=$it")
-            if (debugShowDetailsDialog.isShow()) {
+            if (debugShowDetailsDialog.isShow) {
                 debugShowDetailsDialog.showPop(
                     requireContext(), width = 1500,
                     isCancelable = true

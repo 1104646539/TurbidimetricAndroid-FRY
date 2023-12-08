@@ -31,9 +31,9 @@ public class NavigationView extends View {
     private final static String TAG = NavigationView.class.getSimpleName();
     private int width;
     private int height;
-    private int padding = 15;
+    private final int padding = 15;
     //logo下方与第一个导航的间隔
-    private int logoSpace = 80;
+    private final int logoSpace = 80;
 
     //logo资源id
     private int icon_logo_id;
@@ -42,19 +42,19 @@ public class NavigationView extends View {
     //u盘是否有效的资源id
     private int icon_upan_id;
     //移动动画的持续时间
-    private int moveAnimDuration = 100;
+    private final int moveAnimDuration = 100;
 
     List<NavItem> navItems;
     //当前选中的下标
     public int selectIndex;
     //背景颜色
-    private int colorBg = getResources().getColor(R.color.white);
+    private final int colorBg = getResources().getColor(R.color.white);
     //背景颜色
-    private int colorShutdownBg = getResources().getColor(R.color.shutdown_bg);
+    private final int colorShutdownBg = getResources().getColor(R.color.shutdown_bg);
     //选中的背景颜色
-    private int colorSelectedBg = getResources().getColor(R.color.nav_select_bg);
+    private final int colorSelectedBg = getResources().getColor(R.color.nav_select_bg);
     //文字颜色
-    private int colorName = getResources().getColor(R.color.textColor);
+    private final int colorName = getResources().getColor(R.color.textColor);
 
     //选中的区域
     RectF rectFSelect = new RectF(0, 0, 0, 0);
@@ -73,13 +73,13 @@ public class NavigationView extends View {
     //关机按钮背景
     private RectF rectShutdownBg;
     //背景的宽、高、圆角大小
-    private int shutdownBgWidth = 156;
-    private int shutdownBgHeight = 128;
-    private int round = 8;
+    private final int shutdownBgWidth = 156;
+    private final int shutdownBgHeight = 128;
+    private final int round = 8;
     //按钮的文字高度，宽度
-    private int shutdownNameHeight = 15;
+    private final int shutdownNameHeight = 15;
     private float shutdownTextWidth = 0;
-    private String shutdownText = getResources().getString(R.string.nav_shutdown);
+    private final String shutdownText = getResources().getString(R.string.nav_shutdown);
     //关机按钮的bitmap,绘制区域等
     private Bitmap bitmapShutdown;
     private RectF rectShutdown;
@@ -145,7 +145,7 @@ public class NavigationView extends View {
     /**
      * 给绘制导航文字留下的高度
      */
-    private int nameHeight = 25;
+    private final int nameHeight = 25;
 
     /**
      * 绘图所有元素

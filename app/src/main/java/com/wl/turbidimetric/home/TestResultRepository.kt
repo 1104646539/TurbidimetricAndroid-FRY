@@ -29,6 +29,9 @@ class TestResultRepository {
     fun getTestResultAndCurveModelById(id:Long):TestResultAndCurveModel? {
         return dao.getTestResultAndCurveModelById(id)
     }
+    fun getTestResultModelById(id:Long):TestResultModel? {
+        return dao.getTestResultModelById(id)
+    }
     fun updateTestResult(testResultModel: TestResultModel): Int {
         return dao.updateTestResultModel(testResultModel)
     }

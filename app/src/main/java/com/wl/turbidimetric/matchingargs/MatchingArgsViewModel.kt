@@ -76,12 +76,12 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
     /**
      * 加稀释液的量
      */
-    private val dripDiluentVolumes = arrayListOf(200, 320, 380)
+    private val dripDiluentVolumes = arrayListOf(300, 300, 300)
 
     /**
      * 加标准品的量
      */
-    private val dripStandardVolumes = arrayListOf(200, 80, 20)
+    private val dripStandardVolumes = arrayListOf(300, 200, 100)
 
     /**
      * 移动已混匀的样本的下标顺序
@@ -531,14 +531,17 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
             TestState.MoveSample -> {
                 moveCuvetteDripSample()
             }
+
             TestState.Test1 -> {
 
             }
+
             TestState.Test2,
             TestState.Test3,
             TestState.Test4 -> {
                 moveCuvetteTest()
             }
+
             else -> {}
         }
 
@@ -577,6 +580,11 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
         return testState == TestState.TestFinish && cuvetteShelfMoveFinish && sampleShelfMoveFinish
     }
 
+    /**
+     * 已取样 在取|加稀释液时和取|加标准品使用
+     * false时代表应该去取样了，反之加样
+     */
+    var sampled = false
 
     /**
      * 接收到移动样本
@@ -598,10 +606,11 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
             TestState.DripDiluentVolume,
             TestState.DripStandardVolume
             -> {//去取稀释液、标准品
-                if (samplePos == 1 || samplePos == 2) {
+                if (!sampled) {
                     sampleStep++
                     val volume = getSamplingVolume(testState, sampleStep - 1)
                     sampling(volume)
+
                 } else {
                     val volume = getSamplingVolume(testState, sampleStep - 1)
                     dripSample(
@@ -610,11 +619,14 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
                         volume
                     )
                 }
+                sampled = !sampled
             }
+
             TestState.MoveSample -> {//去取需要移动的已混匀的样本
                 sampleStep++
                 sampling(LocalData.SamplingVolume)
             }
+
             else -> {
 
             }
@@ -785,6 +797,7 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
                 updateResult()
                 dripReagentAndStirAndTestFinish()
             }
+
             TestState.Test2 -> {
                 updateCuvetteState(cuvettePos, CuvetteState.Test2)
                 resultTest2.add(calcAbsorbance(value.toBigDecimal()))
@@ -806,6 +819,7 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
                 }
 
             }
+
             TestState.Test3 -> {
                 updateCuvetteState(cuvettePos, CuvetteState.Test3)
                 resultTest3.add(calcAbsorbance(value.toBigDecimal()))
@@ -826,6 +840,7 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
                 }
 
             }
+
             TestState.Test4 -> {
                 updateCuvetteState(cuvettePos, CuvetteState.Test4)
                 resultTest4.add(calcAbsorbance(value.toBigDecimal()))
@@ -842,6 +857,7 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
                     }
                 }
             }
+
             else -> {}
         }
 
@@ -971,7 +987,7 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
                     "吸光度:$result \n" +
                     "拟合度：${cf.fitGoodness} \n" +
                     "四参数：f0=${f0} f1=${f1} f2=${f2} f3=${f3} \n " +
-                    "验算 ${yzs}\n"+
+                    "验算 ${yzs}\n" +
                     "吸光度2:$absorbancys2 \n" +
                     "拟合度2：${cf2.fitGoodness} \n" +
                     "四参数2：f0=${cf2.params[0]} f1=${cf2.params[1]} f2=${cf2.params[2]} f3=${cf2.params[3]} \n " +
@@ -1061,13 +1077,16 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
                     moveSample(-samplePos + 1)
                 }
             }
+
             TestState.DripStandardVolume -> {//加标准品
                 samplingProbeCleaning()
             }
+
             TestState.MoveSample -> {//加已混匀的样本
                 updateCuvetteState(cuvettePos - 1, CuvetteState.DripSample)
                 samplingProbeCleaning()
             }
+
             else -> {}
         }
 
@@ -1089,12 +1108,15 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
             TestState.DripDiluentVolume -> {//去加稀释液
                 moveSample(sampleStep + 1)
             }
+
             TestState.DripStandardVolume -> {//去加标准品
-                moveSample(sampleStep)
+                moveSample(1)
             }
+
             TestState.MoveSample -> {//去加已混匀的样本
                 goDripSample()
             }
+
             else -> {}
         }
     }
@@ -1143,6 +1165,7 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
             TestState.Test4 -> {
                 test()
             }
+
             else -> {}
         }
     }
@@ -1184,7 +1207,8 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
                 moveSample(-samplePos + 1)
                 moveCuvetteShelf(cuvetteShelfPos)
             } else {//继续加标准品
-                moveSample(-samplePos + 2)
+//                moveSample(-samplePos + 2)
+                moveSample(0)
             }
         } else if (testState == TestState.MoveSample) {//加已混匀的样本的清洗
             if ((sampleStep == 5 && !quality) || (sampleStep == 7 && quality)) {
@@ -1502,7 +1526,7 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
     }
 }
 
-class MatchingArgsViewModelFactory(private val curveRepository: CurveRepository= CurveRepository()) :
+class MatchingArgsViewModelFactory(private val curveRepository: CurveRepository = CurveRepository()) :
     ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MatchingArgsViewModel::class.java)) {

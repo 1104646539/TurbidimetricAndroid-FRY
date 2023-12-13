@@ -1188,7 +1188,25 @@ class HomeViewModel(
             else -> {}
         }
         resultModels[pos]?.result?.let {
-            testResultRepository.updateTestResult(it)
+            //因为结果内的姓名性别等信息可能在数据管理内修改过了，所以这里没有
+            testResultRepository.getTestResultModelById(it.resultId)?.apply {
+                testOriginalValue1 = it.testOriginalValue1
+                testOriginalValue2 = it.testOriginalValue2
+                testOriginalValue3 = it.testOriginalValue3
+                testOriginalValue4 = it.testOriginalValue4
+                testTime = it.testTime
+                testState = it.testState
+                testResult = it.testResult
+                testValue1 = it.testValue1
+                testValue2 = it.testValue2
+                testValue3 = it.testValue3
+                testValue4 = it.testValue4
+                sampleBarcode = it.sampleBarcode
+                concentration = it.concentration
+                absorbances = it.absorbances
+                testResultRepository.updateTestResult(this)
+            }
+
         }
         i("updateTestResultModel resultModels=$resultModels")
     }

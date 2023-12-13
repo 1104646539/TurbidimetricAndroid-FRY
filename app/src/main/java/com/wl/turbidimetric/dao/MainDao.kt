@@ -47,6 +47,9 @@ interface MainDao {
     @Transaction
     @Query("select * from TestResultModel where resultId = :id")
     fun getTestResultAndCurveModelById(id: Long): TestResultAndCurveModel
+    @Transaction
+    @Query("select * from TestResultModel where resultId = :id")
+    fun getTestResultModelById(id: Long): TestResultModel
 
     @Query("select * from CurveModel")
     fun getCurveModels(): List<CurveModel>

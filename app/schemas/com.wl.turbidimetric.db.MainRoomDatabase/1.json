@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "f10e81e1d86561b61cf632f132aaf4ce",
+    "identityHash": "6ba908e46fd520cb6a425fdb897d4d0b",
     "entities": [
       {
         "tableName": "TestResultModel",
@@ -176,7 +176,7 @@
       },
       {
         "tableName": "ProjectModel",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`projectId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `projectName` TEXT NOT NULL, `projectCode` TEXT NOT NULL, `projectLjz` INTEGER NOT NULL, `projectUnit` TEXT NOT NULL, `f0` REAL NOT NULL, `f1` REAL NOT NULL, `f2` REAL NOT NULL, `f3` REAL NOT NULL, `fitGoodness` REAL NOT NULL, `createTime` TEXT NOT NULL, `isSelect` INTEGER NOT NULL, `reagentNO` TEXT NOT NULL, `reactionValues` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`projectId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `projectName` TEXT NOT NULL, `projectCode` TEXT NOT NULL, `projectLjz` INTEGER NOT NULL, `projectUnit` TEXT NOT NULL, `fitGoodness` REAL NOT NULL, `createTime` TEXT NOT NULL, `isSelect` INTEGER NOT NULL, `reagentNO` TEXT NOT NULL, `reactionValues` TEXT)",
         "fields": [
           {
             "fieldPath": "projectId",
@@ -206,30 +206,6 @@
             "fieldPath": "projectUnit",
             "columnName": "projectUnit",
             "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "f0",
-            "columnName": "f0",
-            "affinity": "REAL",
-            "notNull": true
-          },
-          {
-            "fieldPath": "f1",
-            "columnName": "f1",
-            "affinity": "REAL",
-            "notNull": true
-          },
-          {
-            "fieldPath": "f2",
-            "columnName": "f2",
-            "affinity": "REAL",
-            "notNull": true
-          },
-          {
-            "fieldPath": "f3",
-            "columnName": "f3",
-            "affinity": "REAL",
             "notNull": true
           },
           {
@@ -374,7 +350,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f10e81e1d86561b61cf632f132aaf4ce')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6ba908e46fd520cb6a425fdb897d4d0b')"
     ]
   }
 }

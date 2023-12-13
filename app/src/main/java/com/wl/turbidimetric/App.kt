@@ -6,7 +6,10 @@ import android.content.Context
 import com.lxj.xpopup.XPopup
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.db.MainRoomDatabase
+import com.wl.turbidimetric.db.putTestResultAndCurve
 import com.wl.turbidimetric.global.SystemGlobal
+import com.wl.turbidimetric.model.CurveModel
+import com.wl.turbidimetric.model.ProjectModel
 import com.wl.turbidimetric.upload.hl7.util.getLocalConfig
 import com.wl.turbidimetric.util.CrashHandler
 import com.wl.wllib.LogToFile
@@ -37,18 +40,30 @@ class App : Application() {
             initPop()
 //
             //没有项目参数的时候，添加一个默认参数
-//            if (DBManager.ProjectBox.all.isNullOrEmpty()) {
-//                repeat(10) {
-//                    DBManager.ProjectBox.put(ProjectModel().apply {
-//                        reagentNO = it.toString()
-//                        f0 = 14.32525697891957
-//                        f1 = 1.1568311508309208
-//                        f2 = -9.761226454206153E-4
-//                        f3 = 4.993717916686672E-7
-//                    })
-//                }
-//            }
+            initDB()
+
         }
+    }
+
+    private fun initDB() {
+        val ps = mainDao.getProjectModels()
+        if (ps.isEmpty()) {
+            repeat(1) {
+                mainDao.insertProjectModel(ProjectModel().apply {
+                    projectName = "项目1"
+                    projectCode = "FOB"
+                    projectUnit = "ug/mL"
+                    projectLjz = 100
+                })
+            }
+        }
+        mainDao.insertCurveModel(CurveModel().apply {
+            reagentNO = "999"
+            f0 = 14.32525697891957
+            f1 = 1.1568311508309208
+            f2 = -9.761226454206153E-4
+            f3 = 4.993717916686672E-7
+        })
     }
 
     private fun initPop() {

@@ -67,7 +67,7 @@ class HomeConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_ho
         items.clear()
         items.addAll(curveModels)
 //        projectAdapter?.notifyDataSetChanged()
-        if(isCreated){
+        if (isCreated) {
             setContent()
         }
         super.show()
@@ -90,6 +90,11 @@ class HomeConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_ho
 
         val selectedIndex = items.indexOf(curveModel)
         spnProject?.setSelection(selectedIndex)
+
+        if (items.size == 1) {//解决从没有项目到只有一个项目时，出现的不能选中的bug
+            projectAdapter = HomeProjectAdapter(context, items)
+            spnProject?.adapter = projectAdapter
+        }
 
         llSampleNum?.visibility = if (isAuto()) View.GONE else View.VISIBLE
 
@@ -146,6 +151,7 @@ class HomeConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_ho
         projectAdapter = HomeProjectAdapter(context, items)
         spnProject?.adapter = projectAdapter
     }
+
     override fun getResId(): Int {
         return 0
     }

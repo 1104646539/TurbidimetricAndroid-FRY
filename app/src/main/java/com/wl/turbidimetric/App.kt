@@ -56,14 +56,14 @@ class App : Application() {
                     projectLjz = 100
                 })
             }
+//            mainDao.insertCurveModel(CurveModel().apply {
+//                reagentNO = "999"
+//                f0 = 14.32525697891957
+//                f1 = 1.1568311508309208
+//                f2 = -9.761226454206153E-4
+//                f3 = 4.993717916686672E-7
+//            })
         }
-        mainDao.insertCurveModel(CurveModel().apply {
-            reagentNO = "999"
-            f0 = 14.32525697891957
-            f1 = 1.1568311508309208
-            f2 = -9.761226454206153E-4
-            f3 = 4.993717916686672E-7
-        })
     }
 
     private fun initPop() {

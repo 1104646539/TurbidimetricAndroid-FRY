@@ -1321,13 +1321,15 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
      */
     fun saveProject() {
         //添加到参数列表，刷新
-        curProject?.let {
-            curveRepository.addCurve(it)
-            coverCurveModel?.let {
-                curveRepository.removeCurve(it)
-                coverCurveModel = null
-            }
+        viewModelScope.launch {
+            curProject?.let {
+                curveRepository.addCurve(it)
+                coverCurveModel?.let { curve ->
+                    curveRepository.removeCurve(curve)
+                    coverCurveModel = null
+                }
 
+            }
         }
     }
 

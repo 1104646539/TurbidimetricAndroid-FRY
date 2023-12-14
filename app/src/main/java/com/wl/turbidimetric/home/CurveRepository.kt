@@ -20,7 +20,7 @@ class CurveRepository {
      * @param curve CurveModel
      * @return Long
      */
-    fun updateCurve(curve: CurveModel): Int {
+    suspend fun updateCurve(curve: CurveModel): Int {
         return dao.updateCurveModel(curve)
     }
 
@@ -28,7 +28,7 @@ class CurveRepository {
      * 添加项目参数
      * @param curve CurveModel
      */
-    fun addCurve(curve: CurveModel): Long {
+    suspend fun addCurve(curve: CurveModel): Long {
         return dao.insertCurveModel(curve)
     }
 
@@ -37,7 +37,7 @@ class CurveRepository {
      * @param curve CurveModel
      * @return Boolean
      */
-    fun removeCurve(curve: CurveModel): Boolean {
+    suspend fun removeCurve(curve: CurveModel): Boolean {
         return dao.removeCurveModel(curve) > 0
     }
 }

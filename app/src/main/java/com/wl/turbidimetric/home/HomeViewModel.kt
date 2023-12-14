@@ -993,7 +993,7 @@ class HomeViewModel(
      * 新建检测记录
      * @param str String?
      */
-    private fun createResultModel(str: String?, sampleItem: SampleItem?): TestResultModel {
+    private suspend fun createResultModel(str: String?, sampleItem: SampleItem?): TestResultModel {
         val resultModel = TestResultModel(
             sampleBarcode = str ?: "",
             createTime = Date().time,
@@ -1187,26 +1187,28 @@ class HomeViewModel(
 
             else -> {}
         }
-        resultModels[pos]?.result?.let {
-            //因为结果内的姓名性别等信息可能在数据管理内修改过了，所以这里没有
-            testResultRepository.getTestResultModelById(it.resultId)?.apply {
-                testOriginalValue1 = it.testOriginalValue1
-                testOriginalValue2 = it.testOriginalValue2
-                testOriginalValue3 = it.testOriginalValue3
-                testOriginalValue4 = it.testOriginalValue4
-                testTime = it.testTime
-                testState = it.testState
-                testResult = it.testResult
-                testValue1 = it.testValue1
-                testValue2 = it.testValue2
-                testValue3 = it.testValue3
-                testValue4 = it.testValue4
-                sampleBarcode = it.sampleBarcode
-                concentration = it.concentration
-                absorbances = it.absorbances
-                testResultRepository.updateTestResult(this)
-            }
 
+        resultModels[pos]?.result?.let {
+            viewModelScope.launch {
+                //因为结果内的姓名性别等信息可能在数据管理内修改过了，所以这里没有
+                testResultRepository.getTestResultModelById(it.resultId)?.apply {
+                    testOriginalValue1 = it.testOriginalValue1
+                    testOriginalValue2 = it.testOriginalValue2
+                    testOriginalValue3 = it.testOriginalValue3
+                    testOriginalValue4 = it.testOriginalValue4
+                    testTime = it.testTime
+                    testState = it.testState
+                    testResult = it.testResult
+                    testValue1 = it.testValue1
+                    testValue2 = it.testValue2
+                    testValue3 = it.testValue3
+                    testValue4 = it.testValue4
+                    sampleBarcode = it.sampleBarcode
+                    concentration = it.concentration
+                    absorbances = it.absorbances
+                    testResultRepository.updateTestResult(this)
+                }
+            }
         }
         i("updateTestResultModel resultModels=$resultModels")
     }
@@ -1599,18 +1601,20 @@ class HomeViewModel(
         c("接收到 加样 reply=$reply cuvettePos=$cuvettePos samplePos=$samplePos")
 
         dripSampleFinish = true
-        val result = createResultModel(
-            scanResults[samplePos - 1], mSamplesStates[sampleShelfPos]?.get(samplePos - 1)
-        )
-        updateCuvetteState(
-            cuvettePos, CuvetteState.DripSample, result, "${sampleShelfPos + 1}- $samplePos"
-        )
-        updateSampleState(
-            samplePos - 1, null, null, result, "${cuvetteShelfPos + 1}- ${cuvettePos + 1}"
-        )
-        samplingProbeCleaning()
+        viewModelScope.launch {
+            val result = createResultModel(
+                scanResults[samplePos - 1], mSamplesStates[sampleShelfPos]?.get(samplePos - 1)
+            )
+            updateCuvetteState(
+                cuvettePos, CuvetteState.DripSample, result, "${sampleShelfPos + 1}- $samplePos"
+            )
+            updateSampleState(
+                samplePos - 1, null, null, result, "${cuvetteShelfPos + 1}- ${cuvettePos + 1}"
+            )
+            samplingProbeCleaning()
 
-        nextStepDripReagent()
+            nextStepDripReagent()
+        }
     }
 
     /**

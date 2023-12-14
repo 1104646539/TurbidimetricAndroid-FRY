@@ -15,6 +15,8 @@ import com.wl.turbidimetric.util.CrashHandler
 import com.wl.wllib.LogToFile
 import com.wl.wllib.ToastUtil
 import com.wl.wllib.ktxRunOnBgCache
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 
 class App : Application() {
@@ -46,23 +48,25 @@ class App : Application() {
     }
 
     private fun initDB() {
-        val ps = mainDao.getProjectModels()
-        if (ps.isEmpty()) {
-            repeat(1) {
-                mainDao.insertProjectModel(ProjectModel().apply {
-                    projectName = "项目1"
-                    projectCode = "FOB"
-                    projectUnit = "ug/mL"
-                    projectLjz = 100
-                })
+        GlobalScope.launch {
+            val ps = mainDao.getProjectModels()
+            if (ps.isEmpty()) {
+                repeat(1) {
+                    mainDao.insertProjectModel(ProjectModel().apply {
+                        projectName = "项目1"
+                        projectCode = "FOB"
+                        projectUnit = "ug/mL"
+                        projectLjz = 100
+                    })
+                }
+//                mainDao.insertCurveModel(CurveModel().apply {
+//                    reagentNO = "999"
+//                    f0 = 14.32525697891957
+//                    f1 = 1.1568311508309208
+//                    f2 = -9.761226454206153E-4
+//                    f3 = 4.993717916686672E-7
+//                })
             }
-//            mainDao.insertCurveModel(CurveModel().apply {
-//                reagentNO = "999"
-//                f0 = 14.32525697891957
-//                f1 = 1.1568311508309208
-//                f2 = -9.761226454206153E-4
-//                f3 = 4.993717916686672E-7
-//            })
         }
     }
 

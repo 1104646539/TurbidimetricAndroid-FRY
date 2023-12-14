@@ -90,8 +90,10 @@ class DataManagerFragment :
     }
 
     fun test() {
-        val testdatas = createTestData()
-        vm.add(testdatas)
+        launchAndRepeatWithViewLifecycle {
+            val testdatas = createTestData()
+            vm.add(testdatas)
+        }
     }
 
     private fun createPrintData(): List<List<String>> {
@@ -181,12 +183,16 @@ class DataManagerFragment :
 
         adapter.onLongClick = { id ->
             if (id > 0) {
-                val result = vm.getTestResultAndCurveModelById(id)
-                result?.let {
-                    resultDialog.showPop(requireContext(), isCancelable = false) {
-                        it.showDialog(result) {
-                            vm.update(it)
-                            true
+                launchAndRepeatWithViewLifecycle {
+                    val result = vm.getTestResultAndCurveModelById(id)
+                    result?.let {
+                        resultDialog.showPop(requireContext(), isCancelable = false) {
+                            it.showDialog(result) {
+                                launchAndRepeatWithViewLifecycle {
+                                    vm.update(it)
+                                }
+                                true
+                            }
                         }
                     }
                 }
@@ -290,7 +296,9 @@ class DataManagerFragment :
                         val results = getSelectData()
                         it.dismiss()
                         if (!results.isNullOrEmpty()) {
-                            vm.clickDeleteDialogConfirm(results.map { it.result })
+                            launchAndRepeatWithViewLifecycle {
+                                vm.clickDeleteDialogConfirm(results.map { it.result })
+                            }
                         }
                     }, "取消", {
                         it.dismiss()
@@ -410,8 +418,10 @@ class DataManagerFragment :
     private fun showConditionDialog() {
         conditionDialog.showPop(requireContext(), isCancelable = false) {
             it.showDialog({ conditionModel ->
-                vm.conditionChange(conditionModel)
-                it.dismiss()
+                launchAndRepeatWithViewLifecycle {
+                    vm.conditionChange(conditionModel)
+                    it.dismiss()
+                }
                 i("conditionModel=$conditionModel")
             }, {
                 it.dismiss()

@@ -20,7 +20,7 @@ class ProjectRepository {
      * @param project ProjectModel
      * @return Long
      */
-    fun updateProject(project: ProjectModel): Int {
+    suspend fun updateProject(project: ProjectModel): Int {
         return dao.updateProjectModel(project)
     }
 
@@ -28,7 +28,7 @@ class ProjectRepository {
      * 添加项目参数
      * @param project ProjectModel
      */
-    fun addProject(project: ProjectModel): Long {
+    suspend fun addProject(project: ProjectModel): Long {
         return dao.insertProjectModel(project)
     }
 
@@ -37,7 +37,7 @@ class ProjectRepository {
      * @param project ProjectModel
      * @return Boolean
      */
-    fun removeProject(project: ProjectModel): Boolean {
+    suspend fun removeProject(project: ProjectModel): Boolean {
         return dao.removeProjectModel(project) > 0
     }
 }

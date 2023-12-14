@@ -13,6 +13,7 @@ import com.wl.turbidimetric.model.TestResultAndCurveModel
 import com.wl.turbidimetric.model.TestResultModel
 import com.wl.wwanandroid.base.BaseViewModel
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 
 
 class DataManagerViewModel(
@@ -37,43 +38,45 @@ class DataManagerViewModel(
     val resultSize: StateFlow<Long> = _resultSize.asStateFlow()
 
     fun item(condition: ConditionModel): Flow<PagingData<TestResultAndCurveModel>> {
-        _resultSize.value = testResultRepository.countTestResultAndCurveModels(condition)
+        viewModelScope.launch {
+            _resultSize.value = testResultRepository.countTestResultAndCurveModels(condition)
+        }
         return testResultRepository.datas(condition).cachedIn(viewModelScope)
     }
 
-    fun update(testResult: TestResultModel): Int {
+    suspend fun update(testResult: TestResultModel): Int {
         return testResultRepository.updateTestResult(testResult)
     }
 
-    fun update(model: TestResultAndCurveModel): Int {
+    suspend fun update(model: TestResultAndCurveModel): Int {
         return testResultRepository.updateTestResult(model.result)
     }
 
-    fun getTestResultAndCurveModelById(id: Long): TestResultAndCurveModel? {
+    suspend fun getTestResultAndCurveModelById(id: Long): TestResultAndCurveModel? {
         return testResultRepository.getTestResultAndCurveModelById(id)
     }
 
-    fun add(testResult: TestResultModel): Long {
+    suspend fun add(testResult: TestResultModel): Long {
         return testResultRepository.addTestResult(testResult)
     }
 
-    fun add(testResult: List<TestResultModel>) {
+    suspend fun add(testResult: List<TestResultModel>) {
         testResultRepository.addTestResults(testResult)
     }
 
-    fun remove(testResults: List<TestResultModel>) {
+    suspend fun remove(testResults: List<TestResultModel>) {
         testResultRepository.removeTestResult(testResults)
     }
 
-    fun clickDeleteDialogConfirm(results: List<TestResultModel>) {
+    suspend fun clickDeleteDialogConfirm(results: List<TestResultModel>) {
         remove(results)
     }
 
-    fun getFilterAll(condition: ConditionModel): List<TestResultAndCurveModel> {
+    suspend fun getFilterAll(condition: ConditionModel): List<TestResultAndCurveModel> {
         return testResultRepository.getAllTestResult(condition)
     }
 
-    fun conditionChange(conditionModel: ConditionModel) {
+    suspend fun conditionChange(conditionModel: ConditionModel) {
         _conditionModel.value = conditionModel
         _resultSize.value = testResultRepository.countTestResultAndCurveModels(conditionModel)
     }

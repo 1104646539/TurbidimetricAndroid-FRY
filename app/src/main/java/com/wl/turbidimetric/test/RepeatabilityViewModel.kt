@@ -207,9 +207,18 @@ class RepeatabilityViewModel(
     var selectProject: CurveModel? = null
 
     /**
-     * 每排之间的检测间隔
+     * 第二次的检测间隔
      */
-    var testShelfInterval: Long = 1000 * 0
+    var testShelfInterval2: Long = 1000 * 0
+    /**
+     * 第三次的检测间隔
+     */
+    var testShelfInterval3: Long = 1000 * 0
+    /**
+     * 第四次的检测间隔
+     */
+    var testShelfInterval4: Long = 1000 * 0
+
 
     /**
      * 每个比色皿之间的检测间隔
@@ -368,9 +377,15 @@ class RepeatabilityViewModel(
         firstStirTime = 0
 
         if (SystemGlobal.isCodeDebug) {
-            testShelfInterval = testS
+            testShelfInterval2 = testS
+            testShelfInterval3 = testS
+            testShelfInterval4 = testS
             testPosInterval = testP
-
+        } else {
+            testShelfInterval2 = LocalData.Test2DelayTime
+            testShelfInterval3 = LocalData.Test3DelayTime
+            testShelfInterval4 = LocalData.Test4DelayTime
+            testPosInterval = LocalData.TestIntervalTime
         }
     }
 
@@ -667,10 +682,9 @@ class RepeatabilityViewModel(
             cuvettePos = -1
             var intervalTemp = 0L
             if (!SystemGlobal.isCodeDebug) {
-                i("重新计算间隔时间 之后 testShelfInterval=$testShelfInterval cuvettePos=$cuvettePos")
                 //第二次检测到搅拌结束的间隔时间要保持220s
                 val stirInterval = (Date().time - firstStirTime)
-                intervalTemp = (220 * 1000) - stirInterval
+                intervalTemp = (testShelfInterval2) - stirInterval
                 i("intervalTemp=$intervalTemp stirInterval=$stirInterval")
             }
             viewModelScope.launch {
@@ -740,7 +754,10 @@ class RepeatabilityViewModel(
                     testState = TestState.Test3
 
                     viewModelScope.launch {
-                        delay(testShelfInterval)
+                        val stirInterval = (Date().time - firstStirTime)
+                        val intervalTemp =
+                            (testShelfInterval3) - stirInterval
+                        delay(intervalTemp)
                         moveCuvetteTest(-cuvettePos)
                     }
                 } else {
@@ -760,12 +777,15 @@ class RepeatabilityViewModel(
                 if (cuvettePos == 9) {
                     testState = TestState.Test4
                     viewModelScope.launch {
-                        delay(testShelfInterval)
+                        val stirInterval = (Date().time - firstStirTime)
+                        val intervalTemp =
+                            (testShelfInterval4) - stirInterval
+                        delay(intervalTemp)
                         moveCuvetteTest(-cuvettePos)
                     }
                 } else {
                     viewModelScope.launch {
-                        delay(testPosInterval)
+                        delay(0)
                         moveCuvetteTest()
                     }
                 }

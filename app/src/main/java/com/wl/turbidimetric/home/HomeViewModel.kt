@@ -360,9 +360,17 @@ class HomeViewModel(
 
 
     /**
-     * 每排之间的检测间隔
+     * 第二次的检测间隔
      */
-    var testShelfInterval: Long = 1000 * 0
+    var testShelfInterval2: Long = 1000 * 0
+    /**
+     * 第三次的检测间隔
+     */
+    var testShelfInterval3: Long = 1000 * 0
+    /**
+     * 第四次的检测间隔
+     */
+    var testShelfInterval4: Long = 1000 * 0
 
     /**
      * 每个比色皿之间的检测间隔
@@ -544,8 +552,15 @@ class HomeViewModel(
         i("跳过 $cuvetteStartPos 个比色皿")
 
         if (SystemGlobal.isCodeDebug) {
-            testShelfInterval = testS
+            testShelfInterval2 = testS
+            testShelfInterval3 = testS
+            testShelfInterval4 = testS
             testPosInterval = testP
+        }else{
+            testShelfInterval2 = LocalData.Test2DelayTime
+            testShelfInterval3 = LocalData.Test3DelayTime
+            testShelfInterval4 = LocalData.Test4DelayTime
+            testPosInterval = LocalData.TestIntervalTime
         }
         resultTest1.clear()
         resultTest2.clear()
@@ -1048,7 +1063,10 @@ class HomeViewModel(
                 if (lastNeed(cuvettePos, CuvetteState.Test1)) {
                     //检测结束，下一个步骤，检测第三次
                     viewModelScope.launch {
-                        delay(0)
+                        val stirInterval = (Date().time - firstStirTime)
+                        val intervalTemp =
+                            (testShelfInterval3) - stirInterval
+                        delay(intervalTemp)
                         stepTest(TestState.Test3)
                     }
                 } else {
@@ -1066,7 +1084,10 @@ class HomeViewModel(
                 if (lastNeed(cuvettePos, CuvetteState.Test2)) {
                     //检测结束，下一个步骤，检测第四次
                     viewModelScope.launch {
-                        delay(0)
+                        val stirInterval = (Date().time - firstStirTime)
+                        val intervalTemp =
+                            (testShelfInterval4) - stirInterval
+                        delay(intervalTemp)
                         stepTest(TestState.Test4)
                     }
                 } else {
@@ -1412,13 +1433,13 @@ class HomeViewModel(
                     takeReagent()
                 }
                 if (cuvettePos >= 5 && lastNeedTest1(cuvettePos - 5)) {
-                    testShelfInterval = 0
-                    i("重新计算间隔时间 之后 testShelfInterval=$testShelfInterval cuvettePos=$cuvettePos cuvetteStartPos=$cuvetteStartPos")
+//                    testShelfInterval = 0
+//                    i("重新计算间隔时间 之后 testShelfInterval=$testShelfInterval cuvettePos=$cuvettePos cuvetteStartPos=$cuvetteStartPos")
                     var intervalTemp = 0L
                     if (!SystemGlobal.isCodeDebug) {
                         //第二次检测到搅拌结束的间隔时间要保持220s
                         val stirInterval = (Date().time - firstStirTime)
-                        intervalTemp = (220 * 1000) - stirInterval
+                        intervalTemp = (testShelfInterval2) - stirInterval
                         i("intervalTemp=$intervalTemp stirInterval=$stirInterval")
                     }
                     viewModelScope.launch {

@@ -68,6 +68,27 @@ object LocalData {
      */
     var DebugMode by BooleanDataStoreProperty(LocalDataGlobal.Default.DebugMode)
 
+    /**
+     * 检测第二次的等待时间
+     */
+    var Test2DelayTime by LongDataStoreProperty(LocalDataGlobal.Default.test2DelayTime)
+
+    /**
+     * 检测第三次的等待时间
+     */
+    var Test3DelayTime by LongDataStoreProperty(LocalDataGlobal.Default.test3DelayTime)
+
+    /**
+     * 检测第四次的等待时间
+     */
+    var Test4DelayTime by LongDataStoreProperty(LocalDataGlobal.Default.test4DelayTime)
+
+    /**
+     * 每个比色皿的检测间隔时间，第二次开始
+     */
+    var TestIntervalTime by LongDataStoreProperty(LocalDataGlobal.Default.testIntervalTime)
+
+
 
     /**
      * 编号自增并保存

@@ -44,6 +44,10 @@ object LocalDataGlobal {
         val ScanCode = false
         val SelectProjectID = 0L
         val DebugMode = false
+        val test2DelayTime = 220 * 1000L
+        val test3DelayTime = 0 * 1000L
+        val test4DelayTime = 0 * 1000L
+        val testIntervalTime = 10 * 1000L
     }
 
 

@@ -3,12 +3,10 @@ package com.wl.turbidimetric.settings
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
-import android.os.Message
 import android.view.View
 import androidx.lifecycle.lifecycleScope
 import com.lxj.xpopup.core.BasePopupView
 import com.wl.turbidimetric.R
-import com.wl.turbidimetric.databinding.FragmentSettings2Binding
 import com.wl.turbidimetric.databinding.FragmentSettingsBinding
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.ex.*
@@ -16,7 +14,6 @@ import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.MachineTestModel
 import com.wl.turbidimetric.test.TestActivity
 import com.wl.turbidimetric.upload.view.UploadSettingsActivity
-import com.wl.turbidimetric.util.ExportExcelHelper
 import com.wl.turbidimetric.util.ExportLogHelper
 import com.wl.turbidimetric.view.*
 import com.wl.turbidimetric.view.dialog.*
@@ -24,11 +21,9 @@ import com.wl.weiqianwllib.OrderUtil
 import com.wl.wwanandroid.base.BaseFragment
 import com.wl.wwanandroid.base.BaseViewModel
 import com.wl.wllib.LogToFile.i
-import com.wl.wllib.toLongTimeStr
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import java.util.Date
 
 class SettingsFragment :
     BaseFragment<BaseViewModel, FragmentSettingsBinding>(R.layout.fragment_settings) {
@@ -126,7 +121,8 @@ class SettingsFragment :
         vd.tvExportLog.setOnClickListener {
             exportLog()
         }
-        val versionAndroid =String(((getPackageInfo(requireContext())?.versionName)?:"").toByteArray(),
+        val versionAndroid = String(
+            ((getPackageInfo(requireContext())?.versionName) ?: "").toByteArray(),
             charset("UTF-8")
         )
 
@@ -286,12 +282,20 @@ class SettingsFragment :
                 LocalData.SamplingProbeCleaningDuration,
                 LocalData.StirProbeCleaningDuration,
                 LocalData.StirDuration,
-                { takeR1: Int, takeR2: Int, samplingVolume: Int, samplingProbeCleaningDuration: Int, stirProbeCleaningDuration: Int, stirDuration: Int, baseDialog: BasePopupView ->
+                LocalData.Test2DelayTime,
+                LocalData.Test3DelayTime,
+                LocalData.Test4DelayTime,
+                LocalData.TestIntervalTime,
+                { takeR1: Int, takeR2: Int, samplingVolume: Int, samplingProbeCleaningTime: Int, stirProbeCleaningTime: Int, stirDuration: Int, test2DelayTime: Long, test3DelayTime: Long, test4DelayTime: Long, testIntervalTime: Long, baseDialog: BasePopupView ->
                     LocalData.TakeReagentR1 = takeR1
                     LocalData.TakeReagentR2 = takeR2
                     LocalData.SamplingVolume = samplingVolume
-                    LocalData.SamplingProbeCleaningDuration = samplingProbeCleaningDuration
+                    LocalData.SamplingProbeCleaningDuration = samplingProbeCleaningTime
                     LocalData.StirDuration = stirDuration
+                    LocalData.Test2DelayTime = test2DelayTime
+                    LocalData.Test3DelayTime = test3DelayTime
+                    LocalData.Test4DelayTime = test4DelayTime
+                    LocalData.TestIntervalTime = testIntervalTime
                     baseDialog.dismiss()
                 },
                 {

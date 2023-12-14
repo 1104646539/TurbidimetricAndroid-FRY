@@ -20,35 +20,90 @@ import com.wl.turbidimetric.ex.toast
  * @constructor
  */
 class ParamsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_params_settings) {
+    /**
+     * 取R1量
+     */
     var etTakeR1: EditText? = null
+
+    /**
+     * 取R2量
+     */
     var etTakeR2: EditText? = null
+
+    /**
+     * 取样本量
+     */
     var etSampling: EditText? = null
+
+    /**
+     * 取样针清洗时长
+     */
     var etSamplingProbeCleaningTime: EditText? = null
+
+    /**
+     * 搅拌针清洗时长
+     */
     var etStirProbeCleaningTime: EditText? = null
+
+    /**
+     * 搅拌时长
+     */
     var etStirDuration: EditText? = null
+
+    /**
+     * 第二次检测距离搅拌的间隔时长
+     */
+    var etTest2DelayTime: EditText? = null
+
+    /**
+     * 第三次检测距离搅拌的间隔时长
+     */
+    var etTest3DelayTime: EditText? = null
+
+    /**
+     * 第四次检测距离搅拌的间隔时长
+     */
+    var etTest4DelayTime: EditText? = null
+
+    /**
+     * 每个比色皿的间隔时长
+     */
+    var etTestIntervalTime: EditText? = null
 
     var takeR1: Int? = null
     var takeR2: Int? = null
-    var sampling: Int? = null
+    var samplingVolume: Int? = null
     var samplingProbeCleaningTime: Int? = null
     var stirProbeCleaningTime: Int? = null
     var stirDuration: Int? = null
+    var test2DelayTime: Long? = null
+    var test3DelayTime: Long? = null
+    var test4DelayTime: Long? = null
+    var testIntervalTime: Long? = null
     fun showDialog(
         takeR1: Int,
         takeR2: Int,
-        sampling: Int,
+        samplingVolume: Int,
         samplingProbeCleaningTime: Int,
         stirProbeCleaningTime: Int,
         stirDuration: Int,
-        onConfirm: ((Int, Int, Int, Int, Int, Int, BasePopupView) -> Unit)?,
+        test2DelayTime: Long,
+        test3DelayTime: Long,
+        test4DelayTime: Long,
+        testIntervalTime: Long,
+        onConfirm: ((takeR1: Int, takeR2: Int, samplingVolume: Int, samplingProbeCleaningTime: Int, stirProbeCleaningTime: Int, stirDuration: Int, test2DelayTime: Long, test3DelayTime: Long, test4DelayTime: Long, testIntervalTime: Long, baseDialog: BasePopupView) -> Unit)?,
         onCancel: onClick?
     ) {
         this.takeR1 = takeR1
         this.takeR2 = takeR2
-        this.sampling = sampling
+        this.samplingVolume = samplingVolume
         this.samplingProbeCleaningTime = samplingProbeCleaningTime
         this.stirProbeCleaningTime = stirProbeCleaningTime
         this.stirDuration = stirDuration
+        this.test2DelayTime = test2DelayTime
+        this.test3DelayTime = test3DelayTime
+        this.test4DelayTime = test4DelayTime
+        this.testIntervalTime = testIntervalTime
         this.confirmText = "确定"
         this.confirmClick = {
             confirm(onConfirm)
@@ -59,17 +114,26 @@ class ParamsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_params
 
     }
 
-    fun confirm(onConfirm: ((Int, Int, Int, Int, Int, Int, BasePopupView) -> Unit)?) {
+    fun confirm(onConfirm: ((takeR1: Int, takeR2: Int, samplingVolume: Int, samplingProbeCleaningTime: Int, stirProbeCleaningTime: Int, stirDuration: Int, test2DelayTime: Long, test3DelayTime: Long, test4DelayTime: Long, testIntervalTime: Long, baseDialog: BasePopupView) -> Unit)?) {
         val takeR1 = etTakeR1?.text.toString()
         val takeR2 = etTakeR2?.text.toString()
         val sampling = etSampling?.text.toString()
         val samplingProbeCleaningTime = etSamplingProbeCleaningTime?.text.toString()
         val stirProbeCleaningTime = etStirProbeCleaningTime?.text.toString()
         val stirDuration = etStirDuration?.text.toString()
+        val test2DelayTime = etTest2DelayTime?.text.toString()
+        val test3DelayTime = etTest3DelayTime?.text.toString()
+        val test4DelayTime = etTest4DelayTime?.text.toString()
+        val testIntervalTime = etTestIntervalTime?.text.toString()
 
         if (takeR1.trim().isNullOrEmpty() || takeR2.trim().isNullOrEmpty() || sampling.trim()
                 .isNullOrEmpty() || samplingProbeCleaningTime.trim()
                 .isNullOrEmpty() || stirProbeCleaningTime.trim()
+                .isNullOrEmpty() || stirDuration.trim()
+                .isNullOrEmpty() || test2DelayTime.trim()
+                .isNullOrEmpty() || test3DelayTime.trim()
+                .isNullOrEmpty() || test4DelayTime.trim()
+                .isNullOrEmpty() || testIntervalTime.trim()
                 .isNullOrEmpty()
         ) {
             toast("请输入数字")
@@ -86,6 +150,10 @@ class ParamsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_params
             samplingProbeCleaningTime.toIntOrNull() ?: 0,
             stirProbeCleaningTime.toIntOrNull() ?: 0,
             stirDuration.toIntOrNull() ?: 0,
+            test2DelayTime.toLongOrNull() ?: 0L,
+            test3DelayTime.toLongOrNull() ?: 0,
+            test4DelayTime.toLongOrNull() ?: 0,
+            testIntervalTime.toLongOrNull() ?: 0,
             this
         )
     }
@@ -97,16 +165,24 @@ class ParamsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_params
         etSamplingProbeCleaningTime = findViewById(R.id.et_sampling_probe_cleaning_time)
         etStirProbeCleaningTime = findViewById(R.id.et_stir_probe_cleaning_time)
         etStirDuration = findViewById(R.id.et_stir_time)
+        etTest2DelayTime = findViewById(R.id.et_test2_delay_time)
+        etTest3DelayTime = findViewById(R.id.et_test3_delay_time)
+        etTest4DelayTime = findViewById(R.id.et_test4_delay_time)
+        etTestIntervalTime = findViewById(R.id.et_test_interval_time)
     }
 
     override fun setContent() {
         super.setContent()
         etTakeR1?.setText(takeR1.toString())
         etTakeR2?.setText(takeR2.toString())
-        etSampling?.setText(sampling.toString())
+        etSampling?.setText(samplingVolume.toString())
         etSamplingProbeCleaningTime?.setText(samplingProbeCleaningTime.toString())
         etStirProbeCleaningTime?.setText(stirProbeCleaningTime.toString())
         etStirDuration?.setText(stirDuration.toString())
+        etTest2DelayTime?.setText(test2DelayTime.toString())
+        etTest3DelayTime?.setText(test3DelayTime.toString())
+        etTest4DelayTime?.setText(test4DelayTime.toString())
+        etTestIntervalTime?.setText(testIntervalTime.toString())
 
         etTakeR1?.selectionLast()
         etTakeR2?.selectionLast()
@@ -114,6 +190,11 @@ class ParamsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_params
         etSamplingProbeCleaningTime?.selectionLast()
         etStirProbeCleaningTime?.selectionLast()
         etStirDuration?.selectionLast()
+        etTest2DelayTime?.selectionLast()
+        etTest3DelayTime?.selectionLast()
+        etTest4DelayTime?.selectionLast()
+        etTestIntervalTime?.selectionLast()
+
     }
 
     override fun getResId(): Int {

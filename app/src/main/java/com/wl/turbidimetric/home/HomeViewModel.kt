@@ -363,10 +363,12 @@ class HomeViewModel(
      * 第二次的检测间隔
      */
     var testShelfInterval2: Long = 1000 * 0
+
     /**
      * 第三次的检测间隔
      */
     var testShelfInterval3: Long = 1000 * 0
+
     /**
      * 第四次的检测间隔
      */
@@ -445,6 +447,10 @@ class HomeViewModel(
      */
     var firstStirTime = 0L
 
+    /**
+     * 开始检测前的清洗取样针
+     */
+    var cleaningBeforeStartTest = false
     /**
      * 测试用的 start
      */
@@ -556,7 +562,7 @@ class HomeViewModel(
             testShelfInterval3 = testS
             testShelfInterval4 = testS
             testPosInterval = testP
-        }else{
+        } else {
             testShelfInterval2 = LocalData.Test2DelayTime
             testShelfInterval3 = LocalData.Test3DelayTime
             testShelfInterval4 = LocalData.Test4DelayTime
@@ -580,10 +586,6 @@ class HomeViewModel(
     private fun initCuvetteStates(): Array<Array<CuvetteItem>?> {
         val arrays = mutableListOf<Array<CuvetteItem>?>()
         for (j in 0 until 4) {
-            val array = null
-//            for (i in 0 until 10) {
-//                array.add(SampleState.None)
-//            }
             arrays.add(null)
         }
 
@@ -644,6 +646,12 @@ class HomeViewModel(
         c("接收到 取样针清洗 reply=$reply samplingProbeCleaningRecoverSampling=$samplingProbeCleaningRecoverSampling")
         samplingProbeCleaningFinish = true
 
+        if (cleaningBeforeStartTest) {
+            //是开始检测前的清洗，清洗完才开始检测
+            cleaningBeforeStartTest = false
+            moveSampleShelf(sampleShelfPos)
+            moveCuvetteShelf(cuvetteShelfPos)
+        }
         //恢复取样
         /**
          * @sample readDataMoveSampleModel
@@ -840,20 +848,6 @@ class HomeViewModel(
             }
         }
         //判断是否需要取样。取样位和扫码位差一个位置
-//        if (sampleNeedSampling(samplePos - 1)) {
-//            //注：如果上次取样针清洗未结束，就等待清洗结束后再加样,否则直接加样
-//            if (samplingProbeCleaningFinish) {
-//                sampling()
-//            } else {
-//                samplingProbeCleaningRecoverSampling = true
-//            }
-//        } else if (samplePos == sampleMax && sampleMoveFinish) {
-//            //加入sampleMoveFinish的判断是为了防止在上面的nextStepDripReagent()之前samplePos=sampleMax-1，而移动了样本后，导致samplePos == sampleMax从而发生同时移动样本和比色皿的问题
-//            //最后一个样本，并且不需要取样时，下一步
-//            nextStepDripReagent()
-//        }
-
-        //判断是否需要取样。取样位和扫码位差一个位置
         if (sampleNeedSampling(samplePos - 1)) {
             val isSample =
                 mSamplesStates[sampleShelfPos]?.get(samplePos - 1)?.sampleType?.isSample() == true
@@ -873,7 +867,6 @@ class HomeViewModel(
     private fun sampleNeedSampling(samplePos: Int): Boolean {
         if (samplePos < 0) return false
         return mSamplesStates[sampleShelfPos]!![samplePos].state == SampleState.Pierced || mSamplesStates[sampleShelfPos]!![samplePos].state == SampleState.Squeezing
-//        return mSamplesStates[sampleShelfPos]!![samplePos].state == SampleState.Squeezing
     }
 
     /**
@@ -1120,8 +1113,6 @@ class HomeViewModel(
 
     /**
      * 更新检测结果
-     * @param pos Int
-     * @param state CuvetteState
      */
     private fun updateTestResultModel(value: Int, index: Int, state: CuvetteState) {
         var pos = index
@@ -1334,12 +1325,6 @@ class HomeViewModel(
         testState = TestState.DripSample
         cuvettePos = -1
 
-//        if ((isAuto() && lastSamplePos(samplePos)) || !isAuto()) {//这排最后一个样本
-//            if (!isAuto() && manualModelSamplingFinish()) {
-//                i("手动模式，样本加样完成！")
-//                stepDripReagent()
-//            }
-
         if ((isAuto() && lastSamplePos(samplePos)) || !isAuto()) {//这排最后一个样本
             if (!isAuto() && manualModelSamplingFinish()) {
                 //手动模式，检测完了
@@ -1357,7 +1342,6 @@ class HomeViewModel(
                             )
                         )
                     }
-//                    dialogTestFinishCuvetteDeficiency.postValue(true)
 
                 } else {
                     checkTestState(accord = {
@@ -1376,16 +1360,11 @@ class HomeViewModel(
                             )
                         }
                     })
-//                    //还有比色皿。继续移动比色皿，检测
-//                    moveCuvetteShelfNext()
-//                    //移动样本架
-//                    moveSampleShelfNext()
                 }
             }
         } else {
             if (lastCuvetteShelf(cuvetteShelfPos)) {//最后一排比色皿
                 //提示，比色皿不足了
-//                dialogTestFinishCuvetteDeficiency.postValue(true)
                 viewModelScope.launch {
                     _dialogUiState.emit(
                         HomeDialogUiState(
@@ -1409,8 +1388,6 @@ class HomeViewModel(
                         )
                     }
                 })
-//                moveSample()
-//                moveCuvetteShelfNext()
             }
         }
     }
@@ -2196,9 +2173,10 @@ class HomeViewModel(
         }
 
         checkTestState(accord = {
-            //开始检测
-            moveSampleShelf(sampleShelfPos)
-            moveCuvetteShelf(cuvetteShelfPos)
+            //开始检测前先清洗取样针
+            cleaningBeforeStartTest = true
+            samplingProbeCleaning()
+
         }, discrepancy = { str ->
 //            getStateNotExistMsg.postValue(str)
             viewModelScope.launch {

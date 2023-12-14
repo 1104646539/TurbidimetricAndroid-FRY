@@ -269,17 +269,6 @@ class MatchingArgsFragment :
 
         vm.changeSelectProject(project)
 
-//        //方程和拟合度
-//        vm.equationText.postValue(
-//            "Y=${project.f0.scale(8)}+${project.f1.scale(8)}x+${
-//                project.f2.scale(
-//                    8
-//                )
-//            }x²+${project.f3.scale(8)}x³"
-//        )
-//        vm.fitGoodnessText.postValue("R²=${project.fitGoodness.scale(6)}")
-
-
         if (vd.lcCurve.data != null && vd.lcCurve.data.dataSetCount > 0) {
             val set1 = vd.lcCurve.data.getDataSetByIndex(0) as LineDataSet
             set1.values = values

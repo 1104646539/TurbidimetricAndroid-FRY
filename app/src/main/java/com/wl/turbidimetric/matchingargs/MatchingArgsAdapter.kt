@@ -11,6 +11,7 @@ import com.wl.turbidimetric.databinding.ItemMatchingargsBinding
 import com.wl.turbidimetric.ex.scaleStr
 import com.wl.turbidimetric.model.CurveModel
 import com.wl.wllib.LogToFile.i
+
 class MatchingArgsAdapter :
     RecyclerView.Adapter<MatchingArgsAdapter.MatchingArgsViewHolder>() {
     var onSelectChange: ((CurveModel) -> Unit)? = null
@@ -30,11 +31,11 @@ class MatchingArgsAdapter :
         fun bindData(item: CurveModel?) {
             binding.setVariable(BR.item, item)
             binding.tvID.text = (item?.reagentNO ?: "-").toString()
-            binding.tvA1.text = (item?.f0 ?: 0.0).scaleStr(6).toString()
-            binding.tvA2.text = (item?.f1 ?: 0.0).scaleStr(6).toString()
-            binding.tvX0.text = (item?.f2 ?: 0.0).scaleStr(6).toString()
-            binding.tvP.text = (item?.f3 ?: 0.0).scaleStr(6).toString()
-            binding.tvTestTime.text = item?.createTime ?: "-"
+            binding.tvA1.text = (item?.f0 ?: 0.0).scaleStr(7).toString()
+            binding.tvA2.text = (item?.f1 ?: 0.0).scaleStr(7).toString()
+            binding.tvX0.text = (item?.f2 ?: 0.0).scaleStr(7).toString()
+            binding.tvP.text = (item?.f3 ?: 0.0).scaleStr(8).toString()
+            binding.tvTestTime.text = if(item?.createTime.isNullOrEmpty()) "-" else item?.createTime
             binding.tvFitGoodness.text = (item?.fitGoodness ?: 0.0).scaleStr(6).toString()
         }
     }

@@ -8,6 +8,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.FragmentDataManagerBinding
 import com.wl.turbidimetric.datastore.LocalData
@@ -437,9 +438,10 @@ class DataManagerFragment :
                 i("---监听到了变化---condition=$condition")
                 vm.conditionChange(condition)
                 adapter.submitData(it)
-
+                //刷新后移动到顶部，只在没有移动的时候移动
                 withContext(Dispatchers.Main) {
-                    vd.rv.scrollToPosition(0)
+                    if (vd.rv.scrollState == RecyclerView.SCROLL_STATE_IDLE)
+                        vd.rv.scrollToPosition(0)
                 }
             }
         }

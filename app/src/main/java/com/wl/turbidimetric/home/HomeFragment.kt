@@ -3,6 +3,7 @@ package com.wl.turbidimetric.home
 import android.app.ProgressDialog
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.*
 import com.wl.turbidimetric.R
@@ -265,6 +266,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     "确定",
                     confirmClick = { it.dismiss() },
                     scMaxHeight = 600,
+                    textGravity = Gravity.LEFT
                 )
             }
 
@@ -429,7 +431,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                         dialog.showPop(requireContext(), width = 1500) { d ->
                             d.showDialog(
                                 it, "确定", confirmClick = { it.dismiss() },
-                                showIcon = false
+                                showIcon = false, textGravity = Gravity.LEFT
                             )
                         }
                     }
@@ -446,6 +448,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     DialogState.GET_MACHINE_SHOW -> {
                         dialogGetMachine.show()
                     }
+
                     DialogState.GET_MACHINE_DISMISS -> {
                         dialogGetMachine.dismiss()
                     }

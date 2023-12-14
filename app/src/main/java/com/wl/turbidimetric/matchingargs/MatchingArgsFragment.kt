@@ -1,6 +1,7 @@
 package com.wl.turbidimetric.matchingargs
 
 import android.os.Bundle
+import android.view.Gravity
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -207,7 +208,7 @@ class MatchingArgsFragment :
                 it.showDialog(
                     vm.testMsg.value ?: "",
                     "确定",
-                    confirmClick = { it.dismiss() })
+                    confirmClick = { it.dismiss() }, textGravity = Gravity.LEFT)
             }
         }
     }
@@ -358,7 +359,7 @@ class MatchingArgsFragment :
                     requireContext(), width = 1500,
                     isCancelable = true
                 ) { d ->
-                    d.showDialog(it, "确定", confirmClick = { d.dismiss() })
+                    d.showDialog(it, "确定", confirmClick = { d.dismiss() }, textGravity = Gravity.LEFT)
                 }
             }
         }

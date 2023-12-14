@@ -204,7 +204,7 @@ class MatchingArgsFragment :
         }
 
         vd.btnDebugDialog.setOnClickListener {
-            debugShowDetailsDialog.showPop(requireContext()) {
+            debugShowDetailsDialog.showPop(requireContext(), width = 1500) {
                 it.showDialog(
                     vm.testMsg.value ?: "",
                     "确定",
@@ -335,7 +335,7 @@ class MatchingArgsFragment :
                         dialog.showPop(requireContext()) { dialog ->
                             dialog.showDialog(
                                 msg = "${it.msg}",
-                                confirmText = "我已添加",
+                                confirmText = "我知道了",
                                 confirmClick = {
                                     dialog.dismiss()
 

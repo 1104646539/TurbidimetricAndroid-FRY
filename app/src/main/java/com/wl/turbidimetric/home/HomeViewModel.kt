@@ -456,7 +456,7 @@ class HomeViewModel(
      */
     //检测的值
     private val testValues1 =
-        doubleArrayOf(0.0006, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+        doubleArrayOf(0.0006, 0.0, 0.0, 0.0, 0.0, 0.0, 10.0, 100.0, 0.0, 0.0, 0.0)
     private val testValues2 = doubleArrayOf(
         0.0,
         0.12410,

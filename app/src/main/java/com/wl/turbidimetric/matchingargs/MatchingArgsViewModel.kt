@@ -359,7 +359,7 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
             viewModelScope.launch {
                 _dialogUiState.emit(
                     MatchingArgsDialogUiState(
-                        dialogState = DialogState.GetStateNotExistMsg,
+                        dialogState = DialogState.ACCIDENT,
                         msg = "请重新自检或重启仪器"
                     )
                 )
@@ -370,8 +370,20 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
             viewModelScope.launch {
                 _dialogUiState.emit(
                     MatchingArgsDialogUiState(
-                        dialogState = DialogState.GetStateNotExistMsg,
+                        dialogState = DialogState.ACCIDENT,
                         msg = "正在检测，请勿操作"
+                    )
+                )
+            }
+            return
+        }
+
+        if(reagentNOStr.isNullOrEmpty()){
+            viewModelScope.launch {
+                _dialogUiState.emit(
+                    MatchingArgsDialogUiState(
+                        dialogState = DialogState.ACCIDENT,
+                        msg = "请输入试剂序号"
                     )
                 )
             }

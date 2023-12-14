@@ -213,7 +213,7 @@ fun calcCon(absorbance: BigDecimal, project: CurveModel): Int {
         doubleArrayOf(f0, f1, f2, f3),
         absorbance.multiply(10000.toBigDecimal()).toDouble()
     )
-    if (con < 0) {
+    if (con.compareTo(0.0) <= 0) {
         con = 0.0
     }
 

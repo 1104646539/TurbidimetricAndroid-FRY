@@ -395,6 +395,10 @@ class HomeViewModel(
     var samplingNum = 0
 
     /**
+     * 禁止取样，直接加试剂检测
+     */
+    var banSampling = false
+    /**
      * 是否是检测完一排比色皿后，准备检测下一排时却因为清洗液|R1|R2状态不符合时获取的状态
      */
     var continueTestGetState = false
@@ -2611,12 +2615,13 @@ class HomeViewModel(
      * @param sampleNum Int
      */
     fun changeConfig(
-        curveModel: CurveModel, skipNum: Int, detectionNum: String, sampleNum: Int
+        curveModel: CurveModel, skipNum: Int, detectionNum: String, sampleNum: Int,banSampling:Boolean
     ) {
         selectProject = curveModel
         detectionNumInput = detectionNum
         cuvetteStartPos = skipNum
         needSamplingNum = sampleNum
+        this.banSampling = banSampling
 
         selectProject?.let {
             LocalData.SelectProjectID = it.curveId

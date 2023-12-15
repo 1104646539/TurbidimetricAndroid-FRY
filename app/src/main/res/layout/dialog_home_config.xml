@@ -3,8 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_dialog_hint"
-    android:focusableInTouchMode="true"
     android:focusable="true"
+    android:focusableInTouchMode="true"
     android:orientation="vertical"
     android:padding="40dp">
 
@@ -79,12 +79,13 @@
             android:textColor="@color/textColor"
             android:textSize="18sp" />
     </LinearLayout>
+
     <LinearLayout
+        android:id="@+id/ll_sample_num"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:gravity="center_vertical"
-        android:id="@+id/ll_sample_num"
         android:orientation="horizontal">
 
         <TextView
@@ -106,4 +107,34 @@
             android:textSize="18sp" />
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            style="@style/TextTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text="禁止加样:" />
+
+        <LinearLayout
+            android:layout_width="300dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="14dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <Switch
+                android:id="@+id/sw_ban_sampling"
+                android:layout_width="300dp"
+                android:layout_height="match_parent"
+                android:switchMinWidth="56dp"
+                android:thumb="@drawable/selector_switch_thumb"
+                android:track="@drawable/selector_switch_track" />
+        </LinearLayout>
+    </LinearLayout>
 </LinearLayout>

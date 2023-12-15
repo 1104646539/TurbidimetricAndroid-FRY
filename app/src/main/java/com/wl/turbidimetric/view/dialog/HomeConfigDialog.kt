@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.EditText
 import android.widget.Spinner
+import android.widget.Switch
 import com.lxj.xpopup.core.BasePopupView
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.datastore.LocalData
@@ -27,6 +28,7 @@ class HomeConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_ho
     var etDetectionNum: EditText? = null
     var etSampleNum: EditText? = null
     var llSampleNum: View? = null
+    var swBanSampling: Switch? = null
 
     var selectProject: CurveModel? = null
     var projectAdapter: HomeProjectAdapter? = null
@@ -39,6 +41,8 @@ class HomeConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_ho
     var skipNum: Int? = null
     var detectionNum: String? = null
     var sampleNum: Int? = null
+    var banSampling: Boolean? = null
+
     fun showDialog(
         selectProjectEnable: Boolean,
         editDetectionNumEnable: Boolean,
@@ -48,7 +52,8 @@ class HomeConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_ho
         skipNum: Int,
         detectionNum: String,
         sampleNum: Int,
-        onConfirm: ((CurveModel?, Int, String, Int, BasePopupView) -> Unit)? = null,
+        banSampling:Boolean,
+        onConfirm: ((CurveModel?, Int, String, Int, Boolean, BasePopupView) -> Unit)? = null,
         onCancel: onClick,
     ) {
         this.confirmText = "确定"
@@ -63,6 +68,7 @@ class HomeConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_ho
         this.skipNum = skipNum
         this.detectionNum = detectionNum
         this.sampleNum = sampleNum
+        this.banSampling = banSampling
 
         items.clear()
         items.addAll(curveModels)
@@ -87,6 +93,7 @@ class HomeConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_ho
         etSkipNum?.isEnabled = skipCuvetteEnable ?: false
         spnProject?.isEnabled = selectProjectEnable ?: false
         etDetectionNum?.isEnabled = editDetectionNumEnable ?: false
+        swBanSampling?.isChecked = banSampling ?: false
 
         val selectedIndex = items.indexOf(curveModel)
         spnProject?.setSelection(selectedIndex)
@@ -110,9 +117,12 @@ class HomeConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_ho
                 selectProject = null
             }
         }
+        swBanSampling?.setOnCheckedChangeListener { buttonView, isChecked ->
+            banSampling = isChecked
+        }
     }
 
-    private fun confirm(onConfirm: ((CurveModel?, Int, String, Int, BasePopupView) -> Unit)?) {
+    private fun confirm(onConfirm: ((CurveModel?, Int, String, Int, Boolean, BasePopupView) -> Unit)?) {
         if (selectProject == null) {
             toast("请选择标曲")
             return
@@ -138,7 +148,14 @@ class HomeConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_ho
             detectionNum = LocalData.DetectionNum
         }
 
-        onConfirm?.invoke(selectProject, skipNum, detectionNum, sampleNum, this)
+        onConfirm?.invoke(
+            selectProject,
+            skipNum,
+            detectionNum,
+            sampleNum,
+            banSampling ?: false,
+            this
+        )
     }
 
     override fun initDialogView() {
@@ -147,6 +164,7 @@ class HomeConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_ho
         etDetectionNum = findViewById(R.id.et_start_num)
         etSampleNum = findViewById(R.id.et_sample_num)
         llSampleNum = findViewById(R.id.ll_sample_num)
+        swBanSampling = findViewById(R.id.sw_ban_sampling)
 
         projectAdapter = HomeProjectAdapter(context, items)
         spnProject?.adapter = projectAdapter

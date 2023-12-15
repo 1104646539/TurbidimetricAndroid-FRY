@@ -1,8 +1,10 @@
 package com.wl.turbidimetric.view.dialog
 
+import android.app.Activity
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -41,6 +43,8 @@ abstract class CustomBtn3Popup(val ctx: Context, val viewId: Int) : CenterPopupV
 
     var cancelText: String? = null
     var cancelClick: onClick? = null
+    val imm: InputMethodManager =
+        ctx.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager;
 
     // 返回自定义弹窗的布局
     override fun getImplLayoutId(): Int {
@@ -64,6 +68,10 @@ abstract class CustomBtn3Popup(val ctx: Context, val viewId: Int) : CenterPopupV
         setContent()
     }
 
+    override fun dismiss() {
+        imm.hideSoftInputFromWindow(rootView.windowToken, 0);
+        super.dismiss()
+    }
 
     abstract fun initDialogView()
 

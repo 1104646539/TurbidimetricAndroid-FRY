@@ -29,7 +29,7 @@ class DataManagerAdapter :
             oldItem: TestResultAndCurveModel,
             newItem: TestResultAndCurveModel
         ): Boolean {
-            return oldItem.result?.resultId == newItem.result?.resultId && oldItem.curve?.curveId == newItem.curve?.curveId
+            return oldItem.result.resultId == newItem.result.resultId && oldItem.curve?.curveId == newItem.curve?.curveId
         }
 
         override fun areContentsTheSame(
@@ -53,15 +53,16 @@ class DataManagerAdapter :
             binding.tvName.text = item?.result?.name ?: "-"
             binding.tvGender.text = item?.result?.gender ?: "-"
             binding.tvAge.text = item?.result?.age ?: "-"
-            binding.tvAbsorbances.text = item?.result?.absorbances?.setScale(6, RoundingMode.HALF_UP).toString() ?: "-"
+            binding.tvAbsorbances.text =
+                item?.result?.absorbances?.setScale(6, RoundingMode.HALF_UP).toString()
             binding.tvResult.text = item?.result?.testResult ?: "-"
             binding.tvConcentration.text = item?.result?.concentration?.toString() ?: "-"
             binding.tvTestTime.text =
                 if (item?.result?.testTime == 0L) "-" else item?.result?.testTime?.toTimeStr() ?: "-"
-            binding.tvTestValue1.text = item?.result?.testValue1?.setScale(6, RoundingMode.HALF_UP).toString() ?: "-"
-            binding.tvTestValue2.text = item?.result?.testValue2?.setScale(6, RoundingMode.HALF_UP).toString() ?: "-"
-            binding.tvTestValue3.text = item?.result?.testValue3?.setScale(6, RoundingMode.HALF_UP).toString() ?: "-"
-            binding.tvTestValue4.text = item?.result?.testValue4?.setScale(6, RoundingMode.HALF_UP).toString() ?: "-"
+            binding.tvTestValue1.text = item?.result?.testValue1?.setScale(6, RoundingMode.HALF_UP).toString()
+            binding.tvTestValue2.text = item?.result?.testValue2?.setScale(6, RoundingMode.HALF_UP).toString()
+            binding.tvTestValue3.text = item?.result?.testValue3?.setScale(6, RoundingMode.HALF_UP).toString()
+            binding.tvTestValue4.text = item?.result?.testValue4?.setScale(6, RoundingMode.HALF_UP).toString()
             binding.tvTestOriginalValue1.text = item?.result?.testOriginalValue1?.toString() ?: "-"
             binding.tvTestOriginalValue2.text = item?.result?.testOriginalValue2?.toString() ?: "-"
             binding.tvTestOriginalValue3.text = item?.result?.testOriginalValue3?.toString() ?: "-"
@@ -87,7 +88,7 @@ class DataManagerAdapter :
 //        }
         val items = mutableListOf<TestResultAndCurveModel>().apply {
             snapshot().items.forEach {
-                if (it!!.result!!.isSelect)
+                if (it.result.isSelect)
                     add(it)
             }
         }
@@ -107,12 +108,12 @@ class DataManagerAdapter :
                 when (tem) {
                     REFRESH_SELECT_CHANGE -> {
                         getItem(position)?.let {
-                            if (it!!.result!!.isSelect) {
+                            if (it.result.isSelect) {
                                 holder.binding.root.setBackgroundResource(R.drawable.bg_item_select)
                             } else {
                                 holder.binding.root.setBackgroundColor(Color.WHITE)
                             }
-                            holder.binding.ivSelect.isSelected = it.result!!.isSelect
+                            holder.binding.ivSelect.isSelected = it.result.isSelect
                         }
                     }
                 }

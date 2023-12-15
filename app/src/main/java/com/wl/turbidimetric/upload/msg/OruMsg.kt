@@ -87,7 +87,7 @@ object OruMsg {
         val range = if (t.curve?.projectLjz == null) {
             return "0-100"
         } else {
-            "0-${t.curve?.projectLjz}"
+            "0-${t.curve.projectLjz}"
         }
 //        val arr = createArray(
 //            18, hashMapOf(
@@ -107,10 +107,10 @@ object OruMsg {
             18, hashMapOf(
                 0 to "OBX",
                 2 to "NM",
-                3 to t.curve?.projectCode,
-                4 to t.curve?.projectName,
+                3 to t.curve.projectCode,
+                4 to t.curve.projectName,
                 5 to t.result.concentration.toString(),
-                6 to t.curve?.projectUnit,
+                6 to t.curve.projectUnit,
                 7 to range,
                 9 to t.result.testResult,
                 13 to t.result.absorbances.setScale(5).toString(),

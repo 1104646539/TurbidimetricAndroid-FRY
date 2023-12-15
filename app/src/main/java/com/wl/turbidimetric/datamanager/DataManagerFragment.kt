@@ -236,7 +236,7 @@ class DataManagerFragment :
 
             lifecycleScope.launch(Dispatchers.IO) {
                 if (HL7Helper.isConnected()) {
-                    HL7Helper.uploadTestResult(results!!) { count, success, failed ->
+                    HL7Helper.uploadTestResult(results) { count, success, failed ->
                         lifecycleScope.launch(Dispatchers.Main) {
                             dialog.showDialog(
                                 "上传结束，本次上传共${count}条，成功${success}条,失败${failed}条",
@@ -369,7 +369,7 @@ class DataManagerFragment :
                 if (err.isEmpty()) {
                     ExportExcelHelper.export(
                         requireContext(),
-                        data!!,
+                        data,
                         { msg ->
                             lifecycleScope.launch(Dispatchers.Main) {
                                 dialog.showDialog("导出成功,文件保存在 $msg", "确定", { d ->

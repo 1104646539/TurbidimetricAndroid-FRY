@@ -49,11 +49,11 @@ class TestResultRepository {
         dao.insertTestResultModels(*(testResultModel.toTypedArray()))
     }
 
-    suspend fun getTestResultAndCurveModelById(id: Long): TestResultAndCurveModel? {
+    suspend fun getTestResultAndCurveModelById(id: Long): TestResultAndCurveModel {
         return dao.getTestResultAndCurveModelById(id)
     }
 
-    suspend fun getTestResultModelById(id: Long): TestResultModel? {
+    suspend fun getTestResultModelById(id: Long): TestResultModel {
         return dao.getTestResultModelById(id)
     }
 

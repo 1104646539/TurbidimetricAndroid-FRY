@@ -169,7 +169,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 } else {
                     vd.ivR2.setImageResource(r2VolumeIds[0])
                 }
-                vd.ivCleanoutFluid.setImageResource(if (it.cleanoutFluidState.not() == true) R.drawable.icon_cleanout_fluid_empty else R.drawable.icon_cleanout_fluid_full)
+                vd.ivCleanoutFluid.setImageResource(if (it.cleanoutFluidState.not()) R.drawable.icon_cleanout_fluid_empty else R.drawable.icon_cleanout_fluid_full)
                 vd.tvTemp.text = it.reactionTemp.toString().plus("℃")
             }
         }

@@ -39,12 +39,12 @@ class ResultDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog
     ) {
         this.confirmText = "确定"
         this.confirmClick = {
-            result?.result?.name = etName?.text.toString()
-            result?.result?.gender = etGender?.text.toString()
-            result?.result?.absorbances = (etAbs?.text.toString().toDoubleOrNull() ?: 0.0).toBigDecimal()
-            result?.result?.concentration = etCon?.text.toString().toIntOrNull() ?: 0
-            result?.result?.testResult = etResult?.text.toString()
-            result?.result?.sampleBarcode = etSampleBarcode?.text.toString()
+            result.result.name = etName?.text.toString()
+            result.result.gender = etGender?.text.toString()
+            result.result.absorbances = (etAbs?.text.toString().toDoubleOrNull() ?: 0.0).toBigDecimal()
+            result.result.concentration = etCon?.text.toString().toIntOrNull() ?: 0
+            result.result.testResult = etResult?.text.toString()
+            result.result.sampleBarcode = etSampleBarcode?.text.toString()
             dismiss().takeIf {
                 onConfirm.invoke(result)
             }

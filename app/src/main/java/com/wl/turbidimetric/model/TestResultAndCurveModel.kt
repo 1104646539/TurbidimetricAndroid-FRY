@@ -13,13 +13,13 @@ data class TestResultAndCurveModel(
     override fun equals(other: Any?): Boolean {
         if (other == null) return false
         if (other !is TestResultAndCurveModel) return false
-        if (other!!.result == null && result == null && other!!.curve == null && curve == null) return true
-        return other.result?.equals(result) == true && other?.curve?.equals(curve) == true
+        if (other.result == null && result == null && other.curve == null && curve == null) return true
+        return other.result.equals(result) == true && other.curve?.equals(curve) == true
     }
 
     @Suppress("UNCHECKED_CAST")
     @Override
     fun copy(): TestResultAndCurveModel {
-        return TestResultAndCurveModel(result?.copy(), curve?.copy())
+        return TestResultAndCurveModel(result.copy(), curve?.copy())
     }
 }

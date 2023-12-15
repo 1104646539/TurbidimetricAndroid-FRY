@@ -20,7 +20,7 @@ suspend fun MainDao.putTestResultAndCurve(model: TestResultAndCurveModel) {
 
         if (model.result == null) return@runInTransaction
 
-        model.result?.curveOwnerId = curveId
+        model.result.curveOwnerId = curveId
         GlobalScope.launch {
             val resultId = dao.insertTestResultModel(model.result)
             if (resultId <= 0 && model.result != null) throw Exception("result插入失败")

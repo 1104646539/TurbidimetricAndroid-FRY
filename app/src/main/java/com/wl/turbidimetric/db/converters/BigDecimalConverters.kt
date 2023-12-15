@@ -10,7 +10,7 @@ class BigDecimalConverters {
     }
 
     @TypeConverter
-    fun bigDecimalToDouble(bigDecimal: BigDecimal):Double?{
+    fun bigDecimalToDouble(bigDecimal: BigDecimal): Double {
         return bigDecimal.toDouble()
     }
 }

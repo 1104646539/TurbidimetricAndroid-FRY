@@ -10,7 +10,7 @@ class IntArrayConverters {
     }
 
     @TypeConverter
-    fun stringToIntArray(str: String?): IntArray? {
+    fun stringToIntArray(str: String?): IntArray {
         return if (str.isNullOrEmpty()) intArrayOf()
         else str.split(",").map {
             it.toInt()

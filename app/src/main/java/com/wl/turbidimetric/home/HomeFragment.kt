@@ -359,16 +359,16 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
     private fun showConfigDialog() {
         i("showConfigDialog before")
         homeConfigDialog.showPop(requireContext(), width = 1000) {
-            it.showDialog(vm.selectProjectEnable.value ?: true,
-                vm.editDetectionNumEnable.value ?: true,
-                vm.skipCuvetteEnable.value ?: true,
+            it.showDialog(
+                vm.configViewEnable.value ?: true,
                 projects,
                 vm.selectProject,
                 vm.cuvetteStartPos,
                 if (vm.detectionNumInput.isNullOrEmpty()) LocalData.DetectionNum else vm.detectionNumInput,
                 vm.needSamplingNum,
                 vm.banSampling,
-                { projectModel, skipNum, detectionNum, sampleNum,banSampling, baseDialog ->
+                vm.banSamplingNum,
+                { projectModel, skipNum, detectionNum, sampleNum, banSampling, banSamplingNum, baseDialog ->
                     if (projectModel == null) {
                         toast("请选择标曲")
                     } else {
@@ -377,7 +377,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                             return@showDialog
                         }
                         //选择的项目变更
-                        vm.changeConfig(projectModel, skipNum, detectionNum, sampleNum,banSampling)
+                        vm.changeConfig(projectModel, skipNum, detectionNum, sampleNum, banSampling,banSamplingNum)
                         baseDialog.dismiss()
                     }
                 },

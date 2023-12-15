@@ -137,4 +137,31 @@
                 android:track="@drawable/selector_switch_track" />
         </LinearLayout>
     </LinearLayout>
+    <LinearLayout
+        android:id="@+id/ll_ban_sampling"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            style="@style/TextHilt"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:text="禁止加样数量:" />
+
+        <EditText
+            android:id="@+id/et_ban_sampling_num"
+            android:layout_width="300dp"
+            android:layout_height="48dp"
+            android:layout_marginLeft="14dp"
+            android:background="@drawable/bg_et_gray"
+            android:inputType="number"
+            android:paddingLeft="10dp"
+            android:text=""
+            android:textColor="@color/textColor"
+            android:textSize="18sp" />
+    </LinearLayout>
+
 </LinearLayout>

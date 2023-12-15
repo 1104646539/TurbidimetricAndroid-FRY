@@ -25,6 +25,7 @@ import kotlin.concurrent.timer
 import kotlin.math.absoluteValue
 import com.wl.wllib.LogToFile.i
 import kotlinx.coroutines.flow.*
+import kotlin.math.min
 
 class HomeViewModel(
     private val projectRepository: ProjectRepository,
@@ -142,19 +143,9 @@ class HomeViewModel(
 //    val getStateNotExistMsg = MutableLiveData("")
 
     /**
-     * 选择项目是否可用
+     * 配置信息内的选择项目、编号、跳过比色皿等按钮是否可用，检测时不可用
      */
-    val selectProjectEnable = MutableLiveData(true)
-
-    /**
-     * 跳过比色皿是否可用
-     */
-    val skipCuvetteEnable = MutableLiveData(true)
-
-    /**
-     * 编辑编号是否可用
-     */
-    val editDetectionNumEnable = MutableLiveData(true)
+    val configViewEnable = MutableLiveData(true)
 
     /**样本架状态 1有 0无 顺序是从中间往旁边
      *
@@ -398,6 +389,12 @@ class HomeViewModel(
      * 禁止取样，直接加试剂检测
      */
     var banSampling = false
+
+    /**
+     * 禁止加样的数量 1-10
+     */
+    var banSamplingNum = 10
+
     /**
      * 是否是检测完一排比色皿后，准备检测下一排时却因为清洗液|R1|R2状态不符合时获取的状态
      */
@@ -455,6 +452,7 @@ class HomeViewModel(
      * 开始检测前的清洗取样针
      */
     var cleaningBeforeStartTest = false
+
     /**
      * 测试用的 start
      */
@@ -653,7 +651,9 @@ class HomeViewModel(
         if (cleaningBeforeStartTest) {
             //是开始检测前的清洗，清洗完才开始检测
             cleaningBeforeStartTest = false
-            moveSampleShelf(sampleShelfPos)
+            if (!banSampling) {
+                moveSampleShelf(sampleShelfPos)
+            }
             moveCuvetteShelf(cuvetteShelfPos)
         }
         //恢复取样
@@ -1338,15 +1338,18 @@ class HomeViewModel(
                 testFinishAction()
             } else {
                 if (lastCuvetteShelf(cuvetteShelfPos)) {//最后一排比色皿
-                    //提示，比色皿不足了
-                    viewModelScope.launch {
-                        _dialogUiState.emit(
-                            HomeDialogUiState(
-                                dialogState = DialogState.CUVETTE_DEFICIENCY, ""
+                    if (banSampling) {
+                        testFinishAction()
+                    } else {
+                        //提示，比色皿不足了
+                        viewModelScope.launch {
+                            _dialogUiState.emit(
+                                HomeDialogUiState(
+                                    dialogState = DialogState.CUVETTE_DEFICIENCY, ""
+                                )
                             )
-                        )
+                        }
                     }
-
                 } else {
                     checkTestState(accord = {
                         //还有比色皿。继续移动比色皿，检测
@@ -1355,7 +1358,6 @@ class HomeViewModel(
                         moveSampleShelfNext()
                     }, discrepancy = { str ->
                         continueTestGetState = true
-//                        getStateNotExistMsg.postValue(str)
                         viewModelScope.launch {
                             _dialogUiState.emit(
                                 HomeDialogUiState(
@@ -1368,13 +1370,17 @@ class HomeViewModel(
             }
         } else {
             if (lastCuvetteShelf(cuvetteShelfPos)) {//最后一排比色皿
-                //提示，比色皿不足了
-                viewModelScope.launch {
-                    _dialogUiState.emit(
-                        HomeDialogUiState(
-                            dialogState = DialogState.CUVETTE_DEFICIENCY, ""
+                if (banSampling) {
+                    testFinishAction()
+                } else {
+                    //提示，比色皿不足了
+                    viewModelScope.launch {
+                        _dialogUiState.emit(
+                            HomeDialogUiState(
+                                dialogState = DialogState.CUVETTE_DEFICIENCY, ""
+                            )
                         )
-                    )
+                    }
                 }
             } else {
                 //还有比色皿。继续移动比色皿，检测
@@ -1383,7 +1389,6 @@ class HomeViewModel(
                     moveCuvetteShelfNext()
                 }, discrepancy = { str ->
                     continueTestGetState = true
-//                    getStateNotExistMsg.postValue(str)
                     viewModelScope.launch {
                         _dialogUiState.emit(
                             HomeDialogUiState(
@@ -1892,13 +1897,30 @@ class HomeViewModel(
         cuvetteShelfMoveFinish = true
 
         if (testState != TestState.TestFinish) {
-            val needMoveStep = getFirstCuvetteStartPos()
-            if (needMoveStep > -1) {
-                moveCuvetteDripSample(needMoveStep + 2)
+            if (banSampling) {
+                initBanSamplingCuvetteStatus()
+                stepDripReagent()
             } else {
-                moveCuvetteDripSample()
+                val needMoveStep = getFirstCuvetteStartPos()
+                if (needMoveStep > -1) {
+                    moveCuvetteDripSample(needMoveStep + 2)
+                } else {
+                    moveCuvetteDripSample()
+                }
             }
+        }
+    }
 
+    /**
+     * 初始化禁止加样的比色皿状态，设为已加样
+     */
+    private fun initBanSamplingCuvetteStatus() {
+        i("initBanSamplingCuvetteStatus cuvetteStartPos=$cuvetteStartPos")
+        for (i in cuvetteStartPos until min(
+            (mCuvetteStates[cuvetteShelfPos]?.size ?: 0),
+            cuvetteStartPos + banSamplingNum
+        )) {
+            mCuvetteStates[cuvetteShelfPos]?.get(i)?.state = CuvetteState.DripSample
         }
     }
 
@@ -2131,23 +2153,11 @@ class HomeViewModel(
             continueTestGetState = false
             //还有比色皿。继续移动比色皿，检测
             continueTestNextCuvette()
-//            checkTestState(r2Volume, r1Reagent, r2Reagent, cleanoutFluid, accord = {
-//                continueTestNextCuvette()
-//            }, discrepancy = { str ->
-//                continueTestGetState = true
-//                getStateNotExistMsg.postValue(str)
-//            })
             return
         }
         cuvetteShelfStates = reply.data.cuvetteShelfs
         sampleShelfStates = reply.data.sampleShelfs
 
-        //如果是手动开始检测，就进行下一步骤，而且就直接返回
-//        if (clickStart) {
-//            clickStart = false
-//        } else {
-//            return
-//        }
 
         getInitialPos()
         i("cuvetteShelfPos=${cuvetteShelfPos} sampleShelfPos=${sampleShelfPos}")
@@ -2176,11 +2186,16 @@ class HomeViewModel(
             return
         }
 
+        i("cuvetteStartPos=$cuvetteStartPos banSamplingNum=$banSamplingNum")
+        if (banSampling && (cuvetteStartPos + banSamplingNum) > 10) {
+            toast("跳过比色皿的数量+禁止加样的数量不能大于10")
+            return
+        }
+
         checkTestState(accord = {
             //开始检测前先清洗取样针
             cleaningBeforeStartTest = true
             samplingProbeCleaning()
-
         }, discrepancy = { str ->
 //            getStateNotExistMsg.postValue(str)
             viewModelScope.launch {
@@ -2615,13 +2630,19 @@ class HomeViewModel(
      * @param sampleNum Int
      */
     fun changeConfig(
-        curveModel: CurveModel, skipNum: Int, detectionNum: String, sampleNum: Int,banSampling:Boolean
+        curveModel: CurveModel,
+        skipNum: Int,
+        detectionNum: String,
+        sampleNum: Int,
+        banSampling: Boolean,
+        banSamplingNum: Int,
     ) {
         selectProject = curveModel
         detectionNumInput = detectionNum
         cuvetteStartPos = skipNum
         needSamplingNum = sampleNum
         this.banSampling = banSampling
+        this.banSamplingNum = banSamplingNum
 
         selectProject?.let {
             LocalData.SelectProjectID = it.curveId
@@ -2634,9 +2655,7 @@ class HomeViewModel(
      * @param enable Boolean
      */
     fun enableView(enable: Boolean) {
-        selectProjectEnable.postValue(enable)
-        editDetectionNumEnable.postValue(enable)
-        skipCuvetteEnable.postValue(enable)
+        configViewEnable.postValue(enable)
     }
 
     /**

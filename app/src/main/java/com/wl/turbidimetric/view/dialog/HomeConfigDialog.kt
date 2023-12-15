@@ -29,31 +29,31 @@ class HomeConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_ho
     var etSampleNum: EditText? = null
     var llSampleNum: View? = null
     var swBanSampling: Switch? = null
+    var etBanSamplingNum: EditText? = null
+    var llBanSamplingNum: View? = null
 
     var selectProject: CurveModel? = null
     var projectAdapter: HomeProjectAdapter? = null
     val items: MutableList<CurveModel> = mutableListOf()
 
-    var selectProjectEnable: Boolean? = null
-    var editDetectionNumEnable: Boolean? = null
-    var skipCuvetteEnable: Boolean? = null
+    var configViewEnable: Boolean? = null
     var curveModel: CurveModel?? = null
     var skipNum: Int? = null
     var detectionNum: String? = null
     var sampleNum: Int? = null
     var banSampling: Boolean? = null
+    var banSamplingNum: Int? = null
 
     fun showDialog(
-        selectProjectEnable: Boolean,
-        editDetectionNumEnable: Boolean,
-        skipCuvetteEnable: Boolean,
+        configViewEnable: Boolean,
         curveModels: MutableList<CurveModel>,
         curveModel: CurveModel?,
         skipNum: Int,
         detectionNum: String,
         sampleNum: Int,
-        banSampling:Boolean,
-        onConfirm: ((CurveModel?, Int, String, Int, Boolean, BasePopupView) -> Unit)? = null,
+        banSampling: Boolean,
+        banSamplingNum: Int,
+        onConfirm: ((CurveModel?, Int, String, Int, Boolean, Int, BasePopupView) -> Unit)? = null,
         onCancel: onClick,
     ) {
         this.confirmText = "确定"
@@ -61,14 +61,13 @@ class HomeConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_ho
         this.cancelText = "取消"
         this.cancelClick = { onCancel.invoke(it) }
 
-        this.selectProjectEnable = selectProjectEnable
-        this.editDetectionNumEnable = editDetectionNumEnable
-        this.skipCuvetteEnable = skipCuvetteEnable
+        this.configViewEnable = configViewEnable
         this.curveModel = curveModel
         this.skipNum = skipNum
         this.detectionNum = detectionNum
         this.sampleNum = sampleNum
         this.banSampling = banSampling
+        this.banSamplingNum = banSamplingNum
 
         items.clear()
         items.addAll(curveModels)
@@ -85,15 +84,21 @@ class HomeConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_ho
         etSkipNum?.setText(skipNum.toString())
         etDetectionNum?.setText(detectionNum)
         etSampleNum?.setText(sampleNum.toString())
+        etBanSamplingNum?.setText(banSamplingNum.toString())
 
         etSkipNum?.selectionLast()
         etDetectionNum?.selectionLast()
         etSampleNum?.selectionLast()
+        etBanSamplingNum?.selectionLast()
 
-        etSkipNum?.isEnabled = skipCuvetteEnable ?: false
-        spnProject?.isEnabled = selectProjectEnable ?: false
-        etDetectionNum?.isEnabled = editDetectionNumEnable ?: false
+        etSkipNum?.isEnabled = configViewEnable ?: false
+        spnProject?.isEnabled = configViewEnable ?: false
+        etDetectionNum?.isEnabled = configViewEnable ?: false
+
         swBanSampling?.isChecked = banSampling ?: false
+        llBanSamplingNum?.visibility = banSampling.isShow()
+        llBanSamplingNum?.isEnabled = configViewEnable ?: false
+        swBanSampling?.isEnabled = configViewEnable ?: false
 
         val selectedIndex = items.indexOf(curveModel)
         spnProject?.setSelection(selectedIndex)
@@ -104,7 +109,6 @@ class HomeConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_ho
         }
 
         llSampleNum?.visibility = if (isAuto()) View.GONE else View.VISIBLE
-
 
         spnProject?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
@@ -119,10 +123,11 @@ class HomeConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_ho
         }
         swBanSampling?.setOnCheckedChangeListener { buttonView, isChecked ->
             banSampling = isChecked
+            llBanSamplingNum?.visibility = banSampling.isShow()
         }
     }
 
-    private fun confirm(onConfirm: ((CurveModel?, Int, String, Int, Boolean, BasePopupView) -> Unit)?) {
+    private fun confirm(onConfirm: ((CurveModel?, Int, String, Int, Boolean, Int,  BasePopupView) -> Unit)?) {
         if (selectProject == null) {
             toast("请选择标曲")
             return
@@ -130,7 +135,7 @@ class HomeConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_ho
         var sampleNum: Int = (etSampleNum?.text?.trim().toString()).toIntOrNull() ?: 0
         var skipNum: Int = (etSkipNum?.text?.trim().toString()).toIntOrNull() ?: 0
         var detectionNum: String = etDetectionNum?.text?.trim().toString()
-
+        var banSamplingNum: Int = etBanSamplingNum?.text?.trim().toString().toIntOrNull() ?: 0
         if (!isAuto()) {
             if (sampleNum < 0 || sampleNum > 50) {
                 sampleNum = 0
@@ -141,6 +146,10 @@ class HomeConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_ho
         if (skipNum < 0 || skipNum > 9) {
             skipNum = 0
             toast("跳过比色皿必须为0-9")
+            return
+        }
+        if (banSamplingNum + skipNum > 10) {
+            toast("禁止加样数量+跳过比色皿数量必须小于等于10")
             return
         }
 
@@ -154,6 +163,7 @@ class HomeConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_ho
             detectionNum,
             sampleNum,
             banSampling ?: false,
+            banSamplingNum,
             this
         )
     }
@@ -165,6 +175,8 @@ class HomeConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_ho
         etSampleNum = findViewById(R.id.et_sample_num)
         llSampleNum = findViewById(R.id.ll_sample_num)
         swBanSampling = findViewById(R.id.sw_ban_sampling)
+        etBanSamplingNum = findViewById(R.id.et_ban_sampling_num)
+        llBanSamplingNum = findViewById(R.id.ll_ban_sampling)
 
         projectAdapter = HomeProjectAdapter(context, items)
         spnProject?.adapter = projectAdapter

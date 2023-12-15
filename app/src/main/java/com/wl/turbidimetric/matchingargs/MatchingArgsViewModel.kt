@@ -43,14 +43,9 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
     }
 
     /**
-     * 序号是否可输入
+     * 序号、质控是否可输入
      */
-    val reagentNoEnable = MutableLiveData(true)
-
-    /**
-     * 是否质控是否可输入
-     */
-    val qualityEnable = MutableLiveData(true)
+    val configEnable = MutableLiveData(true)
 
     /**
      * 四次检测的吸光度值

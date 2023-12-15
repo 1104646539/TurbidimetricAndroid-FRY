@@ -180,13 +180,11 @@ class MatchingArgsFragment :
                 if (it.isRunning()) {
                     vd.btnStart.setBackgroundResource(R.drawable.rip_positive2)
                     vd.btnStart.setText("正在拟合")
-                    vm.qualityEnable.postValue(false)
-                    vm.reagentNoEnable.postValue(false)
+                    vm.configEnable.postValue(false)
                 } else {
                     vd.btnStart.setBackgroundResource(R.drawable.rip_positive)
                     vd.btnStart.setText("开始拟合")
-                    vm.qualityEnable.postValue(true)
-                    vm.reagentNoEnable.postValue(true)
+                    vm.configEnable.postValue(true)
                 }
             }
         }
@@ -315,7 +313,7 @@ class MatchingArgsFragment :
                                     dialog.dismiss()
                                 }, cancelText = "取消", cancelClick = {
                                     dialog.dismiss()
-                                }
+                                }, textGravity = Gravity.LEFT
                             )
                         }
 

@@ -230,10 +230,12 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
      * 第二次的检测间隔
      */
     var testShelfInterval2: Long = 1000 * 0
+
     /**
      * 第三次的检测间隔
      */
     var testShelfInterval3: Long = 1000 * 0
+
     /**
      * 第四次的检测间隔
      */
@@ -268,6 +270,12 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
      * 这排比色皿的第一次搅拌完成的时间，用来计算检测到搅拌时间的间隔
      */
     var firstStirTime = 0L
+
+
+    /**
+     * 开始检测前的清洗取样针
+     */
+    var cleaningBeforeStartTest = false
 
     /**
      * 测试用的 start
@@ -373,7 +381,7 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
             return
         }
 
-        if(reagentNOStr.isNullOrEmpty()){
+        if (reagentNOStr.isNullOrEmpty()) {
             viewModelScope.launch {
                 _dialogUiState.emit(
                     MatchingArgsDialogUiState(
@@ -483,7 +491,10 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
 
         testState = TestState.DripDiluentVolume
         //开始检测
-        moveSampleShelf(sampleShelfPos)
+//        moveSampleShelf(sampleShelfPos)
+        cleaningBeforeStartTest = true
+        samplingProbeCleaning()
+
 //        moveCuvetteShelf(cuvetteShelfPos)
     }
 
@@ -1214,6 +1225,12 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
         if (!runningMatching()) return
         if (!machineStateNormal()) return
         i("接收到 取样针清洗 reply=$reply samplePos=$samplePos sampleStep=$sampleStep")
+        if (cleaningBeforeStartTest) {
+            //是开始检测前的清洗，清洗完才开始检测
+            cleaningBeforeStartTest = false
+            moveSampleShelf(sampleShelfPos)
+            return
+        }
         if (testState == TestState.DripDiluentVolume) {//加完稀释液后的清洗
             sampleStep = 0
             testState = TestState.DripStandardVolume
@@ -1227,7 +1244,6 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
                 moveSample(-samplePos + 1)
                 moveCuvetteShelf(cuvetteShelfPos)
             } else {//继续加标准品
-//                moveSample(-samplePos + 2)
                 moveSample(0)
             }
         } else if (testState == TestState.MoveSample) {//加已混匀的样本的清洗
@@ -1245,10 +1261,6 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
                 val targetIndex = moveBlendingPos[sampleStep]
                 moveSample(targetIndex - samplePos)
                 moveCuvetteDripSample()
-//                i("sampleStep=$sampleStep")
-//                val targetIndex = moveBlendingPos[sampleStep]
-//                moveSample()
-//                moveCuvetteDripSample()
             }
         }
     }

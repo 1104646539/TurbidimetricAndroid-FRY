@@ -236,6 +236,11 @@ class RepeatabilityViewModel(
     var firstStirTime = 0L
 
     /**
+     * 开始检测前的清洗取样针
+     */
+    var cleaningBeforeStartTest = false
+
+    /**
      * 测试用的 start
      */
     //检测的值
@@ -451,8 +456,10 @@ class RepeatabilityViewModel(
         }
         testState = TestState.MoveSample
         //开始检测
-        moveSampleShelf(sampleShelfPos)
-        moveCuvetteShelf(cuvetteShelfPos)
+        cleaningBeforeStartTest = true
+        samplingProbeCleaning()
+//        moveSampleShelf(sampleShelfPos)
+//        moveCuvetteShelf(cuvetteShelfPos)
     }
 
     /**
@@ -1069,36 +1076,25 @@ class RepeatabilityViewModel(
         if (!runningRepeatability()) return
         if (!machineStateNormal()) return
         i("接收到 取样针清洗 reply=$reply samplePos=$samplePos sampleStep=$sampleStep")
-//        if (testState == TestState.MoveSample) {//加已混匀的样本的清洗
-//            if ((sampleStep == 9)) {
-//                //开始加试剂的步骤
-//                testState = TestState.DripReagent
-//                sampleStep = 0
-//                cuvettePos = -1
-////                moveSample(-samplePos + 1)
-//                moveCuvetteDripReagent()
-//
-//                takeReagent()
-//            } else {//继续移动已混匀的样本
-//                moveSample()
-//                moveCuvetteDripSample()
-//            }
-//        }
+        if (cleaningBeforeStartTest) {
+            //是开始检测前的清洗，清洗完才开始检测
+            cleaningBeforeStartTest = false
+            moveSampleShelf(sampleShelfPos)
+            moveCuvetteShelf(cuvetteShelfPos)
+            return
+        }
         when (testState) {
             TestState.MoveSample -> {//加完样判断是否结束
                 updateCuvetteState(cuvettePos - 1, CuvetteState.DripSample)
-//                samplingProbeCleaning()
                 if ((sampleStep == 10)) {
                     //开始加试剂的步骤
                     testState = TestState.DripReagent
                     sampleStep = 0
                     cuvettePos = -1
-//                moveSample(-samplePos + 1)
                     moveCuvetteDripReagent()
 
                     takeReagent()
                 } else {//去清洗
-//                    moveSample()
                     sampleStep++
                     sampling(moveSampleVolume)
                     moveCuvetteDripSample()

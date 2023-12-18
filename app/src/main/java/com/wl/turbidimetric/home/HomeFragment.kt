@@ -26,6 +26,7 @@ import kotlinx.coroutines.launch
 import com.wl.wllib.LogToFile.i
 import com.wl.wllib.toLongTimeStr
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import java.util.Date
 
@@ -366,7 +367,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 vm.cuvetteStartPos,
                 if (vm.detectionNumInput.isNullOrEmpty()) LocalData.DetectionNum else vm.detectionNumInput,
                 vm.needSamplingNum,
-                { projectModel, skipNum, detectionNum, sampleNum,  baseDialog ->
+                { projectModel, skipNum, detectionNum, sampleNum, baseDialog ->
                     if (projectModel == null) {
                         toast("请选择标曲")
                     } else {
@@ -438,7 +439,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             }
         }
         lifecycleScope.launch {
-            vm.dialogUiState.collectLatest { state ->
+            vm.dialogUiState.collect { state ->
                 i("launchAndRepeatWithViewLifecycle state=${state.dialogState}")
                 when (state.dialogState) {
                     /**
@@ -455,22 +456,24 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                      * 自检失败对话框
                      */
                     DialogState.GET_MACHINE_FAILED_SHOW -> {
-                        dialog.showPop(requireContext(), isCancelable = false) {
-                            it.showDialog(
-                                msg = state.dialogMsg,
-                                confirmText = "重新自检",
-                                confirmClick = {
-                                    it.dismiss()
-                                    vm.dialogGetMachineFailedConfirm()
-                                },
-                                cancelText = "我知道了",
-                                cancelClick = {
-                                    it.dismiss()
-                                    vm.dialogGetMachineFailedCancel()
-                                }, showIcon = true, iconId = ICON_HINT
-                            )
+                        lifecycleScope.launch {
+                            delay(300)
+                            dialog.showPop(requireContext(), isCancelable = false) {
+                                it.showDialog(
+                                    msg = state.dialogMsg,
+                                    confirmText = "重新自检",
+                                    confirmClick = { baseDialog ->
+                                        baseDialog.dismiss()
+                                        vm.dialogGetMachineFailedConfirm()
+                                    },
+                                    cancelText = "我知道了",
+                                    cancelClick = { baseDialog ->
+                                        baseDialog.dismiss()
+                                        vm.dialogGetMachineFailedCancel()
+                                    }, showIcon = true, iconId = ICON_HINT
+                                )
+                            }
                         }
-
                     }
                     /**
                      * 检测结束后 比色皿不足

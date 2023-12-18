@@ -351,6 +351,11 @@ class HomeViewModel(
 
 
     /**
+     * 第一次的检测间隔
+     */
+    var testShelfInterval1: Long = 1000 * 0
+
+    /**
      * 第二次的检测间隔
      */
     var testShelfInterval2: Long = 1000 * 0
@@ -442,6 +447,11 @@ class HomeViewModel(
      * 开始检测前的清洗取样针
      */
     var cleaningBeforeStartTest = false
+
+    /**
+     * 记录每个比色皿的搅拌时间
+     */
+    val stirTimes = longArrayOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
     /**
      * 测试用的 start
@@ -554,11 +564,13 @@ class HomeViewModel(
         i("跳过 $cuvetteStartPos 个比色皿")
 
         if (SystemGlobal.isCodeDebug) {
+            testShelfInterval1 = testS
             testShelfInterval2 = testS
             testShelfInterval3 = testS
             testShelfInterval4 = testS
             testPosInterval = testP
         } else {
+            testShelfInterval1 = LocalData.Test1DelayTime
             testShelfInterval2 = LocalData.Test2DelayTime
             testShelfInterval3 = LocalData.Test3DelayTime
             testShelfInterval4 = LocalData.Test4DelayTime
@@ -1063,7 +1075,7 @@ class HomeViewModel(
                 } else {
                     //继续检测
                     viewModelScope.launch {
-                        delay(testPosInterval)
+//                        delay(testPosInterval)
                         moveCuvetteTest()
                     }
                 }
@@ -1075,16 +1087,16 @@ class HomeViewModel(
                 if (lastNeed(cuvettePos, CuvetteState.Test2)) {
                     //检测结束，下一个步骤，检测第四次
                     viewModelScope.launch {
-                        val stirInterval = (Date().time - firstStirTime)
-                        val intervalTemp =
-                            (testShelfInterval4) - stirInterval
-                        delay(intervalTemp)
+//                        val stirInterval = (Date().time - firstStirTime)
+//                        val intervalTemp =
+//                            (testShelfInterval4) - stirInterval
+//                        delay(intervalTemp)
                         stepTest(TestState.Test4)
                     }
                 } else {
                     //继续检测
                     viewModelScope.launch {
-                        delay(0)
+//                        delay(0)
                         moveCuvetteTest()
                     }
                 }
@@ -1098,7 +1110,7 @@ class HomeViewModel(
                     showResultFinishAndNext()
                 } else {
                     viewModelScope.launch {
-                        delay(0)
+//                        delay(0)
                         moveCuvetteTest()
                     }
                 }
@@ -1423,12 +1435,14 @@ class HomeViewModel(
                     var intervalTemp = 0L
                     if (!SystemGlobal.isCodeDebug) {
                         //第二次检测到搅拌结束的间隔时间要保持220s
-                        val stirInterval = (Date().time - firstStirTime)
-                        intervalTemp = (testShelfInterval2) - stirInterval
-                        i("intervalTemp=$intervalTemp stirInterval=$stirInterval")
+//                        val stirInterval = (Date().time - firstStirTime)
+//                        intervalTemp = (testShelfInterval2) - stirInterval
+//                        val stirTime = stirTimes[0]
+//                        intervalTemp = testShelfInterval2 - (Date().time - stirTime) - 3
+//                        i("intervalTemp=$intervalTemp stirTime=$stirTime")
                     }
                     viewModelScope.launch {
-                        delay(intervalTemp)
+//                        delay(intervalTemp)
                         stepTest(TestState.Test2)
                     }
                     return
@@ -1552,6 +1566,7 @@ class HomeViewModel(
         if (!runningTest()) return
         if (!machineStateNormal()) return
         c("接收到 搅拌 reply=$reply cuvettePos=$cuvettePos")
+        updateStirTime()
         if (firstStirTime <= 0) {
             firstStirTime = Date().time
         }
@@ -1560,6 +1575,13 @@ class HomeViewModel(
         stirProbeCleaning()
     }
 
+    /**
+     * 更新比色皿的搅拌时间
+     */
+    private fun updateStirTime() {
+        if (cuvettePos < 2 || cuvettePos > 12) return
+        stirTimes[cuvettePos - 2] = Date().time
+    }
 
     /**
      * 接收到加试剂
@@ -1772,7 +1794,17 @@ class HomeViewModel(
         c("接收到 移动比色皿 检测位 reply=$reply")
         cuvetteMoveFinish = true
 
-        test()
+        if (cuvettePos in 0 until 10) {
+            val targetTime =
+                if (testState == TestState.Test2) testShelfInterval2 else if (testState == TestState.Test3) testShelfInterval3 else testShelfInterval4
+            val stirTime = stirTimes[cuvettePos]
+            val intervalTemp = targetTime - (Date().time - stirTime) - 3
+            i("intervalTemp=$intervalTemp stirTime=$stirTime targetTime=$targetTime")
+            viewModelScope.launch {
+                delay(intervalTemp)
+                test()
+            }
+        }
     }
 
     /**
@@ -1816,17 +1848,19 @@ class HomeViewModel(
             testFinish = false //先置为未检测完成
             var testInterval = 0L
             //倒数第二个需要检测的
-            val index = getLastNeedIndex(CuvetteState.Stir)
-            val isPenult = index != -1 && index == cuvettePos - 4
-            if (cuvettePos >= 4 && lastNeed(cuvettePos - 4, CuvetteState.Stir)) {
-                if (cuvetteOnlyOne()) {//如果只有一个比色皿,特殊情况需要等待两个比色皿的时间来让检测时间为搅拌后的30s
-                    testInterval = testPosInterval * 2
-                } else {
-                    testInterval = testPosInterval
-                }
-            } else if (isPenult) {
-                testInterval = testPosInterval
-            }
+            val stirTime = stirTimes[cuvettePos - 5]
+            testInterval = testShelfInterval1 - (Date().time - stirTime)
+//            val index = getLastNeedIndex(CuvetteState.Stir)
+//            val isPenult = index != -1 && index == cuvettePos - 4
+//            if (cuvettePos >= 4 && lastNeed(cuvettePos - 4, CuvetteState.Stir)) {
+//                if (cuvetteOnlyOne()) {//如果只有一个比色皿,特殊情况需要等待两个比色皿的时间来让检测时间为搅拌后的30s
+//                    testInterval = testPosInterval * 2
+//                } else {
+//                    testInterval = testPosInterval
+//                }
+//            } else if (isPenult) {
+//                testInterval = testPosInterval
+//            }
 
             i("goTest testInterval=$testInterval cuvettePos=$cuvettePos")
             viewModelScope.launch {

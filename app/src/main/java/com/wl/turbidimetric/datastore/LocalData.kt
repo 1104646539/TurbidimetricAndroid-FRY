@@ -69,6 +69,10 @@ object LocalData {
     var DebugMode by BooleanDataStoreProperty(LocalDataGlobal.Default.DebugMode)
 
     /**
+     * 检测第一次的等待时间
+     */
+    var Test1DelayTime by LongDataStoreProperty(LocalDataGlobal.Default.test1DelayTime)
+    /**
      * 检测第二次的等待时间
      */
     var Test2DelayTime by LongDataStoreProperty(LocalDataGlobal.Default.test2DelayTime)

@@ -258,7 +258,7 @@ object SerialPortUtil {
         GlobalScope.launch {
             launch {
                 while (true) {
-                    Thread.sleep(100)
+                    Thread.sleep(50)
                     val take = sendQueue.take()
 //                    println("take=$take")
                     if (take != null) {

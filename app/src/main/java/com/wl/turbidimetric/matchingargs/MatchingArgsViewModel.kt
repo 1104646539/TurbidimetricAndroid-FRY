@@ -227,6 +227,11 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
 //    val toastMsg = MutableLiveData("")
 
     /**
+     * 第一次的检测间隔
+     */
+    var testShelfInterval1: Long = 1000 * 0
+
+    /**
      * 第二次的检测间隔
      */
     var testShelfInterval2: Long = 1000 * 0
@@ -267,25 +272,18 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
     var isDetectedSample = false
 
     /**
-     * 这排比色皿的第一次搅拌完成的时间，用来计算检测到搅拌时间的间隔
-     */
-    var firstStirTime = 0L
-
-
-    /**
      * 开始检测前的清洗取样针
      */
     var cleaningBeforeStartTest = false
 
     /**
+     * 记录每个比色皿的搅拌时间
+     */
+    val stirTimes = longArrayOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+
+    /**
      * 测试用的 start
      */
-    //检测的值
-//    private val testValues1 = doubleArrayOf(1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)
-//    private val testValues2 = doubleArrayOf(0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3)
-//    private val testValues3 = doubleArrayOf(0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3)
-//    private val testValues4 =
-//        doubleArrayOf(0.9998, 1.1586, 1.0642, 1.0178, 1.0035, 1.0141, 1.0585, 1.0, 1.0, 1.0)
     private val testValues1 = doubleArrayOf(1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)
     private val testValues2 = doubleArrayOf(0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3)
     private val testValues3 = doubleArrayOf(0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3)
@@ -418,14 +416,15 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
         cuvettePos = -1
         sampleShelfPos = -1
         cuvetteShelfPos = -1
-        firstStirTime = 0
 
         if (SystemGlobal.isCodeDebug) {
+            testShelfInterval1 = testS
             testShelfInterval2 = testS
             testShelfInterval3 = testS
             testShelfInterval4 = testS
             testPosInterval = testP
         } else {
+            testShelfInterval1 = LocalData.Test1DelayTime
             testShelfInterval2 = LocalData.Test2DelayTime
             testShelfInterval3 = LocalData.Test3DelayTime
             testShelfInterval4 = LocalData.Test4DelayTime
@@ -723,12 +722,8 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
         }
         if (cuvettePos > 4 && cuvetteNeedTest(cuvettePos - 5)) {
             testFinish = false
-            val testInterval =
-                if (((cuvettePos == 8 || cuvettePos == 9) && !quality) || (quality && (cuvettePos == 10 || cuvettePos == 11))) {
-                    10 * 1000
-                } else {
-                    0.toLong()
-                }
+            val stirTime = stirTimes[cuvettePos - 5]
+            val testInterval = testShelfInterval1 - (Date().time - stirTime)
             viewModelScope.launch {
                 delay(testInterval)
                 test()
@@ -758,17 +753,7 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
             //最后一个也检测结束了
             testState = TestState.Test2
             cuvettePos = -1
-            var intervalTemp = 0L
-            if (!SystemGlobal.isCodeDebug) {
-                //第二次检测到搅拌结束的间隔时间要保持220s
-                val stirInterval = (Date().time - firstStirTime)
-                intervalTemp = (testShelfInterval2) - stirInterval
-                i("intervalTemp=$intervalTemp stirInterval=$stirInterval")
-            }
-            viewModelScope.launch {
-                delay(intervalTemp)
-                moveCuvetteTest()
-            }
+            moveCuvetteTest()
         } else {
             //如果没有结束，移动比色皿，判断是否需要加试剂
             moveCuvetteDripReagent()
@@ -832,18 +817,9 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
                 if ((cuvettePos == 4 && !quality) || (cuvettePos == 6 && quality)) {
                     testState = TestState.Test3
 
-                    viewModelScope.launch {
-                        val stirInterval = (Date().time - firstStirTime)
-                        val intervalTemp =
-                            (testShelfInterval3) - stirInterval
-                        delay(intervalTemp)
-                        moveCuvetteTest(-cuvettePos)
-                    }
+                    moveCuvetteTest(-cuvettePos)
                 } else {
-                    viewModelScope.launch {
-                        delay(testPosInterval)
-                        moveCuvetteTest()
-                    }
+                    moveCuvetteTest()
                 }
 
             }
@@ -856,18 +832,10 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
                 //检测结束,开始检测第四次
                 if ((cuvettePos == 4 && !quality) || (cuvettePos == 6 && quality)) {
                     testState = TestState.Test4
-                    viewModelScope.launch {
-                        val stirInterval = (Date().time - firstStirTime)
-                        val intervalTemp =
-                            (testShelfInterval4) - stirInterval
-                        delay(intervalTemp)
-                        moveCuvetteTest(-cuvettePos)
-                    }
+
+                    moveCuvetteTest(-cuvettePos)
                 } else {
-                    viewModelScope.launch {
-                        delay(0)
-                        moveCuvetteTest()
-                    }
+                    moveCuvetteTest()
                 }
 
             }
@@ -882,10 +850,7 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
                     matchingFinish()
                     calcMatchingArg()
                 } else {
-                    viewModelScope.launch {
-                        delay(0)
-                        moveCuvetteTest()
-                    }
+                    moveCuvetteTest()
                 }
             }
 
@@ -900,7 +865,6 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
      */
     private fun matchingFinish() {
         testState = TestState.TestFinish
-        firstStirTime = 0
         moveCuvetteShelf(-1)
         moveSampleShelf(-1)
     }
@@ -942,10 +906,6 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
             resultOriginalTest3.clear()
             resultOriginalTest4.clear()
             repeat(testValues1.size) {
-//                resultTest1.add(testValues1[it].toBigDecimal())
-//                resultTest2.add(testValues2[it].toBigDecimal())
-//                resultTest3.add(testValues3[it].toBigDecimal())
-//                resultTest4.add(testValues4[it].toBigDecimal())
                 resultTest1.add(roundResult())
                 resultTest2.add(roundResult())
                 resultTest3.add(roundResult())
@@ -1065,12 +1025,18 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
         if (!runningMatching()) return
         if (!machineStateNormal()) return
         i("接收到 搅拌 reply=$reply cuvettePos=$cuvettePos")
-        if (firstStirTime <= 0) {
-            firstStirTime = Date().time
-        }
+        updateStirTime()
         stirFinish = true
         updateCuvetteState(cuvettePos - 2, CuvetteState.Stir)
         stirProbeCleaning()
+    }
+
+    /**
+     * 更新比色皿的搅拌时间
+     */
+    private fun updateStirTime() {
+        if (cuvettePos < 2 || cuvettePos > 12) return
+        stirTimes[cuvettePos - 2] = Date().time
     }
 
     /**
@@ -1194,7 +1160,17 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
             TestState.Test2,
             TestState.Test3,
             TestState.Test4 -> {
-                test()
+                if (cuvettePos in 0 until 10) {
+                    val targetTime =
+                        if (testState == TestState.Test2) testShelfInterval2 else if (testState == TestState.Test3) testShelfInterval3 else testShelfInterval4
+                    val stirTime = stirTimes[cuvettePos]
+                    val intervalTemp = targetTime - (Date().time - stirTime) - 3
+                    i("intervalTemp=$intervalTemp stirTime=$stirTime targetTime=$targetTime")
+                    viewModelScope.launch {
+                        delay(intervalTemp)
+                        test()
+                    }
+                }
             }
 
             else -> {}
@@ -1344,7 +1320,6 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
                 )
             }
         }
-//        matchingFinishMsg.postValue(testMsg.value)
         testState = TestState.Normal
     }
 
@@ -1549,14 +1524,6 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
                 fitGoodnessText = "R²=${project.fitGoodness.scale(6)}"
             )
         }
-//        vm.equationText.postValue(
-//            "Y=${project.f0.scale(8)}+${project.f1.scale(8)}x+${
-//                project.f2.scale(
-//                    8
-//                )
-//            }x²+${project.f3.scale(8)}x³"
-//        )
-//        vm.fitGoodnessText.postValue("R²=${project.fitGoodness.scale(6)}")
     }
 }
 

@@ -17,6 +17,7 @@ class MachineTestModelDialog(val ct: Context) :
     CustomBtn3Popup(ct, R.layout.dialog_machine_test_model) {
     var rbAuto: RadioButton? = null
     var rbManual: RadioButton? = null
+    var rbManualSampling: RadioButton? = null
     var cbSample: CheckBox? = null
     var cbScanCode: CheckBox? = null
     var llAuto: View? = null
@@ -43,9 +44,11 @@ class MachineTestModelDialog(val ct: Context) :
 
     private fun confirm(onConfirm: (MachineTestModel, Boolean, Boolean, BasePopupView?) -> Unit) {
         val machineTestModel = if (rbAuto?.isChecked == true) {
-             MachineTestModel.Auto
+            MachineTestModel.Auto
+        } else if (machineTestModel == MachineTestModel.Manual) {
+            MachineTestModel.Manual
         } else {
-             MachineTestModel.Manual
+            MachineTestModel.ManualSampling
         }
         onConfirm.invoke(
             machineTestModel,
@@ -58,6 +61,7 @@ class MachineTestModelDialog(val ct: Context) :
     override fun initDialogView() {
         rbAuto = findViewById(R.id.rb_auto)
         rbManual = findViewById(R.id.rb_manual)
+        rbManualSampling = findViewById(R.id.rb_manual_sampling)
         cbSample = findViewById(R.id.cb_sample)
         cbScanCode = findViewById(R.id.cb_scan_code)
         llAuto = findViewById(R.id.ll_auto)
@@ -68,8 +72,10 @@ class MachineTestModelDialog(val ct: Context) :
 
         if (machineTestModel == MachineTestModel.Auto) {
             rbAuto?.isChecked = true
-        } else {
+        } else if (machineTestModel == MachineTestModel.Manual) {
             rbManual?.isChecked = true
+        } else {
+            rbManualSampling?.isChecked = true
         }
 
         rbAuto?.setOnCheckedChangeListener { buttonView, isChecked ->

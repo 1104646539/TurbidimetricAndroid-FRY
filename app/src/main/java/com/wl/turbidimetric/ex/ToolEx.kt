@@ -289,6 +289,20 @@ fun isTestRunning(): Boolean {
 fun isAuto(machineTestModel: MachineTestModel = MachineTestModel.valueOf(LocalData.CurMachineTestModel)): Boolean {
     return machineTestModel == MachineTestModel.Auto
 }
+/**
+ * 是否是手动加样模式
+ * @return Boolean
+ */
+fun isManualSampling(machineTestModel: MachineTestModel = MachineTestModel.valueOf(LocalData.CurMachineTestModel)): Boolean {
+    return machineTestModel == MachineTestModel.ManualSampling
+}
+/**
+ * 是否是手动模式
+ * @return Boolean
+ */
+fun isManual(machineTestModel: MachineTestModel = MachineTestModel.valueOf(LocalData.CurMachineTestModel)): Boolean {
+    return machineTestModel == MachineTestModel.Manual
+}
 
 /**
  * 仪器是否可正常运行

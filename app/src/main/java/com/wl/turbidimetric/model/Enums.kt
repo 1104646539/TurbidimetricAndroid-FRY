@@ -20,7 +20,8 @@ enum class CuvetteState(state: String) {
  */
 enum class MachineTestModel {
     Auto,//全自动模式 。指自动识别样本是否存在，扫码等
-    Manual;//手动模式。指手动输入样本数量
+    Manual,//手动模式。指手动输入样本数量
+    ManualSampling;//手动加样模式。指手动输入样本数量
 }
 
 /**

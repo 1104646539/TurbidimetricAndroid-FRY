@@ -26,6 +26,14 @@
             android:textSize="18sp" />
 
         <RadioButton
+            android:id="@+id/rb_manual_sampling"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="50dp"
+            android:text="手动加样模式（手动将样本加入到比色皿中）"
+            android:textSize="18sp" />
+
+        <RadioButton
             android:id="@+id/rb_manual"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -37,8 +45,8 @@
     <LinearLayout
         android:id="@+id/ll_auto"
         android:layout_width="match_parent"
-        android:layout_marginTop="20dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
         android:orientation="horizontal">
 
         <CheckBox
@@ -52,8 +60,8 @@
         <CheckBox
             android:id="@+id/cb_scan_code"
             android:layout_width="wrap_content"
-            android:layout_marginLeft="40dp"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="40dp"
             android:minHeight="50dp"
             android:text="开启扫码器"
             android:textSize="18sp" />

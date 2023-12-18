@@ -386,16 +386,6 @@ class HomeViewModel(
     var samplingNum = 0
 
     /**
-     * 禁止取样，直接加试剂检测
-     */
-    var banSampling = false
-
-    /**
-     * 禁止加样的数量 1-10
-     */
-    var banSamplingNum = 10
-
-    /**
      * 是否是检测完一排比色皿后，准备检测下一排时却因为清洗液|R1|R2状态不符合时获取的状态
      */
     var continueTestGetState = false
@@ -512,9 +502,13 @@ class HomeViewModel(
      */
     fun clickStart() {
         val errorMsg = if (testState.isRunning()) {
-            "正在检检测测，请勿操作！"
+            "正在检测，请勿操作！"
         } else if (selectProject == null) {
             "未选择标曲"
+        } else if (isManual() && needSamplingNum <= 0) {
+            "未指定检测数量"
+        } else if (isManualSampling() && needSamplingNum <= 0) {
+            "未指定检测数量"
         } else {
             ""
         }
@@ -651,7 +645,7 @@ class HomeViewModel(
         if (cleaningBeforeStartTest) {
             //是开始检测前的清洗，清洗完才开始检测
             cleaningBeforeStartTest = false
-            if (!banSampling) {
+            if (!isManualSampling()) {
                 moveSampleShelf(sampleShelfPos)
             }
             moveCuvetteShelf(cuvetteShelfPos)
@@ -961,7 +955,7 @@ class HomeViewModel(
              * 3、是手动模式时
              * 4、是比色杯时
              */
-            if ((SystemGlobal.isCodeDebug && tempSampleState[samplePos] == 1) || (isAuto() && !LocalData.ScanCode) || (!isAuto()) || sampleType?.isCuvette() == true) {
+            if ((SystemGlobal.isCodeDebug && tempSampleState[samplePos] == 1) || (isAuto() && !LocalData.ScanCode) || (!isManual()) || sampleType?.isCuvette() == true) {
                 scanSuccess("")
             } else {
                 scanFailed()
@@ -1329,16 +1323,19 @@ class HomeViewModel(
         testState = TestState.DripSample
         cuvettePos = -1
 
-        if ((isAuto() && lastSamplePos(samplePos)) || !isAuto()) {//这排最后一个样本
-            if (!isAuto() && manualModelSamplingFinish()) {
+        if ((isAuto() && lastSamplePos(samplePos)) || isManual() || isManualSampling()) {//这排最后一个样本
+            if (isManual() && manualModelSamplingFinish()) {//手动模式已经取完样
                 //手动模式，检测完了
                 testFinishAction()
-            } else if (lastSampleShelf(sampleShelfPos)) {//最后一排
+            } else if (isManualSampling() && needSamplingNum <= 0) {//手动取样模式已经检测指定数量的比色皿
+                //手动模式，检测完了
+                testFinishAction()
+            } else if ((isAuto() || isManual()) && lastSampleShelf(sampleShelfPos)) {//最后一排
                 //结束检测，样本已经取完样了
                 testFinishAction()
             } else {
                 if (lastCuvetteShelf(cuvetteShelfPos)) {//最后一排比色皿
-                    if (banSampling) {
+                    if (isManualSampling()) {
                         testFinishAction()
                     } else {
                         //提示，比色皿不足了
@@ -1352,10 +1349,12 @@ class HomeViewModel(
                     }
                 } else {
                     checkTestState(accord = {
+                        if (!isManualSampling()) {
+                            //移动样本架
+                            moveSampleShelfNext()
+                        }
                         //还有比色皿。继续移动比色皿，检测
                         moveCuvetteShelfNext()
-                        //移动样本架
-                        moveSampleShelfNext()
                     }, discrepancy = { str ->
                         continueTestGetState = true
                         viewModelScope.launch {
@@ -1370,7 +1369,7 @@ class HomeViewModel(
             }
         } else {
             if (lastCuvetteShelf(cuvetteShelfPos)) {//最后一排比色皿
-                if (banSampling) {
+                if (isManualSampling()) {
                     testFinishAction()
                 } else {
                     //提示，比色皿不足了
@@ -1682,7 +1681,7 @@ class HomeViewModel(
                 i("这排最后一个比色皿，需要去下一个步骤，加试剂")
                 stepDripReagent()
             } else if ((isAuto() && lastSamplePos(samplePos)) || !isAuto()) {//这排最后一个样本
-                if (!isAuto() && manualModelSamplingFinish()) {
+                if (!isManual() && manualModelSamplingFinish()) {
                     i("手动模式，样本加样完成！")
                     stepDripReagent()
                 } else if (lastSampleShelf(sampleShelfPos)) {//最后一排
@@ -1897,8 +1896,8 @@ class HomeViewModel(
         cuvetteShelfMoveFinish = true
 
         if (testState != TestState.TestFinish) {
-            if (banSampling) {
-                initBanSamplingCuvetteStatus()
+            if (isManualSampling()) {
+                initManualSamplingCuvetteStatus()
                 stepDripReagent()
             } else {
                 val needMoveStep = getFirstCuvetteStartPos()
@@ -1912,16 +1911,31 @@ class HomeViewModel(
     }
 
     /**
-     * 初始化禁止加样的比色皿状态，设为已加样
+     * 初始化手动加样的比色皿状态，设为已加样
      */
-    private fun initBanSamplingCuvetteStatus() {
-        i("initBanSamplingCuvetteStatus cuvetteStartPos=$cuvetteStartPos")
-        for (i in cuvetteStartPos until min(
-            (mCuvetteStates[cuvetteShelfPos]?.size ?: 0),
-            cuvetteStartPos + banSamplingNum
-        )) {
-            mCuvetteStates[cuvetteShelfPos]?.get(i)?.state = CuvetteState.DripSample
+    private fun initManualSamplingCuvetteStatus() {
+        i("initManualSamplingCuvetteStatus cuvetteStartPos=$cuvetteStartPos")
+        val need = needSamplingNum
+        viewModelScope.launch {
+            for (i in cuvetteStartPos until (mCuvetteStates[cuvetteShelfPos]?.size ?: 0)) {
+                if (needSamplingNum > 0) {
+                    mCuvetteStates[cuvetteShelfPos]?.get(i)?.state = CuvetteState.DripSample
+                    needSamplingNum--
+                    val result = createResultModel(
+                        "",
+                        null
+                    )
+                    updateCuvetteState(
+                        i,
+                        CuvetteState.DripSample,
+                        result,
+                        ""
+                    )
+
+                }
+            }
         }
+        i("needSamplingNum=$needSamplingNum")
     }
 
     /**
@@ -2173,23 +2187,19 @@ class HomeViewModel(
             }
             return
         }
-        if (sampleShelfPos == -1) {
-            i("没有样本架")
+        if (!isManualSampling()) {
+            if (sampleShelfPos == -1) {
+                i("没有样本架")
 //            getStateNotExistMsg.postValue("样本不足，请添加")
-            viewModelScope.launch {
-                _dialogUiState.emit(
-                    HomeDialogUiState(
-                        dialogState = DialogState.GET_STATE_NOT_EXIST, "样本不足，请添加"
+                viewModelScope.launch {
+                    _dialogUiState.emit(
+                        HomeDialogUiState(
+                            dialogState = DialogState.GET_STATE_NOT_EXIST, "样本不足，请添加"
+                        )
                     )
-                )
+                }
+                return
             }
-            return
-        }
-
-        i("cuvetteStartPos=$cuvetteStartPos banSamplingNum=$banSamplingNum")
-        if (banSampling && (cuvetteStartPos + banSamplingNum) > 10) {
-            toast("跳过比色皿的数量+禁止加样的数量不能大于10")
-            return
         }
 
         checkTestState(accord = {
@@ -2634,15 +2644,11 @@ class HomeViewModel(
         skipNum: Int,
         detectionNum: String,
         sampleNum: Int,
-        banSampling: Boolean,
-        banSamplingNum: Int,
     ) {
         selectProject = curveModel
         detectionNumInput = detectionNum
         cuvetteStartPos = skipNum
         needSamplingNum = sampleNum
-        this.banSampling = banSampling
-        this.banSamplingNum = banSamplingNum
 
         selectProject?.let {
             LocalData.SelectProjectID = it.curveId

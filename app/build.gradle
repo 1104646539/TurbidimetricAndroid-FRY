@@ -33,7 +33,7 @@ android {
         minSdk 21
         targetSdk 25
         versionCode 1
-        versionName "1.0.0.0修复曲线拟合的问题"
+        versionName "1.0.0.0增加检测前清洗取样针"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 

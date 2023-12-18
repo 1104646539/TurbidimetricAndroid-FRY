@@ -366,9 +366,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 vm.cuvetteStartPos,
                 if (vm.detectionNumInput.isNullOrEmpty()) LocalData.DetectionNum else vm.detectionNumInput,
                 vm.needSamplingNum,
-                vm.banSampling,
-                vm.banSamplingNum,
-                { projectModel, skipNum, detectionNum, sampleNum, banSampling, banSamplingNum, baseDialog ->
+                { projectModel, skipNum, detectionNum, sampleNum,  baseDialog ->
                     if (projectModel == null) {
                         toast("请选择标曲")
                     } else {
@@ -377,7 +375,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                             return@showDialog
                         }
                         //选择的项目变更
-                        vm.changeConfig(projectModel, skipNum, detectionNum, sampleNum, banSampling,banSamplingNum)
+                        vm.changeConfig(projectModel, skipNum, detectionNum, sampleNum)
                         baseDialog.dismiss()
                     }
                 },

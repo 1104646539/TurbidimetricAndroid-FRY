@@ -10,6 +10,8 @@ import com.lxj.xpopup.core.BasePopupView
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.ex.isAuto
+import com.wl.turbidimetric.ex.isManual
+import com.wl.turbidimetric.ex.isManualSampling
 import com.wl.turbidimetric.ex.selectionLast
 import com.wl.turbidimetric.ex.toast
 import com.wl.turbidimetric.home.HomeProjectAdapter
@@ -28,9 +30,6 @@ class HomeConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_ho
     var etDetectionNum: EditText? = null
     var etSampleNum: EditText? = null
     var llSampleNum: View? = null
-    var swBanSampling: Switch? = null
-    var etBanSamplingNum: EditText? = null
-    var llBanSamplingNum: View? = null
 
     var selectProject: CurveModel? = null
     var projectAdapter: HomeProjectAdapter? = null
@@ -41,8 +40,6 @@ class HomeConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_ho
     var skipNum: Int? = null
     var detectionNum: String? = null
     var sampleNum: Int? = null
-    var banSampling: Boolean? = null
-    var banSamplingNum: Int? = null
 
     fun showDialog(
         configViewEnable: Boolean,
@@ -51,9 +48,7 @@ class HomeConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_ho
         skipNum: Int,
         detectionNum: String,
         sampleNum: Int,
-        banSampling: Boolean,
-        banSamplingNum: Int,
-        onConfirm: ((CurveModel?, Int, String, Int, Boolean, Int, BasePopupView) -> Unit)? = null,
+        onConfirm: ((CurveModel?, Int, String, Int, BasePopupView) -> Unit)? = null,
         onCancel: onClick,
     ) {
         this.confirmText = "确定"
@@ -66,8 +61,6 @@ class HomeConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_ho
         this.skipNum = skipNum
         this.detectionNum = detectionNum
         this.sampleNum = sampleNum
-        this.banSampling = banSampling
-        this.banSamplingNum = banSamplingNum
 
         items.clear()
         items.addAll(curveModels)
@@ -84,21 +77,15 @@ class HomeConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_ho
         etSkipNum?.setText(skipNum.toString())
         etDetectionNum?.setText(detectionNum)
         etSampleNum?.setText(sampleNum.toString())
-        etBanSamplingNum?.setText(banSamplingNum.toString())
 
         etSkipNum?.selectionLast()
         etDetectionNum?.selectionLast()
         etSampleNum?.selectionLast()
-        etBanSamplingNum?.selectionLast()
 
         etSkipNum?.isEnabled = configViewEnable ?: false
         spnProject?.isEnabled = configViewEnable ?: false
         etDetectionNum?.isEnabled = configViewEnable ?: false
-
-        swBanSampling?.isChecked = banSampling ?: false
-        llBanSamplingNum?.visibility = banSampling.isShow()
-        llBanSamplingNum?.isEnabled = configViewEnable ?: false
-        swBanSampling?.isEnabled = configViewEnable ?: false
+        etSampleNum?.isEnabled = configViewEnable ?: false
 
         val selectedIndex = items.indexOf(curveModel)
         spnProject?.setSelection(selectedIndex)
@@ -121,13 +108,10 @@ class HomeConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_ho
                 selectProject = null
             }
         }
-        swBanSampling?.setOnCheckedChangeListener { buttonView, isChecked ->
-            banSampling = isChecked
-            llBanSamplingNum?.visibility = banSampling.isShow()
-        }
+
     }
 
-    private fun confirm(onConfirm: ((CurveModel?, Int, String, Int, Boolean, Int,  BasePopupView) -> Unit)?) {
+    private fun confirm(onConfirm: ((CurveModel?, Int, String, Int, BasePopupView) -> Unit)?) {
         if (selectProject == null) {
             toast("请选择标曲")
             return
@@ -135,7 +119,6 @@ class HomeConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_ho
         var sampleNum: Int = (etSampleNum?.text?.trim().toString()).toIntOrNull() ?: 0
         var skipNum: Int = (etSkipNum?.text?.trim().toString()).toIntOrNull() ?: 0
         var detectionNum: String = etDetectionNum?.text?.trim().toString()
-        var banSamplingNum: Int = etBanSamplingNum?.text?.trim().toString().toIntOrNull() ?: 0
         if (!isAuto()) {
             if (sampleNum < 0 || sampleNum > 50) {
                 sampleNum = 0
@@ -148,10 +131,7 @@ class HomeConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_ho
             toast("跳过比色皿必须为0-9")
             return
         }
-        if (banSamplingNum + skipNum > 10) {
-            toast("禁止加样数量+跳过比色皿数量必须小于等于10")
-            return
-        }
+
 
         if (detectionNum.isNullOrEmpty()) {
             detectionNum = LocalData.DetectionNum
@@ -162,8 +142,6 @@ class HomeConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_ho
             skipNum,
             detectionNum,
             sampleNum,
-            banSampling ?: false,
-            banSamplingNum,
             this
         )
     }
@@ -174,9 +152,6 @@ class HomeConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_ho
         etDetectionNum = findViewById(R.id.et_start_num)
         etSampleNum = findViewById(R.id.et_sample_num)
         llSampleNum = findViewById(R.id.ll_sample_num)
-        swBanSampling = findViewById(R.id.sw_ban_sampling)
-        etBanSamplingNum = findViewById(R.id.et_ban_sampling_num)
-        llBanSamplingNum = findViewById(R.id.ll_ban_sampling)
 
         projectAdapter = HomeProjectAdapter(context, items)
         spnProject?.adapter = projectAdapter

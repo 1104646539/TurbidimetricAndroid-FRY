@@ -32,7 +32,7 @@ object TestSerialPort {
             }
             SerialGlobal.CMD_GetState -> {
 //                reply = reply.plus(ubyteArrayOf(0x0u, 0x2u, 0x33u, 0xffu))// 0011 0011
-                reply = reply.plus(ubyteArrayOf(0x0u, 0x2u, 0x11u, 0xffu))//0001 0001
+                reply = reply.plus(ubyteArrayOf(0x0u, 0x2u, 0x13u, 0xffu))//0001 0001
             }
             SerialGlobal.CMD_MoveSample -> {
                 reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x2u))//0不存在 1样本管 2比色杯

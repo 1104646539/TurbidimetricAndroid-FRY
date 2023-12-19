@@ -30,15 +30,6 @@ class CurveFitterTest {
             println("---------")
         }
 
-
-//        val f0 = String.format("%.6f", cf1.params[0]).toDouble()
-//        val f1 = String.format("%.6f", cf1.params[1]).toDouble()
-//        val f2 = String.format("%.6f", cf1.params[2]).toDouble()
-//        val f3 = String.format("%.6f", cf1.params[3]).toDouble()
-
-//        println("f0=$f0 f1=$f1 f2=$f2 f3=$f3 ")
-//        println("f0=$f0 f1=$f1 f2=$f2 f3=$f3 ")
-//        Assert.assertEquals(a1, -1.82824, 0.1)
     }
 
     @Test
@@ -90,50 +81,9 @@ class CurveFitterTest {
         println("df=${cf2.fitGoodness}")
     }
 
-    @Test
-    fun testFixCurve2() {
-        //:0.00275,0.00288,0.02396,0.09756,0.19790
-//        val p1 = -27.5.toDouble()
-        val p1 = (-29.490857497446726).toDouble()
-        val p2 = 28.8.toDouble()
-        val p3 = 239.6.toDouble()
-        val p4 = 975.6.toDouble()
-        val p5 = 1979.toDouble()
-//
-        val m1 = 0.toDouble()
-        val m2 = 50.toDouble()
-        val m3 = 200.toDouble()
-        val m4 = 500.toDouble()
-        val m5 = 1000.toDouble()
-//
-        val ps = doubleArrayOf(p1, p2, p3, p4, p5)
-
-        val cf = CurveFitter(ps, doubleArrayOf(m1, m2, m3, m4, m5))
-        cf.doFitCon()
-        for (p in cf.params) {
-            println("params=$p")
-        }
-
-        val p12 = (-30).toDouble()
-        val p22 = 28.8.toDouble()
-        val p32 = 239.6.toDouble()
-        val p42 = 975.6.toDouble()
-        val p52 = 1979.toDouble()
-
-
-        val ps2 = doubleArrayOf(p12, p22, p32, p42, p52)
-
-        val cf2 = CurveFitter(ps2, doubleArrayOf(m1, m2, m3, m4, m5))
-        cf2.doFitCon()
-        for (p in cf2.params) {
-            println("params=$p")
-        }
-    }
 
     @Test
     fun testFixCurve() {
-        //:0.00275,0.00288,0.02396,0.09756,0.19790
-//        val p1 = -27.5.toDouble()
         val p1 = (-29.5).toDouble()
         val p2 = 28.8.toDouble()
         val p3 = 239.6.toDouble()
@@ -216,72 +166,9 @@ class CurveFitterTest {
         }
     }
 
-    @Test
-    fun testk() {
-        val p1 = (-29.5).toDouble()
-        val p2 = 28.8.toDouble()
-        val p3 = 239.6.toDouble()
-        val p4 = 975.6.toDouble()
-        val p5 = 1979.toDouble()
-
-        val m1 = 0.toDouble()
-        val m2 = 50.toDouble()
-        val m3 = 200.toDouble()
-        val m4 = 500.toDouble()
-        val m5 = 1000.toDouble()
-
-        val xs = doubleArrayOf(p1, p2, p3, p4, p5)
-        val ys = doubleArrayOf(m1, m2, m3, m4, m5)
-        val points = WeightedObservedPoints()
-
-        for (i in xs.indices) {
-            points.add(xs[i], ys[i])
-        }
-
-        val fitter = PolynomialCurveFitter.create(3)  //指定多项式阶数
-        val result = fitter.fit(points.toList())  // 曲线拟合，结果保存于数组
 
 
-        result.forEach {
-            println("p=$it")
-        }
-    }
 
-    @Test
-    fun testkk() {
-        val function = PolynomialFunction.Parametric()/*多项式函数*/
-        val p1 = (-12.34).toDouble()
-        val p2 = 31.8.toDouble()
-        val p3 = 187.2.toDouble()
-        val p4 = 667.3.toDouble()
-        val p5 = 1329.1.toDouble()
-
-        val xs = doubleArrayOf(p1, p2, p3, p4, p5)
-
-        val curveFitter2 = matchingArg(xs.toList())
-
-        curveFitter2.params.forEach {
-            println("p2=$it")
-        }
-        println("p3=${curveFitter2.fitGoodness}")
-        curveFitter2.yss.forEach {
-            println("p4=$it")
-        }
-
-        val newAbs = arrayListOf(0.00251, 0.01838, 0.06686, 0.12513, -0.00025)
-        val project = CurveModel(
-            f0 = curveFitter2.params[0],
-            f1 = curveFitter2.params[1],
-            f2 = curveFitter2.params[2],
-            f3 = curveFitter2.params[3]
-        )
-        newAbs.forEach {
-            val v = curveFitter2.f(curveFitter2.params, it * 10000).scale(2)
-            val v2 = calcCon(it.toBigDecimal(), project)
-            println("v=$v v2=$v2")
-        }
-
-    }
 
     @Test
     fun testfj() {

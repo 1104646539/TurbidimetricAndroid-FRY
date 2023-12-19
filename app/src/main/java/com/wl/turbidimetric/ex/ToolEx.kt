@@ -207,9 +207,9 @@ fun calcCon(absorbance: BigDecimal, project: CurveModel): Int {
     val f2 = project.f2
     val f3 = project.f3
     //吸光度小于0浓度直接等于0
-    if (absorbance < 0.toBigDecimal()) {
-        return 0
-    }
+//    if (absorbance < 0.toBigDecimal()) {
+//        return 0
+//    }
     var con = CurveFitterUtil.f(
         doubleArrayOf(f0, f1, f2, f3),
         absorbance.multiply(10000.toBigDecimal()).toDouble()

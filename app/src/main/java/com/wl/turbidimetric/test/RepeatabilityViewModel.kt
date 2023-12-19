@@ -207,13 +207,20 @@ class RepeatabilityViewModel(
     var selectProject: CurveModel? = null
 
     /**
+     * 第一次的检测间隔
+     */
+    var testShelfInterval1: Long = 1000 * 0
+
+    /**
      * 第二次的检测间隔
      */
     var testShelfInterval2: Long = 1000 * 0
+
     /**
      * 第三次的检测间隔
      */
     var testShelfInterval3: Long = 1000 * 0
+
     /**
      * 第四次的检测间隔
      */
@@ -230,15 +237,16 @@ class RepeatabilityViewModel(
      */
     var isDetectedSample = false
 
-    /**
-     * 这排比色皿的第一次搅拌完成的时间，用来计算检测到搅拌时间的间隔
-     */
-    var firstStirTime = 0L
 
     /**
      * 开始检测前的清洗取样针
      */
     var cleaningBeforeStartTest = false
+
+    /**
+     * 记录每个比色皿的搅拌时间
+     */
+    val stirTimes = longArrayOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
     /**
      * 测试用的 start
@@ -351,7 +359,7 @@ class RepeatabilityViewModel(
                         testOriginalValue2 = resultOriginalTest2[index],
                         testOriginalValue3 = resultOriginalTest3[index],
                         testOriginalValue4 = resultOriginalTest4[index],
-                        curveOwnerId = selectProject?.curveId?:0
+                        curveOwnerId = selectProject?.curveId ?: 0
                     )
                 )
             }
@@ -379,14 +387,15 @@ class RepeatabilityViewModel(
         cuvettePos = -1
         sampleShelfPos = -1
         cuvetteShelfPos = -1
-        firstStirTime = 0
 
         if (SystemGlobal.isCodeDebug) {
+            testShelfInterval1 = testS
             testShelfInterval2 = testS
             testShelfInterval3 = testS
             testShelfInterval4 = testS
             testPosInterval = testP
         } else {
+            testShelfInterval1 = LocalData.Test1DelayTime
             testShelfInterval2 = LocalData.Test2DelayTime
             testShelfInterval3 = LocalData.Test3DelayTime
             testShelfInterval4 = LocalData.Test4DelayTime
@@ -521,14 +530,17 @@ class RepeatabilityViewModel(
             TestState.MoveSample -> {
                 moveCuvetteDripSample()
             }
+
             TestState.Test1 -> {
 
             }
+
             TestState.Test2,
             TestState.Test3,
             TestState.Test4 -> {
                 moveCuvetteTest()
             }
+
             else -> {}
         }
 
@@ -578,7 +590,6 @@ class RepeatabilityViewModel(
         i("接收到 移动样本 reply=$reply samplePos=$samplePos testState=$testState sampleStep=$sampleStep")
         sampleMoveFinish = true
 
-
         when (testState) {
             TestState.MoveSample -> {//因为需要检测第一个样本是否是比色杯，所以一次移动一个位置
                 if (samplePos == 0) {
@@ -594,6 +605,7 @@ class RepeatabilityViewModel(
                     sampling(moveSampleVolume)
                 }
             }
+
             else -> {
 
             }
@@ -651,15 +663,11 @@ class RepeatabilityViewModel(
         }
         if (cuvettePos > 4 && cuvetteNeedTest(cuvettePos - 5)) {
             testFinish = false
-            val testInterval = if (cuvettePos == 13) {
-                10 * 1000
-            } else if (cuvettePos == 14) {
-                10 * 1000
-            } else {
-                0.toLong()
-            }
+            val stirTime = stirTimes[cuvettePos - 5]
+            val intervalTemp = testShelfInterval1 - (Date().time - stirTime)
+            i("intervalTemp=$intervalTemp stirTime=$stirTime testShelfInterval1=$testShelfInterval1")
             viewModelScope.launch {
-                delay(testInterval)
+                delay(intervalTemp)
                 test()
             }
         }
@@ -687,17 +695,8 @@ class RepeatabilityViewModel(
             //最后一个也检测结束了
             testState = TestState.Test2
             cuvettePos = -1
-            var intervalTemp = 0L
-            if (!SystemGlobal.isCodeDebug) {
-                //第二次检测到搅拌结束的间隔时间要保持220s
-                val stirInterval = (Date().time - firstStirTime)
-                intervalTemp = (testShelfInterval2) - stirInterval
-                i("intervalTemp=$intervalTemp stirInterval=$stirInterval")
-            }
-            viewModelScope.launch {
-                delay(intervalTemp)
-                moveCuvetteTest()
-            }
+
+            moveCuvetteTest()
         } else {
             //如果没有结束，移动比色皿，判断是否需要加试剂
             moveCuvetteDripReagent()
@@ -751,6 +750,7 @@ class RepeatabilityViewModel(
                 updateResult()
                 dripReagentAndStirAndTestFinish()
             }
+
             TestState.Test2 -> {
                 updateCuvetteState(cuvettePos, CuvetteState.Test2)
                 resultTest2.add(calcAbsorbance(value.toBigDecimal()))
@@ -760,21 +760,13 @@ class RepeatabilityViewModel(
                 if (cuvettePos == 9) {
                     testState = TestState.Test3
 
-                    viewModelScope.launch {
-                        val stirInterval = (Date().time - firstStirTime)
-                        val intervalTemp =
-                            (testShelfInterval3) - stirInterval
-                        delay(intervalTemp)
-                        moveCuvetteTest(-cuvettePos)
-                    }
+                    moveCuvetteTest(-cuvettePos)
                 } else {
-                    viewModelScope.launch {
-                        delay(testPosInterval)
                         moveCuvetteTest()
-                    }
                 }
 
             }
+
             TestState.Test3 -> {
                 updateCuvetteState(cuvettePos, CuvetteState.Test3)
                 resultTest3.add(calcAbsorbance(value.toBigDecimal()))
@@ -783,21 +775,13 @@ class RepeatabilityViewModel(
                 //检测结束,开始检测第四次
                 if (cuvettePos == 9) {
                     testState = TestState.Test4
-                    viewModelScope.launch {
-                        val stirInterval = (Date().time - firstStirTime)
-                        val intervalTemp =
-                            (testShelfInterval4) - stirInterval
-                        delay(intervalTemp)
-                        moveCuvetteTest(-cuvettePos)
-                    }
-                } else {
-                    viewModelScope.launch {
-                        delay(0)
-                        moveCuvetteTest()
-                    }
-                }
 
+                    moveCuvetteTest(-cuvettePos)
+                } else {
+                    moveCuvetteTest()
+                }
             }
+
             TestState.Test4 -> {
                 updateCuvetteState(cuvettePos, CuvetteState.Test4)
                 resultTest4.add(calcAbsorbance(value.toBigDecimal()))
@@ -808,12 +792,11 @@ class RepeatabilityViewModel(
                     matchingFinish()
                     calcMatchingArg()
                 } else {
-                    viewModelScope.launch {
-                        delay(0)
-                        moveCuvetteTest()
-                    }
+                    moveCuvetteTest()
+
                 }
             }
+
             else -> {}
         }
 
@@ -827,7 +810,6 @@ class RepeatabilityViewModel(
         testState = TestState.TestFinish
         moveCuvetteShelf(-1)
         moveSampleShelf(-1)
-//        samplingProbeCleaning()
     }
 
     /**
@@ -946,12 +928,18 @@ class RepeatabilityViewModel(
         if (!runningRepeatability()) return
         if (!machineStateNormal()) return
         i("接收到 搅拌 reply=$reply cuvettePos=$cuvettePos")
-        if (firstStirTime <= 0) {
-            firstStirTime = Date().time
-        }
         stirFinish = true
+        updateStirTime()
         updateCuvetteState(cuvettePos - 2, CuvetteState.Stir)
         stirProbeCleaning()
+    }
+
+    /**
+     * 更新比色皿的搅拌时间
+     */
+    private fun updateStirTime() {
+        if (cuvettePos < 2 || cuvettePos > 12) return
+        stirTimes[cuvettePos - 2] = Date().time
     }
 
     /**
@@ -1000,6 +988,7 @@ class RepeatabilityViewModel(
             TestState.MoveSample -> {//去加已混匀的样本
                 goDripSample()
             }
+
             else -> {}
         }
     }
@@ -1046,8 +1035,17 @@ class RepeatabilityViewModel(
             TestState.Test2,
             TestState.Test3,
             TestState.Test4 -> {
-                test()
+                val targetTime =
+                    if (testState == TestState.Test2) testShelfInterval2 else if (testState == TestState.Test3) testShelfInterval3 else testShelfInterval4
+                val stirTime = stirTimes[cuvettePos]
+                val intervalTemp = targetTime - (Date().time - stirTime) - 3
+                i("intervalTemp=$intervalTemp stirTime=$stirTime targetTime=$targetTime")
+                viewModelScope.launch {
+                    delay(intervalTemp)
+                    test()
+                }
             }
+
             else -> {}
         }
     }
@@ -1100,6 +1098,7 @@ class RepeatabilityViewModel(
                     moveCuvetteDripSample()
                 }
             }
+
             else -> {}
         }
     }
@@ -1149,24 +1148,6 @@ class RepeatabilityViewModel(
      * @param reply ReplyModel<SampleDoorModel>
      */
     override fun readDataSampleDoorModel(reply: ReplyModel<SampleDoorModel>) {
-//        i("接收到 样本门状态 reply=$reply")
-//        sampleDoorLocked = reply.data.isOpen
-//        sampleDoorLockedLD.postValue(reply.data.isOpen)
-//        //拟合完成后的开门，不成功代表有故障
-//        if (testState == TestState.TestFinish) {
-//            if (cuvetteDoorLocked && sampleDoorLocked) {
-//                showMatchingDialog()
-//            } else if (!sampleDoorLocked) {
-//                i("样本门打开失败")
-//                testMsg.postValue("样本门打开失败")
-//            }
-//        }
-//        if (!runningRepeatability()) return
-//        if (!machineStateNormal()) return
-        //开始检测前的检测状态，必须开门
-//        if (testState == TestState.None) {
-//
-//        }
 
     }
 
@@ -1175,14 +1156,7 @@ class RepeatabilityViewModel(
      * @param reply ReplyModel<CuvetteDoorModel>
      */
     override fun readDataCuvetteDoorModel(reply: ReplyModel<CuvetteDoorModel>) {
-//        i("接收到 比色皿门状态 reply=$reply")
-//        cuvetteDoorLocked = reply.data.isOpen
-//        cuvetteDoorLockedLD.postValue(reply.data.isOpen)
-//        if (testState == TestState.TestFinish && cuvetteDoorLocked && sampleDoorLocked) {
-//            showMatchingDialog()
-//        }
-//        if (!runningRepeatability()) return
-//        if (!machineStateNormal()) return
+
     }
 
     /**
@@ -1374,7 +1348,7 @@ class RepeatabilityViewModel(
 }
 
 class RepeatabilityViewModelFactory(
-    private val curveRepository: CurveRepository=CurveRepository(),
+    private val curveRepository: CurveRepository = CurveRepository(),
     private val testResultRepository: TestResultRepository = TestResultRepository()
 ) :
     ViewModelProvider.NewInstanceFactory() {

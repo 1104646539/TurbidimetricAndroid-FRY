@@ -724,6 +724,7 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
             testFinish = false
             val stirTime = stirTimes[cuvettePos - 5]
             val testInterval = testShelfInterval1 - (Date().time - stirTime)
+            i("goDripReagentAndStirAndTest testInterval=$testInterval stirTime=$stirTime")
             viewModelScope.launch {
                 delay(testInterval)
                 test()

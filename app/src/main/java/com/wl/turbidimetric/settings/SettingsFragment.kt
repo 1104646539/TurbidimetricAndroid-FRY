@@ -282,21 +282,23 @@ class SettingsFragment :
                 LocalData.SamplingProbeCleaningDuration,
                 LocalData.StirProbeCleaningDuration,
                 LocalData.StirDuration,
+                LocalData.Test1DelayTime,
                 LocalData.Test2DelayTime,
                 LocalData.Test3DelayTime,
                 LocalData.Test4DelayTime,
-                LocalData.TestIntervalTime,
-                { takeR1: Int, takeR2: Int, samplingVolume: Int, samplingProbeCleaningTime: Int, stirProbeCleaningTime: Int, stirDuration: Int, test2DelayTime: Long, test3DelayTime: Long, test4DelayTime: Long, testIntervalTime: Long, baseDialog: BasePopupView ->
+                { takeR1: Int, takeR2: Int, samplingVolume: Int, samplingProbeCleaningTime: Int, stirProbeCleaningTime: Int, stirDuration: Int, test1DelayTime: Long, test2DelayTime: Long, test3DelayTime: Long, test4DelayTime: Long, baseDialog: BasePopupView ->
                     LocalData.TakeReagentR1 = takeR1
                     LocalData.TakeReagentR2 = takeR2
                     LocalData.SamplingVolume = samplingVolume
                     LocalData.SamplingProbeCleaningDuration = samplingProbeCleaningTime
+                    LocalData.StirProbeCleaningDuration = stirProbeCleaningTime
                     LocalData.StirDuration = stirDuration
+                    LocalData.Test1DelayTime = test1DelayTime
                     LocalData.Test2DelayTime = test2DelayTime
                     LocalData.Test3DelayTime = test3DelayTime
                     LocalData.Test4DelayTime = test4DelayTime
-                    LocalData.TestIntervalTime = testIntervalTime
                     baseDialog.dismiss()
+
                 },
                 {
                     it.dismiss()

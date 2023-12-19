@@ -87,12 +87,6 @@ object LocalData {
      */
     var Test4DelayTime by LongDataStoreProperty(LocalDataGlobal.Default.test4DelayTime)
 
-    /**
-     * 每个比色皿的检测间隔时间，第二次开始
-     */
-    var TestIntervalTime by LongDataStoreProperty(LocalDataGlobal.Default.testIntervalTime)
-
-
 
     /**
      * 编号自增并保存

@@ -206,13 +206,15 @@ fun calcCon(absorbance: BigDecimal, project: CurveModel): Int {
     val f1 = project.f1
     val f2 = project.f2
     val f3 = project.f3
-//    var con: Double = x0 * ((a2 - a1) / (a2 - absorbance) - 1).pow(1 / p)
-
-//    return con.scale(2)
+    //吸光度小于0浓度直接等于0
+    if (absorbance < 0.toBigDecimal()) {
+        return 0
+    }
     var con = CurveFitterUtil.f(
         doubleArrayOf(f0, f1, f2, f3),
         absorbance.multiply(10000.toBigDecimal()).toDouble()
     )
+    //浓度不能小于0
     if (con.compareTo(0.0) <= 0) {
         con = 0.0
     }
@@ -289,6 +291,7 @@ fun isTestRunning(): Boolean {
 fun isAuto(machineTestModel: MachineTestModel = MachineTestModel.valueOf(LocalData.CurMachineTestModel)): Boolean {
     return machineTestModel == MachineTestModel.Auto
 }
+
 /**
  * 是否是手动加样模式
  * @return Boolean
@@ -296,6 +299,7 @@ fun isAuto(machineTestModel: MachineTestModel = MachineTestModel.valueOf(LocalDa
 fun isManualSampling(machineTestModel: MachineTestModel = MachineTestModel.valueOf(LocalData.CurMachineTestModel)): Boolean {
     return machineTestModel == MachineTestModel.ManualSampling
 }
+
 /**
  * 是否是手动模式
  * @return Boolean

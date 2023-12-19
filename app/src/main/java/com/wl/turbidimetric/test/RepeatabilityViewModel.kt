@@ -226,12 +226,6 @@ class RepeatabilityViewModel(
      */
     var testShelfInterval4: Long = 1000 * 0
 
-
-    /**
-     * 每个比色皿之间的检测间隔
-     */
-    var testPosInterval: Long = 1000 * 10
-
     /**
      * 移动样本时检测到样本管的标记
      */
@@ -393,13 +387,11 @@ class RepeatabilityViewModel(
             testShelfInterval2 = testS
             testShelfInterval3 = testS
             testShelfInterval4 = testS
-            testPosInterval = testP
         } else {
             testShelfInterval1 = LocalData.Test1DelayTime
             testShelfInterval2 = LocalData.Test2DelayTime
             testShelfInterval3 = LocalData.Test3DelayTime
             testShelfInterval4 = LocalData.Test4DelayTime
-            testPosInterval = LocalData.TestIntervalTime
         }
     }
 

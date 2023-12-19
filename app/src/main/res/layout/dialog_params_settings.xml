@@ -174,7 +174,30 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="8dp"
-                android:text="第二次检测距离搅拌的间隔时长(ms)" />
+                android:text="第一次检测间隔时长(ms)" />
+
+            <EditText
+                android:id="@+id/et_test1_delay_time"
+                style="@style/EtDefault"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:numeric="decimal"
+                android:textSize="24sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/TextTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="第二次检测间隔时长(ms)" />
 
             <EditText
                 android:id="@+id/et_test2_delay_time"
@@ -198,7 +221,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="8dp"
-                android:text="第三次检测距离搅拌的间隔时长(ms)" />
+                android:text="第三次检测间隔时长(ms)" />
 
             <EditText
                 android:id="@+id/et_test3_delay_time"
@@ -210,29 +233,7 @@
                 android:textSize="24sp" />
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
 
-
-            <TextView
-                style="@style/TextTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:text="第四次检测距离搅拌的间隔时长(ms)" />
-
-            <EditText
-                android:id="@+id/et_test4_delay_time"
-                style="@style/EtDefault"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="numberDecimal"
-                android:numeric="decimal"
-                android:textSize="24sp" />
-        </LinearLayout>
     </LinearLayout>
 
     <LinearLayout
@@ -246,15 +247,16 @@
             android:layout_weight="1"
             android:orientation="vertical">
 
+
             <TextView
                 style="@style/TextTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="8dp"
-                android:text="每个比色皿的间隔时长(ms)" />
+                android:text="第四次检测间隔时长(ms)" />
 
             <EditText
-                android:id="@+id/et_test_interval_time"
+                android:id="@+id/et_test4_delay_time"
                 style="@style/EtDefault"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

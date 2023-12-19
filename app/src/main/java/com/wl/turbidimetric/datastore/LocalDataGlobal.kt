@@ -36,7 +36,7 @@ object LocalDataGlobal {
         val SamplingVolume = 25
         val FirstOpen = true
         val DetectionNum = "1"
-        val StirDuration = 1000
+        val StirDuration = 2000
         val StirProbeCleaningDuration = 1000
         val SamplingProbeCleaningDuration = 2000
         val MachineTestModelDefault = MachineTestModel.Auto
@@ -48,7 +48,6 @@ object LocalDataGlobal {
         val test2DelayTime = 220 * 1000L
         val test3DelayTime = 0 * 1000L
         val test4DelayTime = 0 * 1000L
-        val testIntervalTime = 10 * 1000L
     }
 
 

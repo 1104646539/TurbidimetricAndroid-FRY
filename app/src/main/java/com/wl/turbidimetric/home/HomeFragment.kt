@@ -549,7 +549,17 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                      * 通知
                      */
                     DialogState.NOTIFY -> {
-                        toast(state.dialogMsg)
+//                        toast(state.dialogMsg)
+                        dialog.showPop(requireContext(), isCancelable = false) {
+                            it.showDialog(
+                                msg = state.dialogMsg,
+                                confirmText = "我知道了",
+                                confirmClick = { baseDialog ->
+                                    baseDialog.dismiss()
+                                },
+                                showIcon = true, iconId = ICON_HINT
+                            )
+                        }
                     }
                 }
             }

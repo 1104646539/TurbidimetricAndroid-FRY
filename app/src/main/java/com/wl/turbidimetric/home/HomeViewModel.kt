@@ -747,19 +747,22 @@ class HomeViewModel(
      */
     override fun readDataStateFailed(cmd: UByte, state: UByte) {
         if (!runningTest()) return
-        if (cmd == SerialGlobal.CMD_TakeReagent) {
-            i("报错了，cmd=$cmd state=$state 是取试剂的暂时不管")
-            readDataTakeReagentModel(
-                ReplyModel(
-                    SerialGlobal.CMD_TakeReagent, 0, TakeReagentModel()
-                )
-            )
-            return
-        }
+//        if (cmd == SerialGlobal.CMD_TakeReagent) {
+//            i("报错了，cmd=$cmd state=$state 是取试剂的暂时不管")
+//            readDataTakeReagentModel(
+//                ReplyModel(
+//                    SerialGlobal.CMD_TakeReagent, 0, TakeReagentModel()
+//                )
+//            )
+//            return
+//        }
         testState = TestState.RunningError
+        viewModelScope.launch {
+            _dialogUiState.emit(HomeDialogUiState(dialogState = DialogState.NOTIFY, "报错了，停止运行 cmd=$cmd state=$state"))
+        }
         i("报错了，cmd=$cmd state=$state")
 
-        testMsg.postValue("报错了，cmd=$cmd state=$state")
+//        testMsg.postValue("报错了，cmd=$cmd state=$state")
     }
 
     /**

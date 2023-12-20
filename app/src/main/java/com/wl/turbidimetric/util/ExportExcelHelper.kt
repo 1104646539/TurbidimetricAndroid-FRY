@@ -8,6 +8,7 @@ import com.wl.wllib.toTimeStr
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.io.OutputStream
+import java.math.RoundingMode
 import java.util.*
 
 object ExportExcelHelper {
@@ -105,15 +106,15 @@ object ExportExcelHelper {
                 add("${it.result.detectionNum}")
                 add("${it.result.concentration}")
                 add("${it.result.testResult}")
-                add("${it.result.absorbances}")
+                add("${it.result.absorbances.setScale(5, RoundingMode.HALF_UP)}")
                 add("${it.result.testOriginalValue1}")
                 add("${it.result.testOriginalValue2}")
                 add("${it.result.testOriginalValue3}")
                 add("${it.result.testOriginalValue4}")
-                add("${it.result.testValue1}")
-                add("${it.result.testValue2}")
-                add("${it.result.testValue3}")
-                add("${it.result.testValue4}")
+                add("${it.result.testValue1.setScale(5, RoundingMode.HALF_UP)}")
+                add("${it.result.testValue2.setScale(5, RoundingMode.HALF_UP)}")
+                add("${it.result.testValue3.setScale(5, RoundingMode.HALF_UP)}")
+                add("${it.result.testValue4.setScale(5, RoundingMode.HALF_UP)}")
                 add("${it.result.testTime.toTimeStr()}")
                 add("${it.result.sampleBarcode}")
             }

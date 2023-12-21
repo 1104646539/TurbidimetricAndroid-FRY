@@ -90,6 +90,15 @@
                 android:textSize="26sp" />
 
             <TextView
+                android:id="@+id/tv_debug"
+                style="@style/TextTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:padding="8dp"
+                android:text="调试"
+                android:textSize="26sp" />
+            <TextView
                 android:id="@+id/tv_repeatability"
                 style="@style/TextTitle"
                 android:layout_width="wrap_content"
@@ -98,7 +107,6 @@
                 android:padding="8dp"
                 android:text="重复性测试"
                 android:textSize="26sp" />
-
             <TextView
                 android:id="@+id/tv_nav"
                 style="@style/TextTitle"

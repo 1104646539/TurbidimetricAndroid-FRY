@@ -92,6 +92,7 @@ enum class TestState(val state: Int) {
  */
 enum class TestType {
     None,//无
+    Debug,//调试
     Test,//检测
     MatchingArgs,//标曲
     Repeatability;//重复性测试
@@ -106,6 +107,9 @@ enum class TestType {
 
     fun isRepeatability(): Boolean {
         return this == Repeatability
+    }
+    fun isDebug():Boolean{
+        return this== Debug
     }
 }
 

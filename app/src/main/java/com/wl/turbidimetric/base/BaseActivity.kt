@@ -21,17 +21,17 @@ abstract class BaseActivity<VM : BaseViewModel, VD : ViewDataBinding> : AppCompa
         vm.init()
         vd.root
         supportActionBar?.hide()
-        EventBus.getDefault().register(this)
+//        EventBus.getDefault().register(this)
         init()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         App.instance?.removeActivity(this)
-        EventBus.getDefault().unregister(this)
+//        EventBus.getDefault().unregister(this)
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
+//    @Subscribe(threadMode = ThreadMode.MAIN)
     open fun onMessageEvent(event: EventMsg<Any>) {
 
     }

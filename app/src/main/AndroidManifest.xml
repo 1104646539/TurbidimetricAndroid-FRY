@@ -37,6 +37,11 @@
             android:windowSoftInputMode="adjustPan|stateAlwaysHidden" /> <!-- android:windowSoftInputMode="adjustPan|stateAlwaysHidden|adjustNothing" -->
         <!-- android:configChanges="orientation|keyboardHidden|keyboard" -->
         <activity
+            android:name=".test.debug.DebugActivity"
+            android:configChanges="orientation|keyboardHidden|keyboard"
+            android:windowSoftInputMode="adjustPan|stateAlwaysHidden">
+        </activity>
+        <activity
             android:name=".main.MainActivity"
             android:configChanges="orientation|keyboardHidden|keyboard"
             android:exported="true"

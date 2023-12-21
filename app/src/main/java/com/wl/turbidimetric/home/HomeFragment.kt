@@ -10,6 +10,8 @@ import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.FragmentHomeBinding
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.ex.*
+import com.wl.turbidimetric.global.EventGlobal
+import com.wl.turbidimetric.global.EventMsg
 import com.wl.turbidimetric.global.SystemGlobal.obTestState
 import com.wl.turbidimetric.model.CurveModel
 import com.wl.turbidimetric.upload.hl7.HL7Helper
@@ -280,7 +282,18 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             showGetTestPatientInfo()
         }
     }
+    override fun onMessageEvent(event: EventMsg<Any>) {
+        super.onMessageEvent(event)
+        when (event.what) {
+            EventGlobal.WHAT_GET_TEMP_CHANGE -> {
+                if (event.data is Boolean) {
+                    vm.needTemp = event.data
+                }
+            }
 
+            else -> {}
+        }
+    }
     private fun showGetTestPatientInfo() {
         getTestPatientInfoDialog.showPop(
             requireContext(),

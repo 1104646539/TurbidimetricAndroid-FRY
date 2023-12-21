@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_start_interval_test"
+                style="@style/BtnPositive"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="150dp"
+                android:text="开始连续检测" />
+
+            <Button
+                android:id="@+id/btn_stop_interval_test"
+                style="@style/BtnPositive"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:minWidth="150dp"
+                android:text="结束连续检测" />
+
+            <Button
+                android:id="@+id/btn_create_chart"
+                style="@style/BtnPositive"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:minWidth="150dp"
+                android:text="生成图像" />
+            <Button
+                android:id="@+id/btn_clear_chart"
+                style="@style/BtnPositive"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:minWidth="150dp"
+                android:text="清除图像" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/tet_interval_duration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:hint="检测间隔ms"
+                    android:inputType="numberSigned"
+                    android:maxLength="4"
+                    android:minWidth="200dp"
+                    android:text="2000"
+                    android:textSize="24sp" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+        </LinearLayout>
+
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/lcCurve"
+            android:layout_width="match_parent"
+            android:layout_height="400dp"
+            android:layout_marginLeft="40dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="40dp" />
+
+        <ScrollView
+            android:id="@+id/sv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/tv_msg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="30sp" />
+        </ScrollView>
+    </LinearLayout>
+</layout>

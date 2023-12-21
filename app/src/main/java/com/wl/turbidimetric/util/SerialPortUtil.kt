@@ -25,6 +25,7 @@ object SerialPortUtil {
 
     //  lateinit var callback: Callback<ReplyModel<Any>>
     val callback: MutableList<Callback2> = mutableListOf()
+    val originalCallback: MutableList<OriginalDataCall> = mutableListOf()
     private var data: MutableList<UByte> = mutableListOf<UByte>()
     private val header = arrayOf<UByte>(0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u)
     private val hCount = header.size
@@ -64,6 +65,12 @@ object SerialPortUtil {
         dispatchData(ready)
     }
 
+    private fun dispatchOriginalData(ready: UByteArray) {
+        originalCallback.forEach {
+            it.readDataOriginalData(ready)
+        }
+    }
+
     fun callback(call: (Callback2) -> Unit) {
         callback.forEach {
             call.invoke(it)
@@ -75,6 +82,7 @@ object SerialPortUtil {
      */
     @OptIn(ExperimentalUnsignedTypes::class)
     private fun dispatchData(ready: UByteArray) = runBlocking {
+        dispatchOriginalData(ready)
         val cmd = ready[0]
         val state = ready[1]
         //重发的信息就不处理了
@@ -103,26 +111,31 @@ object SerialPortUtil {
                     it.readDataGetMachineStateModel(transitionGetMachineStateModel(ready))
                 }
             }
+
             SerialGlobal.CMD_GetState -> {
                 callback {
                     it.readDataGetStateModel(transitionGetStateModel(ready))
                 }
             }
+
             SerialGlobal.CMD_MoveSampleShelf -> {
                 callback {
                     it.readDataMoveSampleShelfModel(transitionMoveSampleShelfModel(ready))
                 }
             }
+
             SerialGlobal.CMD_MoveCuvetteShelf -> {
                 callback {
                     it.readDataMoveCuvetteShelfModel(transitionMoveCuvetteShelfModel(ready))
                 }
             }
+
             SerialGlobal.CMD_MoveSample -> {
                 callback {
                     it.readDataMoveSampleModel(transitionMoveSampleModel(ready))
                 }
             }
+
             SerialGlobal.CMD_MoveCuvetteDripSample -> {
                 callback {
                     it.readDataMoveCuvetteDripSampleModel(
@@ -132,6 +145,7 @@ object SerialPortUtil {
                     )
                 }
             }
+
             SerialGlobal.CMD_MoveCuvetteDripReagent -> {
                 callback {
                     it.readDataMoveCuvetteDripReagentModel(
@@ -141,16 +155,19 @@ object SerialPortUtil {
                     )
                 }
             }
+
             SerialGlobal.CMD_MoveCuvetteTest -> {
                 callback {
                     it.readDataMoveCuvetteTestModel(transitionMoveCuvetteTestModel(ready))
                 }
             }
+
             SerialGlobal.CMD_Sampling -> {
                 callback {
                     it.readDataSamplingModel(transitionSamplingModel(ready))
                 }
             }
+
             SerialGlobal.CMD_SamplingProbeCleaning -> {
                 callback {
                     it.readDataSamplingProbeCleaningModelModel(
@@ -160,61 +177,73 @@ object SerialPortUtil {
                     )
                 }
             }
+
             SerialGlobal.CMD_DripSample -> {
                 callback {
                     it.readDataDripSampleModel(transitionDripSampleModel(ready))
                 }
             }
+
             SerialGlobal.CMD_DripReagent -> {
                 callback {
                     it.readDataDripReagentModel(transitionDripReagentModel(ready))
                 }
             }
+
             SerialGlobal.CMD_TakeReagent -> {
                 callback {
                     it.readDataTakeReagentModel(transitionTakeReagentModel(ready))
                 }
             }
+
             SerialGlobal.CMD_Stir -> {
                 callback {
                     it.readDataStirModel(transitionStirModel(ready))
                 }
             }
+
             SerialGlobal.CMD_StirProbeCleaning -> {
                 callback {
                     it.readDataStirProbeCleaningModel(transitionStirProbeCleaningModel(ready))
                 }
             }
+
             SerialGlobal.CMD_Test -> {
                 callback {
                     it.readDataTestModel(transitionTestModel(ready))
                 }
             }
+
             SerialGlobal.CMD_CuvetteDoor -> {
                 callback {
                     it.readDataCuvetteDoorModel(transitionCuvetteDoorModel(ready))
                 }
             }
+
             SerialGlobal.CMD_SampleDoor -> {
                 callback {
                     it.readDataSampleDoorModel(transitionSampleDoorModel(ready))
                 }
             }
+
             SerialGlobal.CMD_Pierced -> {
                 callback {
                     it.readDataPiercedModel(transitionPiercedModel(ready))
                 }
             }
+
             SerialGlobal.CMD_GetVersion -> {
                 callback {
                     it.readDataGetVersionModel(transitionGetVersionModel(ready))
                 }
             }
+
             SerialGlobal.CMD_GetSetTemp -> {
                 callback {
                     it.readDataTempModel(transitionTempModel(ready))
                 }
             }
+
             SerialGlobal.CMD_Squeezing -> {
                 callback {
                     it.readDataSqueezing(transitionSqueezingModel(ready))
@@ -342,6 +371,9 @@ object SerialPortUtil {
 
     private fun writeAsync(data: UByteArray) {
 //        c("writeAsync ${data.toHex()}")
+        originalCallback.forEach {
+            it.sendOriginalData(data)
+        }
         if (SystemGlobal.isCodeDebug) {
             GlobalScope.launch(Dispatchers.IO) {
                 TestSerialPort.testReply(data)
@@ -490,7 +522,7 @@ object SerialPortUtil {
     /**
      * 取样针清洗
      */
-    fun samplingProbeCleaning() {
+    fun samplingProbeCleaning(samplingProbeCleaningDuration: Int = LocalData.SamplingProbeCleaningDuration) {
 //        c("发送 取样针清洗")
         if (SystemGlobal.isCodeDebug) {
             GlobalScope.launch {
@@ -498,8 +530,8 @@ object SerialPortUtil {
                 writeAsync(
                     createCmd(
                         SerialGlobal.CMD_SamplingProbeCleaning,
-                        data3 = (LocalData.SamplingProbeCleaningDuration shr 8).toUByte(),
-                        data4 = LocalData.SamplingProbeCleaningDuration.toUByte()
+                        data3 = (samplingProbeCleaningDuration shr 8).toUByte(),
+                        data4 = samplingProbeCleaningDuration.toUByte()
                     )
                 )
             }
@@ -507,8 +539,8 @@ object SerialPortUtil {
             writeAsync(
                 createCmd(
                     SerialGlobal.CMD_SamplingProbeCleaning,
-                    data3 = (LocalData.SamplingProbeCleaningDuration shr 8).toUByte(),
-                    data4 = LocalData.SamplingProbeCleaningDuration.toUByte()
+                    data3 = (samplingProbeCleaningDuration shr 8).toUByte(),
+                    data4 = samplingProbeCleaningDuration.toUByte()
                 )
             )
         }
@@ -540,15 +572,18 @@ object SerialPortUtil {
     /**
      * 加试剂
      */
-    fun dripReagent() {
+    fun dripReagent(
+        r1Volume: Int = LocalData.TakeReagentR1,
+        r2Volume: Int = LocalData.TakeReagentR2
+    ) {
 //        c("发送 加试剂 ${LocalData.getTakeReagentR2()} ${LocalData.getTakeReagentR1()}")
         writeAsync(
             createCmd(
                 SerialGlobal.CMD_DripReagent,
-                data1 = (LocalData.TakeReagentR2 shr 8).toUByte(),
-                data2 = LocalData.TakeReagentR2.toUByte(),
-                data3 = (LocalData.TakeReagentR1 shr 8).toUByte(),
-                data4 = LocalData.TakeReagentR1.toUByte()
+                data1 = (r2Volume shr 8).toUByte(),
+                data2 = r2Volume.toUByte(),
+                data3 = (r1Volume shr 8).toUByte(),
+                data4 = r1Volume.toUByte()
             )
         )
     }
@@ -556,7 +591,10 @@ object SerialPortUtil {
     /**
      * 取试剂
      */
-    fun takeReagent() {
+    fun takeReagent(
+        r1Volume: Int = LocalData.TakeReagentR1,
+        r2Volume: Int = LocalData.TakeReagentR2
+    ) {
 //        c("发送 取试剂")
         GlobalScope.launch {
             if (SystemGlobal.isCodeDebug) {
@@ -565,10 +603,10 @@ object SerialPortUtil {
             writeAsync(
                 createCmd(
                     SerialGlobal.CMD_TakeReagent,
-                    data1 = (LocalData.TakeReagentR2 shr 8).toUByte(),
-                    data2 = LocalData.TakeReagentR2.toUByte(),
-                    data3 = (LocalData.TakeReagentR1 shr 8).toUByte(),
-                    data4 = LocalData.TakeReagentR1.toUByte()
+                    data1 = (r2Volume shr 8).toUByte(),
+                    data2 = r2Volume.toUByte(),
+                    data3 = (r1Volume shr 8).toUByte(),
+                    data4 = r1Volume.toUByte()
                 )
             )
         }
@@ -577,13 +615,13 @@ object SerialPortUtil {
     /**
      * 搅拌
      */
-    fun stir() {
+    fun stir(stirDuration: Int = LocalData.StirDuration) {
 //        c("发送 搅拌")
         writeAsync(
             createCmd(
                 SerialGlobal.CMD_Stir,
-                data3 = (LocalData.StirDuration shr 8).toUByte(),
-                data4 = LocalData.StirDuration.toUByte()
+                data3 = (stirDuration shr 8).toUByte(),
+                data4 = stirDuration.toUByte()
             )
         )
     }
@@ -591,7 +629,7 @@ object SerialPortUtil {
     /**
      * 搅拌针清洗
      */
-    fun stirProbeCleaning() {
+    fun stirProbeCleaning(stirProbeCleaningDuration: Int = LocalData.StirProbeCleaningDuration) {
 //        c("发送 搅拌针清洗")
         if (SystemGlobal.isCodeDebug) {
             GlobalScope.launch {
@@ -599,8 +637,8 @@ object SerialPortUtil {
                 writeAsync(
                     createCmd(
                         SerialGlobal.CMD_StirProbeCleaning,
-                        data3 = (LocalData.StirProbeCleaningDuration shr 8).toUByte(),
-                        data4 = LocalData.StirProbeCleaningDuration.toUByte()
+                        data3 = (stirProbeCleaningDuration shr 8).toUByte(),
+                        data4 = stirProbeCleaningDuration.toUByte()
                     )
                 )
             }
@@ -608,8 +646,8 @@ object SerialPortUtil {
             writeAsync(
                 createCmd(
                     SerialGlobal.CMD_StirProbeCleaning,
-                    data3 = (LocalData.StirProbeCleaningDuration shr 8).toUByte(),
-                    data4 = LocalData.StirProbeCleaningDuration.toUByte()
+                    data3 = (stirProbeCleaningDuration shr 8).toUByte(),
+                    data4 = stirProbeCleaningDuration.toUByte()
                 )
             )
         }
@@ -788,4 +826,9 @@ interface Callback2 {
     fun readDataTempModel(reply: ReplyModel<TempModel>)
     fun readDataStateFailed(cmd: UByte, state: UByte)
     fun readDataSqueezing(reply: ReplyModel<SqueezingModel>)
+}
+
+interface OriginalDataCall {
+    fun readDataOriginalData(ready: UByteArray)
+    fun sendOriginalData(ready: UByteArray)
 }

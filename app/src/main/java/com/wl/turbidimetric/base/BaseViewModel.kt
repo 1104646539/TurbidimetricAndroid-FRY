@@ -16,9 +16,9 @@ open class BaseViewModel : ViewModel() {
 //        EventBus.getDefault().register(this)
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    open fun onMessageEvent(event: EventMsg<Any>) {
-
-    }
+//    @Subscribe(threadMode = ThreadMode.MAIN)
+//    open fun onMessageEvent(event: EventMsg<Any>) {
+//
+//    }
 
 }

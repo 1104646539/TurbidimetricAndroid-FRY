@@ -445,6 +445,11 @@ class HomeViewModel(
     val stirTimes = longArrayOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
     /**
+     * 是否允许获取温度（在调试时不自动获取）
+     */
+    var needTemp: Boolean = true
+
+    /**
      * 测试用的 start
      */
     //检测的值
@@ -491,8 +496,10 @@ class HomeViewModel(
      */
     private fun listenerTempState() {
         viewModelScope.launch {
-            timer("", true, Date(), 30000) {
-                SerialPortUtil.getTemp()
+            timer("", true, Date(), 5000) {
+                if (needTemp) {
+                    SerialPortUtil.getTemp()
+                }
             }
         }
     }
@@ -758,7 +765,12 @@ class HomeViewModel(
 //        }
         testState = TestState.RunningError
         viewModelScope.launch {
-            _dialogUiState.emit(HomeDialogUiState(dialogState = DialogState.NOTIFY, "报错了，停止运行 cmd=$cmd state=$state"))
+            _dialogUiState.emit(
+                HomeDialogUiState(
+                    dialogState = DialogState.NOTIFY,
+                    "报错了，停止运行 cmd=$cmd state=$state"
+                )
+            )
         }
         i("报错了，cmd=$cmd state=$state")
 
@@ -2017,6 +2029,9 @@ class HomeViewModel(
      */
     override fun readDataGetMachineStateModel(reply: ReplyModel<GetMachineStateModel>) {
         c("接收到 自检 reply=$reply")
+        if (testType.isDebug()) {
+            return
+        }
         viewModelScope.launch {
             _dialogUiState.emit(HomeDialogUiState(DialogState.GET_MACHINE_DISMISS, ""))
         }
@@ -2284,15 +2299,6 @@ class HomeViewModel(
         return -1
     }
 
-    override fun onMessageEvent(event: EventMsg<Any>) {
-        super.onMessageEvent(event)
-        when (event.what) {
-            EventGlobal.WHAT_INIT_QRCODE -> {
-            }
-
-            else -> {}
-        }
-    }
 
     /**
      * 执行检测结束动作

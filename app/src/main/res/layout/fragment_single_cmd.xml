@@ -1,0 +1,781 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_msg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="60dp"
+            android:padding="10dp"
+            android:textSize="22sp" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingLeft="10dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btn_get_machine_state"
+                        style="@style/BtnPositive"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:minWidth="150dp"
+                        android:text="自检" />
+
+                    <Button
+                        android:id="@+id/btn_get_state"
+                        style="@style/BtnPositive"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:minWidth="150dp"
+                        android:text="获取状态" />
+                    <Button
+                        android:id="@+id/btn_test"
+                        style="@style/BtnPositive"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:minWidth="150dp"
+                        android:text="检测" />
+
+                    <Button
+                        android:id="@+id/btn_pierced"
+                        style="@style/BtnPositive"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:minWidth="150dp"
+                        android:text="刺破" />
+
+
+                    <Button
+                        android:id="@+id/btn_squeezing"
+                        style="@style/BtnPositive"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:minWidth="150dp"
+                        android:text="挤压" />
+                    <Button
+                        android:id="@+id/btn_get_mcu_version"
+                        style="@style/BtnPositive"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:minWidth="150dp"
+                        android:text="获取下位机版本号" />
+
+                    <Button
+                        android:id="@+id/btn_temp"
+                        style="@style/BtnPositive"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:minWidth="150dp"
+                        android:text="获取温度" />
+
+                    <Button
+                        android:id="@+id/btn_shutdown"
+                        style="@style/BtnPositive"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:minWidth="150dp"
+                        android:text="关机" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btn_move_sample_shelf"
+                        style="@style/BtnPositive"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:minWidth="150dp"
+                        android:text="移动样本架" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/tet_move_sample_shelf_step"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:hint="移动位置1-4"
+                            android:inputType="numberSigned"
+                            android:maxLength="1"
+                            android:minWidth="200dp"
+                            android:text="1"
+                            android:textSize="24sp" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <Button
+                        android:id="@+id/btn_move_sample_shelf_reset"
+                        style="@style/BtnPositive"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:minWidth="150dp"
+                        android:text="样本架复位" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btn_move_cuvette_shelf"
+                        style="@style/BtnPositive"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:minWidth="150dp"
+                        android:text="移动比色皿架" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/tet_move_cuvette_shelf_step"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:hint="移动位置1-4"
+                            android:inputType="numberSigned"
+                            android:maxLength="1"
+                            android:minWidth="200dp"
+                            android:text="1"
+                            android:textSize="24sp" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                    <Button
+                        android:id="@+id/btn_move_cuvette_shelf_reset"
+                        style="@style/BtnPositive"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:minWidth="150dp"
+                        android:text="比色皿架复位" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btn_move_sample"
+                        style="@style/BtnPositive"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:minWidth="150dp"
+                        android:text="移动样本管" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/tet_move_sample"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:hint="移动距离1-10"
+                            android:inputType="numberSigned"
+                            android:maxLength="1"
+                            android:minWidth="200dp"
+                            android:text="1"
+                            android:textSize="24sp" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <RadioGroup
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="10dp"
+                        android:orientation="horizontal">
+
+                        <RadioButton
+                            android:id="@+id/rb_forward_sample"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:checked="true"
+                            android:paddingLeft="20dp"
+                            android:text="向前"
+                            android:textSize="26sp" />
+
+                        <RadioButton
+                            android:id="@+id/rb_backward_sample"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_marginLeft="20dp"
+                            android:paddingLeft="20dp"
+                            android:text="向后"
+                            android:textSize="26sp" />
+
+                    </RadioGroup>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btn_move_cuvette_drip_sample"
+                        style="@style/BtnPositive"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:minWidth="150dp"
+                        android:text="移动比色皿到加样位" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/tet_move_cuvette_drip_sample"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:hint="移动距离1-10"
+                            android:inputType="numberSigned"
+                            android:maxLength="1"
+                            android:minWidth="200dp"
+                            android:text="1"
+                            android:textSize="24sp" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <RadioGroup
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="10dp"
+                        android:orientation="horizontal">
+
+                        <RadioButton
+                            android:id="@+id/rb_forward_cuvette_drip_sample"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:checked="true"
+                            android:paddingLeft="20dp"
+                            android:text="向前"
+                            android:textSize="26sp" />
+
+                        <RadioButton
+                            android:id="@+id/rb_backward_cuvette_drip_sample"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_marginLeft="20dp"
+                            android:paddingLeft="20dp"
+                            android:text="向后"
+                            android:textSize="26sp" />
+
+                    </RadioGroup>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btn_move_cuvette_drip_reagent"
+                        style="@style/BtnPositive"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:minWidth="150dp"
+                        android:text="移动比色皿到加试剂位" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/tet_move_cuvette_drip_reagent"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:hint="移动距离1-10"
+                            android:inputType="numberSigned"
+                            android:maxLength="1"
+                            android:minWidth="200dp"
+                            android:text="1"
+                            android:textSize="24sp" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <RadioGroup
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="10dp"
+                        android:orientation="horizontal">
+
+                        <RadioButton
+                            android:id="@+id/rb_forward_cuvette_drip_reagent"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:checked="true"
+                            android:paddingLeft="20dp"
+                            android:text="向前"
+                            android:textSize="26sp" />
+
+                        <RadioButton
+                            android:id="@+id/rb_backward_cuvette_drip_reagent"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_marginLeft="20dp"
+                            android:paddingLeft="20dp"
+                            android:text="向后"
+                            android:textSize="26sp" />
+
+                    </RadioGroup>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btn_move_cuvette_test"
+                        style="@style/BtnPositive"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:minWidth="150dp"
+                        android:text="移动比色皿到检测位" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/tet_move_cuvette_test"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:hint="移动距离1-10"
+                            android:inputType="numberSigned"
+                            android:maxLength="1"
+                            android:minWidth="200dp"
+                            android:text="1"
+                            android:textSize="24sp" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <RadioGroup
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="10dp"
+                        android:orientation="horizontal">
+
+                        <RadioButton
+                            android:id="@+id/rb_forward_cuvette_test"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:checked="true"
+                            android:paddingLeft="20dp"
+                            android:text="向前"
+                            android:textSize="26sp" />
+
+                        <RadioButton
+                            android:id="@+id/rb_backward_cuvette_test"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_marginLeft="20dp"
+                            android:paddingLeft="20dp"
+                            android:text="向后"
+                            android:textSize="26sp" />
+
+                    </RadioGroup>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btn_sampling"
+                        style="@style/BtnPositive"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:minWidth="150dp"
+                        android:text="取样" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/tet_sampling_volume"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:hint="取样量"
+                            android:inputType="numberSigned"
+                            android:maxLength="3"
+                            android:minWidth="200dp"
+                            android:text="25"
+                            android:textSize="24sp" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <RadioGroup
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="10dp"
+                        android:orientation="horizontal">
+
+                        <RadioButton
+                            android:id="@+id/rb_sampling_sample"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:checked="true"
+                            android:paddingLeft="20dp"
+                            android:text="样本管"
+                            android:textSize="26sp" />
+
+                        <RadioButton
+                            android:id="@+id/rb_sampling_sample_cup"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_marginLeft="20dp"
+                            android:paddingLeft="20dp"
+                            android:text="样本杯"
+                            android:textSize="26sp" />
+
+                    </RadioGroup>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btn_drip_sample"
+                        style="@style/BtnPositive"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:minWidth="150dp"
+                        android:text="加样" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/tet_drip_sample_volume"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:hint="加样量"
+                            android:inputType="numberSigned"
+                            android:maxLength="3"
+                            android:minWidth="200dp"
+                            android:text="25"
+                            android:textSize="24sp" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="是否混匀"
+                        android:textColor="@color/themePositiveColor"
+                        android:textSize="26sp" />
+
+                    <RadioGroup
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="10dp"
+                        android:orientation="horizontal">
+
+                        <RadioButton
+                            android:id="@+id/rb_drip_sample_blending_y"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:paddingLeft="20dp"
+                            android:text="混匀"
+                            android:textSize="26sp" />
+
+                        <RadioButton
+                            android:id="@+id/rb_drip_sample_blending_n"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_marginLeft="20dp"
+                            android:checked="true"
+                            android:paddingLeft="20dp"
+                            android:text="不混匀"
+                            android:textSize="26sp" />
+                    </RadioGroup>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="14dp"
+                        android:text="是否原地加样"
+                        android:textColor="@color/themePositiveColor"
+                        android:textSize="26sp" />
+
+                    <RadioGroup
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="10dp"
+                        android:orientation="horizontal">
+
+                        <RadioButton
+                            android:id="@+id/rb_drip_sample_inplace_y"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:paddingLeft="20dp"
+                            android:text="原地加样"
+                            android:textSize="26sp" />
+
+                        <RadioButton
+                            android:id="@+id/rb_drip_sample_inplace_n"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_marginLeft="20dp"
+                            android:checked="true"
+                            android:paddingLeft="20dp"
+                            android:text="去比色皿"
+                            android:textSize="26sp" />
+                    </RadioGroup>
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btn_take_reagent"
+                        style="@style/BtnPositive"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:minWidth="150dp"
+                        android:text="取试剂" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/tet_take_reagent_r1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:hint="R1加样量"
+                            android:inputType="numberSigned"
+                            android:maxLength="3"
+                            android:minWidth="200dp"
+                            android:text="60"
+                            android:textSize="24sp" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/tet_take_reagent_r2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:hint="R2加样量"
+                            android:inputType="numberSigned"
+                            android:maxLength="3"
+                            android:minWidth="200dp"
+                            android:text="300"
+                            android:textSize="24sp" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btn_drip_reagent"
+                        style="@style/BtnPositive"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:minWidth="150dp"
+                        android:text="加试剂" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/tet_drip_reagent_r1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:hint="R1加样量"
+                            android:inputType="numberSigned"
+                            android:maxLength="3"
+                            android:minWidth="200dp"
+                            android:text="60"
+                            android:textSize="24sp" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/tet_drip_reagent_r2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:hint="R2加样量"
+                            android:inputType="numberSigned"
+                            android:maxLength="3"
+                            android:minWidth="200dp"
+                            android:text="300"
+                            android:textSize="24sp" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btn_stir"
+                        style="@style/BtnPositive"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:minWidth="150dp"
+                        android:text="搅拌" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/tet_stir"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:hint="搅拌时长ms"
+                            android:inputType="numberSigned"
+                            android:maxLength="4"
+                            android:minWidth="200dp"
+                            android:text="1000"
+                            android:textSize="24sp" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btn_stir_probe_cleaning"
+                        style="@style/BtnPositive"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:minWidth="150dp"
+                        android:text="搅拌针清洗" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/tet_stir_probe_cleaning_duration"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:hint="清洗时长ms"
+                            android:inputType="numberSigned"
+                            android:maxLength="4"
+                            android:minWidth="200dp"
+                            android:text="1000"
+                            android:textSize="24sp" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btn_sampling_probe_cleaning"
+                        style="@style/BtnPositive"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:minWidth="150dp"
+                        android:text="取样针清洗" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/tet_sampling_probe_cleaning_duration"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:hint="清洗时长ms"
+                            android:inputType="numberSigned"
+                            android:maxLength="4"
+                            android:minWidth="200dp"
+                            android:text="1000"
+                            android:textSize="24sp" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+
+
+
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+</layout>

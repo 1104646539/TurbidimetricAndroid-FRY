@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"></com.google.android.material.tabs.TabLayout>
+
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/vp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"></androidx.viewpager2.widget.ViewPager2>
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="400dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <androidx.core.widget.NestedScrollView
+                android:layout_width="400dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:id="@+id/nsv"
+                android:background="@color/divider"
+                android:scrollbars="vertical">
+
+                <TextView
+                    android:id="@+id/tv_msg"
+                    android:layout_width="400dp"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textSize="24sp" />
+            </androidx.core.widget.NestedScrollView>
+
+            <Button
+                android:id="@+id/btn_clear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="清空日志" />
+        </LinearLayout>
+
+    </LinearLayout>
+</layout>

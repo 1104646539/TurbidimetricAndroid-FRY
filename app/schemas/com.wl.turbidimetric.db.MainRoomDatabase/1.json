@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "6ba908e46fd520cb6a425fdb897d4d0b",
+    "identityHash": "f3888095fd096ef5dbb221ebdd6fab1c",
     "entities": [
       {
         "tableName": "TestResultModel",
@@ -250,7 +250,7 @@
       },
       {
         "tableName": "CurveModel",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`curveId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `projectName` TEXT NOT NULL, `projectCode` TEXT NOT NULL, `projectLjz` INTEGER NOT NULL, `projectUnit` TEXT NOT NULL, `f0` REAL NOT NULL, `f1` REAL NOT NULL, `f2` REAL NOT NULL, `f3` REAL NOT NULL, `fitGoodness` REAL NOT NULL, `createTime` TEXT NOT NULL, `isSelect` INTEGER NOT NULL, `reagentNO` TEXT NOT NULL, `reactionValues` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`curveId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `projectName` TEXT NOT NULL, `projectCode` TEXT NOT NULL, `projectLjz` INTEGER NOT NULL, `projectUnit` TEXT NOT NULL, `f0` REAL NOT NULL, `f1` REAL NOT NULL, `f2` REAL NOT NULL, `f3` REAL NOT NULL, `fitGoodness` REAL NOT NULL, `createTime` TEXT NOT NULL, `isSelect` INTEGER NOT NULL, `reagentNO` TEXT NOT NULL, `reactionValues` TEXT, `yzs` TEXT)",
         "fields": [
           {
             "fieldPath": "curveId",
@@ -335,6 +335,12 @@
             "columnName": "reactionValues",
             "affinity": "TEXT",
             "notNull": false
+          },
+          {
+            "fieldPath": "yzs",
+            "columnName": "yzs",
+            "affinity": "TEXT",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -350,7 +356,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6ba908e46fd520cb6a425fdb897d4d0b')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f3888095fd096ef5dbb221ebdd6fab1c')"
     ]
   }
 }

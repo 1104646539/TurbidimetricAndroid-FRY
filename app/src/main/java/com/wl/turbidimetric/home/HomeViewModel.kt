@@ -496,7 +496,7 @@ class HomeViewModel(
      */
     private fun listenerTempState() {
         viewModelScope.launch {
-            timer("", true, Date(), 5000) {
+            timer("", true, Date(), 30000) {
                 if (needTemp) {
                     SerialPortUtil.getTemp()
                 }

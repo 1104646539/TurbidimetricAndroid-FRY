@@ -222,7 +222,6 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
     private val _curveUiState = MutableStateFlow(MatchingArgsCurveUiState("", ""))
     val curveUiState = _curveUiState.asStateFlow()
 
-
     val testMsg = MutableLiveData("")
 //    val toastMsg = MutableLiveData("")
 
@@ -258,6 +257,11 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
     var coverCurveModel: CurveModel? = null
 
     /**
+     * 当前选择的项目参数
+     */
+    var selectProject: CurveModel? = null
+
+    /**
      * 当前拟合好的项目参数
      */
     var curProject: CurveModel? = null
@@ -280,7 +284,7 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
     /**
      * 测试用的 start
      */
-    private val testValues1 = doubleArrayOf(1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)
+    private val testValues1 = doubleArrayOf(1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.3, 0.3, 0.3)
     private val testValues2 = doubleArrayOf(0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3)
     private val testValues3 = doubleArrayOf(0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3)
     private val testValues4 =
@@ -900,7 +904,8 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
             resultOriginalTest2.clear()
             resultOriginalTest3.clear()
             resultOriginalTest4.clear()
-            repeat(testValues1.size) {
+            val size = if (quality) 7 else 5
+            repeat(size) {
                 resultTest1.add(roundResult())
                 resultTest2.add(roundResult())
                 resultTest3.add(roundResult())
@@ -970,14 +975,14 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
                     "第三次:$resultTest3 \n" +
                     "第四次原始:$resultOriginalTest4 \n" +
                     "第四次:$resultTest4 \n" +
-                    "吸光度:$result \n" +
-                    "拟合度：${cf.fitGoodness} \n" +
-                    "四参数：f0=${f0} f1=${f1} f2=${f2} f3=${f3} \n " +
-                    "验算 ${yzs}\n" +
-                    "吸光度2:$absorbancys2 \n" +
-                    "拟合度2：${cf2.fitGoodness} \n" +
-                    "四参数2：f0=${cf2.params[0]} f1=${cf2.params[1]} f2=${cf2.params[2]} f3=${cf2.params[3]} \n " +
-                    "验算2 ${yzs2}\n"
+//                    "吸光度:$result \n" +
+//                    "拟合度：${cf.fitGoodness} \n" +
+//                    "四参数：f0=${f0} f1=${f1} f2=${f2} f3=${f3} \n " +
+//                    "验算 ${yzs}\n" +
+                    "吸光度:$absorbancys2 \n" +
+                    "拟合度：${cf2.fitGoodness} \n" +
+                    "四参数：f0=${cf2.params[0]} f1=${cf2.params[1]} f2=${cf2.params[2]} f3=${cf2.params[3]} \n" +
+                    "验算 ${yzs2}\n"
         )
         curProject = CurveModel().apply {
             this.f0 = cf2.params[0]
@@ -988,9 +993,10 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
             this.createTime = Date().toTimeStr()
             this.projectLjz = 100
             this.reagentNO = reagentNOStr
-            this.reactionValues = absorbancys2.subList(0, 5).map { it.toInt() }.toIntArray()
+            this.reactionValues = absorbancys2.map { it.toInt() }.toIntArray()
+            this.yzs = yzs2.map { it.toInt() }.toIntArray()
         }
-        print()
+//        print()
         testMsg.postValue(msg.toString())
 
         //添加到参数列表，刷新
@@ -1001,14 +1007,17 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
      * 打印上次的
      */
     fun print() {
-        curProject?.let {
-            PrintUtil.printMatchingQuality(
-                absorbancys,
-                nds,
-                yzs,
-                mutableListOf(it.f0, it.f1, it.f2, it.f3),
-                quality
-            )
+        selectProject?.let {
+            if (it.reactionValues?.isNotEmpty() == true
+                && it.yzs?.isNotEmpty() == true
+            ) {
+                PrintUtil.printMatchingQuality(
+                    it.reactionValues!!.toList(),
+                    nds,
+                    it.yzs!!.toList(),
+                    mutableListOf(it.f0, it.f1, it.f2, it.f3)
+                )
+            }
         }
     }
 
@@ -1322,16 +1331,27 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
      * 保存标曲记录
      */
     fun saveProject() {
+        selectProject = curProject
         //添加到参数列表，刷新
         viewModelScope.launch {
-            curProject?.let {
+            selectProject?.let {
                 curveRepository.addCurve(it)
                 coverCurveModel?.let { curve ->
                     curveRepository.removeCurve(curve)
                     coverCurveModel = null
                 }
-
+                print()
             }
+        }
+    }
+
+    /**
+     * 不保存标曲记录
+     */
+    fun notSaveProject() {
+        viewModelScope.launch {
+//            curProject =
+            coverCurveModel = null
         }
     }
 
@@ -1509,6 +1529,7 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
     }
 
     fun changeSelectProject(project: CurveModel) {
+        selectProject = project
         _curveUiState.update {
             it.copy(
                 equationText = "Y=${project.f0.scale(8)}+${project.f1.scale(8)}x+${

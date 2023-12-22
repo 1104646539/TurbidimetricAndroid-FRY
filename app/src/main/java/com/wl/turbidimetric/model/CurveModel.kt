@@ -20,10 +20,11 @@ data class CurveModel(
     var createTime: String = "",
     var isSelect: Boolean = false,
     var reagentNO: String = "",
-    var reactionValues: IntArray? = intArrayOf()
-)  {
+    var reactionValues: IntArray? = intArrayOf(),
+    var yzs: IntArray? = intArrayOf()
+) {
     override fun toString(): String {
-        return "CurveModel(id=$curveId,projectName=$projectName,projectCode=$projectCode,projectLjz=$projectLjz,projectUnit=$projectUnit,f0=$f0,f1=$f1,f2=$f2,f3=$f3,fitGoodness=$fitGoodness,createTime=$createTime,reagentNO=$reagentNO)"
+        return "CurveModel(id=$curveId,projectName=$projectName,projectCode=$projectCode,projectLjz=$projectLjz,projectUnit=$projectUnit,f0=$f0,f1=$f1,f2=$f2,f3=$f3,fitGoodness=$fitGoodness,createTime=$createTime,reagentNO=$reagentNO,yzs=$yzs)"
     }
 
     override fun equals(other: Any?): Boolean {
@@ -47,6 +48,10 @@ data class CurveModel(
             if (other.reactionValues == null) return false
             if (!reactionValues.contentEquals(other.reactionValues)) return false
         } else if (other.reactionValues != null) return false
+        if (yzs != null) {
+            if (other.yzs == null) return false
+            if (!yzs.contentEquals(other.yzs)) return false
+        } else if (other.yzs != null) return false
 
         return true
     }
@@ -66,6 +71,7 @@ data class CurveModel(
         result = 31 * result + isSelect.hashCode()
         result = 31 * result + reagentNO.hashCode()
         result = 31 * result + (reactionValues?.contentHashCode() ?: 0)
+        result = 31 * result + (yzs?.contentHashCode() ?: 0)
         return result
     }
 }

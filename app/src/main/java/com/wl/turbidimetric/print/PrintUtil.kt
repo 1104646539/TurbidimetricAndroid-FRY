@@ -76,18 +76,16 @@ object PrintUtil {
     }
 
     fun printMatchingQuality(
-        absorbancys: List<Double>,
+        absorbancys: List<Int>,
         nds: DoubleArray,
-        yzs: List<Double>,
-        params: MutableList<Double>,
-        quality: Boolean
+        yzs: List<Int>,
+        params: MutableList<Double>
     ) {
         val msg = getMatchingQualityMsg(
             absorbancys.toMutableList(),
             nds,
             yzs.toMutableList(),
-            params,
-            quality
+            params
         )
         send(msg)
     }
@@ -102,27 +100,11 @@ object PrintUtil {
      * @return String
      */
     private fun getMatchingQualityMsg(
-        absorbancys: MutableList<Double>,
+        absorbancys: MutableList<Int>,
         nds: DoubleArray,
-        yzs: MutableList<Double>,
-        params: MutableList<Double>,
-        quality: Boolean
+        yzs: MutableList<Int>,
+        params: MutableList<Double>
     ): String {
-
-//        absorbancys[1] = absorbancys[4].apply {
-//            absorbancys[4] = absorbancys[1]
-//        }
-//        absorbancys[2] = absorbancys[3].apply {
-//            absorbancys[3] = absorbancys[2]
-//        }
-//        yzs[1] = yzs[4].apply {
-//            yzs[4] = yzs[1]
-//        }
-//        yzs[2] = yzs[3].apply {
-//            yzs[3] = yzs[2]
-//        }
-//
-//        nds.sort()
 
         val sb = StringBuilder()
         sb.append("\n\n")
@@ -139,7 +121,7 @@ object PrintUtil {
 
         sb.append("\n\n")
 
-        if (quality) {
+        if (yzs.size>5) {
             sb.append("${yzs[5]}ng/mL")
             sb.append("\n")
             sb.append("${absorbancys[5]}")

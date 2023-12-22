@@ -312,6 +312,7 @@ class MatchingArgsFragment :
                                     vm.saveProject()
                                     dialog.dismiss()
                                 }, cancelText = "取消", cancelClick = {
+                                    vm.notSaveProject()
                                     dialog.dismiss()
                                 }, textGravity = Gravity.LEFT
                             )

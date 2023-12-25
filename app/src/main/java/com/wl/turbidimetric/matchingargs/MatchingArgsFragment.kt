@@ -206,7 +206,8 @@ class MatchingArgsFragment :
                 it.showDialog(
                     vm.testMsg.value ?: "",
                     "确定",
-                    confirmClick = { it.dismiss() }, textGravity = Gravity.LEFT)
+                    confirmClick = { it.dismiss() }, textGravity = Gravity.LEFT
+                )
             }
         }
     }
@@ -257,9 +258,11 @@ class MatchingArgsFragment :
     private fun changeCurve(project: CurveModel) {
         val values = ArrayList<Entry>()
 
-        if (project.reactionValues != null && project.reactionValues!!.isNotEmpty() && project.reactionValues!!.size == 5) {
+        if (project.reactionValues != null && project.reactionValues!!.isNotEmpty()) {
             project.reactionValues?.forEachIndexed { i, it ->
-                values.add(Entry(nds[i].toFloat(), it.toFloat()))
+                if (i < 5) {
+                    values.add(Entry(nds[i].toFloat(), it.toFloat()))
+                }
             }
         } else {
             return
@@ -298,6 +301,7 @@ class MatchingArgsFragment :
                             )
                         }
                     }
+
                     DialogState.MatchingFinishMsg -> {//检测结束，提示是否保存
 //                        vm.saveProject()
                         val msg = it.msg.plus("\n确定保存该条标曲记录？\n\n")
@@ -319,6 +323,7 @@ class MatchingArgsFragment :
                         }
 
                     }
+
                     DialogState.ACCIDENT -> {//意外的检测结束等
                         dialog.showPop(requireContext()) { dialog ->
                             dialog.showDialog(
@@ -331,6 +336,7 @@ class MatchingArgsFragment :
                             )
                         }
                     }
+
                     else -> {
 
                     }
@@ -347,7 +353,12 @@ class MatchingArgsFragment :
                     requireContext(), width = 1500,
                     isCancelable = true
                 ) { d ->
-                    d.showDialog(it, "确定", confirmClick = { d.dismiss() }, textGravity = Gravity.LEFT)
+                    d.showDialog(
+                        it,
+                        "确定",
+                        confirmClick = { d.dismiss() },
+                        textGravity = Gravity.LEFT
+                    )
                 }
             }
         }

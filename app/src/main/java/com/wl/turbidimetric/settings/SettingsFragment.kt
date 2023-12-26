@@ -140,6 +140,10 @@ class SettingsFragment :
      * 启动调试页面
      */
     private fun debug() {
+        if (isTestRunning()) {
+            toast("正在检测，请稍后")
+            return
+        }
         startActivity(Intent(requireContext(), DebugActivity::class.java))
     }
 
@@ -220,6 +224,10 @@ class SettingsFragment :
      * 进入重复性测试
      */
     private fun showRepeatability() {
+        if (isTestRunning()) {
+            toast("正在检测，请稍后")
+            return
+        }
         startActivity(
             Intent(requireContext(), TestActivity::class.java).putExtra(
                 TestActivity.flag, TestActivity.flag_Repeatability

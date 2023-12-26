@@ -1,7 +1,9 @@
 package com.wl.turbidimetric.main
 
+import android.app.Activity
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -10,6 +12,7 @@ import android.os.Handler
 import android.os.Message
 import android.util.Log
 import androidx.activity.viewModels
+import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.lifecycleScope
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.ActivityMainBinding
@@ -20,7 +23,6 @@ import com.wl.turbidimetric.util.ActivityDataBindingDelegate
 import com.wl.turbidimetric.util.SerialPortUtil
 import com.wl.turbidimetric.view.dialog.HiltDialog
 import com.wl.turbidimetric.view.dialog.showPop
-import com.wl.weiqianwllib.upan.DocumentsUtils
 import com.wl.weiqianwllib.upan.StorageState
 import com.wl.weiqianwllib.upan.StorageUtil
 import com.wl.weiqianwllib.upan.StorageUtil.OPEN_DOCUMENT_TREE_CODE
@@ -83,6 +85,23 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
             }
         }
         super.onActivityResult(requestCode, resultCode, data)
+
+        //授权一次后重启开机不用再次授权
+        if (resultCode != Activity.RESULT_OK) return
+        val treeUri = data!!.data
+        grantUriPermission(
+            packageName,
+            treeUri,
+            Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+        )
+        contentResolver.takePersistableUriPermission(
+            treeUri!!,
+            Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+        )
+        Log.i(
+            TAG,
+            "onActivityResult 第一次插入的U盘地址= ： $treeUri"
+        )
     }
 
     private fun initQrCode() {

@@ -20,6 +20,7 @@ import com.wl.turbidimetric.util.ActivityDataBindingDelegate
 import com.wl.turbidimetric.util.SerialPortUtil
 import com.wl.turbidimetric.view.dialog.HiltDialog
 import com.wl.turbidimetric.view.dialog.showPop
+import com.wl.weiqianwllib.upan.DocumentsUtils
 import com.wl.weiqianwllib.upan.StorageState
 import com.wl.weiqianwllib.upan.StorageUtil
 import com.wl.weiqianwllib.upan.StorageUtil.OPEN_DOCUMENT_TREE_CODE
@@ -47,6 +48,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
                 handler_init_qrcode -> {
                     initQrCode()
                 }
+
                 handler_init_upan -> {
 
                 }
@@ -244,7 +246,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
 
         if (state != StorageState.NONE) {
             vd.rnv.setUpanResId(if (state.isExist()) R.drawable.upan_enable_true else R.drawable.upan_enable_false)
-        }else{
+        } else {
             vd.rnv.setUpanResId(0)
         }
 //        vd.tvState!!.text = "U盘状态:" + StorageUtil.state.stateName
@@ -259,6 +261,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
             Log.d(TAG, "action=$action")
             if (action == UsbManager.ACTION_USB_DEVICE_DETACHED) {
                 Log.d(TAG, "设备 已拔出action=\$action")
+                StorageUtil.remove()
                 changeStorageState(StorageState.NONE)
             } else if (action == UsbManager.ACTION_USB_DEVICE_ATTACHED) {
                 Log.d(TAG, "设备 已插入action=\$action")

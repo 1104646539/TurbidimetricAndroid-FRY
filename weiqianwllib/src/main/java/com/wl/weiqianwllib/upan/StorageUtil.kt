@@ -56,6 +56,13 @@ object StorageUtil {
     }
 
     @JvmStatic
+    fun remove() {
+//        curPath = null
+//        DocumentsUtils.root = null
+        DocumentsUtils.cleanCache()
+    }
+
+    @JvmStatic
     fun getRootUri(context: Context, path: String): String? {
         val perf = PreferenceManager.getDefaultSharedPreferences(context)
         return perf.getString(path, null)

@@ -2023,6 +2023,8 @@ class HomeViewModel(
         moveSampleShelf(sampleShelfPos)
     }
 
+    var errorInfo: MutableList<ErrorInfo>? = null
+
     /**
      * 接收到自检
      * @param reply ReplyModel<GetMachineStateModel>
@@ -2032,23 +2034,25 @@ class HomeViewModel(
         if (testType.isDebug()) {
             return
         }
-        viewModelScope.launch {
-            _dialogUiState.emit(HomeDialogUiState(DialogState.GET_MACHINE_DISMISS, ""))
-        }
-        val errorInfo = reply.data.errorInfo
+
+        errorInfo = reply.data.errorInfo
         testState = TestState.None
         if (errorInfo.isNullOrEmpty()) {
-            i("自检完成")
             testState = TestState.Normal
             //自检成功后获取一下r1,r2，清洗液状态
             getState()
         } else {
+            viewModelScope.launch {
+                _dialogUiState.emit(HomeDialogUiState(DialogState.GET_MACHINE_DISMISS, ""))
+            }
             testState = TestState.NotGetMachineState
             val sb = StringBuffer()
-            for (error in errorInfo) {
-                sb.append(error.errorMsg)
-                sb.append(error.motorMsg)
-                sb.append("\n")
+            errorInfo?.let {
+                for (error in it) {
+                    sb.append(error.errorMsg)
+                    sb.append(error.motorMsg)
+                    sb.append("\n")
+                }
             }
             i("自检失败，错误信息=${sb}")
             viewModelScope.launch {
@@ -2079,6 +2083,12 @@ class HomeViewModel(
         r2Volume = reply.data.r2Volume
         cleanoutFluid = reply.data.cleanoutFluid
         c("接收到 获取状态 testState=$testState reply=$reply continueTestCuvetteState=$continueTestCuvetteState continueTestSampleState=$continueTestSampleState clickStart=$clickStart r1Reagent=$r1Reagent r2Reagent=$r2Reagent cleanoutFluid=$cleanoutFluid continueTestGetState=$continueTestGetState")
+        if (testState == TestState.Normal) {
+            i("自检完成")
+            viewModelScope.launch {
+                _dialogUiState.emit(HomeDialogUiState(DialogState.GET_MACHINE_DISMISS, ""))
+            }
+        }
         if (!runningTest()) return
         if (!machineStateNormal()) return
 //        c("接收到 获取状态 reply=$reply continueTestCuvetteState=$continueTestCuvetteState continueTestSampleState=$continueTestSampleState clickStart=$clickStart r1Reagent=$r1Reagent r2Reagent=$r2Reagent cleanoutFluid=$cleanoutFluid continueTestGetState=$continueTestGetState")

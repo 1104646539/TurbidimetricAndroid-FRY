@@ -167,8 +167,8 @@ class IntegrationViewModel : BaseViewModel(), Callback2 {
             return
         }
         val intervalDuration = msg.toIntOrNull() ?: 0
-        if (intervalDuration !in 1..100000) {
-            changeHilt("间隔错误,必须为1-100000")
+        if (intervalDuration !in 1..500000) {
+            changeHilt("间隔错误,必须为1-500000")
             return
         }
         debugType = DebugType.IntervalTest
@@ -181,7 +181,6 @@ class IntegrationViewModel : BaseViewModel(), Callback2 {
 
     fun stopIntervalTest() {
         intervalTestTimer?.cancel()
-
     }
 
     /**

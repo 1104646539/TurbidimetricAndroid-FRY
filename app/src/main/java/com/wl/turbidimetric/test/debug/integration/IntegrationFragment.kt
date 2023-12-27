@@ -139,7 +139,7 @@ class IntegrationFragment :
                 temp.add(0, it)
                 vd.tvMsg.post {
                     vd.tvMsg.text = temp.joinToString()
-                    vd.sv.fullScroll(View.FOCUS_DOWN)
+//                    vd.sv.fullScroll(View.FOCUS_DOWN)
                 }
             }
         }
@@ -165,6 +165,11 @@ class IntegrationFragment :
             temp.clear()
             changeCurve(temp)
         }
+    }
+
+    override fun onDestroyView() {
+        vm.stopIntervalTest()
+        super.onDestroyView()
     }
 
     companion object {

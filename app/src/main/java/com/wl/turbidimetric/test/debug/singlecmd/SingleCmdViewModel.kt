@@ -230,7 +230,7 @@ class SingleCmdViewModel : BaseViewModel(), Callback2 {
             return
         }
         val step = msg.toIntOrNull() ?: 0
-        if (step !in 1..4) {
+        if (step !in 1..10) {
             changeHilt("移动位置错误,必须为1-10")
             return
         }
@@ -249,7 +249,7 @@ class SingleCmdViewModel : BaseViewModel(), Callback2 {
             return
         }
         val step = msg.toIntOrNull() ?: 0
-        if (step !in 1..4) {
+        if (step !in 1..10) {
             changeHilt("移动位置错误,必须为1-10")
             return
         }
@@ -268,7 +268,7 @@ class SingleCmdViewModel : BaseViewModel(), Callback2 {
             return
         }
         val step = msg.toIntOrNull() ?: 0
-        if (step !in 1..4) {
+        if (step !in 1..10) {
             changeHilt("移动位置错误,必须为1-10")
             return
         }
@@ -287,7 +287,7 @@ class SingleCmdViewModel : BaseViewModel(), Callback2 {
             return
         }
         val step = msg.toIntOrNull() ?: 0
-        if (step !in 1..4) {
+        if (step !in 1..10) {
             changeHilt("移动位置错误,必须为1-10")
             return
         }
@@ -354,7 +354,7 @@ class SingleCmdViewModel : BaseViewModel(), Callback2 {
             return
         }
         val volumeR2 = msg1.toIntOrNull() ?: 0
-        if (volumeR2 !in 1..500) {
+        if (volumeR2 !in 1..100) {
             changeHilt("R2取试剂量错误,必须为1-100")
             return
         }
@@ -382,7 +382,7 @@ class SingleCmdViewModel : BaseViewModel(), Callback2 {
             return
         }
         val volumeR2 = msg1.toIntOrNull() ?: 0
-        if (volumeR2 !in 1..500) {
+        if (volumeR2 !in 1..100) {
             changeHilt("R2加试剂量错误,必须为1-100")
             return
         }

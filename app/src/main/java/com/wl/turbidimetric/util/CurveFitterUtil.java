@@ -73,19 +73,8 @@ public class CurveFitterUtil {
         return calcuteNumerator(guess, yss) / calculateDenominator(guess, yss);
     }
 
-    /**
-     * 计算R方
-     *
-     * @param xList
-     * @param yList
-     * @return
-     */
-    public static double calcRSquared(double[] xList, double[] yList) {
-        return calcuteNumerator(xList, yList) / calculateDenominator(xList, yList);
-    }
-
     //add denominatorCalculate method
-    private static double calculateDenominator(double[] xList, double[] yList) {
+    public static double calculateDenominator(double[] xList, double[] yList) {
         double standardDifference = 0.0;
         int size = xList.length;
         double xAverage = 0.0;
@@ -112,7 +101,7 @@ public class CurveFitterUtil {
         return standardDifference = Math.sqrt(xException * yException);
     }
 
-    private static double calcuteNumerator(double[] xList, double[] yList) {
+    public static double calcuteNumerator(double[] xList, double[] yList) {
         double result = 0.0;
         double xAverage = 0.0;
         double temp = 0.0;

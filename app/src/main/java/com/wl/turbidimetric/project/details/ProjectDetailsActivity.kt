@@ -92,6 +92,7 @@ class ProjectDetailsActivity :
                         hiltDialog.showPop(this@ProjectDetailsActivity) {
                             it.showDialog(state.dialogMsg, confirmText = "确定", confirmClick = {
                                 it.dismiss()
+                                finish()
                             })
                         }
                     }

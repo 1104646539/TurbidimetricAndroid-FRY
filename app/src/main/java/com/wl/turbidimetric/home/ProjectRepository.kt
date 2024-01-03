@@ -3,6 +3,8 @@ package com.wl.turbidimetric.home
 import com.wl.turbidimetric.App
 import com.wl.turbidimetric.model.CurveModel
 import com.wl.turbidimetric.model.ProjectModel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 class ProjectRepository {
     val dao = App.instance!!.mainDao
@@ -10,9 +12,9 @@ class ProjectRepository {
     /**
      * 所有项目
      */
-//    val allDatas =
-////        DBManager.ProjectBox.query().orderDesc(ProjectModel_.projectId).build()
-//        dao.getProjectModels()
+    fun getProjects(): Flow<List<ProjectModel>> {
+        return dao.getProjectModels()
+    }
 
 
     /**
@@ -39,5 +41,19 @@ class ProjectRepository {
      */
     suspend fun removeProject(project: ProjectModel): Boolean {
         return dao.removeProjectModel(project) > 0
+    }
+
+    /**
+     * 查询是否有重复的项目
+     */
+    suspend fun queryRepeatProjectModel(projectName: String, projectCode: String): ProjectModel {
+        return dao.queryRepeatProjectModel(projectName, projectCode)
+    }
+
+    /**
+     * 获取项目 根据id
+     */
+    suspend fun getProjectModelForId(id: Long): ProjectModel {
+        return dao.getProjectModelForId(id)
     }
 }

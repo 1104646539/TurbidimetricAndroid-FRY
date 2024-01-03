@@ -13,6 +13,7 @@ import com.wl.turbidimetric.model.CurveModel
 import com.wl.turbidimetric.model.TestResultAndCurveModel
 import com.wl.turbidimetric.model.TestResultModel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 @Dao
 interface MainDao {
@@ -58,10 +59,16 @@ interface MainDao {
     suspend fun getCurveModels(): List<CurveModel>
 
     @Query("select * from CurveModel")
-     fun listenerCurveModels(): Flow<List<CurveModel>>
+    fun listenerCurveModels(): Flow<List<CurveModel>>
 
     @Query("select * from ProjectModel")
-    suspend fun getProjectModels(): List<ProjectModel>
+    fun getProjectModels(): Flow<List<ProjectModel>>
+
+    @Query("select * from ProjectModel where projectId = :id")
+    fun getProjectModelForId(id:Long): ProjectModel
+
+    @Query("select * from Projectmodel where projectName = :projectName or projectCode = :projectCode")
+    suspend fun queryRepeatProjectModel(projectName: String, projectCode: String): ProjectModel
 
     @Insert
     suspend fun insertTestResultModel(model: TestResultModel): Long

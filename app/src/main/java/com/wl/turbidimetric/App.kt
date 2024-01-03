@@ -16,6 +16,7 @@ import com.wl.wllib.LogToFile
 import com.wl.wllib.ToastUtil
 import com.wl.wllib.ktxRunOnBgCache
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 
@@ -49,7 +50,8 @@ class App : Application() {
 
     private fun initDB() {
         GlobalScope.launch {
-            val ps = mainDao.getProjectModels()
+            val ps = mainDao.getProjectModels().first()
+
             if (ps.isEmpty()) {
                 repeat(1) {
                     mainDao.insertProjectModel(ProjectModel().apply {

@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_dialog_hint"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:orientation="vertical"
+    android:padding="40dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            style="@style/TextHilt"
+            android:layout_width="140dp"
+            android:gravity="left|center_vertical"
+            android:layout_height="wrap_content"
+            android:text="选择项目:" />
+
+        <Spinner
+            android:id="@+id/spn_project"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:minHeight="50dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            style="@style/TextHilt"
+            android:layout_width="140dp"
+            android:layout_height="wrap_content"
+            android:gravity="left|center_vertical"
+            android:text="选择拟合方程:" />
+
+        <Spinner
+            android:id="@+id/spn_fun"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:minHeight="50dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            style="@style/TextHilt"
+            android:layout_width="140dp"
+            android:layout_height="wrap_content"
+            android:gravity="left|center_vertical"
+            android:text="是否自动稀释:" />
+
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/rb_auto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="30dp"
+                android:minHeight="50dp"
+                android:text="自动稀释"
+                android:textSize="18sp" />
+
+            <RadioButton
+                android:id="@+id/rb_manual"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="50dp"
+                android:text="人工稀释"
+                android:textSize="18sp" />
+
+
+        </RadioGroup>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            style="@style/TextHilt"
+            android:layout_width="140dp"
+            android:layout_height="wrap_content"
+            android:gravity="left|center_vertical"
+            android:text="拟合梯度数量:" />
+
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/rb_grad_5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="30dp"
+                android:minWidth="130dp"
+                android:minHeight="50dp"
+                android:text="5"
+                android:textSize="18sp" />
+
+            <RadioButton
+                android:id="@+id/rb_grad_6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="130dp"
+                android:minHeight="50dp"
+                android:text="6"
+                android:textSize="18sp" />
+
+
+        </RadioGroup>
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            style="@style/TextHilt"
+            android:layout_width="140dp"
+            android:layout_height="wrap_content"
+            android:gravity="left|center_vertical"
+            android:text="跳过比色皿:" />
+
+        <EditText
+            android:id="@+id/et_skip"
+            android:layout_width="300dp"
+            android:layout_height="48dp"
+            android:layout_marginLeft="14dp"
+            android:background="@drawable/bg_et_gray"
+            android:inputType="number"
+            android:paddingLeft="10dp"
+            android:text=""
+            android:textColor="@color/textColor"
+            android:textSize="18sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_sample_num"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            style="@style/TextHilt"
+            android:layout_width="140dp"
+            android:gravity="left|center_vertical"
+            android:layout_height="wrap_content"
+            android:text="目标浓度:" />
+
+        <EditText
+            android:id="@+id/et_target_con_1"
+            android:layout_width="100dp"
+            android:layout_height="48dp"
+            android:layout_marginLeft="14dp"
+            android:background="@drawable/bg_et_gray"
+            android:inputType="number"
+            android:paddingLeft="10dp"
+            android:text=""
+            android:textColor="@color/textColor"
+            android:textSize="18sp" />
+
+        <EditText
+            android:id="@+id/et_target_con_2"
+            android:layout_width="100dp"
+            android:layout_height="48dp"
+            android:layout_marginLeft="14dp"
+            android:background="@drawable/bg_et_gray"
+            android:inputType="number"
+            android:paddingLeft="10dp"
+            android:text=""
+            android:textColor="@color/textColor"
+            android:textSize="18sp" />
+
+        <EditText
+            android:id="@+id/et_target_con_3"
+            android:layout_width="100dp"
+            android:layout_height="48dp"
+            android:layout_marginLeft="14dp"
+            android:background="@drawable/bg_et_gray"
+            android:inputType="number"
+            android:paddingLeft="10dp"
+            android:text=""
+            android:textColor="@color/textColor"
+            android:textSize="18sp" />
+
+        <EditText
+            android:id="@+id/et_target_con_4"
+            android:layout_width="100dp"
+            android:layout_height="48dp"
+            android:layout_marginLeft="14dp"
+            android:background="@drawable/bg_et_gray"
+            android:inputType="number"
+            android:paddingLeft="10dp"
+            android:text=""
+            android:textColor="@color/textColor"
+            android:textSize="18sp" />
+
+        <EditText
+            android:id="@+id/et_target_con_5"
+            android:layout_width="100dp"
+            android:layout_height="48dp"
+            android:layout_marginLeft="14dp"
+            android:background="@drawable/bg_et_gray"
+            android:inputType="number"
+            android:paddingLeft="10dp"
+            android:text=""
+            android:textColor="@color/textColor"
+            android:textSize="18sp" />
+
+        <EditText
+            android:id="@+id/et_target_con_6"
+            android:layout_width="100dp"
+            android:layout_height="48dp"
+            android:layout_marginLeft="14dp"
+            android:background="@drawable/bg_et_gray"
+            android:inputType="number"
+            android:paddingLeft="10dp"
+            android:text=""
+            android:textColor="@color/textColor"
+            android:textSize="18sp" />
+    </LinearLayout>
+
+</LinearLayout>

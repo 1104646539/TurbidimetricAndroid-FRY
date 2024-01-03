@@ -12,6 +12,7 @@ import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.MachineTestModel
+import com.wl.turbidimetric.project.list.ProjectListActivity
 import com.wl.turbidimetric.test.TestActivity
 import com.wl.turbidimetric.test.debug.DebugActivity
 import com.wl.turbidimetric.upload.view.UploadSettingsActivity
@@ -125,6 +126,9 @@ class SettingsFragment :
         vd.tvDebug.setOnClickListener {
             debug()
         }
+        vd.tvProjectList.setOnClickListener {
+            projectList()
+        }
         val versionAndroid = String(
             ((getPackageInfo(requireContext())?.versionName) ?: "").toByteArray(),
             charset("UTF-8")
@@ -134,6 +138,10 @@ class SettingsFragment :
             "上位机版本:${versionAndroid} 发布版本:1"
         vd.tvSoftVersionMcu.text = "MCU版本:${SystemGlobal.mcuVersion}"
 
+    }
+
+    private fun projectList() {
+        startActivity(Intent(requireContext(),ProjectListActivity::class.java))
     }
 
     /**

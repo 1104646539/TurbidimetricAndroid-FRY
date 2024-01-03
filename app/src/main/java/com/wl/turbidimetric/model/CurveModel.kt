@@ -2,6 +2,7 @@ package com.wl.turbidimetric.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.wl.turbidimetric.util.FitterType
 
 
 @Entity
@@ -16,15 +17,35 @@ data class CurveModel(
     var f1: Double = 0.0,
     var f2: Double = 0.0,
     var f3: Double = 0.0,
+    /**
+     * R方
+     */
     var fitGoodness: Double = 0.0,
     var createTime: String = "",
     var isSelect: Boolean = false,
+    /**
+     * 曲线编号
+     */
     var reagentNO: String = "",
+    /**
+     * 反应值 ，指拟合时各个梯度的反应值
+     */
     var reactionValues: IntArray? = intArrayOf(),
-    var yzs: IntArray? = intArrayOf()
+    /**
+     * 验证值 ，指拟合时使用的拟合参数反算出的值
+     */
+    var yzs: IntArray? = intArrayOf(),
+    /**
+     * 曲线类型 ，指拟合时使用的曲线类型
+     */
+    var fitterType: Int = FitterType.Three.ordinal,
+    /**
+     * 梯度 ，指拟合时取的浓度梯度数量
+     */
+    var gradsNum: Int = 5
 ) {
     override fun toString(): String {
-        return "CurveModel(id=$curveId,projectName=$projectName,projectCode=$projectCode,projectLjz=$projectLjz,projectUnit=$projectUnit,f0=$f0,f1=$f1,f2=$f2,f3=$f3,fitGoodness=$fitGoodness,createTime=$createTime,reagentNO=$reagentNO,yzs=$yzs)"
+        return "CurveModel(id=$curveId,projectName=$projectName,projectCode=$projectCode,projectLjz=$projectLjz,projectUnit=$projectUnit,f0=$f0,f1=$f1,f2=$f2,f3=$f3,fitGoodness=$fitGoodness,createTime=$createTime,reagentNO=$reagentNO,yzs=$yzs,fitterType=$fitterType,gradsNum=$gradsNum)"
     }
 
     override fun equals(other: Any?): Boolean {
@@ -52,7 +73,8 @@ data class CurveModel(
             if (other.yzs == null) return false
             if (!yzs.contentEquals(other.yzs)) return false
         } else if (other.yzs != null) return false
-
+        if (fitterType != other.fitterType) return false
+        if (gradsNum != other.gradsNum) return false
         return true
     }
 
@@ -72,6 +94,8 @@ data class CurveModel(
         result = 31 * result + reagentNO.hashCode()
         result = 31 * result + (reactionValues?.contentHashCode() ?: 0)
         result = 31 * result + (yzs?.contentHashCode() ?: 0)
+        result = 31 * result + fitterType.hashCode()
+        result = 31 * result + gradsNum.hashCode()
         return result
     }
 }

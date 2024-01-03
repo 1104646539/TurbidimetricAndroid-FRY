@@ -41,6 +41,8 @@
             android:configChanges="orientation|keyboardHidden|keyboard"
             android:windowSoftInputMode="adjustPan|stateAlwaysHidden">
         </activity>
+        <activity android:name=".project.list.ProjectListActivity"></activity>
+        <activity android:name=".project.details.ProjectDetailsActivity"></activity>
         <activity
             android:name=".main.MainActivity"
             android:configChanges="orientation|keyboardHidden|keyboard"

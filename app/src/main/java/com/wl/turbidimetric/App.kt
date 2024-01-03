@@ -7,6 +7,7 @@ import com.lxj.xpopup.XPopup
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.db.MainRoomDatabase
 import com.wl.turbidimetric.db.putTestResultAndCurve
+import com.wl.turbidimetric.ex.copyForProject
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.CurveModel
 import com.wl.turbidimetric.model.ProjectModel
@@ -53,14 +54,14 @@ class App : Application() {
             val ps = mainDao.getProjectModels().first()
 
             if (ps.isEmpty()) {
-                repeat(1) {
-                    mainDao.insertProjectModel(ProjectModel().apply {
-                        projectName = "项目1"
-                        projectCode = "FOB"
-                        projectUnit = "ug/mL"
-                        projectLjz = 100
-                    })
+                val project = ProjectModel().apply {
+                    projectName = "项目1"
+                    projectCode = "FOB"
+                    projectUnit = "ug/mL"
+                    projectLjz = 100
                 }
+                mainDao.insertProjectModel(project)
+
                 mainDao.insertCurveModel(CurveModel().apply {
                     reagentNO = "999"
                     f0 = 8.14617614
@@ -68,9 +69,9 @@ class App : Application() {
                     f2 = -8.9409E-4
                     f3 = 3.2E-7
                     fitGoodness = 1.0
-                    reactionValues = intArrayOf(0,49,200,500,1000)
-                    yzs = intArrayOf(0,49,200,500,1000)
-                })
+                    reactionValues = intArrayOf(0, 49, 200, 500, 1000)
+                    yzs = intArrayOf(0, 49, 200, 500, 1000)
+                }.copyForProject(project))
             }
         }
     }

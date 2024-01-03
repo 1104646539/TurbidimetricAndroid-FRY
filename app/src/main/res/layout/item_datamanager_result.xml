@@ -34,6 +34,7 @@
         <TextView
             android:id="@+id/tvName"
             style="@style/TextHilt"
+            android:visibility="gone"
             android:layout_width="60dp"
             android:layout_height="wrap_content"
             android:text="姓名" />
@@ -148,6 +149,7 @@
             android:id="@+id/tvTestOriginalValue4"
             style="@style/TextTitle"
             android:layout_width="100dp"
+            android:visibility="gone"
             android:layout_height="wrap_content"
             android:text="原始值4" />
 
@@ -155,8 +157,9 @@
             android:id="@+id/tvProjectName"
             style="@style/TextHilt"
             android:layout_width="wrap_content"
+            android:minWidth="100dp"
             android:layout_height="wrap_content"
-            android:visibility="gone" />
+            android:visibility="visible" />
 
     </LinearLayout>
 </layout>

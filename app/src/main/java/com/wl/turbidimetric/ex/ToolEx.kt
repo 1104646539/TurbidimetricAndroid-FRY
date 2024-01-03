@@ -16,6 +16,7 @@ import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.MachineTestModel
 import com.wl.turbidimetric.model.CurveModel
+import com.wl.turbidimetric.model.ProjectModel
 import com.wl.turbidimetric.model.SampleType
 import com.wl.turbidimetric.model.TestState
 import com.wl.turbidimetric.util.CurveFitterUtil
@@ -427,4 +428,16 @@ fun File.getContent(): String? {
 
     }
     return readText()
+}
+
+/**
+ * 从项目参数新建曲线
+ */
+fun CurveModel.copyForProject(project: ProjectModel): CurveModel {
+    return this.apply {
+        projectName = project.projectName
+        projectCode = project.projectCode
+        projectLjz = project.projectLjz
+        projectUnit = project.projectUnit
+    }
 }

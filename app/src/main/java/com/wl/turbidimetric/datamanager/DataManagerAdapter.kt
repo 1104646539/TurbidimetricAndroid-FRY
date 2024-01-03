@@ -50,6 +50,7 @@ class DataManagerAdapter :
 //            binding.setVariable(BR.item, item)
             binding.tvID.text = item?.result?.resultId.toString()
             binding.tvDetectionNum.text = item?.result?.detectionNum ?: "-"
+            binding.tvProjectName.text = item?.curve?.projectName ?: "-"
             binding.tvName.text = item?.result?.name ?: "-"
             binding.tvGender.text = item?.result?.gender ?: "-"
             binding.tvAge.text = item?.result?.age ?: "-"
@@ -58,11 +59,16 @@ class DataManagerAdapter :
             binding.tvResult.text = item?.result?.testResult ?: "-"
             binding.tvConcentration.text = item?.result?.concentration?.toString() ?: "-"
             binding.tvTestTime.text =
-                if (item?.result?.testTime == 0L) "-" else item?.result?.testTime?.toTimeStr() ?: "-"
-            binding.tvTestValue1.text = item?.result?.testValue1?.setScale(5, RoundingMode.HALF_UP).toString()
-            binding.tvTestValue2.text = item?.result?.testValue2?.setScale(5, RoundingMode.HALF_UP).toString()
-            binding.tvTestValue3.text = item?.result?.testValue3?.setScale(5, RoundingMode.HALF_UP).toString()
-            binding.tvTestValue4.text = item?.result?.testValue4?.setScale(5, RoundingMode.HALF_UP).toString()
+                if (item?.result?.testTime == 0L) "-" else item?.result?.testTime?.toTimeStr()
+                    ?: "-"
+            binding.tvTestValue1.text =
+                item?.result?.testValue1?.setScale(5, RoundingMode.HALF_UP).toString()
+            binding.tvTestValue2.text =
+                item?.result?.testValue2?.setScale(5, RoundingMode.HALF_UP).toString()
+            binding.tvTestValue3.text =
+                item?.result?.testValue3?.setScale(5, RoundingMode.HALF_UP).toString()
+            binding.tvTestValue4.text =
+                item?.result?.testValue4?.setScale(5, RoundingMode.HALF_UP).toString()
             binding.tvTestOriginalValue1.text = item?.result?.testOriginalValue1?.toString() ?: "-"
             binding.tvTestOriginalValue2.text = item?.result?.testOriginalValue2?.toString() ?: "-"
             binding.tvTestOriginalValue3.text = item?.result?.testOriginalValue3?.toString() ?: "-"

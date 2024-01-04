@@ -11,14 +11,15 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
         <TextView
             style="@style/TextHilt"
             android:layout_width="140dp"
-            android:gravity="left|center_vertical"
             android:layout_height="wrap_content"
+            android:gravity="left|center_vertical"
             android:text="选择项目:" />
 
         <Spinner
@@ -32,6 +33,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
@@ -43,71 +45,32 @@
             android:text="选择拟合方程:" />
 
         <Spinner
-            android:id="@+id/spn_fun"
+            android:id="@+id/spn_fitter_type"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:minHeight="50dp" />
     </LinearLayout>
 
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
         <TextView
             style="@style/TextHilt"
             android:layout_width="140dp"
-            android:layout_height="wrap_content"
-            android:gravity="left|center_vertical"
-            android:text="是否自动稀释:" />
-
-        <RadioGroup
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:orientation="horizontal">
-
-            <RadioButton
-                android:id="@+id/rb_auto"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="30dp"
-                android:minHeight="50dp"
-                android:text="自动稀释"
-                android:textSize="18sp" />
-
-            <RadioButton
-                android:id="@+id/rb_manual"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:minHeight="50dp"
-                android:text="人工稀释"
-                android:textSize="18sp" />
-
-
-        </RadioGroup>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
-
-        <TextView
-            style="@style/TextHilt"
-            android:layout_width="140dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:gravity="left|center_vertical"
             android:text="拟合梯度数量:" />
 
         <RadioGroup
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_height="match_parent"
+
             android:orientation="horizontal">
 
             <RadioButton
@@ -134,7 +97,6 @@
 
     </LinearLayout>
 
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -147,19 +109,33 @@
             android:layout_width="140dp"
             android:layout_height="wrap_content"
             android:gravity="left|center_vertical"
-            android:text="跳过比色皿:" />
+            android:text="是否自动稀释:" />
 
-        <EditText
-            android:id="@+id/et_skip"
-            android:layout_width="300dp"
-            android:layout_height="48dp"
-            android:layout_marginLeft="14dp"
-            android:background="@drawable/bg_et_gray"
-            android:inputType="number"
-            android:paddingLeft="10dp"
-            android:text=""
-            android:textColor="@color/textColor"
-            android:textSize="18sp" />
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/rb_auto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="30dp"
+                android:minHeight="50dp"
+                android:text="自动稀释"
+                android:textSize="18sp" />
+
+            <RadioButton
+                android:id="@+id/rb_manual"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="50dp"
+                android:text="人工稀释"
+                android:textSize="18sp" />
+
+
+        </RadioGroup>
+
     </LinearLayout>
 
     <LinearLayout
@@ -173,8 +149,8 @@
         <TextView
             style="@style/TextHilt"
             android:layout_width="140dp"
-            android:gravity="left|center_vertical"
             android:layout_height="wrap_content"
+            android:gravity="left|center_vertical"
             android:text="目标浓度:" />
 
         <EditText

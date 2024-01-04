@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tv_result_header"
+            style="@style/TextItem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="100dp"
+            android:text="目标值" />
+
+        <TextView
+            android:id="@+id/tv_result_1"
+            style="@style/TextItem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="100dp"
+            android:text="0" />
+
+        <TextView
+            android:id="@+id/tv_result_2"
+            style="@style/TextItem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="100dp"
+            android:text="25" />
+
+        <TextView
+            android:id="@+id/tv_result_3"
+            style="@style/TextItem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="100dp"
+            android:text="50" />
+
+        <TextView
+            android:id="@+id/tv_result_4"
+            style="@style/TextItem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="100dp"
+            android:text="200" />
+
+        <TextView
+            style="@style/TextItem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="100dp"
+            android:text="500" />
+
+        <TextView
+            style="@style/TextItem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="100dp"
+            android:text="1000" />
+    </LinearLayout>
+</layout>

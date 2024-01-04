@@ -15,9 +15,12 @@ import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.SystemGlobal.obTestState
 import com.wl.turbidimetric.global.SystemGlobal.testState
 import com.wl.turbidimetric.model.CurveModel
+import com.wl.turbidimetric.model.ProjectModel
 import com.wl.turbidimetric.model.TestState
+import com.wl.turbidimetric.util.FitterType
 import com.wl.turbidimetric.view.dialog.CoverProjectDialog
 import com.wl.turbidimetric.view.dialog.HiltDialog
+import com.wl.turbidimetric.view.dialog.MatchingConfigDialog
 import com.wl.turbidimetric.view.dialog.showPop
 import com.wl.wwanandroid.base.BaseFragment
 import kotlinx.coroutines.flow.collectLatest
@@ -65,6 +68,13 @@ class MatchingArgsFragment :
      */
     private val debugShowDetailsDialog: HiltDialog by lazy {
         HiltDialog(requireContext())
+    }
+
+    /**
+     * 拟合设置对话框
+     */
+    private val matchingConfigDialog: MatchingConfigDialog by lazy {
+        MatchingConfigDialog(requireContext())
     }
 
     override fun init(savedInstanceState: Bundle?) {
@@ -221,8 +231,8 @@ class MatchingArgsFragment :
             toast("正在检测")
             return
         }
-
-        showCoverDialog()
+        vm.showMatchingSettingsDialog()
+//        showCoverDialog()
     }
 
     private fun showCoverDialog() {
@@ -337,6 +347,25 @@ class MatchingArgsFragment :
                         }
                     }
 
+                    DialogState.MatchingSettings -> {//拟合配置
+                        matchingConfigDialog.showPop(requireContext(), width = 1000) { dialog ->
+                            dialog.showDialog(
+                                vm.projects,
+                                vm.autoAttenuation,
+                                vm.matchingNum,
+                                vm.selectMatchingProject,
+                                vm.selectFitterType,
+                                vm.targetCons,
+                                { matchingNum: Int, autoAttenuation: Boolean, selectProject: ProjectModel?, selectFitterType: FitterType, cons: List<Int> ->
+                                    vm.matchingConfigFinish(matchingNum,autoAttenuation,selectProject,selectFitterType,cons)
+                                }
+                            ) {}
+                        }
+                    }
+                    DialogState.MatchingState -> {//拟合状态
+
+                    }
+
                     else -> {
 
                     }
@@ -364,4 +393,7 @@ class MatchingArgsFragment :
         }
     }
 
+
 }
+
+

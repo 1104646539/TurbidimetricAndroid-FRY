@@ -10,10 +10,12 @@ import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.global.SystemGlobal.testState
 import com.wl.turbidimetric.global.SystemGlobal.testType
 import com.wl.turbidimetric.home.CurveRepository
+import com.wl.turbidimetric.home.ProjectRepository
 import com.wl.turbidimetric.model.*
 import com.wl.turbidimetric.print.PrintUtil
 import com.wl.turbidimetric.util.Callback2
 import com.wl.turbidimetric.util.CurveFitterUtil
+import com.wl.turbidimetric.util.FitterType
 import com.wl.turbidimetric.util.SerialPortUtil
 import com.wl.wwanandroid.base.BaseViewModel
 import kotlinx.coroutines.delay
@@ -31,7 +33,10 @@ import kotlin.random.Random
  *
  * @property quality Boolean
  */
-class MatchingArgsViewModel(private val curveRepository: CurveRepository) : BaseViewModel(),
+class MatchingArgsViewModel(
+    private val projectRepository: ProjectRepository,
+    private val curveRepository: CurveRepository
+) : BaseViewModel(),
     Callback2 {
 
     init {
@@ -40,6 +45,12 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
 
     private fun listener() {
         SerialPortUtil.callback.add(this)
+        viewModelScope.launch {
+            projectRepository.getProjects().collectLatest {
+                projects.clear()
+                projects.addAll(it)
+            }
+        }
     }
 
     /**
@@ -92,28 +103,20 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
      */
     private val moveBlendingPos = arrayListOf(0, 5, 4, 3, 2, 6, 7)
 
-//    /**
-//     * 移动已混匀的样本
-//     */
-//    private val movePoss = arrayListOf(1, 5, 4, 3, 2);
-
-    /**
-     * 移动已混匀样本的量
-     */
-    private val moveSampleVolume = 15
-
     /**
      * 是否要同时质控
      */
     var quality: Boolean = false
 
-//    //是否要同时质控
-//    var isQuality = MutableLiveData(false)
-
     /**
      * 当前取样的步骤
      */
     private var sampleStep: Int = 0
+
+    /**
+     * 取样步骤最大需要步数
+     */
+    private var sampleStepMax = 3
 
     /**比色皿架是否移动完毕
      *
@@ -223,7 +226,7 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
     val curveUiState = _curveUiState.asStateFlow()
 
     val testMsg = MutableLiveData("")
-//    val toastMsg = MutableLiveData("")
+
 
     /**
      * 第一次的检测间隔
@@ -280,6 +283,42 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
      * 记录每个比色皿的搅拌时间
      */
     val stirTimes = longArrayOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+
+    /**
+     * 全部可选择的项目
+     */
+    var projects = mutableListOf<ProjectModel>()
+
+    /**
+     * 是否自动稀释
+     */
+    var autoAttenuation = true
+
+    /**
+     * 拟合梯度数量
+     */
+    var matchingNum = 5
+
+    /**
+     * 选择用来拟合的项目
+     */
+    var selectMatchingProject: ProjectModel? = null
+
+    /**
+     * 选择用来拟合的方程
+     */
+    var selectFitterType: FitterType = FitterType.Three
+
+
+    /**
+     * 拟合梯度对应的浓度
+     */
+    var targetCons = mutableListOf<Int>()
+
+    /**
+     * 拟合后的浓度
+     */
+    var resultCons = mutableListOf<MutableList<Int>>()
 
     /**
      * 测试用的 start
@@ -351,6 +390,19 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
         i("接收到 挤压 reply=$reply")
     }
 
+    /**
+     * 显示拟合配置对话框
+     */
+    fun showMatchingSettingsDialog() {
+        viewModelScope.launch {
+            _dialogUiState.emit(
+                MatchingArgsDialogUiState(
+                    dialogState = DialogState.MatchingSettings,
+                    msg = ""
+                )
+            )
+        }
+    }
 
     /**
      * 点击开始拟合
@@ -391,6 +443,11 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
             return
         }
 
+
+        start(curveModel)
+    }
+
+    fun start(curveModel: CurveModel?) {
         this.coverCurveModel = curveModel
         initState()
         testState = TestState.GetState
@@ -954,7 +1011,7 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
         val dif0 = absorbancys[0] - dif50
         println("0原始吸光度-50差值计算后：$dif0")
 
-        val np1 = dif0.toDouble()
+        val np1 = dif0
         var absorbancys2 = absorbancys.toMutableList()
         absorbancys2[0] = np1
 
@@ -1071,7 +1128,7 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
 
         when (testState) {
             TestState.DripDiluentVolume -> {//加稀释液
-                if (sampleStep == 3) {
+                if (sampleStep == sampleStepMax) {
                     //已经加完三个了，清洗取样针，然后进行下一个步骤，取标准品
                     samplingProbeCleaning()
                 } else {
@@ -1216,7 +1273,7 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
             testState = TestState.DripStandardVolume
             moveSample(-samplePos + 2)//直接到取标准品的位置
         } else if (testState == TestState.DripStandardVolume) {//加标准后的清洗
-            if (sampleStep == 3) {
+            if (sampleStep == sampleStepMax) {
                 //开始移动已混匀样本的步骤
                 //第一步、先复位样本和比色皿
                 testState = TestState.MoveSample
@@ -1541,13 +1598,36 @@ class MatchingArgsViewModel(private val curveRepository: CurveRepository) : Base
             )
         }
     }
+
+    /**
+     * 拟合配置完毕
+     */
+    fun matchingConfigFinish(
+        matchingNum: Int,
+        autoAttenuation: Boolean,
+        selectProject: ProjectModel?,
+        selectFitterType: FitterType,
+        cons: List<Int>
+    ) {
+        this.matchingNum = matchingNum
+        this.autoAttenuation = autoAttenuation
+        this.selectMatchingProject = selectProject
+        this.selectFitterType = selectFitterType
+        this.targetCons.clear()
+        this.targetCons.addAll(cons)
+
+
+    }
 }
 
-class MatchingArgsViewModelFactory(private val curveRepository: CurveRepository = CurveRepository()) :
+class MatchingArgsViewModelFactory(
+    private val projectRepository: ProjectRepository = ProjectRepository(),
+    private val curveRepository: CurveRepository = CurveRepository()
+) :
     ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MatchingArgsViewModel::class.java)) {
-            return MatchingArgsViewModel(curveRepository) as T
+            return MatchingArgsViewModel(projectRepository, curveRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

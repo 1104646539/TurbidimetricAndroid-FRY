@@ -3,8 +3,8 @@ package com.wl.turbidimetric.view.dialog
 import android.content.Context
 import com.wl.turbidimetric.R
 
-class MatchingStateDialog(val context: Context) :
-    CustomBtn3Popup(context, R.layout.dialog_matching_state) {
+class MatchingStateDialog(val ct: Context) :
+    CustomBtn3Popup(ct, R.layout.dialog_matching_state) {
     override fun initDialogView() {
 
     }

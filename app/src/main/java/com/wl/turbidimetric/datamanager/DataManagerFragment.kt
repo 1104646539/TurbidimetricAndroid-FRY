@@ -184,12 +184,13 @@ class DataManagerFragment :
 
         adapter.onLongClick = { id ->
             if (id > 0) {
-                launchAndRepeatWithViewLifecycle {
+                launchAndRepeatWithViewLifecycle {  }
+                lifecycleScope.launch {
                     val result = vm.getTestResultAndCurveModelById(id)
                     result?.let {
                         resultDialog.showPop(requireContext(), isCancelable = false) {
                             it.showDialog(result) {
-                                launchAndRepeatWithViewLifecycle {
+                                lifecycleScope.launch {
                                     vm.update(it)
                                 }
                                 true

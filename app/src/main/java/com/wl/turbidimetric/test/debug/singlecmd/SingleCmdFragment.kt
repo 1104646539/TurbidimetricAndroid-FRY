@@ -7,7 +7,7 @@ import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.FragmentSingleCmdBinding
 import com.wl.turbidimetric.ex.toast
 import com.wl.turbidimetric.model.SampleType
-import com.wl.wwanandroid.base.BaseFragment
+import com.wl.turbidimetric.base.BaseFragment
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 

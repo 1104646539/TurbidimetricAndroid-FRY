@@ -20,8 +20,8 @@ import com.wl.turbidimetric.util.ExportLogHelper
 import com.wl.turbidimetric.view.*
 import com.wl.turbidimetric.view.dialog.*
 import com.wl.weiqianwllib.OrderUtil
-import com.wl.wwanandroid.base.BaseFragment
-import com.wl.wwanandroid.base.BaseViewModel
+import com.wl.turbidimetric.base.BaseFragment
+import com.wl.turbidimetric.base.BaseViewModel
 import com.wl.wllib.LogToFile.i
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest

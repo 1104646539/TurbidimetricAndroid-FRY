@@ -1,5 +1,5 @@
 package com.wl.turbidimetric.test
 
-import com.wl.wwanandroid.base.BaseViewModel
+import com.wl.turbidimetric.base.BaseViewModel
 
 class TestDataViewModel : BaseViewModel()

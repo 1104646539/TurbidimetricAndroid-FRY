@@ -1,4 +1,4 @@
-package com.wl.wwanandroid.base
+package com.wl.turbidimetric.base
 
 import androidx.lifecycle.ViewModel
 import com.wl.turbidimetric.global.EventGlobal
@@ -12,13 +12,5 @@ open class BaseViewModel : ViewModel() {
 
     open fun init(): Unit {}
 
-    init {
-//        EventBus.getDefault().register(this)
-    }
-
-//    @Subscribe(threadMode = ThreadMode.MAIN)
-//    open fun onMessageEvent(event: EventMsg<Any>) {
-//
-//    }
 
 }

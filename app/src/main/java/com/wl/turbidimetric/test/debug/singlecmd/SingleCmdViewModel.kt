@@ -1,7 +1,6 @@
 package com.wl.turbidimetric.test.debug.singlecmd
 
 import androidx.lifecycle.MutableLiveData
-import com.wl.turbidimetric.global.SystemGlobal.testState
 import com.wl.turbidimetric.global.SystemGlobal.testType
 import com.wl.turbidimetric.model.CuvetteDoorModel
 import com.wl.turbidimetric.model.DripReagentModel
@@ -31,7 +30,7 @@ import com.wl.turbidimetric.model.TestType
 import com.wl.turbidimetric.util.Callback2
 import com.wl.turbidimetric.util.SerialPortUtil
 import com.wl.wllib.LogToFile.i
-import com.wl.wwanandroid.base.BaseViewModel
+import com.wl.turbidimetric.base.BaseViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class SingleCmdViewModel : BaseViewModel(), Callback2 {

@@ -14,7 +14,7 @@ import com.wl.turbidimetric.home.TestResultRepository
 import com.wl.turbidimetric.model.*
 import com.wl.turbidimetric.util.Callback2
 import com.wl.turbidimetric.util.SerialPortUtil
-import com.wl.wwanandroid.base.BaseViewModel
+import com.wl.turbidimetric.base.BaseViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

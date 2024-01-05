@@ -55,7 +55,7 @@ import com.wl.turbidimetric.util.FitterType
 import com.wl.turbidimetric.util.SerialPortUtil
 import com.wl.wllib.LogToFile.i
 import com.wl.wllib.toTimeStr
-import com.wl.wwanandroid.base.BaseViewModel
+import com.wl.turbidimetric.base.BaseViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow

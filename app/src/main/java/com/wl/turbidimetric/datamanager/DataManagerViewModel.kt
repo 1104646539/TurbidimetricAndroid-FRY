@@ -11,7 +11,7 @@ import com.wl.turbidimetric.home.TestResultRepository
 import com.wl.turbidimetric.model.ConditionModel
 import com.wl.turbidimetric.model.TestResultAndCurveModel
 import com.wl.turbidimetric.model.TestResultModel
-import com.wl.wwanandroid.base.BaseViewModel
+import com.wl.turbidimetric.base.BaseViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 

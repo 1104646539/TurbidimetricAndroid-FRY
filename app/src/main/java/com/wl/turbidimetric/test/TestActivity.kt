@@ -1,14 +1,13 @@
 package com.wl.turbidimetric.test
 
 import android.view.MenuItem
-import android.view.ViewGroup
 import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.ActivityTestBinding
 import com.wl.turbidimetric.util.ActivityDataBindingDelegate
-import com.wl.wwanandroid.base.BaseActivity
-import com.wl.wwanandroid.base.BaseViewModel
+import com.wl.turbidimetric.base.BaseActivity
+import com.wl.turbidimetric.base.BaseViewModel
 
 class TestActivity : BaseActivity<BaseViewModel, ActivityTestBinding>() {
     override val vd: ActivityTestBinding by ActivityDataBindingDelegate(R.layout.activity_test)
@@ -18,6 +17,7 @@ class TestActivity : BaseActivity<BaseViewModel, ActivityTestBinding>() {
     override fun init() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = "测试页面"
+        supportActionBar?.show()
 
         val flag = intent.getStringExtra(TestActivity.flag)
         var fragment: Fragment? = null

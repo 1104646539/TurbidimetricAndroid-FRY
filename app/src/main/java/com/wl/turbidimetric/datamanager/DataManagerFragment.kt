@@ -18,7 +18,6 @@ import com.wl.turbidimetric.ex.launchAndRepeatWithViewLifecycle
 import com.wl.turbidimetric.ex.toast
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.ConditionModel
-import com.wl.turbidimetric.model.CurveModel
 import com.wl.turbidimetric.model.TestResultAndCurveModel
 import com.wl.turbidimetric.model.TestResultModel
 import com.wl.turbidimetric.print.PrintUtil
@@ -26,7 +25,7 @@ import com.wl.turbidimetric.upload.hl7.HL7Helper
 import com.wl.turbidimetric.util.ExportExcelHelper
 import com.wl.turbidimetric.view.dialog.*
 import com.wl.wllib.LogToFile.i
-import com.wl.wwanandroid.base.BaseFragment
+import com.wl.turbidimetric.base.BaseFragment
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
 import java.util.*

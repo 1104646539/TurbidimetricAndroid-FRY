@@ -12,7 +12,7 @@ import com.wl.turbidimetric.home.HomeProjectAdapter
 import com.wl.turbidimetric.model.CurveModel
 import com.wl.turbidimetric.view.dialog.HiltDialog
 import com.wl.turbidimetric.view.dialog.showPop
-import com.wl.wwanandroid.base.BaseFragment
+import com.wl.turbidimetric.base.BaseFragment
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import com.wl.wllib.LogToFile.i

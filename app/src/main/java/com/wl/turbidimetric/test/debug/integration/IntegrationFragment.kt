@@ -1,12 +1,8 @@
 package com.wl.turbidimetric.test.debug.integration
 
 import android.os.Bundle
-import android.view.View
-import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.viewModelScope
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
@@ -14,18 +10,10 @@ import com.github.mikephil.charting.data.LineDataSet
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.FragmentIntegrationBinding
 import com.wl.turbidimetric.ex.getResource
-import com.wl.turbidimetric.ex.nds
 import com.wl.turbidimetric.ex.toast
-import com.wl.turbidimetric.model.CurveModel
-import com.wl.turbidimetric.test.debug.singlecmd.SingleCmdFragment
-import com.wl.turbidimetric.util.SerialPortUtil
-import com.wl.wwanandroid.base.BaseFragment
-import kotlinx.coroutines.Dispatchers
+import com.wl.turbidimetric.base.BaseFragment
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import java.util.Date
-import kotlin.concurrent.timer
-import kotlin.concurrent.timer
 
 class IntegrationFragment :
     BaseFragment<IntegrationViewModel, FragmentIntegrationBinding>(R.layout.fragment_integration) {

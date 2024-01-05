@@ -3,16 +3,11 @@ package com.wl.turbidimetric.project.details
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.wl.turbidimetric.home.DialogState
 import com.wl.turbidimetric.home.ProjectRepository
 import com.wl.turbidimetric.model.ProjectModel
-import com.wl.wwanandroid.base.BaseViewModel
+import com.wl.turbidimetric.base.BaseViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
 
 
 class ProjectDetailsViewModel(private val projectRepository: ProjectRepository) :

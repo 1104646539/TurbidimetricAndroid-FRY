@@ -8,11 +8,10 @@ import com.wl.turbidimetric.ex.selectionLast
 import com.wl.turbidimetric.ex.toast
 import com.wl.turbidimetric.model.ProjectModel
 import com.wl.turbidimetric.project.list.ProjectListAdapter
-import com.wl.turbidimetric.test.TestActivity
 import com.wl.turbidimetric.util.ActivityDataBindingDelegate
 import com.wl.turbidimetric.view.dialog.HiltDialog
 import com.wl.turbidimetric.view.dialog.showPop
-import com.wl.wwanandroid.base.BaseActivity
+import com.wl.turbidimetric.base.BaseActivity
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 

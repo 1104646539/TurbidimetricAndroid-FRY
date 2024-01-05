@@ -1,16 +1,11 @@
 package com.wl.turbidimetric.project.list
 
-import androidx.databinding.ObservableList
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.wl.turbidimetric.datamanager.DataManagerViewModel
 import com.wl.turbidimetric.home.ProjectRepository
-import com.wl.turbidimetric.home.TestResultRepository
 import com.wl.turbidimetric.model.ProjectModel
-import com.wl.wwanandroid.base.BaseViewModel
+import com.wl.turbidimetric.base.BaseViewModel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
 
 class ProjectListViewModel(private val projectRepository: ProjectRepository) :
     BaseViewModel() {

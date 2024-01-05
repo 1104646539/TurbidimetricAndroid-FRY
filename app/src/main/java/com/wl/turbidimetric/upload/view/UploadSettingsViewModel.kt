@@ -1,11 +1,10 @@
 package com.wl.turbidimetric.upload.view
 
-import com.wl.turbidimetric.global.SerialGlobal
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.upload.model.ConnectConfig
 import com.wl.turbidimetric.upload.model.GetPatientType
 import com.wl.weiqianwllib.serialport.WQSerialGlobal
-import com.wl.wwanandroid.base.BaseViewModel
+import com.wl.turbidimetric.base.BaseViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class UploadSettingsViewModel : BaseViewModel() {

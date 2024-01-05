@@ -1,4 +1,4 @@
-package com.wl.wwanandroid.base
+package com.wl.turbidimetric.base
 
 interface BaseService {
     companion object {

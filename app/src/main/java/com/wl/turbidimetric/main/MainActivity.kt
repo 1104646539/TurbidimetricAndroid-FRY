@@ -3,7 +3,6 @@ package com.wl.turbidimetric.main
 import android.app.Activity
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
-import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -12,7 +11,6 @@ import android.os.Handler
 import android.os.Message
 import android.util.Log
 import androidx.activity.viewModels
-import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.lifecycleScope
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.ActivityMainBinding
@@ -28,7 +26,7 @@ import com.wl.weiqianwllib.upan.StorageUtil
 import com.wl.weiqianwllib.upan.StorageUtil.OPEN_DOCUMENT_TREE_CODE
 import com.wl.wllib.LogToFile.i
 import com.wl.wllib.ktxRunOnBgCache
-import com.wl.wwanandroid.base.BaseActivity
+import com.wl.turbidimetric.base.BaseActivity
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus

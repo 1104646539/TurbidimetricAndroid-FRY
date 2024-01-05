@@ -1,5 +1,6 @@
 package com.wl.turbidimetric.test.debug
 
+import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -10,7 +11,7 @@ import com.wl.turbidimetric.databinding.ActivityDebugBinding
 import com.wl.turbidimetric.global.EventGlobal
 import com.wl.turbidimetric.global.EventMsg
 import com.wl.turbidimetric.util.ActivityDataBindingDelegate
-import com.wl.wwanandroid.base.BaseActivity
+import com.wl.turbidimetric.base.BaseActivity
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
@@ -19,6 +20,10 @@ class DebugActivity : BaseActivity<DebugViewModel, ActivityDebugBinding>() {
     override val vd: ActivityDebugBinding by ActivityDataBindingDelegate(R.layout.activity_debug)
     override val vm: DebugViewModel by viewModels()
     override fun init() {
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.title = "测试页面"
+        supportActionBar?.show()
+
         listener()
         vd.vp.adapter = DebugViewPagerAdapter(this)
         vd.vp.isUserInputEnabled = false
@@ -43,7 +48,13 @@ class DebugActivity : BaseActivity<DebugViewModel, ActivityDebugBinding>() {
         })
 
     }
-
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) {
+            finish()
+            return true
+        }
+        return super.onOptionsItemSelected(item)
+    }
     private fun listener() {
         listenerView()
         listenerEvent()

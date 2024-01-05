@@ -1,4 +1,4 @@
-package com.wl.wwanandroid.base
+package com.wl.turbidimetric.base
 
 import android.os.Bundle
 import android.view.LayoutInflater

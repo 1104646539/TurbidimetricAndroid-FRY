@@ -1,7 +1,6 @@
 package com.wl.turbidimetric.test.debug.integration
 
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.wl.turbidimetric.global.SystemGlobal.testType
 import com.wl.turbidimetric.model.CuvetteDoorModel
@@ -32,10 +31,8 @@ import com.wl.turbidimetric.model.TestType
 import com.wl.turbidimetric.util.Callback2
 import com.wl.turbidimetric.util.SerialPortUtil
 import com.wl.wllib.LogToFile.i
-import com.wl.wwanandroid.base.BaseViewModel
+import com.wl.turbidimetric.base.BaseViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.Date
 import java.util.Timer

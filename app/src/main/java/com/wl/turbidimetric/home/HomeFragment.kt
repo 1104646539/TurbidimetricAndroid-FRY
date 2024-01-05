@@ -23,7 +23,7 @@ import com.wl.turbidimetric.upload.model.Patient
 import com.wl.turbidimetric.upload.service.OnConnectListener
 import com.wl.turbidimetric.upload.service.OnGetPatientCallback
 import com.wl.turbidimetric.view.dialog.*
-import com.wl.wwanandroid.base.BaseFragment
+import com.wl.turbidimetric.base.BaseFragment
 import kotlinx.coroutines.launch
 import com.wl.wllib.LogToFile.i
 import com.wl.wllib.toLongTimeStr

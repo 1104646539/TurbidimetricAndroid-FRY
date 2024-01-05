@@ -28,7 +28,7 @@ import com.wl.turbidimetric.view.dialog.PatientInfoDialog
 import com.wl.turbidimetric.view.dialog.showPop
 import com.wl.wllib.LogToFile.i
 import com.wl.wllib.isIP
-import com.wl.wwanandroid.base.BaseActivity
+import com.wl.turbidimetric.base.BaseActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch

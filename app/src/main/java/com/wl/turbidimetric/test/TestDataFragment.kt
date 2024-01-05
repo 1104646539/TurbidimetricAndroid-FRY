@@ -6,7 +6,7 @@ import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.FragmentTestDataBinding
 import com.wl.turbidimetric.test.cmd.CmdProxy
 import com.wl.turbidimetric.test.cmd.MoveSampleShelfCmd
-import com.wl.wwanandroid.base.BaseFragment
+import com.wl.turbidimetric.base.BaseFragment
 
 class TestDataFragment :
     BaseFragment<TestDataViewModel, FragmentTestDataBinding>(R.layout.fragment_test_data) {

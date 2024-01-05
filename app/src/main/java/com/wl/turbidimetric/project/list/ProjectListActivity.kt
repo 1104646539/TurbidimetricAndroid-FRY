@@ -9,7 +9,7 @@ import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.ActivityProjectListBinding
 import com.wl.turbidimetric.project.details.ProjectDetailsActivity
 import com.wl.turbidimetric.util.ActivityDataBindingDelegate
-import com.wl.wwanandroid.base.BaseActivity
+import com.wl.turbidimetric.base.BaseActivity
 import kotlinx.coroutines.flow.collectLatest
 
 /**

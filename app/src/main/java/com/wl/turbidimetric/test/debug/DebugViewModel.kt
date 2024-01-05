@@ -4,7 +4,7 @@ import com.wl.turbidimetric.ex.toHex
 import com.wl.turbidimetric.util.OriginalDataCall
 import com.wl.turbidimetric.util.SerialPortUtil
 import com.wl.wllib.LogToFile
-import com.wl.wwanandroid.base.BaseViewModel
+import com.wl.turbidimetric.base.BaseViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class DebugViewModel : BaseViewModel(), OriginalDataCall {

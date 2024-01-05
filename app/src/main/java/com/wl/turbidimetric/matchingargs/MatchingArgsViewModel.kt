@@ -5,27 +5,70 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.wl.turbidimetric.datastore.LocalData
-import com.wl.turbidimetric.ex.*
+import com.wl.turbidimetric.ex.calcAbsorbance
+import com.wl.turbidimetric.ex.calcAbsorbanceDifferences
+import com.wl.turbidimetric.ex.isSample
+import com.wl.turbidimetric.ex.machineStateNormal
+import com.wl.turbidimetric.ex.matchingArg
+import com.wl.turbidimetric.ex.nds
+import com.wl.turbidimetric.ex.scale
+import com.wl.turbidimetric.global.EventGlobal
+import com.wl.turbidimetric.global.EventMsg
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.global.SystemGlobal.testState
 import com.wl.turbidimetric.global.SystemGlobal.testType
 import com.wl.turbidimetric.home.CurveRepository
 import com.wl.turbidimetric.home.ProjectRepository
-import com.wl.turbidimetric.model.*
+import com.wl.turbidimetric.model.CurveModel
+import com.wl.turbidimetric.model.CuvetteDoorModel
+import com.wl.turbidimetric.model.CuvetteState
+import com.wl.turbidimetric.model.DripReagentModel
+import com.wl.turbidimetric.model.DripSampleModel
+import com.wl.turbidimetric.model.GetMachineStateModel
+import com.wl.turbidimetric.model.GetStateModel
+import com.wl.turbidimetric.model.GetVersionModel
+import com.wl.turbidimetric.model.MoveCuvetteDripReagentModel
+import com.wl.turbidimetric.model.MoveCuvetteDripSampleModel
+import com.wl.turbidimetric.model.MoveCuvetteShelfModel
+import com.wl.turbidimetric.model.MoveCuvetteTestModel
+import com.wl.turbidimetric.model.MoveSampleModel
+import com.wl.turbidimetric.model.MoveSampleShelfModel
+import com.wl.turbidimetric.model.PiercedModel
+import com.wl.turbidimetric.model.ProjectModel
+import com.wl.turbidimetric.model.ReplyModel
+import com.wl.turbidimetric.model.SampleDoorModel
+import com.wl.turbidimetric.model.SampleType
+import com.wl.turbidimetric.model.SamplingModel
+import com.wl.turbidimetric.model.SamplingProbeCleaningModel
+import com.wl.turbidimetric.model.SqueezingModel
+import com.wl.turbidimetric.model.StirModel
+import com.wl.turbidimetric.model.StirProbeCleaningModel
+import com.wl.turbidimetric.model.TakeReagentModel
+import com.wl.turbidimetric.model.TempModel
+import com.wl.turbidimetric.model.TestModel
+import com.wl.turbidimetric.model.TestState
+import com.wl.turbidimetric.model.TestType
 import com.wl.turbidimetric.print.PrintUtil
 import com.wl.turbidimetric.util.Callback2
 import com.wl.turbidimetric.util.CurveFitterUtil
 import com.wl.turbidimetric.util.FitterType
 import com.wl.turbidimetric.util.SerialPortUtil
-import com.wl.wwanandroid.base.BaseViewModel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import java.math.BigDecimal
-import java.util.*
-import kotlin.math.absoluteValue
 import com.wl.wllib.LogToFile.i
 import com.wl.wllib.toTimeStr
-import kotlinx.coroutines.flow.*
+import com.wl.wwanandroid.base.BaseViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import org.greenrobot.eventbus.EventBus
+import java.math.BigDecimal
+import java.util.Date
+import kotlin.math.absoluteValue
 import kotlin.random.Random
 
 /**
@@ -1398,6 +1441,7 @@ class MatchingArgsViewModel(
                     coverCurveModel = null
                 }
                 print()
+                EventBus.getDefault().post(EventMsg<String>(EventGlobal.WHAT_PROJECT_ADD))
             }
         }
     }

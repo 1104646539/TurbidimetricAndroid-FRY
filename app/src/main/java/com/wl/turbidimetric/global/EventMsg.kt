@@ -1,6 +1,6 @@
 package com.wl.turbidimetric.global
 
-class EventMsg<T>(val what: Int,val data:T?=null)
+class EventMsg<T>(val what: Int, val data: T? = null)
 
 
 object EventGlobal {
@@ -13,4 +13,9 @@ object EventGlobal {
      * 首页是否获取温度
      */
     const val WHAT_GET_TEMP_CHANGE = 110
+
+    /**
+     * 拟合增加了曲线
+     */
+    const val WHAT_PROJECT_ADD = 120
 }

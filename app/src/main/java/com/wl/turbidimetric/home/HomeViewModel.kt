@@ -1,12 +1,8 @@
 package com.wl.turbidimetric.home
 
-import android.view.View
 import androidx.lifecycle.*
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.ex.*
-import com.wl.turbidimetric.global.EventGlobal
-import com.wl.turbidimetric.global.EventMsg
-import com.wl.turbidimetric.global.SerialGlobal
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.global.SystemGlobal.testState
 import com.wl.turbidimetric.global.SystemGlobal.testType
@@ -17,15 +13,14 @@ import com.wl.turbidimetric.util.OnScanResult
 import com.wl.turbidimetric.util.ScanCodeUtil
 import com.wl.turbidimetric.util.SerialPortUtil
 import com.wl.wllib.LogToFile.c
+import com.wl.wllib.LogToFile.i
 import com.wl.wwanandroid.base.BaseViewModel
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import java.math.BigDecimal
 import java.util.*
 import kotlin.concurrent.timer
 import kotlin.math.absoluteValue
-import com.wl.wllib.LogToFile.i
-import kotlinx.coroutines.flow.*
-import kotlin.math.min
 
 class HomeViewModel(
     private val projectRepository: ProjectRepository,
@@ -767,8 +762,7 @@ class HomeViewModel(
         viewModelScope.launch {
             _dialogUiState.emit(
                 HomeDialogUiState(
-                    dialogState = DialogState.NOTIFY,
-                    "报错了，停止运行 cmd=$cmd state=$state"
+                    dialogState = DialogState.NOTIFY, "报错了，停止运行 cmd=$cmd state=$state"
                 )
             )
         }
@@ -1806,9 +1800,7 @@ class HomeViewModel(
     private fun cuvetteOnlyOne(): Boolean {
         var count = 0
         for (i in 0 until mCuvetteStates[cuvetteShelfPos]!!.size) {
-            if (mCuvetteStates[cuvetteShelfPos]!![i].state == CuvetteState.None
-                || mCuvetteStates[cuvetteShelfPos]!![i].state == CuvetteState.Skip
-            ) {
+            if (mCuvetteStates[cuvetteShelfPos]!![i].state == CuvetteState.None || mCuvetteStates[cuvetteShelfPos]!![i].state == CuvetteState.Skip) {
                 count++
             }
         }
@@ -1884,14 +1876,10 @@ class HomeViewModel(
                     mCuvetteStates[cuvetteShelfPos]?.get(i)?.state = CuvetteState.DripSample
                     needSamplingNum--
                     val result = createResultModel(
-                        "",
-                        null
+                        "", null
                     )
                     updateCuvetteState(
-                        i,
-                        CuvetteState.DripSample,
-                        result,
-                        ""
+                        i, CuvetteState.DripSample, result, ""
                     )
 
                 }
@@ -2492,8 +2480,8 @@ class HomeViewModel(
      * 取样
      */
     private fun sampling() {
-        val type = mSamplesStates.get(sampleShelfPos)?.get(samplePos - 1)?.sampleType
-            ?: SampleType.CUVETTE
+        val type =
+            mSamplesStates.get(sampleShelfPos)?.get(samplePos - 1)?.sampleType ?: SampleType.CUVETTE
         c("发送 取样 type=$type")
         samplingFinish = false
         dripSampleFinish = false
@@ -2617,19 +2605,25 @@ class HomeViewModel(
      */
     fun recoverSelectProject(projects: MutableList<CurveModel>) {
         val selectId = LocalData.SelectProjectID
-        if (projects.isNotEmpty()) {
-            if (selectId > 0) {
-                val fps = projects.filter { it.curveId == selectId }
-                if (fps.isNotEmpty()) {
-                    selectProject = fps.first()
-                } else {
-                    selectProject = projects.first()
-                }
-            } else {
-                selectProject = projects.first()
-            }
+        val oldSelect = projects.filter { it.curveId == selectId }
+        if (oldSelect.isNotEmpty()) {//如果已经有选中的，就恢复
+            selectProject = oldSelect.first()
+        } else {//如果选中的不在里，就
+            selectProject = projects.first()
         }
     }
+
+    /**
+     * 曲线更新了，选中最新的曲线
+     */
+    fun selectLastProject(projects: MutableList<CurveModel>) {
+        viewModelScope.launch {
+            LocalData.SelectProjectID = projects.first().curveId
+            recoverSelectProject(projects)
+        }
+
+    }
+
 
     data class CuvetteItem(
         var state: CuvetteState, var testResult: TestResultModel? = null, var sampleID: String? = ""

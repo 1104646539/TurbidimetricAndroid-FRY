@@ -7,13 +7,11 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.wl.turbidimetric.model.ConditionModel
-import com.wl.turbidimetric.model.ProjectModel
 import com.wl.turbidimetric.model.CurveModel
+import com.wl.turbidimetric.model.ProjectModel
 import com.wl.turbidimetric.model.TestResultAndCurveModel
 import com.wl.turbidimetric.model.TestResultModel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
 
 @Dao
 interface MainDao {
@@ -58,7 +56,7 @@ interface MainDao {
     @Query("select * from CurveModel")
     suspend fun getCurveModels(): List<CurveModel>
 
-    @Query("select * from CurveModel")
+    @Query("select * from CurveModel order by createTime desc limit 10")
     fun listenerCurveModels(): Flow<List<CurveModel>>
 
     @Query("select * from ProjectModel")

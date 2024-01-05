@@ -128,9 +128,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 
         launchAndRepeatWithViewLifecycle {
             vm.projectDatas.collectLatest {
-                it.filterIndexed { index, projectModel ->
-                    index < 10
-                }.let { ret ->
+                it.let { ret ->
                     projects.clear()
                     projects.addAll(ret.toMutableList())
 
@@ -282,6 +280,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             showGetTestPatientInfo()
         }
     }
+
     override fun onMessageEvent(event: EventMsg<Any>) {
         super.onMessageEvent(event)
         when (event.what) {
@@ -291,9 +290,16 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 }
             }
 
+            EventGlobal.WHAT_PROJECT_ADD -> {
+                lifecycleScope.launch {
+                    vm.selectLastProject(vm.projectDatas.last().toMutableList())
+                }
+            }
+
             else -> {}
         }
     }
+
     private fun showGetTestPatientInfo() {
         getTestPatientInfoDialog.showPop(
             requireContext(),

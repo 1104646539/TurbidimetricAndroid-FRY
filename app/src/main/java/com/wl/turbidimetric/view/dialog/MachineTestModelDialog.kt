@@ -39,6 +39,9 @@ class MachineTestModelDialog(val ct: Context) :
         this.confirmClick = { confirm(onConfirm) }
         this.cancelText = "取消"
         this.cancelClick = onCancel
+        if (isCreated) {
+            setContent()
+        }
         super.show()
     }
 

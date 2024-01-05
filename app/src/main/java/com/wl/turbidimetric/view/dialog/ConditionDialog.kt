@@ -135,7 +135,9 @@ open class ConditionDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
         }
         this.cancelText = "取消"
         this.cancelClick = onCancel
-
+        if (isCreated) {
+            setContent()
+        }
         super.show()
     }
 

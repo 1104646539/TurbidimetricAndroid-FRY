@@ -81,7 +81,9 @@ class GetTestPatientInfoDialog(val ct: Context) :
             it.dismiss()
         }
         this.cancelText = "取消"
-
+        if (isCreated) {
+            setContent()
+        }
         return this
     }
 

@@ -30,6 +30,9 @@ class OneEditDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_one_e
         this.confirmClick = { onConfirm.invoke(this) }
         this.cancelText = cancelMsg
         this.cancelClick = onCancel
+        if (isCreated) {
+            setContent()
+        }
         super.show()
     }
 

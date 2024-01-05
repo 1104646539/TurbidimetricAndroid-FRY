@@ -111,6 +111,9 @@ class ParamsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_params
         }
         this.cancelText = "取消"
         this.cancelClick = onCancel
+        if (isCreated) {
+            setContent()
+        }
         super.show()
 
     }

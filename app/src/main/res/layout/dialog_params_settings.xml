@@ -174,7 +174,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="8dp"
-                android:text="第一次检测间隔时长(ms)" />
+                android:text="第一次检测间隔时长(s)" />
 
             <EditText
                 android:id="@+id/et_test1_delay_time"
@@ -197,7 +197,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="8dp"
-                android:text="第二次检测间隔时长(ms)" />
+                android:text="第二次检测间隔时长(s)" />
 
             <EditText
                 android:id="@+id/et_test2_delay_time"
@@ -221,7 +221,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="8dp"
-                android:text="第三次检测间隔时长(ms)" />
+                android:text="第三次检测间隔时长(s)" />
 
             <EditText
                 android:id="@+id/et_test3_delay_time"
@@ -253,7 +253,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="8dp"
-                android:text="第四次检测间隔时长(ms)" />
+                android:text="第四次检测间隔时长(s)" />
 
             <EditText
                 android:id="@+id/et_test4_delay_time"

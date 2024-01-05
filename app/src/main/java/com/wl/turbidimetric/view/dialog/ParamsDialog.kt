@@ -54,6 +54,7 @@ class ParamsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_params
      * 第一次检测距离搅拌的间隔时长
      */
     var etTest1DelayTime: EditText? = null
+
     /**
      * 第二次检测距离搅拌的间隔时长
      */
@@ -91,7 +92,7 @@ class ParamsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_params
         test2DelayTime: Long,
         test3DelayTime: Long,
         test4DelayTime: Long,
-        onConfirm: ((takeR1: Int, takeR2: Int, samplingVolume: Int, samplingProbeCleaningTime: Int, stirProbeCleaningTime: Int, stirDuration: Int, test1DelayTime: Long,test2DelayTime: Long, test3DelayTime: Long, test4DelayTime: Long, baseDialog: BasePopupView) -> Unit)?,
+        onConfirm: ((takeR1: Int, takeR2: Int, samplingVolume: Int, samplingProbeCleaningTime: Int, stirProbeCleaningTime: Int, stirDuration: Int, test1DelayTime: Long, test2DelayTime: Long, test3DelayTime: Long, test4DelayTime: Long, baseDialog: BasePopupView) -> Unit)?,
         onCancel: onClick?
     ) {
         this.takeR1 = takeR1
@@ -100,10 +101,10 @@ class ParamsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_params
         this.samplingProbeCleaningTime = samplingProbeCleaningTime
         this.stirProbeCleaningTime = stirProbeCleaningTime
         this.stirDuration = stirDuration
-        this.test1DelayTime = test1DelayTime
-        this.test2DelayTime = test2DelayTime
-        this.test3DelayTime = test3DelayTime
-        this.test4DelayTime = test4DelayTime
+        this.test1DelayTime = test1DelayTime / 1000
+        this.test2DelayTime = test2DelayTime / 1000
+        this.test3DelayTime = test3DelayTime / 1000
+        this.test4DelayTime = test4DelayTime / 1000
         this.confirmText = "确定"
         this.confirmClick = {
             confirm(onConfirm)
@@ -114,7 +115,7 @@ class ParamsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_params
 
     }
 
-    fun confirm(onConfirm: ((takeR1: Int, takeR2: Int, samplingVolume: Int, samplingProbeCleaningTime: Int, stirProbeCleaningTime: Int, stirDuration: Int, test1DelayTime: Long,test2DelayTime: Long, test3DelayTime: Long, test4DelayTime: Long, baseDialog: BasePopupView) -> Unit)?) {
+    fun confirm(onConfirm: ((takeR1: Int, takeR2: Int, samplingVolume: Int, samplingProbeCleaningTime: Int, stirProbeCleaningTime: Int, stirDuration: Int, test1DelayTime: Long, test2DelayTime: Long, test3DelayTime: Long, test4DelayTime: Long, baseDialog: BasePopupView) -> Unit)?) {
         val takeR1 = etTakeR1?.text.toString()
         val takeR2 = etTakeR2?.text.toString()
         val sampling = etSampling?.text.toString()
@@ -150,10 +151,10 @@ class ParamsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_params
             samplingProbeCleaningTime.toIntOrNull() ?: 0,
             stirProbeCleaningTime.toIntOrNull() ?: 0,
             stirDuration.toIntOrNull() ?: 0,
-            test1DelayTime.toLongOrNull() ?: 0L,
-            test2DelayTime.toLongOrNull() ?: 0L,
-            test3DelayTime.toLongOrNull() ?: 0,
-            test4DelayTime.toLongOrNull() ?: 0,
+            (test1DelayTime.toLongOrNull() ?: 0L) * 1000,
+            (test2DelayTime.toLongOrNull() ?: 0L) * 1000,
+            (test3DelayTime.toLongOrNull() ?: 0L) * 1000,
+            (test4DelayTime.toLongOrNull() ?: 0L) * 1000,
             this
         )
     }

@@ -31,7 +31,7 @@ android {
     defaultConfig {
         applicationId "com.wl.turbidimetric"
         minSdk 21
-        targetSdk 25
+        targetSdk 26
         versionCode 1
         versionName "1.0.0.0增加检测前清洗取样针"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

@@ -9,7 +9,6 @@ import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.ActivityDebugBinding
 import com.wl.turbidimetric.global.EventGlobal
 import com.wl.turbidimetric.global.EventMsg
-import com.wl.turbidimetric.main.MainViewPagerAdapter
 import com.wl.turbidimetric.util.ActivityDataBindingDelegate
 import com.wl.wwanandroid.base.BaseActivity
 import kotlinx.coroutines.flow.collectLatest

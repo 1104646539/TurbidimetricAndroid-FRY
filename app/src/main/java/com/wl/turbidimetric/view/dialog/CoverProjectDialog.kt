@@ -38,6 +38,7 @@ class CoverProjectDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_
             projectAdapter?.notifyDataSetChanged()
         }
         spnProject?.let { spn ->
+            selectProject = spn.selectedItem as CurveModel
             if(!items.contains(spn.selectedItem)){
                 spn.setSelection(0)
             }

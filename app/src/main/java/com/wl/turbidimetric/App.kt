@@ -62,16 +62,18 @@ class App : Application() {
                 }
                 mainDao.insertProjectModel(project)
 
-                mainDao.insertCurveModel(CurveModel().apply {
-                    reagentNO = "999"
-                    f0 = 8.14617614
-                    f1 = 1.1219026
-                    f2 = -8.9409E-4
-                    f3 = 3.2E-7
-                    fitGoodness = 1.0
-                    reactionValues = intArrayOf(0, 49, 200, 500, 1000)
-                    yzs = intArrayOf(0, 49, 200, 500, 1000)
-                }.copyForProject(project))
+                repeat(1) {
+                    mainDao.insertCurveModel(CurveModel().apply {
+                        reagentNO = "555"
+                        f0 = 8.14617614
+                        f1 = 1.1219026
+                        f2 = -8.9409E-4
+                        f3 = 3.2E-7
+                        fitGoodness = 1.0
+                        reactionValues = intArrayOf(0, 49, 200, 500, 1000)
+                        yzs = intArrayOf(0, 49, 200, 500, 1000)
+                    }.copyForProject(project))
+                }
             }
         }
     }

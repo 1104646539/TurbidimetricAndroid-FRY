@@ -466,7 +466,7 @@ class HomeViewModel(
     fun clickStart() {
         val errorMsg = if (testState.isRunning()) {
             "正在检测，请勿操作！"
-        }else if (testState.isRunningError()) {
+        } else if (testState.isRunningError()) {
             "请停止使用仪器并联系供应商维修"
         } else if (selectProject == null) {
             "未选择标曲"
@@ -1697,11 +1697,16 @@ class HomeViewModel(
         if (!runningTest()) return
         if (!machineStateNormal()) return
         c("接收到 取样 reply=$reply cuvettePos=$cuvettePos samplePos=$samplePos cuvetteShelfPos=$cuvetteShelfPos sampleShelfPos=$sampleShelfPos")
-
         samplingFinish = true
         samplingNum++
-        updateSampleState(samplePos - 1, SampleState.Sampling)
-        goDripSample()
+        if (reply.state == ReplyState.SAMPLING_FAILED) {
+            updateSampleState(samplePos - 1, SampleState.SamplingFailed)
+            nextStepDripReagent()
+            return
+        } else {
+            updateSampleState(samplePos - 1, SampleState.Sampling)
+            goDripSample()
+        }
     }
 
 

@@ -112,6 +112,7 @@ class SampleShelfView :
     private val colorWait = resources.getColor(R.color.circle_wait_sampling)
     private val colorSampling = resources.getColor(R.color.circle_sampling)
     private val colorFinish = resources.getColor(R.color.circle_sampling_finish)
+    private val colorError = resources.getColor(R.color.circle_error)
 
     private var sampleRects: Array<RectF?> = arrayOfNulls(size)
 
@@ -192,6 +193,7 @@ class SampleShelfView :
             SampleState.Pierced -> colorSampling
             SampleState.Squeezing -> colorFinish
             SampleState.Sampling -> colorFinish
+            SampleState.SamplingFailed -> colorError
             else -> colorNone
         }
     }
@@ -236,6 +238,7 @@ class SampleShelfView :
                 clickY = event.y.toInt()
                 return true
             }
+
             MotionEvent.ACTION_UP -> {
                 //点击抬起后，回复初始位置。
                 if (abs(event.x - clickX) > 10) {

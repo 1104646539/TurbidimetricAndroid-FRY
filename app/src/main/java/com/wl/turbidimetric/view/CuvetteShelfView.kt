@@ -13,6 +13,7 @@ import com.wl.turbidimetric.home.HomeViewModel
 import com.wl.turbidimetric.model.CuvetteState
 import kotlin.math.abs
 import com.wl.wllib.LogToFile.i
+
 class CuvetteShelfView :
     View {
     constructor(context: Context) : this(context, null)
@@ -113,6 +114,7 @@ class CuvetteShelfView :
     private val colorWait = resources.getColor(R.color.circle_wait_sampling)
     private val colorSampling = resources.getColor(R.color.circle_sampling)
     private val colorFinish = resources.getColor(R.color.circle_sampling_finish)
+    private val colorError = resources.getColor(R.color.circle_error)
 
     private var sampleRects: Array<RectF?> = arrayOfNulls(size)
 
@@ -200,6 +202,7 @@ class CuvetteShelfView :
             CuvetteState.Test2 -> colorWait
             CuvetteState.Test3 -> colorWait
             CuvetteState.Test4 -> colorFinish
+            CuvetteState.TakeReagentFailed, CuvetteState.CuvetteNotEmpty -> colorError
 //            CuvetteState.Skip -> colorFinish
             else -> colorNone
         }
@@ -245,6 +248,7 @@ class CuvetteShelfView :
                 clickY = event.y.toInt()
                 return true
             }
+
             MotionEvent.ACTION_UP -> {
                 //点击抬起后，回复初始位置。
                 if (abs(event.x - clickX) > 10) {

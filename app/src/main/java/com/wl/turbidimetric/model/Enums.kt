@@ -6,7 +6,9 @@ package com.wl.turbidimetric.model
 enum class CuvetteState(state: String) {
     None("未知"),//啥也没干
     Skip("跳过"),//跳过
+    CuvetteNotEmpty("比色皿非空"),//比色皿非空
     DripSample("已加样"),//已经加样
+    TakeReagentFailed("取试剂失败"),//取试剂失败
     DripReagent("已加试剂"),//已经加过试剂
     Stir("已搅拌"),//已经搅拌
     Test1("已检测1次"),//检测过第一次
@@ -35,6 +37,7 @@ enum class SampleState {
     ScanFailed,//扫码失败
     Pierced,//刺破完成
     Squeezing,//挤压完成
+    SamplingFailed,//取样失败
     Sampling,//取样完成
 
 }

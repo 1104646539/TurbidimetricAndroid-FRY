@@ -13,6 +13,7 @@ import kotlin.random.Random
  */
 object TestSerialPort {
     var callback: ((ready: UByteArray) -> Unit)? = null
+    var index = 0;
 
     /**
      * 测试回复
@@ -41,8 +42,8 @@ object TestSerialPort {
             }
 
             SerialGlobal.CMD_MoveCuvetteShelf -> {
-                reply = ubyteArrayOf(data[0], 0x01u, 0x0u, 0x0u, 0x0u, 0x0u)
-//                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x0u))
+//                reply = ubyteArrayOf(data[0], 0x01u, 0x0u, 0x0u, 0x0u, 0x0u)
+                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x0u))
             }
 
             SerialGlobal.CMD_Test -> {
@@ -79,6 +80,17 @@ object TestSerialPort {
 
             SerialGlobal.CMD_DripReagent -> {
                 reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x0u))
+            }
+
+            SerialGlobal.CMD_Sampling -> {
+                if (index == 0) {
+                    reply = ubyteArrayOf(data[0], 0x04u, 0x0u, 0x0u, 0x0u, 0x0u)//取样失败
+                }else{
+                    reply = ubyteArrayOf(data[0], 0x00u, 0x0u, 0x0u, 0x0u, 0x0u)//取样成功
+                }
+                index++
+//                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x0u))//取样成功
+//                reply = ubyteArrayOf(data[0], 0x04u, 0x0u, 0x0u, 0x0u, 0x0u)//取样失败
             }
 
             else -> {

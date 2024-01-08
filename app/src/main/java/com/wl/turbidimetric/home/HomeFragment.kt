@@ -286,7 +286,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         when (event.what) {
             EventGlobal.WHAT_GET_TEMP_CHANGE -> {
                 if (event.data is Boolean) {
-                    vm.needTemp = event.data
+                    vm.allowTemp = event.data
                 }
             }
 

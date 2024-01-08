@@ -90,7 +90,7 @@ class DataManagerFragment :
     }
 
     fun test() {
-        launchAndRepeatWithViewLifecycle {
+        lifecycleScope.launch {
             val testdatas = createTestData()
             vm.add(testdatas)
         }
@@ -183,7 +183,7 @@ class DataManagerFragment :
 
         adapter.onLongClick = { id ->
             if (id > 0) {
-                launchAndRepeatWithViewLifecycle {  }
+                lifecycleScope.launch {  }
                 lifecycleScope.launch {
                     val result = vm.getTestResultAndCurveModelById(id)
                     result?.let {
@@ -297,7 +297,7 @@ class DataManagerFragment :
                         val results = getSelectData()
                         it.dismiss()
                         if (!results.isNullOrEmpty()) {
-                            launchAndRepeatWithViewLifecycle {
+                            lifecycleScope.launch {
                                 vm.clickDeleteDialogConfirm(results.map { it.result })
                             }
                         }
@@ -308,7 +308,7 @@ class DataManagerFragment :
             }
         }
 
-        launchAndRepeatWithViewLifecycle {
+        lifecycleScope.launch {
             adapter.loadStateFlow.collectLatest { loadState ->
                 if (loadState.source.refresh is LoadState.NotLoading && loadState.append.endOfPaginationReached && adapter.itemCount < 1) {
                     vd.rv.isVisible = false
@@ -320,7 +320,7 @@ class DataManagerFragment :
             }
         }
 
-        launchAndRepeatWithViewLifecycle {
+        lifecycleScope.launch {
             vm.conditionModel.collectLatest {
                 queryData(it)
             }
@@ -419,7 +419,7 @@ class DataManagerFragment :
     private fun showConditionDialog() {
         conditionDialog.showPop(requireContext(), isCancelable = false) {
             it.showDialog({ conditionModel ->
-                launchAndRepeatWithViewLifecycle {
+                lifecycleScope.launch {
                     vm.conditionChange(conditionModel)
                     it.dismiss()
                 }

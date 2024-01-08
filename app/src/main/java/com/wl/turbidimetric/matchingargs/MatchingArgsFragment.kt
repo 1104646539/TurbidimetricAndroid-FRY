@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.Gravity
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
@@ -26,6 +27,7 @@ import com.wl.wllib.LogToFile.i
 import com.wl.turbidimetric.base.BaseFragment
 import com.wl.turbidimetric.view.dialog.ICON_HINT
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 /**
  * 拟合参数
@@ -155,7 +157,7 @@ class MatchingArgsFragment :
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         vd.rv.adapter = adapter
 
-        launchAndRepeatWithViewLifecycle(Lifecycle.State.CREATED) {
+        lifecycleScope.launch {
             vm.datas.collectLatest {
                 it.filterIndexed { index, _ ->
                     index < 10
@@ -186,7 +188,7 @@ class MatchingArgsFragment :
             changeCurve(project)
         }
 
-        launchAndRepeatWithViewLifecycle {
+        lifecycleScope.launch {
             obTestState.collectLatest {
                 if (it.isRunning()) {
                     vd.btnStart.setBackgroundResource(R.drawable.rip_positive2)
@@ -199,7 +201,7 @@ class MatchingArgsFragment :
                 }
             }
         }
-        launchAndRepeatWithViewLifecycle {
+        lifecycleScope.launch {
             vm.curveUiState.collectLatest {
                 vd.tvEquationText.text = it.equationText
                 vd.tvFitGoodnessText.text = it.fitGoodnessText
@@ -292,7 +294,7 @@ class MatchingArgsFragment :
     }
 
     private fun listenerDialog() {
-        launchAndRepeatWithViewLifecycle {
+        lifecycleScope.launch {
             vm.dialogUiState.collect {
                 state->
                 when (state.dialogState) {

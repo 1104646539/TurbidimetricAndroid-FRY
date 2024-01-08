@@ -33,8 +33,8 @@ object TestSerialPort {
             }
 
             SerialGlobal.CMD_GetState -> {
-//                reply = reply.plus(ubyteArrayOf(0x0u, 0x2u, 0x33u, 0xffu))// 0011 0011
-                reply = reply.plus(ubyteArrayOf(0x0u, 0x2u, 0x13u, 0xffu))//0001 0001
+                reply = reply.plus(ubyteArrayOf(0x0u, 0x2u, 0x33u, 0xffu))// 0011 0011
+//                reply = reply.plus(ubyteArrayOf(0x0u, 0x2u, 0x13u, 0xffu))//0001 0001
             }
 
             SerialGlobal.CMD_MoveSample -> {
@@ -66,6 +66,12 @@ object TestSerialPort {
             SerialGlobal.CMD_TakeReagent -> {
                 reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x01u, 0x1u))// 存在r1试剂 1，r2试剂量 1
 //                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x00u, 0x0u))// 不存在r1试剂 0，r2试剂量 0
+//                if (index == 0) {
+//                    reply = ubyteArrayOf(data[0], 0x06u, 0x0u, 0x0u, 0x01u, 0x0u)//取试剂失败
+//                } else {
+//                    reply = ubyteArrayOf(data[0], 0x00u, 0x0u, 0x0u, 0x01u, 0x0u)//取试剂成功
+//                }
+//                index++
             }
 
             SerialGlobal.CMD_StirProbeCleaning -> {
@@ -83,13 +89,13 @@ object TestSerialPort {
             }
 
             SerialGlobal.CMD_Sampling -> {
-                if (index == 0) {
-                    reply = ubyteArrayOf(data[0], 0x04u, 0x0u, 0x0u, 0x0u, 0x0u)//取样失败
-                }else{
-                    reply = ubyteArrayOf(data[0], 0x00u, 0x0u, 0x0u, 0x0u, 0x0u)//取样成功
-                }
-                index++
-//                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x0u))//取样成功
+//                if (index == 0) {
+//                    reply = ubyteArrayOf(data[0], 0x04u, 0x0u, 0x0u, 0x0u, 0x0u)//取样失败
+//                }else{
+//                    reply = ubyteArrayOf(data[0], 0x00u, 0x0u, 0x0u, 0x0u, 0x0u)//取样成功
+//                }
+//                index++
+                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x0u))//取样成功
 //                reply = ubyteArrayOf(data[0], 0x04u, 0x0u, 0x0u, 0x0u, 0x0u)//取样失败
             }
 

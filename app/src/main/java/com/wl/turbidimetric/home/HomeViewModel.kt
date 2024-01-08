@@ -405,6 +405,11 @@ class HomeViewModel(
     var needTemp: Boolean = true
 
     /**
+     * 是否运行取试剂(在出现取试剂失败的情况下，只检测已经加好试剂的样本，不继续取试剂)
+     */
+    var needTakeReagent = true
+
+    /**
      * 测试用的 start
      */
     //检测的值
@@ -496,6 +501,7 @@ class HomeViewModel(
 
 
     private fun initState() {
+        needTakeReagent = true
         testMsg.value = ""
         testState = TestState.DripSample
         cuvetteShelfPos = -1
@@ -580,9 +586,22 @@ class HomeViewModel(
         r2Volume = reply.data.r2Volume
         if (!runningTest()) return
         if (!machineStateNormal()) return
-        c("接收到 取试剂 reply=$reply")
+        c("接收到 取试剂 reply=$reply cuvettePos=$cuvettePos")
         takeReagentFinish = true
-        goDripReagent()
+        if (reply.state == ReplyState.TAKE_REAGENT_FAILED) {//取试剂失败
+            needTakeReagent = false
+            dripReagentFinish = true
+            updateCuvetteState(cuvettePos, CuvetteState.TakeReagentFailed)
+            if (cuvetteMoveFinish) {//已经移动到位了，取试剂失败后不应该再取，只检测已经加完试剂的样本
+                if (cuvettePos == 0) {//第一个就失败，直接结束检测
+                    testFinishAction()
+                } else {
+                    nextDripReagent()
+                }
+            }
+        } else {//取试剂成功,去加试剂
+            goDripReagent()
+        }
     }
 
 
@@ -590,10 +609,11 @@ class HomeViewModel(
      * 去加试剂
      */
     private fun goDripReagent() {
-        i("goDripReagent cuvettePos=$cuvettePos takeReagentFinish=$takeReagentFinish cuvetteMoveFinish=$cuvetteMoveFinish")
-        if (cuvettePos < 10 && cuvetteNeedDripReagent(cuvettePos) && takeReagentFinish && cuvetteMoveFinish) {
+        i("goDripReagent cuvettePos=$cuvettePos takeReagentFinish=$takeReagentFinish cuvetteMoveFinish=$cuvetteMoveFinish needTakeReagent=$needTakeReagent")
+        if (cuvettePos < 10 && cuvetteNeedDripReagent(cuvettePos) && takeReagentFinish && cuvetteMoveFinish && needTakeReagent) {
             dripReagent()
         }
+
     }
 
     /**
@@ -1073,7 +1093,7 @@ class HomeViewModel(
      */
     private fun updateTestResultModel(value: Int, index: Int, state: CuvetteState) {
         var pos = index
-        i("updateTestResultModel pos=$pos resultModels=$resultModels")
+        i("updateTestResultModel pos=$pos resultModels=$resultModels size=${resultModels.size}")
         if (cuvetteStartPos > 0 && isFirstCuvetteShelf()) {
             pos -= cuvetteStartPos
         }
@@ -1279,6 +1299,10 @@ class HomeViewModel(
         testState = TestState.DripSample
         cuvettePos = -1
 
+        if(!needTakeReagent){//取试剂失败了，不允许再检测
+            testFinishAction()
+            return
+        }
         if ((isAuto() && lastSamplePos(samplePos)) || isManual() || isManualSampling()) {//这排最后一个样本
             if (isManual() && manualModelSamplingFinish()) {//手动模式已经取完样
                 //手动模式，检测完了
@@ -1361,7 +1385,7 @@ class HomeViewModel(
      */
     private fun nextDripReagent() {
         if (testState != TestState.DripReagent) return
-        i("nextDripReagent cuvettePos=$cuvettePos dripReagentFinish=$dripReagentFinish testFinish=$testFinish stirFinish=$stirFinish stirProbeCleaningFinish=$stirProbeCleaningFinish takeReagentFinish=$takeReagentFinish cuvetteMoveFinish=$cuvetteMoveFinish")
+        i("nextDripReagent cuvettePos=$cuvettePos dripReagentFinish=$dripReagentFinish testFinish=$testFinish stirFinish=$stirFinish stirProbeCleaningFinish=$stirProbeCleaningFinish takeReagentFinish=$takeReagentFinish cuvetteMoveFinish=$cuvetteMoveFinish needTakeReagent=$needTakeReagent")
         if (cuvettePos < 15) {
             //当取试剂完成，检测完成，搅拌完成，加试剂完成，移动比色皿完成时，
             //去取试剂，移动比色皿
@@ -1369,13 +1393,20 @@ class HomeViewModel(
 //                //是否是最后一个需要加试剂的比色皿了
                 if (lastNeedDripReagent(cuvettePos)) {
                     i("加试剂完成")
-                } else {
+                } else if (needTakeReagent) {
                     //取试剂，移动比色皿
                     takeReagent()
                 }
+//                if (!needTakeReagent) {//如果是取试剂失败，就不需要再取试剂了，检测完直接结束
+//                    if (lastNeedTest1(cuvettePos-1)) {
+//                        stepTest(TestState.Test2)
+//                    } else {
+//                        i("nextDripReagent 未知的")
+//                    }
+//
+//                } else
                 if (cuvettePos >= 5 && lastNeedTest1(cuvettePos - 5)) {
                     stepTest(TestState.Test2)
-                    return
                 } else {
                     moveCuvetteDripReagent()
                 }
@@ -1445,9 +1476,32 @@ class HomeViewModel(
      * 是否是最后一个需要检测的比色皿了
      */
     private fun lastNeedTest1(pos: Int): Boolean {
-        return lastNeed(pos, CuvetteState.Stir) && lastNeed(
+        return (lastNeed(pos, CuvetteState.Stir) && lastNeed(
             pos, CuvetteState.DripSample
-        ) && lastNeed(pos, CuvetteState.DripReagent)
+        ) && lastNeed(pos, CuvetteState.DripReagent)) || takeReagentFailedBeforeFinish(pos)
+    }
+
+    /**
+     * 判断如果有取试剂失败的，那取试剂失败之前的是否都检测过第一次了
+     */
+    private fun takeReagentFailedBeforeFinish(pos: Int): Boolean {
+        if (needTakeReagent) {
+            return false
+        }
+        if (pos > mCuvetteStates[cuvetteShelfPos]!!.size) {
+            return true
+        }
+        val takeReagentFailedIndex =
+            mCuvetteStates[cuvetteShelfPos]!!.indexOfFirst { it.state == CuvetteState.TakeReagentFailed }
+        if (takeReagentFailedIndex <= 1) {
+            return true
+        }
+        for (i in takeReagentFailedIndex - 1 downTo 0) {
+            if (mCuvetteStates[cuvetteShelfPos]!![i].state != CuvetteState.Test1) {
+                return false
+            }
+        }
+        return true
     }
 
     /**
@@ -1699,11 +1753,11 @@ class HomeViewModel(
         c("接收到 取样 reply=$reply cuvettePos=$cuvettePos samplePos=$samplePos cuvetteShelfPos=$cuvetteShelfPos sampleShelfPos=$sampleShelfPos")
         samplingFinish = true
         samplingNum++
-        if (reply.state == ReplyState.SAMPLING_FAILED) {
+        if (reply.state == ReplyState.SAMPLING_FAILED) {//取样失败
             updateSampleState(samplePos - 1, SampleState.SamplingFailed)
             nextStepDripReagent()
             return
-        } else {
+        } else {//取样成功
             updateSampleState(samplePos - 1, SampleState.Sampling)
             goDripSample()
         }
@@ -1739,7 +1793,7 @@ class HomeViewModel(
     override fun readDataMoveCuvetteDripReagentModel(reply: ReplyModel<MoveCuvetteDripReagentModel>) {
         if (!runningTest()) return
         if (!machineStateNormal()) return
-        c("接收到 移动比色皿 加试剂位 reply=$reply cuvettePos=$cuvettePos stirProbeCleaningFinish=$stirProbeCleaningFinish stirProbeCleaningRecoverStir=$stirProbeCleaningRecoverStir takeReagentFinish=$takeReagentFinish")
+        c("接收到 移动比色皿 加试剂位 reply=$reply cuvettePos=$cuvettePos takeReagentFinish=$takeReagentFinish dripReagentFinish=$dripReagentFinish stirFinish=$stirFinish testFinish=$testFinish stirProbeCleaningFinish=$stirProbeCleaningFinish stirProbeCleaningRecoverStir=$stirProbeCleaningRecoverStir takeReagentFinish=$takeReagentFinish")
 
         cuvetteMoveFinish = true
         goDripReagent()
@@ -1826,46 +1880,6 @@ class HomeViewModel(
         goDripSample()
     }
 
-//    /**
-//     * 在收到每个命令的时候判断是否是状态错误
-//     *
-//     * 成功：0
-//     *
-//     * 失败：1:非法参数 2:电机错误 3:传感器错误 4:取样失败（样本量不足） 5:比色皿非空 6:取试剂失败
-//     *
-//     * 其中 1 2 3 在每个命令都通用，在这里判断并提示
-//     *
-//     * 成功：0 继续执行下一步命令
-//     *
-//     * 失败：1 2 3 中断，其他看具体情况而定
-//     */
-//    private fun <T> stateSuccess(reply: ReplyModel<T>): Boolean {
-////        val isSuccess = reply.state == ReplyState.SUCCESS
-////        if (!isSuccess) {//状态失败、
-////            val stateFailedText = when (reply.state) {
-////                ReplyState.INVALID_PARAMETER -> "非法数据 命令号:${reply.what}"
-////                ReplyState.MOTOR_ERR -> "电机错误 命令号:${reply.what}"
-////                ReplyState.SENSOR_ERR -> "传感器错误 命令号:${reply.what}"
-////                ReplyState.ORDER -> "意外的命令号"
-////                else -> {
-////                    ""
-////                }
-////            }
-////            if (stateFailedText.isNotEmpty()) {
-////                stateErrorStopRunning()
-////                viewModelScope.launch {
-////                    _dialogUiState.emit(
-////                        HomeDialogUiState(
-////                            dialogState = DialogState.STATE_FAILED,
-////                            stateFailedText.plus("，请停止使用仪器并联系供应商维修")
-////                        )
-////                    )
-////                }
-////            }
-////        }
-////        return isSuccess
-//        return true
-//    }
 
     /**
      * 停止运行
@@ -2546,9 +2560,11 @@ class HomeViewModel(
      */
     private fun takeReagent() {
         c("发送 取试剂")
-        takeReagentFinish = false
-        dripReagentFinish = false
-        SerialPortUtil.takeReagent()
+        if (needTakeReagent) {
+            takeReagentFinish = false
+            dripReagentFinish = false
+            SerialPortUtil.takeReagent()
+        }
     }
 
     /**

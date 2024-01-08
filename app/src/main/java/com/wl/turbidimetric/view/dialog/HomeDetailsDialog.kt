@@ -55,7 +55,7 @@ class HomeDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_h
             CuvetteState.Test3 -> "正在检测"
             CuvetteState.Test4 -> "检测结束"
             CuvetteState.CuvetteNotEmpty -> "比色皿非空"
-            CuvetteState.TakeReagentFailed -> "加试剂失败"
+            CuvetteState.TakeReagentFailed -> "取试剂失败"
             else -> {
                 "未知"
             }

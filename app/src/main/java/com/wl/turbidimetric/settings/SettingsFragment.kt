@@ -83,7 +83,7 @@ class SettingsFragment :
     }
 
     private fun listenerOb() {
-        launchAndRepeatWithViewLifecycle {
+        lifecycleScope.launch {
             SystemGlobal.obDebugMode.collectLatest {
                 i("obDebugMode $it")
                 vd.llDebugMode.visibility = if (it) View.VISIBLE else View.GONE

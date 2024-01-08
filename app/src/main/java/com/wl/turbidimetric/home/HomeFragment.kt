@@ -126,7 +126,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         vm.goGetMachineState()
         vm.goGetVersion()
 
-        launchAndRepeatWithViewLifecycle {
+        lifecycleScope.launch{
             vm.projectDatas.collectLatest {
                 it.let { ret ->
                     projects.clear()
@@ -162,7 +162,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
     }
 
     private fun listenerView() {
-        launchAndRepeatWithViewLifecycle {
+        lifecycleScope.launch {
             vm.testMachineUiState.collectLatest {
                 vd.ivR1.setImageResource(if (it.r1State.not()) R.drawable.icon_r1_empty else R.drawable.icon_r1_full)
                 if (it.r2State in r2VolumeIds.indices) {
@@ -194,7 +194,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             toast("样本 index4=$it item=$item")
             showDetailsDialog(item)
         }
-        launchAndRepeatWithViewLifecycle {
+        lifecycleScope.launch {
             vm.sampleStates.collectLatest {
                 vd.ssv.sampleStates = it[0]
                 vd.ssv2.sampleStates = it[1]
@@ -223,7 +223,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             toast("比色皿 index4=$it item=$item")
             showDetailsDialog(item)
         }
-        launchAndRepeatWithViewLifecycle {
+        lifecycleScope.launch {
             vm.cuvetteStates.collectLatest {
                 vd.csv.cuvetteStates = it[3]
                 vd.csv2.cuvetteStates = it[2]
@@ -231,7 +231,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 vd.csv4.cuvetteStates = it[0]
             }
         }
-        launchAndRepeatWithViewLifecycle {
+        lifecycleScope.launch {
             obTestState.collectLatest {
                 if (it.isNotPrepare()) {
                     vd.btnStart.setBackgroundResource(R.drawable.rip_positive2)

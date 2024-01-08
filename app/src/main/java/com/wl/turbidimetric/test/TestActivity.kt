@@ -8,6 +8,9 @@ import com.wl.turbidimetric.databinding.ActivityTestBinding
 import com.wl.turbidimetric.util.ActivityDataBindingDelegate
 import com.wl.turbidimetric.base.BaseActivity
 import com.wl.turbidimetric.base.BaseViewModel
+import com.wl.turbidimetric.ex.toast
+import com.wl.turbidimetric.global.SystemGlobal
+import com.wl.turbidimetric.model.TestState
 
 class TestActivity : BaseActivity<BaseViewModel, ActivityTestBinding>() {
     override val vd: ActivityTestBinding by ActivityDataBindingDelegate(R.layout.activity_test)
@@ -35,6 +38,10 @@ class TestActivity : BaseActivity<BaseViewModel, ActivityTestBinding>() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
+            if (SystemGlobal.testState != TestState.Normal) {
+                toast("正在检测，请稍后……")
+                return false
+            }
             finish()
             return true
         }

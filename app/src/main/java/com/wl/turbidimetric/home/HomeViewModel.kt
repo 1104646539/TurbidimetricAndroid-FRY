@@ -107,36 +107,6 @@ class HomeViewModel(
     val testMachineUiState: StateFlow<HomeMachineUiState> = _testMachineUiState.asStateFlow()
 
 
-//    /**
-//     * 自检中对话框
-//     */
-//    val dialogGetMachine = MutableLiveData(false);
-//
-//    /**
-//     * 自检失败对话框
-//     */
-//    val getMachineFailedMsg = MutableLiveData("");
-
-//    /**
-//     * 检测结束 比色皿不足对话框
-//     */
-//    val dialogTestFinishCuvetteDeficiency = MutableLiveData(false)
-//
-//    /**
-//     * 检测结束提示
-//     */
-//    val dialogTestFinish = MutableLiveData(false)
-//
-//    /**
-//     * 正常检测 样本不足对话框
-//     */
-//    val dialogTestSampleDeficiency = MutableLiveData(false)
-//
-//    /**
-//     * 开始检测 比色皿，样本，试剂不存在
-//     */
-//    val getStateNotExistMsg = MutableLiveData("")
-
     /**
      * 配置信息内的选择项目、编号、跳过比色皿等按钮是否可用，检测时不可用
      */
@@ -268,16 +238,6 @@ class HomeViewModel(
      *
      */
     private var continueTestSampleState = false
-
-//    /**比色皿不足
-//     *
-//     */
-//    private var cuvetteDeficiency = false
-//
-//    /**样本不足
-//     *
-//     */
-//    private var sampleDeficiency = false
 
     /**正在检测
      *

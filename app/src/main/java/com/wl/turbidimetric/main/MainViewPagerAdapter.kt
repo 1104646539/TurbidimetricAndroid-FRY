@@ -8,9 +8,8 @@ import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.home.HomeFragment
 import com.wl.turbidimetric.matchingargs.MatchingArgsFragment
 import com.wl.turbidimetric.settings.SettingsFragment
-import com.wl.turbidimetric.test.RepeatabilityFragment
+import com.wl.turbidimetric.test.repeatablitylity.RepeatabilityFragment
 import com.wl.turbidimetric.test.TestDataFragment
-import com.wl.turbidimetric.test.TestFragment
 
 class MainViewPagerAdapter(fragmentActivity: FragmentActivity) :
     FragmentStateAdapter(fragmentActivity) {

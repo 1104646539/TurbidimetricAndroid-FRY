@@ -56,6 +56,9 @@ import com.wl.turbidimetric.util.SerialPortUtil
 import com.wl.wllib.LogToFile.i
 import com.wl.wllib.toTimeStr
 import com.wl.turbidimetric.base.BaseViewModel
+import com.wl.turbidimetric.home.HomeDialogUiState
+import com.wl.turbidimetric.model.ReplyState
+import com.wl.turbidimetric.model.convertReplyState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -411,20 +414,54 @@ class MatchingArgsViewModel(
         return array
     }
 
-//    /**
-//     * 报错
-//     * @param cmd UByte
-//     * @param state UByte
-//     */
-//    override fun readDataStateFailed(cmd: UByte, state: UByte) {
-//        if (!runningMatching()) return
-//        testState = TestState.RunningError
-//        i("报错了，cmd=$cmd state=$state")
-//        testMsg.postValue("报错了，cmd=$cmd state=$state")
-//    }
-override fun stateSuccess(cmd: Int, state: Int): Boolean {
-    return true
-}
+    /**
+     * 在收到每个命令的时候判断是否是状态错误
+     *
+     * 成功：0
+     *
+     * 失败：1:非法参数 2:电机错误 3:传感器错误 4:取样失败（样本量不足） 5:比色皿非空 6:取试剂失败
+     *
+     * 其中 1 2 3 在每个命令都通用，在这里判断并提示
+     *
+     * 成功：0 继续执行下一步命令
+     *
+     * 失败：1 2 3 中断，其他看具体情况而定
+     * @param cmd 命令
+     * @param state 状态
+     */
+    override fun stateSuccess(cmd: Int, state: Int): Boolean {
+        val isSuccess = cmd == ReplyState.SUCCESS.ordinal
+        var stateFailedText = ""
+        if (!isSuccess) {//状态失败、
+            stateFailedText = when (convertReplyState(state)) {
+                ReplyState.INVALID_PARAMETER -> "非法数据 命令号:${cmd}"
+                ReplyState.MOTOR_ERR -> "电机错误 命令号:${cmd}"
+                ReplyState.SENSOR_ERR -> "传感器错误 命令号:${cmd}"
+                ReplyState.ORDER -> "意外的命令号"
+                else -> {
+                    ""
+                }
+            }
+            if (stateFailedText.isNotEmpty()) {
+                stateErrorStopRunning()
+                viewModelScope.launch {
+                    _dialogUiState.emit(
+                        MatchingArgsDialogUiState(
+                            dialogState = DialogState.STATE_FAILED,
+                            stateFailedText.plus("，请停止使用仪器并联系供应商维修")
+                        )
+                    )
+                }
+            }
+        }
+        return stateFailedText.isEmpty()
+    }
+    /**
+     * 停止运行
+     */
+    private fun stateErrorStopRunning() {
+        testState = TestState.RunningError
+    }
     /**
      * 挤压
      * @param reply ReplyModel<SqueezingModel>

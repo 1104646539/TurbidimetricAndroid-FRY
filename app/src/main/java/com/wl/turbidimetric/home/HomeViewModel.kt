@@ -466,7 +466,7 @@ class HomeViewModel(
     fun clickStart() {
         val errorMsg = if (testState.isRunning()) {
             "正在检测，请勿操作！"
-        }else if (testState == TestState.RunningError) {
+        }else if (testState.isRunningError()) {
             "请停止使用仪器并联系供应商维修"
         } else if (selectProject == null) {
             "未选择标曲"
@@ -749,27 +749,6 @@ class HomeViewModel(
             }
         }
         return stateFailedText.isEmpty()
-//        if (!runningTest()) return
-//        if (cmd == SerialGlobal.CMD_TakeReagent) {
-//            i("报错了，cmd=$cmd state=$state 是取试剂的暂时不管")
-//            readDataTakeReagentModel(
-//                ReplyModel(
-//                    SerialGlobal.CMD_TakeReagent, 0, TakeReagentModel()
-//                )
-//            )
-//            return
-//        }
-//        testState = TestState.RunningError
-//        viewModelScope.launch {
-//            _dialogUiState.emit(
-//                HomeDialogUiState(
-//                    dialogState = DialogState.NOTIFY, "报错了，停止运行 cmd=$cmd state=$state"
-//                )
-//            )
-//        }
-//        i("报错了，cmd=$cmd state=$state")
-
-//        testMsg.postValue("报错了，cmd=$cmd state=$state")
     }
 
     /**

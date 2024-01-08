@@ -41,8 +41,8 @@ object TestSerialPort {
             }
 
             SerialGlobal.CMD_MoveCuvetteShelf -> {
-//                reply = ubyteArrayOf(data[0], 0x01u, 0x0u, 0x0u, 0x0u, 0x0u)
-                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x0u))
+                reply = ubyteArrayOf(data[0], 0x01u, 0x0u, 0x0u, 0x0u, 0x0u)
+//                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x0u))
             }
 
             SerialGlobal.CMD_Test -> {

@@ -24,6 +24,7 @@ import com.wl.turbidimetric.view.dialog.MatchingConfigDialog
 import com.wl.turbidimetric.view.dialog.showPop
 import com.wl.wllib.LogToFile.i
 import com.wl.turbidimetric.base.BaseFragment
+import com.wl.turbidimetric.view.dialog.ICON_HINT
 import kotlinx.coroutines.flow.collectLatest
 
 /**
@@ -293,11 +294,12 @@ class MatchingArgsFragment :
     private fun listenerDialog() {
         launchAndRepeatWithViewLifecycle {
             vm.dialogUiState.collect {
-                when (it.dialogState) {
+                state->
+                when (state.dialogState) {
                     DialogState.GetStateNotExistMsg -> {//开始检测，确实清洗液等
                         dialog.showPop(requireContext()) { dialog ->
                             dialog.showDialog(
-                                msg = "${it.msg}",
+                                msg = "${state.msg}",
                                 confirmText = "我已添加",
                                 confirmClick = {
                                     dialog.dismiss()
@@ -314,7 +316,7 @@ class MatchingArgsFragment :
 
                     DialogState.MatchingFinishMsg -> {//检测结束，提示是否保存
 //                        vm.saveProject()
-                        val msg = it.msg.plus("\n确定保存该条标曲记录？\n\n")
+                        val msg = state.msg.plus("\n确定保存该条标曲记录？\n\n")
                         finishCoverDialog.showPop(
                             requireContext(),
                             width = 1500,
@@ -337,7 +339,7 @@ class MatchingArgsFragment :
                     DialogState.ACCIDENT -> {//意外的检测结束等
                         dialog.showPop(requireContext()) { dialog ->
                             dialog.showDialog(
-                                msg = "${it.msg}",
+                                msg = "${state.msg}",
                                 confirmText = "我知道了",
                                 confirmClick = {
                                     dialog.dismiss()
@@ -365,7 +367,21 @@ class MatchingArgsFragment :
                     DialogState.MatchingState -> {//拟合状态
 
                     }
-
+                    /**
+                     * 命令提示错误，中断所有程序
+                     */
+                    DialogState.STATE_FAILED->{
+                        dialog.showPop(requireContext(), isCancelable = false) {
+                            it.showDialog(
+                                msg = state.msg,
+                                confirmText = "我知道了",
+                                confirmClick = { baseDialog ->
+                                    baseDialog.dismiss()
+                                },
+                                showIcon = true, iconId = ICON_HINT
+                            )
+                        }
+                    }
                     else -> {
 
                     }

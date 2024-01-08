@@ -1,9 +1,10 @@
-package com.wl.turbidimetric.test
+package com.wl.turbidimetric.test.repeatablitylity
 
 import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.FragmentRepeatabilityBinding
@@ -91,38 +92,60 @@ class RepeatabilityFragment :
     }
 
     private fun listenerDialog() {
-        /**
-         * 开始检测 比色皿,样本，试剂不足
-         */
-        vm.getStateNotExistMsg.observe(this) { msg ->
-            if (msg.isNotEmpty()) {
-                dialog.showPop(requireContext(), isCancelable = false) { d ->
-                    d.showDialog(
-                        msg = "${vm.getStateNotExistMsg.value}",
-                        confirmText = "我已添加", confirmClick = {
-                            d.dismiss()
-                            vm.dialogGetStateNotExistConfirm()
-                        },
-                        cancelText = "结束检测", cancelClick = {
-                            d.dismiss()
-                            vm.dialogGetStateNotExistCancel()
+        lifecycleScope.launch {
+            vm.dialogUiState.collectLatest { state ->
+                when (state.dialogState) {
+                    DialogState.NONE -> {
+
+                    }
+                    /**
+                     * 开始检测 比色皿,样本，试剂不足
+                     */
+                    DialogState.GET_STATE_NOT_EXIST -> {
+                        dialog.showPop(requireContext(), isCancelable = false) { d ->
+                            d.showDialog(
+                                msg = "${state.dialogMsg}",
+                                confirmText = "我已添加", confirmClick = {
+                                    d.dismiss()
+                                    vm.dialogGetStateNotExistConfirm()
+                                },
+                                cancelText = "结束检测", cancelClick = {
+                                    d.dismiss()
+                                    vm.dialogGetStateNotExistCancel()
+                                }
+                            )
                         }
-                    )
+                    }
+                    /**
+                     * 检测结束
+                     */
+                    DialogState.TEST_FINISH -> {
+                        dialog.showPop(requireContext(), isCancelable = false) { d ->
+                            d.showDialog(
+                                msg = state.dialogMsg,
+                                confirmText = "我知道了", confirmClick = {
+                                    d.dismiss()
+                                }
+                            )
+                        }
+                    }
+                    /**
+                     * 报错
+                     */
+                    DialogState.STATE_FAILED -> {
+                        dialog.showPop(requireContext(), isCancelable = false) { d ->
+                            d.showDialog(
+                                msg = state.dialogMsg,
+                                confirmText = "我知道了", confirmClick = {
+                                    d.dismiss()
+                                }
+                            )
+                        }
+                    }
                 }
             }
         }
-        vm.matchingFinishMsg.observe(this) {
-            if (it.isNotEmpty()) {
-                dialog.showPop(requireContext(), isCancelable = false) { d ->
-                    d.showDialog(
-                        msg = it,
-                        confirmText = "我知道了", confirmClick = {
-                            d.dismiss()
-                        }
-                    )
-                }
-            }
-        }
+
     }
 
 }

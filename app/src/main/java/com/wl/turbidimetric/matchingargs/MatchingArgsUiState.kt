@@ -20,10 +20,38 @@ data class MatchingArgsCurveUiState(
  * 对话框状态
  */
 enum class DialogState {
-    None,//无
-    GetStateNotExistMsg,//开始检测 比色皿，样本，试剂,清洗液不存在
-    MatchingFinishMsg,//拟合质控结束提示
-    ACCIDENT,//意外错误等
-    MatchingSettings,//拟合配置
-    MatchingState,//拟合状态对话框
+    /**
+     * 无
+     */
+    None,
+
+    /**
+     * 开始检测 比色皿，样本，试剂,清洗液不存在
+     */
+    GetStateNotExistMsg,
+
+    /**
+     * 拟合质控结束提示
+     */
+    MatchingFinishMsg,
+
+    /**
+     * 意外错误等
+     */
+    ACCIDENT,
+
+    /**
+     * 拟合配置
+     */
+    MatchingSettings,
+
+    /**
+     * 拟合状态对话框
+     */
+    MatchingState,
+
+    /**
+     * 返回状态失败、非法参数、传感器错误、电机错误等的提示
+     */
+    STATE_FAILED,
 }

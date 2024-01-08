@@ -11,6 +11,7 @@ import com.wl.turbidimetric.base.BaseViewModel
 import com.wl.turbidimetric.ex.toast
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.TestState
+import com.wl.turbidimetric.test.repeatablitylity.RepeatabilityFragment
 
 class TestActivity : BaseActivity<BaseViewModel, ActivityTestBinding>() {
     override val vd: ActivityTestBinding by ActivityDataBindingDelegate(R.layout.activity_test)

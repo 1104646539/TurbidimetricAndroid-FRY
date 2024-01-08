@@ -1,4 +1,4 @@
-package com.wl.turbidimetric.test
+package com.wl.turbidimetric.test.repeatablitylity
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -23,6 +23,8 @@ import java.text.NumberFormat
 import java.util.*
 import kotlin.math.absoluteValue
 import com.wl.wllib.LogToFile.i
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 
 /**
  * 重复性测试
@@ -75,6 +77,12 @@ class RepeatabilityViewModel(
      */
     private var result = arrayListOf<BigDecimal>()
 
+
+    /**
+     * 对话框状态，不包括调试的和不需要viewmodel处理的
+     */
+    private val _dialogUiState = MutableSharedFlow<RepeatabilityUiState>()
+    val dialogUiState = _dialogUiState.asSharedFlow()
 
     /**
      * 移动已混匀样本的量
@@ -187,17 +195,6 @@ class RepeatabilityViewModel(
      * 比色皿架状态 1有 0无 顺序是从中间往旁边
      */
     private var cuvetteShelfStates: IntArray = IntArray(4)
-
-    /**
-     * 开始检测 比色皿，样本，试剂,清洗液不存在
-     */
-    val getStateNotExistMsg = MutableLiveData("")
-
-    /**
-     * 拟合质控结束提示
-     */
-    val matchingFinishMsg = MutableLiveData("")
-
 
     val testMsg = MutableLiveData("")
     val toastMsg = MutableLiveData("")
@@ -430,29 +427,33 @@ class RepeatabilityViewModel(
         getInitialPos()
 
         i("cuvetteShelfPos=${cuvetteShelfPos} sampleShelfPos=${sampleShelfPos}")
-        if (cuvetteShelfPos == -1) {
+        var failedText = if (cuvetteShelfPos == -1) {
             i("没有比色皿架")
-            getStateNotExistMsg.postValue("比色皿不足，请添加")
-            return
-        }
-        if (sampleShelfPos == -1) {
+            "比色皿不足，请添加"
+        } else if (sampleShelfPos == -1) {
             i("没有样本架")
-            getStateNotExistMsg.postValue("样本不足，请添加")
-            return
-        }
-        if (!r1Reagent) {
+            "样本不足，请添加"
+        } else if (!r1Reagent) {
             i("没有R1试剂")
-            getStateNotExistMsg.postValue("R1试剂不足，请添加")
-            return
-        }
-        if (!r2Reagent) {
+            "R1试剂不足，请添加"
+        } else if (!r2Reagent) {
             i("没有R2试剂")
-            getStateNotExistMsg.postValue("R2试剂不足，请添加")
-            return
-        }
-        if (!cleanoutFluid) {
+            "R2试剂不足，请添加"
+        } else if (!cleanoutFluid) {
             i("没有清洗液试剂")
-            getStateNotExistMsg.postValue("清洗液不足，请添加")
+            "清洗液不足，请添加"
+        } else {
+            ""
+        }
+        if (failedText.isNotEmpty()) {
+            viewModelScope.launch {
+                _dialogUiState.emit(
+                    RepeatabilityUiState(
+                        DialogState.GET_STATE_NOT_EXIST,
+                        failedText
+                    )
+                )
+            }
             return
         }
         testState = TestState.MoveSample
@@ -754,7 +755,7 @@ class RepeatabilityViewModel(
 
                     moveCuvetteTest(-cuvettePos)
                 } else {
-                        moveCuvetteTest()
+                    moveCuvetteTest()
                 }
 
             }
@@ -1134,10 +1135,55 @@ class RepeatabilityViewModel(
 
     }
 
+    /**
+     * 在收到每个命令的时候判断是否是状态错误
+     *
+     * 成功：0
+     *
+     * 失败：1:非法参数 2:电机错误 3:传感器错误 4:取样失败（样本量不足） 5:比色皿非空 6:取试剂失败
+     *
+     * 其中 1 2 3 在每个命令都通用，在这里判断并提示
+     *
+     * 成功：0 继续执行下一步命令
+     *
+     * 失败：1 2 3 中断，其他看具体情况而定
+     * @param cmd 命令
+     * @param state 状态
+     */
     override fun stateSuccess(cmd: Int, state: Int): Boolean {
-        return true
+        val isSuccess = cmd == ReplyState.SUCCESS.ordinal
+        var stateFailedText = ""
+        if (!isSuccess) {//状态失败、
+            stateFailedText = when (convertReplyState(state)) {
+                ReplyState.INVALID_PARAMETER -> "非法数据 命令号:${cmd}"
+                ReplyState.MOTOR_ERR -> "电机错误 命令号:${cmd}"
+                ReplyState.SENSOR_ERR -> "传感器错误 命令号:${cmd}"
+                ReplyState.ORDER -> "意外的命令号"
+                else -> {
+                    ""
+                }
+            }
+            if (stateFailedText.isNotEmpty()) {
+                stateErrorStopRunning()
+                viewModelScope.launch {
+                    _dialogUiState.emit(
+                        RepeatabilityUiState(
+                            dialogState = DialogState.STATE_FAILED,
+                            stateFailedText.plus("，请停止使用仪器并联系供应商维修")
+                        )
+                    )
+                }
+            }
+        }
+        return stateFailedText.isEmpty()
     }
 
+    /**
+     * 停止运行
+     */
+    private fun stateErrorStopRunning() {
+        testState = TestState.RunningError
+    }
 
     /**
      * 接收到 样本架锁状态
@@ -1162,10 +1208,24 @@ class RepeatabilityViewModel(
         if (isDetectedSample) {
             isDetectedSample = false
             testState = TestState.Normal
-            matchingFinishMsg.postValue("检测到放入的是样本管，请在样本架上放置比色杯")
+            viewModelScope.launch {
+                _dialogUiState.emit(
+                    RepeatabilityUiState(
+                        DialogState.TEST_FINISH,
+                        "检测到放入的是样本管，请在样本架上放置比色杯"
+                    )
+                )
+            }
         } else {
-            matchingFinishMsg.postValue("重复性检测结束")
             testState = TestState.Normal
+            viewModelScope.launch {
+                _dialogUiState.emit(
+                    RepeatabilityUiState(
+                        DialogState.TEST_FINISH,
+                        "重复性检测结束"
+                    )
+                )
+            }
         }
     }
 

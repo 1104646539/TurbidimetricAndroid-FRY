@@ -30,41 +30,57 @@ object TestSerialPort {
 //                reply = reply.plus(ubyteArrayOf(0x3Fu, 0xFFu, 0xFFu, 0xFFu))
                 reply = reply.plus(ubyteArrayOf(0x00u, 0x00u, 0x00u, 0x00u))
             }
+
             SerialGlobal.CMD_GetState -> {
 //                reply = reply.plus(ubyteArrayOf(0x0u, 0x2u, 0x33u, 0xffu))// 0011 0011
                 reply = reply.plus(ubyteArrayOf(0x0u, 0x2u, 0x13u, 0xffu))//0001 0001
             }
+
             SerialGlobal.CMD_MoveSample -> {
                 reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x2u))//0不存在 1样本管 2比色杯
             }
+
+            SerialGlobal.CMD_MoveCuvetteShelf -> {
+//                reply = ubyteArrayOf(data[0], 0x01u, 0x0u, 0x0u, 0x0u, 0x0u)
+                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x0u))
+            }
+
             SerialGlobal.CMD_Test -> {
 //                delay(2000)//测试上传时需要
                 reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x23u, 0x0u))
             }
+
             SerialGlobal.CMD_SampleDoor -> {
                 reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x00u, 0x0u))
             }
+
             SerialGlobal.CMD_CuvetteDoor -> {
                 reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x00u, 0x0u))
             }
+
             SerialGlobal.CMD_GetSetTemp -> {
                 reply = reply.plus(ubyteArrayOf(0x1u, 0x13u, 0x01u, 0x45u))// 275 325
             }
+
             SerialGlobal.CMD_TakeReagent -> {
                 reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x01u, 0x1u))// 存在r1试剂 1，r2试剂量 1
 //                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x00u, 0x0u))// 不存在r1试剂 0，r2试剂量 0
             }
+
             SerialGlobal.CMD_StirProbeCleaning -> {
                 reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x01u))// 有清洗液 1
 //                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x01u))// 无清洗液 0
             }
+
             SerialGlobal.CMD_SamplingProbeCleaning -> {
                 reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x01u))// 有清洗液 1
 //                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x01u))// 无清洗液 0
             }
+
             SerialGlobal.CMD_DripReagent -> {
                 reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x0u))
             }
+
             else -> {
                 reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x0u))
             }

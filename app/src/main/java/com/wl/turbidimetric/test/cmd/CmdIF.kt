@@ -93,7 +93,10 @@ abstract class CmdIF : Callback2 {
         i("readDataGetVersionModel reply=$reply")
     }
 
-    override fun readDataStateFailed(cmd: UByte, state: UByte) {
-        i("readDataStateFailed cmd=$cmd state=$state")
-    }
+//    override fun readDataStateFailed(cmd: UByte, state: UByte) {
+//        i("readDataStateFailed cmd=$cmd state=$state")
+//    }
+override fun stateSuccess(cmd: Int, state: Int): Boolean {
+    return true
+}
 }

@@ -43,6 +43,7 @@ class IntegrationViewModel : BaseViewModel(), Callback2 {
     val resultMsg = MutableStateFlow("")
     var debugType = DebugType.IntervalTest
     val point = MutableLiveData<Int>()
+
     enum class DebugType {
         IntervalTest
     }
@@ -149,8 +150,11 @@ class IntegrationViewModel : BaseViewModel(), Callback2 {
 
     }
 
-    override fun readDataStateFailed(cmd: UByte, state: UByte) {
-
+    //    override fun readDataStateFailed(cmd: UByte, state: UByte) {
+//
+//    }
+    override fun stateSuccess(cmd: Int, state: Int): Boolean {
+        return true
     }
 
     override fun readDataSqueezing(reply: ReplyModel<SqueezingModel>) {

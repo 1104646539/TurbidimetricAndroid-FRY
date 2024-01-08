@@ -164,11 +164,13 @@ class SingleCmdViewModel : BaseViewModel(), Callback2 {
         changeResult(msg)
     }
 
-    override fun readDataStateFailed(cmd: UByte, state: UByte) {
-        var msg = "错误信息\n cmd=$cmd state=$state"
-        changeResult(msg)
-    }
-
+//    override fun readDataStateFailed(cmd: UByte, state: UByte) {
+//        var msg = "错误信息\n cmd=$cmd state=$state"
+//        changeResult(msg)
+//    }
+override fun stateSuccess(cmd: Int, state: Int): Boolean {
+    return true
+}
     override fun readDataSqueezing(reply: ReplyModel<SqueezingModel>) {
         var msg = "挤压完成"
         changeResult(msg)

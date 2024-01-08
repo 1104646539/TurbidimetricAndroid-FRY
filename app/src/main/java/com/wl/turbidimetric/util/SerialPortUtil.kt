@@ -100,9 +100,10 @@ object SerialPortUtil {
         //状态错误的(不为0)
         if (state.toInt() != 0) {
             callback {
-                it.readDataStateFailed(cmd, state)
+                if (!it.stateSuccess(cmd.toInt(), state.toInt())) {
+                    return@callback
+                }
             }
-            return@runBlocking
         }
 
         when (cmd) {
@@ -379,8 +380,23 @@ object SerialPortUtil {
                 TestSerialPort.testReply(data)
             }
         } else {
-            sendQueue.add(data)
+            if (isAllowRunning(data)) {
+                sendQueue.add(data)
+            }
         }
+    }
+
+    /**
+     * 是否运行发送命令
+     * 当仪器已经发生电机、传感器、非法参数等错误时，不允许再次发送命令，防止仪器损坏
+     */
+    private fun isAllowRunning(data: UByteArray): Boolean {
+        if (TestState.RunningError == SystemGlobal.testState) {
+            if (data[0] != SerialGlobal.CMD_GetSetTemp) {
+                return false
+            }
+        }
+        return true
     }
 
 
@@ -824,7 +840,7 @@ interface Callback2 {
     fun readDataPiercedModel(reply: ReplyModel<PiercedModel>)
     fun readDataGetVersionModel(reply: ReplyModel<GetVersionModel>)
     fun readDataTempModel(reply: ReplyModel<TempModel>)
-    fun readDataStateFailed(cmd: UByte, state: UByte)
+    fun stateSuccess(cmd: Int, state: Int): Boolean
     fun readDataSqueezing(reply: ReplyModel<SqueezingModel>)
 }
 

@@ -466,6 +466,8 @@ class HomeViewModel(
     fun clickStart() {
         val errorMsg = if (testState.isRunning()) {
             "正在检测，请勿操作！"
+        }else if (testState == TestState.RunningError) {
+            "请停止使用仪器并联系供应商维修"
         } else if (selectProject == null) {
             "未选择标曲"
         } else if (isManual() && needSamplingNum <= 0) {
@@ -603,6 +605,7 @@ class HomeViewModel(
         if (!runningTest()) return
         if (!machineStateNormal()) return
         c("接收到 取样针清洗 reply=$reply samplingProbeCleaningRecoverSampling=$samplingProbeCleaningRecoverSampling")
+
         samplingProbeCleaningFinish = true
 
         if (cleaningBeforeStartTest) {
@@ -633,6 +636,7 @@ class HomeViewModel(
         if (!runningTest()) return
         if (!machineStateNormal()) return
         c("接收到 搅拌针清洗 reply=$reply stirProbeCleaningRecoverStir=$stirProbeCleaningRecoverStir")
+
         stirProbeCleaningFinish = true
         nextDripReagent()
 
@@ -651,6 +655,7 @@ class HomeViewModel(
         if (!runningTest()) return
         if (!machineStateNormal()) return
         c("接收到 刺破 reply=$reply samplePos=$samplePos")
+
         piercedFinish = true
         updateSampleState(samplePos, SampleState.Pierced)
         //当不需要取样时，直接下一步
@@ -702,13 +707,49 @@ class HomeViewModel(
         }
     }
 
+
     /**
-     * 报错
-     * @param cmd UByte
-     * @param state UByte
+     * 在收到每个命令的时候判断是否是状态错误
+     *
+     * 成功：0
+     *
+     * 失败：1:非法参数 2:电机错误 3:传感器错误 4:取样失败（样本量不足） 5:比色皿非空 6:取试剂失败
+     *
+     * 其中 1 2 3 在每个命令都通用，在这里判断并提示
+     *
+     * 成功：0 继续执行下一步命令
+     *
+     * 失败：1 2 3 中断，其他看具体情况而定
+     * @param cmd 命令
+     * @param state 状态
      */
-    override fun readDataStateFailed(cmd: UByte, state: UByte) {
-        if (!runningTest()) return
+    override fun stateSuccess(cmd: Int, state: Int): Boolean {
+        val isSuccess = cmd == ReplyState.SUCCESS.ordinal
+        var stateFailedText = ""
+        if (!isSuccess) {//状态失败、
+            stateFailedText = when (convertReplyState(state)) {
+                ReplyState.INVALID_PARAMETER -> "非法数据 命令号:${cmd}"
+                ReplyState.MOTOR_ERR -> "电机错误 命令号:${cmd}"
+                ReplyState.SENSOR_ERR -> "传感器错误 命令号:${cmd}"
+                ReplyState.ORDER -> "意外的命令号"
+                else -> {
+                    ""
+                }
+            }
+            if (stateFailedText.isNotEmpty()) {
+                stateErrorStopRunning()
+                viewModelScope.launch {
+                    _dialogUiState.emit(
+                        HomeDialogUiState(
+                            dialogState = DialogState.STATE_FAILED,
+                            stateFailedText.plus("，请停止使用仪器并联系供应商维修")
+                        )
+                    )
+                }
+            }
+        }
+        return stateFailedText.isEmpty()
+//        if (!runningTest()) return
 //        if (cmd == SerialGlobal.CMD_TakeReagent) {
 //            i("报错了，cmd=$cmd state=$state 是取试剂的暂时不管")
 //            readDataTakeReagentModel(
@@ -718,15 +759,15 @@ class HomeViewModel(
 //            )
 //            return
 //        }
-        testState = TestState.RunningError
-        viewModelScope.launch {
-            _dialogUiState.emit(
-                HomeDialogUiState(
-                    dialogState = DialogState.NOTIFY, "报错了，停止运行 cmd=$cmd state=$state"
-                )
-            )
-        }
-        i("报错了，cmd=$cmd state=$state")
+//        testState = TestState.RunningError
+//        viewModelScope.launch {
+//            _dialogUiState.emit(
+//                HomeDialogUiState(
+//                    dialogState = DialogState.NOTIFY, "报错了，停止运行 cmd=$cmd state=$state"
+//                )
+//            )
+//        }
+//        i("报错了，cmd=$cmd state=$state")
 
 //        testMsg.postValue("报错了，cmd=$cmd state=$state")
     }
@@ -739,6 +780,7 @@ class HomeViewModel(
         if (!runningTest()) return
         if (!machineStateNormal()) return
         c("接收到 挤压 reply=$reply")
+
         updateSampleState(samplePos - 1, SampleState.Squeezing)
         //注：如果上次取样针清洗未结束，就等待清洗结束后再加样,否则直接加样
         if (samplingProbeCleaningFinish) {
@@ -776,6 +818,7 @@ class HomeViewModel(
         if (!runningTest()) return
         if (!machineStateNormal()) return
         c("接收到 移动样本 reply=$reply cuvettePos=$cuvettePos lastCuvetteShelfPos=$lastCuvetteShelfPos cuvetteShelfPos=$cuvetteShelfPos samplePos=$samplePos samplingProbeCleaningFinish=$samplingProbeCleaningFinish")
+
         sampleMoveFinish = true
         samplingFinish = false
         dripSampleFinish = false
@@ -989,6 +1032,7 @@ class HomeViewModel(
         if (!runningTest()) return
         if (!machineStateNormal()) return
         c("接收到 检测完成 reply=$reply cuvettePos=$cuvettePos testState=$testState")
+
         testFinish = true
 
         calcTestResult(reply.data.value)
@@ -1473,6 +1517,7 @@ class HomeViewModel(
         if (!runningTest()) return
         if (!machineStateNormal()) return
         c("接收到 搅拌 reply=$reply cuvettePos=$cuvettePos")
+
         updateStirTime()
         stirFinish = true
         updateCuvetteState(cuvettePos - 2, CuvetteState.Stir)
@@ -1494,6 +1539,7 @@ class HomeViewModel(
         if (!runningTest()) return
         if (!machineStateNormal()) return
         c("接收到 加试剂 reply=$reply cuvettePos=$cuvettePos")
+
         dripReagentFinish = true
         updateCuvetteState(cuvettePos, CuvetteState.DripReagent)
         nextDripReagent()
@@ -1672,6 +1718,7 @@ class HomeViewModel(
         if (!runningTest()) return
         if (!machineStateNormal()) return
         c("接收到 取样 reply=$reply cuvettePos=$cuvettePos samplePos=$samplePos cuvetteShelfPos=$cuvetteShelfPos sampleShelfPos=$sampleShelfPos")
+
         samplingFinish = true
         samplingNum++
         updateSampleState(samplePos - 1, SampleState.Sampling)
@@ -1686,6 +1733,7 @@ class HomeViewModel(
         if (!runningTest()) return
         if (!machineStateNormal()) return
         c("接收到 移动比色皿 检测位 reply=$reply")
+
         cuvetteMoveFinish = true
 
         if (cuvettePos in 0 until 10) {
@@ -1708,6 +1756,7 @@ class HomeViewModel(
         if (!runningTest()) return
         if (!machineStateNormal()) return
         c("接收到 移动比色皿 加试剂位 reply=$reply cuvettePos=$cuvettePos stirProbeCleaningFinish=$stirProbeCleaningFinish stirProbeCleaningRecoverStir=$stirProbeCleaningRecoverStir takeReagentFinish=$takeReagentFinish")
+
         cuvetteMoveFinish = true
         goDripReagent()
 
@@ -1793,6 +1842,54 @@ class HomeViewModel(
         goDripSample()
     }
 
+//    /**
+//     * 在收到每个命令的时候判断是否是状态错误
+//     *
+//     * 成功：0
+//     *
+//     * 失败：1:非法参数 2:电机错误 3:传感器错误 4:取样失败（样本量不足） 5:比色皿非空 6:取试剂失败
+//     *
+//     * 其中 1 2 3 在每个命令都通用，在这里判断并提示
+//     *
+//     * 成功：0 继续执行下一步命令
+//     *
+//     * 失败：1 2 3 中断，其他看具体情况而定
+//     */
+//    private fun <T> stateSuccess(reply: ReplyModel<T>): Boolean {
+////        val isSuccess = reply.state == ReplyState.SUCCESS
+////        if (!isSuccess) {//状态失败、
+////            val stateFailedText = when (reply.state) {
+////                ReplyState.INVALID_PARAMETER -> "非法数据 命令号:${reply.what}"
+////                ReplyState.MOTOR_ERR -> "电机错误 命令号:${reply.what}"
+////                ReplyState.SENSOR_ERR -> "传感器错误 命令号:${reply.what}"
+////                ReplyState.ORDER -> "意外的命令号"
+////                else -> {
+////                    ""
+////                }
+////            }
+////            if (stateFailedText.isNotEmpty()) {
+////                stateErrorStopRunning()
+////                viewModelScope.launch {
+////                    _dialogUiState.emit(
+////                        HomeDialogUiState(
+////                            dialogState = DialogState.STATE_FAILED,
+////                            stateFailedText.plus("，请停止使用仪器并联系供应商维修")
+////                        )
+////                    )
+////                }
+////            }
+////        }
+////        return isSuccess
+//        return true
+//    }
+
+    /**
+     * 停止运行
+     */
+    private fun stateErrorStopRunning() {
+        testState = TestState.RunningError
+    }
+
     /**
      * 接收到移动比色皿架
      */
@@ -1809,11 +1906,12 @@ class HomeViewModel(
         c("接收到 移动比色皿架 reply=$reply cuvetteShelfPos=$cuvetteShelfPos cuvetteStartPos=$cuvetteStartPos")
         cuvetteShelfMoveFinish = true
 
+
         if (testState != TestState.TestFinish) {
-            if (isManualSampling()) {
+            if (isManualSampling()) {//手动加样模式，不需要自动加样，直接设为已加样后加加试剂
                 initManualSamplingCuvetteStatus()
                 stepDripReagent()
-            } else {
+            } else {//自动加样模式，去取样、加样
                 val needMoveStep = getFirstCuvetteStartPos()
                 if (needMoveStep > -1) {
                     moveCuvetteDripSample(needMoveStep + 2)
@@ -1890,6 +1988,7 @@ class HomeViewModel(
         }
         if (!runningTest()) return
         if (!machineStateNormal()) return
+
         sampleShelfMoveFinish = true
 
         if (testState != TestState.TestFinish) {
@@ -2039,6 +2138,7 @@ class HomeViewModel(
         }
         if (!runningTest()) return
         if (!machineStateNormal()) return
+
 //        c("接收到 获取状态 reply=$reply continueTestCuvetteState=$continueTestCuvetteState continueTestSampleState=$continueTestSampleState clickStart=$clickStart r1Reagent=$r1Reagent r2Reagent=$r2Reagent cleanoutFluid=$cleanoutFluid continueTestGetState=$continueTestGetState")
         //比色皿不足才获取的状态
         //如果还是没有比色皿，继续弹框，如果有就移动比色皿架，继续检测

@@ -1,6 +1,62 @@
 package com.wl.turbidimetric.model
 
-data class ReplyModel<T>(val what: UByte, val state: Int, val data: T)
+enum class ReplyState {
+    /**
+     * 成功
+     */
+    SUCCESS,
+
+    /**
+     * 非法参数
+     */
+    INVALID_PARAMETER,
+
+    /**
+     * 电机错误
+     */
+    MOTOR_ERR,
+
+    /**
+     * 传感器错误
+     */
+    SENSOR_ERR,
+
+    /**
+     * 取样失败
+     */
+    SAMPLING_FAILED,
+
+    /**
+     * 比色皿非空
+     */
+    CUVETTE_NOT_EMPTY,
+
+    /**
+     * 加试剂失败
+     */
+    TAKE_REAGENT_FAILED,
+
+    /**
+     * 其他
+     */
+    ORDER,
+
+
+}
+
+/**
+ * index转换具体的
+ */
+fun convertReplyState(index: Int): ReplyState {
+    ReplyState.values().forEach {
+        if (it.ordinal == index) {
+            return it
+        }
+    }
+    return ReplyState.ORDER
+}
+
+data class ReplyModel<T>(val what: UByte, val state: ReplyState, val data: T)
 
 /**
  * 自检

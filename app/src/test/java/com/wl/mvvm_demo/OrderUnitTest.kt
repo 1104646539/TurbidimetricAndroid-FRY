@@ -2,6 +2,7 @@ package com.wl.mvvm_demo
 
 import com.wl.turbidimetric.datastore.LocalDataGlobal
 import com.wl.turbidimetric.matchingargs.MatchingArgsViewModel
+import com.wl.turbidimetric.model.ReplyState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import org.junit.Test
 import kotlin.properties.ReadOnlyProperty
@@ -14,7 +15,6 @@ class OrderUnitTest {
     val s2 by this::s1
 
     var s3 by TextDelegate2()
-
 
 
     class TextDelegate : ReadOnlyProperty<Any, String> {
@@ -40,5 +40,22 @@ class OrderUnitTest {
         println("s3=$s3")
 
 
+    }
+
+    @Test
+    fun testEnum() {
+        val s1 = ReplyState.valueOf("SUCCESS")
+
+
+        println("${f(0)} ${f(2)} ${f(10)}")
+    }
+
+    fun f(index:Int): ReplyState {
+        ReplyState.values().forEach {
+            if (it.ordinal == index) {
+                return it
+            }
+        }
+        return ReplyState.ORDER
     }
 }

@@ -91,11 +91,13 @@ class CmdProxy : CmdIF() {
     override fun readDataGetVersionModel(reply: ReplyModel<GetVersionModel>) {
 
     }
-
-    override fun readDataStateFailed(cmd: UByte, state: UByte) {
-
-    }
-
+//
+//    override fun readDataStateFailed(cmd: UByte, state: UByte) {
+//
+//    }
+override fun stateSuccess(cmd: Int, state: Int): Boolean {
+    return true
+}
     override fun readDataTempModel(reply: ReplyModel<TempModel>) {
 
 

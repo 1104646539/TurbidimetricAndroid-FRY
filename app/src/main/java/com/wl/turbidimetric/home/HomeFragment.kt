@@ -580,6 +580,21 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                             )
                         }
                     }
+                    /**
+                     * 命令提示错误，中断所有程序
+                     */
+                    DialogState.STATE_FAILED->{
+                        dialog.showPop(requireContext(), isCancelable = false) {
+                            it.showDialog(
+                                msg = state.dialogMsg,
+                                confirmText = "我知道了",
+                                confirmClick = { baseDialog ->
+                                    baseDialog.dismiss()
+                                },
+                                showIcon = true, iconId = ICON_HINT
+                            )
+                        }
+                    }
                 }
             }
         }

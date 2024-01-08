@@ -411,18 +411,20 @@ class MatchingArgsViewModel(
         return array
     }
 
-    /**
-     * 报错
-     * @param cmd UByte
-     * @param state UByte
-     */
-    override fun readDataStateFailed(cmd: UByte, state: UByte) {
-        if (!runningMatching()) return
-        testState = TestState.RunningError
-        i("报错了，cmd=$cmd state=$state")
-        testMsg.postValue("报错了，cmd=$cmd state=$state")
-    }
-
+//    /**
+//     * 报错
+//     * @param cmd UByte
+//     * @param state UByte
+//     */
+//    override fun readDataStateFailed(cmd: UByte, state: UByte) {
+//        if (!runningMatching()) return
+//        testState = TestState.RunningError
+//        i("报错了，cmd=$cmd state=$state")
+//        testMsg.postValue("报错了，cmd=$cmd state=$state")
+//    }
+override fun stateSuccess(cmd: Int, state: Int): Boolean {
+    return true
+}
     /**
      * 挤压
      * @param reply ReplyModel<SqueezingModel>

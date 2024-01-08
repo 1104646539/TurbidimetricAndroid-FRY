@@ -294,17 +294,17 @@ class RepeatabilityViewModel(
         return array
     }
 
-    /**
-     * 报错
-     * @param cmd UByte
-     * @param state UByte
-     */
-    override fun readDataStateFailed(cmd: UByte, state: UByte) {
-        if (!runningRepeatability()) return
-        testState = TestState.RunningError
-        i("报错了，cmd=$cmd state=$state")
-        testMsg.postValue("报错了，cmd=$cmd state=$state")
-    }
+//    /**
+//     * 报错
+//     * @param cmd UByte
+//     * @param state UByte
+//     */
+//    override fun readDataStateFailed(cmd: UByte, state: UByte) {
+//        if (!runningRepeatability()) return
+//        testState = TestState.RunningError
+//        i("报错了，cmd=$cmd state=$state")
+//        testMsg.postValue("报错了，cmd=$cmd state=$state")
+//    }
 
 
     /**
@@ -1132,6 +1132,10 @@ class RepeatabilityViewModel(
     override fun readDataTempModel(reply: ReplyModel<TempModel>) {
 
 
+    }
+
+    override fun stateSuccess(cmd: Int, state: Int): Boolean {
+        return true
     }
 
 

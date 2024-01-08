@@ -599,7 +599,8 @@ class HomeViewModel(
             dripReagentFinish = true
             updateCuvetteState(cuvettePos, CuvetteState.TakeReagentFailed)
             if (cuvetteMoveFinish) {//已经移动到位了，取试剂失败后不应该再取，只检测已经加完试剂的样本
-                if (cuvettePos == 0) {//第一个就失败，直接结束检测
+                val takeReagentCuvetteNum = getTakeReagentCuvetteNum()
+                if (takeReagentCuvetteNum == 0) {//第一个就失败，直接结束检测
                     testFinishAction()
                 } else {
                     nextDripReagent()
@@ -608,6 +609,16 @@ class HomeViewModel(
         } else {//取试剂成功,去加试剂
             goDripReagent()
         }
+    }
+
+    /**
+     * 获取当前比色皿架已经加好试剂的比色皿的数量
+     */
+    private fun getTakeReagentCuvetteNum(): Any {
+        if (cuvetteShelfPos !in mCuvetteStates.indices) {
+            return 0
+        }
+        return mCuvetteStates[cuvetteShelfPos]!!.filter { it.state == CuvetteState.DripReagent }.size
     }
 
 

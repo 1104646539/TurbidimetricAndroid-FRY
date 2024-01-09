@@ -559,7 +559,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                      */
                     DialogState.TEST_FINISH -> {
                         dialog.showPop(requireContext(), isCancelable = false) {
-                            it.showDialog(msg = "检测结束", confirmText = "确定", confirmClick = {
+                            it.showDialog(msg = if (state.dialogMsg.isEmpty()) "检测结束" else "检测结束,${state.dialogMsg}", confirmText = "确定", confirmClick = {
                                 it.dismiss()
                             }, showIcon = true, iconId = ICON_FINISH)
                         }

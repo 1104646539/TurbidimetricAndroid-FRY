@@ -2008,10 +2008,32 @@ class HomeViewModel(
      * 检测结束动作完成后提示
      */
     fun showFinishDialog() {
+        var dialogMsg = getFinishDialogMsg()
+
         viewModelScope.launch {
-            _dialogUiState.emit(HomeDialogUiState(dialogState = DialogState.TEST_FINISH, ""))
+            _dialogUiState.emit(HomeDialogUiState(dialogState = DialogState.TEST_FINISH, dialogMsg))
         }
         testState = TestState.Normal
+    }
+
+    /**
+     * 获取检测结束的问题提示
+     */
+    private fun getFinishDialogMsg(): String {
+        var dialogMsg = ""
+        if (!allowDripSample || !allowTakeReagent) {
+            dialogMsg = "请检查"
+        }
+        if (!allowDripSample) {
+            dialogMsg = dialogMsg.plus("比色皿非空")
+        }
+        if (!allowTakeReagent) {
+            if (dialogMsg.length > 3) {
+                dialogMsg = dialogMsg.plus(",")
+            }
+            dialogMsg = dialogMsg.plus("R2试剂是否存在")
+        }
+        return dialogMsg
     }
 
     private fun isTestFinish(): Boolean {

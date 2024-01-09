@@ -64,12 +64,12 @@ object TestSerialPort {
             }
 
             SerialGlobal.CMD_TakeReagent -> {
-                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x01u, 0x1u))// 存在r1试剂 1，r2试剂量 1
+//                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x01u, 0x1u))// 存在r1试剂 1，r2试剂量 1
 //                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x00u, 0x0u))// 不存在r1试剂 0，r2试剂量 0
-//                if (index == 0) {
-//                    reply = ubyteArrayOf(data[0], 0x06u, 0x0u, 0x0u, 0x01u, 0x0u)//取试剂失败
+//                if (index == 2) {
+//                    reply = ubyteArrayOf(data[0], 0x06u, 0x0u, 0x0u, 0x01u, 0x2u)//取试剂失败
 //                } else {
-//                    reply = ubyteArrayOf(data[0], 0x00u, 0x0u, 0x0u, 0x01u, 0x0u)//取试剂成功
+                    reply = ubyteArrayOf(data[0], 0x00u, 0x0u, 0x0u, 0x01u, 0x2u)//取试剂成功
 //                }
 //                index++
             }
@@ -99,13 +99,13 @@ object TestSerialPort {
 //                reply = ubyteArrayOf(data[0], 0x04u, 0x0u, 0x0u, 0x0u, 0x0u)//取样失败
             }
             SerialGlobal.CMD_DripSample -> {
-//                if (index == 0) {
-//                    reply = ubyteArrayOf(data[0], 0x05u, 0x0u, 0x0u, 0x0u, 0x0u)//取样失败
+//                if (index == 3) {
+//                    reply = ubyteArrayOf(data[0], 0x05u, 0x0u, 0x0u, 0x0u, 0x0u)//加样失败
 //                }else{
-//                    reply = ubyteArrayOf(data[0], 0x00u, 0x0u, 0x0u, 0x0u, 0x0u)//取样成功
+                    reply = ubyteArrayOf(data[0], 0x00u, 0x0u, 0x0u, 0x0u, 0x0u)//加样成功
 //                }
 //                index++
-                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x0u))//取样成功
+//                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x0u))//取样成功
 //                reply = ubyteArrayOf(data[0], 0x04u, 0x0u, 0x0u, 0x0u, 0x0u)//取样失败
             }
 

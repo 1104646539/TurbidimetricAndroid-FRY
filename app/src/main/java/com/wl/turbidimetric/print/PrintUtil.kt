@@ -2,7 +2,6 @@ package com.wl.turbidimetric.print
 
 import com.wl.turbidimetric.ex.scale
 import com.wl.turbidimetric.model.TestResultAndCurveModel
-import com.wl.turbidimetric.model.TestResultModel
 import com.wl.turbidimetric.print.PrintUtil.serialPort
 import com.wl.weiqianwllib.serialport.BaseSerialPort
 import com.wl.weiqianwllib.serialport.WQSerialGlobal
@@ -79,13 +78,15 @@ object PrintUtil {
         absorbancys: List<Int>,
         nds: DoubleArray,
         yzs: List<Int>,
-        params: MutableList<Double>
+        params: MutableList<Double>,
+        createTime: String
     ) {
         val msg = getMatchingQualityMsg(
             absorbancys.toMutableList(),
             nds,
             yzs.toMutableList(),
-            params
+            params,
+            createTime
         )
         send(msg)
     }
@@ -103,12 +104,13 @@ object PrintUtil {
         absorbancys: MutableList<Int>,
         nds: DoubleArray,
         yzs: MutableList<Int>,
-        params: MutableList<Double>
+        params: MutableList<Double>,
+        createTime: String
     ): String {
 
         val sb = StringBuilder()
         sb.append("\n\n")
-        sb.append("\n\n")
+        sb.append("质控时间:$createTime\n")
         repeat(5) {
             val nd = "${nds[it]}ng/mL".fix(15)
             val abs = "${absorbancys[it].toInt()}".fix(5)
@@ -139,7 +141,6 @@ object PrintUtil {
         sb.append("F(2)=${params[2].scale(10)}")
         sb.append("\n")
         sb.append("F(3)=${params[3].scale(10)}")
-        sb.append("\n")
         sb.append("\n")
         sb.append("\n")
         sb.append("\n")

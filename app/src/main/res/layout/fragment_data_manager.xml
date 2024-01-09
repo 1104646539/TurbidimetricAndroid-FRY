@@ -186,6 +186,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="20dp"
+                    android:visibility="gone"
                     android:minWidth="150dp"
                     android:text="导出Excel"
                     android:textAllCaps="false" />
@@ -196,7 +197,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="20dp"
                     android:minWidth="150dp"
-                    android:text="导出Excel(全部)"
+                    android:text="导出筛选到Excel"
                     android:textAllCaps="false" />
 
                 <Button

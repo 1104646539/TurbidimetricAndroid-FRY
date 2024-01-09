@@ -67,6 +67,15 @@ class TestResultRepository {
     }
 
     suspend fun getAllTestResult(condition: ConditionModel): List<TestResultAndCurveModel> {
-        return dao.getTestResultAndCurveModels()
+        return dao.getTestResultAndCurveModels(
+            condition.name,
+            condition.qrcode,
+            condition.conMin,
+            condition.conMax,
+            condition.testTimeMin,
+            condition.testTimeMax,
+            condition.results.toList(),
+            condition.results.size
+        )
     }
 }

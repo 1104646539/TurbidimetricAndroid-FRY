@@ -42,8 +42,17 @@ interface MainDao {
     ): Long
 
     @Transaction
-    @Query("select * from TestResultModel order by resultId desc")
-    suspend fun getTestResultAndCurveModels(): List<TestResultAndCurveModel>
+    @Query("select * from TestResultModel where (case when length(:name) > 0 then name = :name else 1 = 1 end) and (case when length(:qrcode) > 0 then sampleBarcode = :qrcode else 1 = 1 end) and (case when (:conMin != 0) then concentration >= :conMin else 1 = 1 end) and (case when (:conMax != 0) then concentration <= :conMax else 1 = 1 end) and (case when (:testTimeMin != 0) then testTime >= :testTimeMin else 1 = 1 end) and (case when (:testTimeMax != 0) then testTime <= :testTimeMax else 1 = 1 end) and (case when (:resultsSize > 0) then (testResult in (:results)) else 1 = 1 end) order by resultId desc")
+    suspend fun getTestResultAndCurveModels(
+        name: String,
+        qrcode: String,
+        conMin: Int,
+        conMax: Int,
+        testTimeMin: Long,
+        testTimeMax: Long,
+        results: List<String>,
+        resultsSize: Int
+    ): List<TestResultAndCurveModel>
 
     @Transaction
     @Query("select * from TestResultModel where resultId = :id")
@@ -63,7 +72,7 @@ interface MainDao {
     fun getProjectModels(): Flow<List<ProjectModel>>
 
     @Query("select * from ProjectModel where projectId = :id")
-    fun getProjectModelForId(id:Long): ProjectModel
+    fun getProjectModelForId(id: Long): ProjectModel
 
     @Query("select * from Projectmodel where projectName = :projectName or projectCode = :projectCode")
     suspend fun queryRepeatProjectModel(projectName: String, projectCode: String): ProjectModel

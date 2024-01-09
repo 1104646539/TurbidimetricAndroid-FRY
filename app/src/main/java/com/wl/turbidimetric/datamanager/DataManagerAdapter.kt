@@ -53,22 +53,33 @@ class DataManagerAdapter :
             binding.tvProjectName.text = item?.curve?.projectName ?: "-"
             binding.tvName.text = item?.result?.name ?: "-"
             binding.tvGender.text = item?.result?.gender ?: "-"
+            binding.tvBarcode.text = item?.result?.sampleBarcode ?: "-"
             binding.tvAge.text = item?.result?.age ?: "-"
             binding.tvAbsorbances.text =
-                item?.result?.absorbances?.setScale(5, RoundingMode.HALF_UP).toString()
+                item?.result?.absorbances?.toInt().toString()
+//            binding.tvAbsorbances.text =
+//                item?.result?.absorbances?.setScale(5, RoundingMode.HALF_UP).toString()
             binding.tvResult.text = item?.result?.testResult ?: "-"
             binding.tvConcentration.text = item?.result?.concentration?.toString() ?: "-"
             binding.tvTestTime.text =
                 if (item?.result?.testTime == 0L) "-" else item?.result?.testTime?.toTimeStr()
                     ?: "-"
+//            binding.tvTestValue1.text =
+//                item?.result?.testValue1?.setScale(5, RoundingMode.HALF_UP).toString()
+//            binding.tvTestValue2.text =
+//                item?.result?.testValue2?.setScale(5, RoundingMode.HALF_UP).toString()
+//            binding.tvTestValue3.text =
+//                item?.result?.testValue3?.setScale(5, RoundingMode.HALF_UP).toString()
+//            binding.tvTestValue4.text =
+//                item?.result?.testValue4?.setScale(5, RoundingMode.HALF_UP).toString()
             binding.tvTestValue1.text =
-                item?.result?.testValue1?.setScale(5, RoundingMode.HALF_UP).toString()
+                item?.result?.testValue1?.toInt().toString()
             binding.tvTestValue2.text =
-                item?.result?.testValue2?.setScale(5, RoundingMode.HALF_UP).toString()
+                item?.result?.testValue2?.toInt().toString()
             binding.tvTestValue3.text =
-                item?.result?.testValue3?.setScale(5, RoundingMode.HALF_UP).toString()
+                item?.result?.testValue3?.toInt().toString()
             binding.tvTestValue4.text =
-                item?.result?.testValue4?.setScale(5, RoundingMode.HALF_UP).toString()
+                item?.result?.testValue4?.toInt().toString()
             binding.tvTestOriginalValue1.text = item?.result?.testOriginalValue1?.toString() ?: "-"
             binding.tvTestOriginalValue2.text = item?.result?.testOriginalValue2?.toString() ?: "-"
             binding.tvTestOriginalValue3.text = item?.result?.testOriginalValue3?.toString() ?: "-"
@@ -84,14 +95,6 @@ class DataManagerAdapter :
 
 
     fun getSelectedItems(): List<TestResultAndCurveModel> {
-//        val items = mutableListOf<TestResultAndCurveModel>().apply {
-//            for (i in 0 until itemCount) {
-//                getItem(i)?.let {
-//                    if (it.isSelect)
-//                        add(it)
-//                }
-//            }
-//        }
         val items = mutableListOf<TestResultAndCurveModel>().apply {
             snapshot().items.forEach {
                 if (it.result.isSelect)

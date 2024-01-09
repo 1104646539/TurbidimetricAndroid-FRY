@@ -153,7 +153,7 @@ fun calcAbsorbance(
     return log10(
         65535.toBigDecimal().divide(resultTest, 5, RoundingMode.HALF_UP).toDouble()
     ).toBigDecimal()
-        .setScale(5, RoundingMode.HALF_UP)
+        .setScale(5, RoundingMode.HALF_UP).multiply(10000.toBigDecimal())
 //    return log10(BigDecimal(65535).divide(BigDecimal(resultTest),5,BigDecimal.ROUND_HALF_UP))
 }
 
@@ -213,7 +213,7 @@ fun calcCon(absorbance: BigDecimal, project: CurveModel): Int {
 //    }
     var con = CurveFitterUtil.f(
         doubleArrayOf(f0, f1, f2, f3),
-        absorbance.multiply(10000.toBigDecimal()).toDouble()
+        absorbance.toDouble()
     )
     //浓度不能小于0
     if (con.compareTo(0.0) <= 0) {

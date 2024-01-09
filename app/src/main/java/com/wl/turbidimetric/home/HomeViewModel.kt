@@ -419,21 +419,16 @@ class HomeViewModel(
      */
     //检测的值
     private val testValues1 =
-        doubleArrayOf(0.0006, 0.0, 0.0, 0.0, 0.0, 0.0, 10.0, 100.0, 0.0, 0.0, 0.0)
-    private val testValues2 = doubleArrayOf(
-        0.0,
-        0.12410,
-        0.06702,
-        0.01834,
-        0.00327,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
+        intArrayOf(60, 20, 30, 50, 0, 0, 0, 0, 0, 0)
+    private val testValues2 = intArrayOf(
+        0, 1522, 800, 300, 30, 0, 0, 0, 0, 0
     )
-    private val testValues3 = doubleArrayOf(0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3)
-    private val testValues4 = doubleArrayOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+    private val testValues3 = intArrayOf(
+        0, 1522, 800, 300, 30, 0, 0, 0, 0, 0
+    )
+    private val testValues4 = intArrayOf(
+        0, 1522, 800, 300, 30, 0, 0, 0, 0, 0
+    )
     private val testOriginalValues1 =
         intArrayOf(65532, 65532, 65532, 65532, 65532, 65532, 65532, 65532, 65532, 65532)
     private val testOriginalValues2 =

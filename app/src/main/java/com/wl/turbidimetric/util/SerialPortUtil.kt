@@ -15,6 +15,7 @@ import com.wl.wllib.LogToFile.e
 import kotlinx.coroutines.*
 import java.util.*
 import java.util.concurrent.BlockingQueue
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.LinkedBlockingQueue
 
 /**
@@ -23,7 +24,6 @@ import java.util.concurrent.LinkedBlockingQueue
 object SerialPortUtil {
     private val serialPort: BaseSerialPort = BaseSerialPort()
 
-    //  lateinit var callback: Callback<ReplyModel<Any>>
     val callback: MutableList<Callback2> = mutableListOf()
     val originalCallback: MutableList<OriginalDataCall> = mutableListOf()
     private var data: MutableList<UByte> = mutableListOf<UByte>()
@@ -32,9 +32,30 @@ object SerialPortUtil {
     private const val allCount = 8
     var byteArray = ByteArray(100)
     private val responseCommand1: UByte = SerialGlobal.CMD_Response
-    private val sendQueue: BlockingQueue<UByteArray> = LinkedBlockingQueue()
 
+    /**
+     * 等待发送的命令队列
+     */
+    private val sendQueue: BlockingQueue<UByteArray> = LinkedBlockingQueue()
+    /**
+     * 已经超时 等待重发的命令
+     */
+    private val retryQueue: BlockingQueue<UByteArray> = LinkedBlockingQueue()
+
+    /**
+     * 超时重发的job
+     */
+    private val retryJobQueue: ConcurrentHashMap<UByte, Job> = ConcurrentHashMap()
+
+    /**
+     * 防止同样的命令发一次但收到多次结果（下位机没收到响应会重发），多收的只发响应码不处理
+     */
     private val sendMap = mutableMapOf<UByte, Int>()
+
+    /**
+     * 超时重发时间
+     */
+    val timeout = 30000L
 
     init {
         open()
@@ -46,8 +67,9 @@ object SerialPortUtil {
         } else {
             serialPort.openSerial(WQSerialGlobal.COM1, 9600, 8)
             openRead()
-            openWrite()
         }
+        openWrite()
+        openRetry()
     }
 
 
@@ -61,8 +83,21 @@ object SerialPortUtil {
         }
         //验证通过，返回响应码，分发消息
 //        println("验证过了")
+
         response(ready)
         dispatchData(ready)
+    }
+
+    /**
+     * 取消这条命令的超时重发
+     */
+    private fun removeRetry(cmd: UByte) {
+        val ret =retryJobQueue.remove(cmd)
+        runBlocking {
+            launch {
+                ret?.cancelAndJoin()
+            }
+        }
     }
 
     private fun dispatchOriginalData(ready: UByteArray) {
@@ -85,6 +120,7 @@ object SerialPortUtil {
         dispatchOriginalData(ready)
         val cmd = ready[0]
         val state = ready[1]
+        removeRetry(cmd)
         //重发的信息就不处理了
         if (!SystemGlobal.isCodeDebug) {
             if (cmd.toInt() != 0xffu.toInt()) {
@@ -284,6 +320,7 @@ object SerialPortUtil {
      * 写
      *
      */
+    @OptIn(ExperimentalUnsignedTypes::class)
     private fun openWrite() {
         GlobalScope.launch {
             launch {
@@ -292,11 +329,41 @@ object SerialPortUtil {
                     val take = sendQueue.take()
 //                    println("take=$take")
                     if (take != null) {
+                        val job = launch {
+                            delay(timeout)
+                            addRetry(take)
+                        }
+                        retryJobQueue[take[0]] = job
                         write(take)
                     }
                 }
             }
         }
+    }
+
+    /**
+     * 重发
+     *
+     */
+    private fun openRetry() {
+        GlobalScope.launch {
+            launch {
+                while (true) {
+                    Thread.sleep(50)
+                    val take = retryQueue.take()
+
+                    if (take != null) {
+                        c("重发了 $take")
+                        writeAsync(take)
+                    }
+                }
+            }
+        }
+    }
+
+    @OptIn(ExperimentalUnsignedTypes::class)
+    private fun addRetry(cmd: UByteArray) {
+        retryQueue.add(cmd)
     }
 
     /**
@@ -375,14 +442,9 @@ object SerialPortUtil {
         originalCallback.forEach {
             it.sendOriginalData(data)
         }
-        if (SystemGlobal.isCodeDebug) {
-            GlobalScope.launch(Dispatchers.IO) {
-                TestSerialPort.testReply(data)
-            }
-        } else {
-            if (isAllowRunning(data)) {
-                sendQueue.add(data)
-            }
+
+        if (isAllowRunning(data)) {
+            sendQueue.add(data)
         }
     }
 
@@ -402,12 +464,18 @@ object SerialPortUtil {
 
     private fun write(data: UByteArray) {
         c("write ${data.toHex()}")
-        val d = data.toByteArray()
-        serialPort.write(d)
-        val a1 = data[0].toInt()
-        val a2 = 0xffu.toInt()
-        if (a1 != a2) {
-            sendMap[data[0]] = 1
+        if (SystemGlobal.isCodeDebug) {
+            GlobalScope.launch(Dispatchers.IO) {
+                TestSerialPort.testReply(data)
+            }
+        } else {
+            val d = data.toByteArray()
+            serialPort.write(d)
+            val a1 = data[0].toInt()
+            val a2 = 0xffu.toInt()
+            if (a1 != a2) {
+                sendMap[data[0]] = 1
+            }
         }
     }
 

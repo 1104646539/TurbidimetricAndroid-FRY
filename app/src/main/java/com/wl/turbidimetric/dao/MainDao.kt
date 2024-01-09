@@ -62,12 +62,11 @@ interface MainDao {
     @Query("select * from TestResultModel where resultId = :id")
     suspend fun getTestResultModelById(id: Long): TestResultModel
 
-    @Query("select * from CurveModel order by createTime desc limit 10")
-    suspend fun getCurveModels(): List<CurveModel>
+    @Query("select * from CurveModel where isValid = :valid order by createTime desc limit 10")
+    suspend fun getCurveModels(valid: Boolean = true): List<CurveModel>
 
-    @Query("select * from CurveModel order by createTime desc limit 10")
-    fun listenerCurveModels(): Flow<List<CurveModel>>
-
+    @Query("select * from CurveModel where isValid = :valid order by createTime desc limit 10")
+    fun listenerCurveModels(valid: Boolean = true): Flow<List<CurveModel>>
 
     @Query("select * from ProjectModel")
     fun getProjectModels(): Flow<List<ProjectModel>>

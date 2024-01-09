@@ -1457,7 +1457,11 @@ class MatchingArgsViewModel(
             selectProject?.let {
                 curveRepository.addCurve(it)
                 coverCurveModel?.let { curve ->
-                    curveRepository.removeCurve(curve)
+                    curveRepository.updateCurve(curve.apply {
+                        isValid = false
+                    }).let { ret ->
+                        i("更新替换曲线成功 $ret")
+                    }
                     coverCurveModel = null
                 }
                 print()

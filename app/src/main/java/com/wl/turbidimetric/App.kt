@@ -16,9 +16,12 @@ import com.wl.turbidimetric.util.CrashHandler
 import com.wl.wllib.LogToFile
 import com.wl.wllib.ToastUtil
 import com.wl.wllib.ktxRunOnBgCache
+import com.wl.wllib.toLongTimeStr
+import com.wl.wllib.toTimeStr
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.util.Date
 
 
 class App : Application() {
@@ -62,16 +65,17 @@ class App : Application() {
                 }
                 mainDao.insertProjectModel(project)
 
-                repeat(1) {
+                repeat(10) {
                     mainDao.insertCurveModel(CurveModel().apply {
-                        reagentNO = "555"
-                        f0 = 8.14617614
-                        f1 = 1.1219026
-                        f2 = -8.9409E-4
-                        f3 = 3.2E-7
+                        reagentNO = "${555 + it}"
+                        f0 = 8.14617614 + it
+                        f1 = 1.1219026 + it
+                        f2 = -8.9409E-4 + it
+                        f3 = 3.2E-7 + it
                         fitGoodness = 1.0
                         reactionValues = intArrayOf(0, 49, 200, 500, 1000)
                         yzs = intArrayOf(0, 49, 200, 500, 1000)
+                        createTime = Date().toTimeStr()
                     }.copyForProject(project))
                 }
             }

@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.wl.turbidimetric.base.BaseViewModel
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.ex.calcAbsorbance
 import com.wl.turbidimetric.ex.calcAbsorbanceDifferences
@@ -36,6 +37,7 @@ import com.wl.turbidimetric.model.MoveSampleShelfModel
 import com.wl.turbidimetric.model.PiercedModel
 import com.wl.turbidimetric.model.ProjectModel
 import com.wl.turbidimetric.model.ReplyModel
+import com.wl.turbidimetric.model.ReplyState
 import com.wl.turbidimetric.model.SampleDoorModel
 import com.wl.turbidimetric.model.SampleType
 import com.wl.turbidimetric.model.SamplingModel
@@ -48,6 +50,7 @@ import com.wl.turbidimetric.model.TempModel
 import com.wl.turbidimetric.model.TestModel
 import com.wl.turbidimetric.model.TestState
 import com.wl.turbidimetric.model.TestType
+import com.wl.turbidimetric.model.convertReplyState
 import com.wl.turbidimetric.print.PrintUtil
 import com.wl.turbidimetric.util.Callback2
 import com.wl.turbidimetric.util.CurveFitterUtil
@@ -55,10 +58,6 @@ import com.wl.turbidimetric.util.FitterType
 import com.wl.turbidimetric.util.SerialPortUtil
 import com.wl.wllib.LogToFile.i
 import com.wl.wllib.toTimeStr
-import com.wl.turbidimetric.base.BaseViewModel
-import com.wl.turbidimetric.home.HomeDialogUiState
-import com.wl.turbidimetric.model.ReplyState
-import com.wl.turbidimetric.model.convertReplyState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -80,10 +79,8 @@ import kotlin.random.Random
  * @property quality Boolean
  */
 class MatchingArgsViewModel(
-    private val projectRepository: ProjectRepository,
-    private val curveRepository: CurveRepository
-) : BaseViewModel(),
-    Callback2 {
+    private val projectRepository: ProjectRepository, private val curveRepository: CurveRepository
+) : BaseViewModel(), Callback2 {
 
     init {
         listener()
@@ -456,12 +453,14 @@ class MatchingArgsViewModel(
         }
         return stateFailedText.isEmpty()
     }
+
     /**
      * 停止运行
      */
     private fun stateErrorStopRunning() {
         testState = TestState.RunningError
     }
+
     /**
      * 挤压
      * @param reply ReplyModel<SqueezingModel>
@@ -479,8 +478,7 @@ class MatchingArgsViewModel(
         viewModelScope.launch {
             _dialogUiState.emit(
                 MatchingArgsDialogUiState(
-                    dialogState = DialogState.MatchingSettings,
-                    msg = ""
+                    dialogState = DialogState.MatchingSettings, msg = ""
                 )
             )
         }
@@ -494,8 +492,7 @@ class MatchingArgsViewModel(
             viewModelScope.launch {
                 _dialogUiState.emit(
                     MatchingArgsDialogUiState(
-                        dialogState = DialogState.ACCIDENT,
-                        msg = "请重新自检或重启仪器"
+                        dialogState = DialogState.ACCIDENT, msg = "请重新自检或重启仪器"
                     )
                 )
             }
@@ -505,8 +502,7 @@ class MatchingArgsViewModel(
             viewModelScope.launch {
                 _dialogUiState.emit(
                     MatchingArgsDialogUiState(
-                        dialogState = DialogState.ACCIDENT,
-                        msg = "正在检测，请勿操作"
+                        dialogState = DialogState.ACCIDENT, msg = "正在检测，请勿操作"
                     )
                 )
             }
@@ -517,8 +513,7 @@ class MatchingArgsViewModel(
             viewModelScope.launch {
                 _dialogUiState.emit(
                     MatchingArgsDialogUiState(
-                        dialogState = DialogState.ACCIDENT,
-                        msg = "请输入试剂序号"
+                        dialogState = DialogState.ACCIDENT, msg = "请输入试剂序号"
                     )
                 )
             }
@@ -617,8 +612,7 @@ class MatchingArgsViewModel(
             viewModelScope.launch {
                 _dialogUiState.emit(
                     MatchingArgsDialogUiState(
-                        DialogState.GetStateNotExistMsg,
-                        errorMsg
+                        DialogState.GetStateNotExistMsg, errorMsg
                     )
                 )
             }
@@ -698,9 +692,7 @@ class MatchingArgsViewModel(
 
             }
 
-            TestState.Test2,
-            TestState.Test3,
-            TestState.Test4 -> {
+            TestState.Test2, TestState.Test3, TestState.Test4 -> {
                 moveCuvetteTest()
             }
 
@@ -765,9 +757,7 @@ class MatchingArgsViewModel(
             return
         }
         when (testState) {
-            TestState.DripDiluentVolume,
-            TestState.DripStandardVolume
-            -> {//去取稀释液、标准品
+            TestState.DripDiluentVolume, TestState.DripStandardVolume -> {//去取稀释液、标准品
                 if (!sampled) {
                     sampleStep++
                     val volume = getSamplingVolume(testState, sampleStep - 1)
@@ -776,9 +766,7 @@ class MatchingArgsViewModel(
                 } else {
                     val volume = getSamplingVolume(testState, sampleStep - 1)
                     dripSample(
-                        testState == TestState.DripStandardVolume,
-                        inplace = true,
-                        volume
+                        testState == TestState.DripStandardVolume, inplace = true, volume
                     )
                 }
                 sampled = !sampled
@@ -1012,14 +1000,7 @@ class MatchingArgsViewModel(
      */
     private fun updateResult() {
         testMsg.postValue(
-            "第一次原始:$resultOriginalTest1 \n" +
-                    "第一次:$resultTest1 \n" +
-                    "第二次原始:$resultOriginalTest2 \n" +
-                    " 第二次:$resultTest2 \n" +
-                    "第三次原始:$resultOriginalTest3 \n" +
-                    " 第三次:$resultTest3 \n" +
-                    "第四次原始:$resultOriginalTest4 \n" +
-                    " 第四次:$resultTest4 \n"
+            "第一次原始:$resultOriginalTest1 \n" + "第一次:$resultTest1 \n" + "第二次原始:$resultOriginalTest2 \n" + " 第二次:$resultTest2 \n" + "第三次原始:$resultOriginalTest3 \n" + " 第三次:$resultTest3 \n" + "第四次原始:$resultOriginalTest4 \n" + " 第四次:$resultTest4 \n"
         )
     }
 
@@ -1106,22 +1087,12 @@ class MatchingArgsViewModel(
 
         //**修正end**
         var msg: StringBuilder = StringBuilder(
-            "第一次原始:$resultOriginalTest1 \n" +
-                    "第一次:$resultTest1 \n" +
-                    "第二次原始:$resultOriginalTest2 \n" +
-                    "第二次:$resultTest2 \n" +
-                    "第三次原始:$resultOriginalTest3 \n" +
-                    "第三次:$resultTest3 \n" +
-                    "第四次原始:$resultOriginalTest4 \n" +
-                    "第四次:$resultTest4 \n" +
+            "第一次原始:$resultOriginalTest1 \n" + "第一次:$resultTest1 \n" + "第二次原始:$resultOriginalTest2 \n" + "第二次:$resultTest2 \n" + "第三次原始:$resultOriginalTest3 \n" + "第三次:$resultTest3 \n" + "第四次原始:$resultOriginalTest4 \n" + "第四次:$resultTest4 \n" +
 //                    "吸光度:$result \n" +
 //                    "拟合度：${cf.fitGoodness} \n" +
 //                    "四参数：f0=${f0} f1=${f1} f2=${f2} f3=${f3} \n " +
 //                    "验算 ${yzs}\n" +
-                    "吸光度:$absorbancys2 \n" +
-                    "拟合度：${cf2.fitGoodness} \n" +
-                    "四参数：f0=${cf2.params[0]} f1=${cf2.params[1]} f2=${cf2.params[2]} f3=${cf2.params[3]} \n" +
-                    "验算 ${yzs2}\n"
+                    "吸光度:$absorbancys2 \n" + "拟合度：${cf2.fitGoodness} \n" + "四参数：f0=${cf2.params[0]} f1=${cf2.params[1]} f2=${cf2.params[2]} f3=${cf2.params[3]} \n" + "验算 ${yzs2}\n"
         )
         curProject = CurveModel().apply {
             this.f0 = cf2.params[0]
@@ -1147,9 +1118,7 @@ class MatchingArgsViewModel(
      */
     fun print() {
         selectProject?.let {
-            if (it.reactionValues?.isNotEmpty() == true
-                && it.yzs?.isNotEmpty() == true
-            ) {
+            if (it.reactionValues?.isNotEmpty() == true && it.yzs?.isNotEmpty() == true) {
                 PrintUtil.printMatchingQuality(
                     it.reactionValues!!.toList(),
                     nds,
@@ -1207,7 +1176,10 @@ class MatchingArgsViewModel(
 
         dripSamplingFinish = true
         samplingFinish = false
-
+        if (reply.state == ReplyState.CUVETTE_NOT_EMPTY) {//比色皿非空
+            showMatchingDialog("拟合结束，比色皿非空")
+            return
+        }
         when (testState) {
             TestState.DripDiluentVolume -> {//加稀释液
                 if (sampleStep == sampleStepMax) {
@@ -1243,7 +1215,10 @@ class MatchingArgsViewModel(
         i("接收到 取样 reply=$reply testState=$testState sampleStep=$sampleStep samplePos=$samplePos")
 
         samplingFinish = true
-
+        if (reply.state == ReplyState.SAMPLING_FAILED) {//取样失败
+            showMatchingDialog("拟合结束，取样失败")
+            return
+        }
         when (testState) {
             TestState.DripDiluentVolume -> {//去加稀释液
                 moveSample(sampleStep + 1)
@@ -1279,16 +1254,14 @@ class MatchingArgsViewModel(
      * @param cuvettePos Int
      * @return Boolean
      */
-    private fun cuvetteNeedStir(cuvettePos: Int) =
-        cuvetteNeed(cuvettePos, CuvetteState.DripReagent)
+    private fun cuvetteNeedStir(cuvettePos: Int) = cuvetteNeed(cuvettePos, CuvetteState.DripReagent)
 
     /**
      * 当前的比色皿位置是否需要检测
      * @param cuvettePos Int
      * @return Boolean
      */
-    private fun cuvetteNeedTest(cuvettePos: Int) =
-        cuvetteNeed(cuvettePos, CuvetteState.Stir)
+    private fun cuvetteNeedTest(cuvettePos: Int) = cuvetteNeed(cuvettePos, CuvetteState.Stir)
 
     /**
      * 接收到移动比色皿到检测位
@@ -1300,9 +1273,7 @@ class MatchingArgsViewModel(
         i("接收到 移动比色皿到检测位 reply=$reply cuvetteStates=$cuvetteStates testState=$testState")
 
         when (testState) {
-            TestState.Test2,
-            TestState.Test3,
-            TestState.Test4 -> {
+            TestState.Test2, TestState.Test3, TestState.Test4 -> {
                 if (cuvettePos in 0 until 10) {
                     val targetTime =
                         if (testState == TestState.Test2) testShelfInterval2 else if (testState == TestState.Test3) testShelfInterval3 else testShelfInterval4
@@ -1329,7 +1300,10 @@ class MatchingArgsViewModel(
         if (!machineStateNormal()) return
         i("接收到 取试剂 reply=$reply cuvettePos=$cuvettePos cuvetteMoveFinish=$cuvetteMoveFinish")
         takeReagentFinish = true
-
+        if (reply.state == ReplyState.TAKE_REAGENT_FAILED) {//取试剂失败
+            showMatchingDialog("拟合结束，取试剂失败")
+            return
+        }
         //取完试剂判断是否移动比色皿完成，完成就直接取样
         if (cuvetteNeedDripReagent(cuvettePos) && cuvetteMoveFinish && takeReagentFinish) {
             dripReagent()
@@ -1442,14 +1416,21 @@ class MatchingArgsViewModel(
     /**
      * 显示拟合结束对话框
      */
-    private fun showMatchingDialog() {
+    private fun showMatchingDialog(msg: String = "") {
         if (isDetectedSample) {
             isDetectedSample = false
             viewModelScope.launch {
                 _dialogUiState.emit(
                     MatchingArgsDialogUiState(
-                        DialogState.ACCIDENT,
-                        "检测到放入的是样本管，请在样本架上放置比色杯！"
+                        DialogState.ACCIDENT, "检测到放入的是样本管，请在样本架上放置比色杯！"
+                    )
+                )
+            }
+        } else if (msg.isNotEmpty()) {
+            viewModelScope.launch {
+                _dialogUiState.emit(
+                    MatchingArgsDialogUiState(
+                        DialogState.ACCIDENT, msg
                     )
                 )
             }
@@ -1457,8 +1438,7 @@ class MatchingArgsViewModel(
             viewModelScope.launch {
                 _dialogUiState.emit(
                     MatchingArgsDialogUiState(
-                        DialogState.MatchingFinishMsg,
-                        testMsg.value ?: ""
+                        DialogState.MatchingFinishMsg, testMsg.value ?: ""
                     )
                 )
             }
@@ -1617,9 +1597,7 @@ class MatchingArgsViewModel(
         i("发送 加样 volume=$volume")
         dripSamplingFinish = false
         SerialPortUtil.dripSample(
-            autoBlending = autoBlending,
-            inplace = inplace,
-            volume = volume
+            autoBlending = autoBlending, inplace = inplace, volume = volume
         )
     }
 
@@ -1706,8 +1684,7 @@ class MatchingArgsViewModel(
 class MatchingArgsViewModelFactory(
     private val projectRepository: ProjectRepository = ProjectRepository(),
     private val curveRepository: CurveRepository = CurveRepository()
-) :
-    ViewModelProvider.NewInstanceFactory() {
+) : ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MatchingArgsViewModel::class.java)) {
             return MatchingArgsViewModel(projectRepository, curveRepository) as T

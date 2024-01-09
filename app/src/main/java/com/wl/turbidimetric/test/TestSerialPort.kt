@@ -3,10 +3,12 @@ package com.wl.turbidimetric.test
 import com.wl.turbidimetric.ex.toHex
 import com.wl.turbidimetric.global.SerialGlobal
 import com.wl.wllib.CRC.CRC16
-import java.util.concurrent.LinkedBlockingQueue
 import com.wl.wllib.LogToFile.i
-import kotlinx.coroutines.*
-import kotlin.random.Random
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import java.util.concurrent.LinkedBlockingQueue
 
 /**
  * 仅测试回复用
@@ -69,7 +71,7 @@ object TestSerialPort {
 //                if (index == 2) {
 //                    reply = ubyteArrayOf(data[0], 0x06u, 0x0u, 0x0u, 0x01u, 0x2u)//取试剂失败
 //                } else {
-                    reply = ubyteArrayOf(data[0], 0x00u, 0x0u, 0x0u, 0x01u, 0x2u)//取试剂成功
+                reply = ubyteArrayOf(data[0], 0x00u, 0x0u, 0x0u, 0x01u, 0x2u)//取试剂成功
 //                }
 //                index++
             }
@@ -89,20 +91,21 @@ object TestSerialPort {
             }
 
             SerialGlobal.CMD_Sampling -> {
-//                if (index == 0) {
+//                if (index == 2) {
 //                    reply = ubyteArrayOf(data[0], 0x04u, 0x0u, 0x0u, 0x0u, 0x0u)//取样失败
 //                }else{
-//                    reply = ubyteArrayOf(data[0], 0x00u, 0x0u, 0x0u, 0x0u, 0x0u)//取样成功
+                reply = ubyteArrayOf(data[0], 0x00u, 0x0u, 0x0u, 0x0u, 0x0u)//取样成功
 //                }
 //                index++
-                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x0u))//取样成功
+//                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x0u))//取样成功
 //                reply = ubyteArrayOf(data[0], 0x04u, 0x0u, 0x0u, 0x0u, 0x0u)//取样失败
             }
+
             SerialGlobal.CMD_DripSample -> {
 //                if (index == 3) {
 //                    reply = ubyteArrayOf(data[0], 0x05u, 0x0u, 0x0u, 0x0u, 0x0u)//加样失败
 //                }else{
-                    reply = ubyteArrayOf(data[0], 0x00u, 0x0u, 0x0u, 0x0u, 0x0u)//加样成功
+                reply = ubyteArrayOf(data[0], 0x00u, 0x0u, 0x0u, 0x0u, 0x0u)//加样成功
 //                }
 //                index++
 //                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x0u))//取样成功

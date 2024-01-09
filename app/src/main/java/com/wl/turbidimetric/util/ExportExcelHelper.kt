@@ -17,10 +17,12 @@ object ExportExcelHelper {
         "姓名",
         "性别",
         "年龄",
+        "项目",
+        "条码",
         "编号",
         "浓度",
         "检测结果",
-        "吸光度",
+        "反应度",
         "原始1",
         "原始2",
         "原始3",
@@ -30,7 +32,6 @@ object ExportExcelHelper {
         "值3",
         "值4",
         "检测时间",
-        "条码"
     )
 
     @JvmStatic
@@ -92,7 +93,9 @@ object ExportExcelHelper {
      */
     private fun getFileName(): String {
         return "${Date().toTimeStr()}.xls"
-    } /**
+    }
+
+    /**
      * 数据转换成导出的格式
      * @param datas List<TestResultModel>
      * @return List<List<String>>
@@ -103,20 +106,27 @@ object ExportExcelHelper {
                 add("${it.result.name}")
                 add("${it.result.gender}")
                 add("${it.result.age}")
+                add("${it.curve?.projectName ?: "-"}")
+                add("${it.result.sampleBarcode}")
                 add("${it.result.detectionNum}")
                 add("${it.result.concentration}")
                 add("${it.result.testResult}")
-                add("${it.result.absorbances.setScale(5, RoundingMode.HALF_UP)}")
+//                add("${it.result.absorbances.setScale(5, RoundingMode.HALF_UP)}")
+                add(it.result.absorbances.toInt().toString())
                 add("${it.result.testOriginalValue1}")
                 add("${it.result.testOriginalValue2}")
                 add("${it.result.testOriginalValue3}")
                 add("${it.result.testOriginalValue4}")
-                add("${it.result.testValue1.setScale(5, RoundingMode.HALF_UP)}")
-                add("${it.result.testValue2.setScale(5, RoundingMode.HALF_UP)}")
-                add("${it.result.testValue3.setScale(5, RoundingMode.HALF_UP)}")
-                add("${it.result.testValue4.setScale(5, RoundingMode.HALF_UP)}")
+                add(it.result.testValue1.toInt().toString())
+                add(it.result.testValue2.toInt().toString())
+                add(it.result.testValue3.toInt().toString())
+                add(it.result.testValue4.toInt().toString())
+//                add("${it.result.testValue1.setScale(5, RoundingMode.HALF_UP)}")
+//                add("${it.result.testValue2.setScale(5, RoundingMode.HALF_UP)}")
+//                add("${it.result.testValue3.setScale(5, RoundingMode.HALF_UP)}")
+//                add("${it.result.testValue4.setScale(5, RoundingMode.HALF_UP)}")
                 add("${it.result.testTime.toTimeStr()}")
-                add("${it.result.sampleBarcode}")
+
             }
         }
     }

@@ -2738,14 +2738,18 @@ class HomeViewModel(
     }
 
     /**
+     * 获取曲线参数
+     */
+    suspend fun getCurveModels(): List<CurveModel> {
+        return curveRepository.getCurveModels()
+    }
+
+    /**
      * 曲线更新了，选中最新的曲线
      */
-    fun selectLastProject(projects: MutableList<CurveModel>) {
-        viewModelScope.launch {
-            LocalData.SelectProjectID = projects.first().curveId
-            recoverSelectProject(projects)
-        }
-
+    fun selectLastProject(projects: List<CurveModel>) {
+        LocalData.SelectProjectID = projects.first().curveId
+        recoverSelectProject(projects.toMutableList())
     }
 
 

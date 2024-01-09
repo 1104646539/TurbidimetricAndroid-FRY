@@ -14,18 +14,26 @@ class CurveRepository {
 //        DBManager.CurveBox.query().orderDesc(CurveModel_.curveId).build()
         dao.listenerCurveModels()
 
+    /**
+     * 直接获取曲线参数
+     */
+    suspend fun getCurveModels(): List<CurveModel> {
+        return dao.getCurveModels()
+    }
 
     /**
-     * 更新项目参数
+     * 更新曲线参数
      * @param curve CurveModel
      * @return Long
      */
-    suspend fun updateCurve(curve: CurveModel): Int {
+    suspend
+
+    fun updateCurve(curve: CurveModel): Int {
         return dao.updateCurveModel(curve)
     }
 
     /**
-     * 添加项目参数
+     * 添加曲线参数
      * @param curve CurveModel
      */
     suspend fun addCurve(curve: CurveModel): Long {
@@ -33,7 +41,7 @@ class CurveRepository {
     }
 
     /**
-     * 删除项目参数
+     * 删除曲线参数
      * @param curve CurveModel
      * @return Boolean
      */

@@ -292,7 +292,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 
             EventGlobal.WHAT_PROJECT_ADD -> {
                 lifecycleScope.launch {
-                    vm.selectLastProject(vm.projectDatas.last().toMutableList())
+                    vm.selectLastProject(vm.getCurveModels())
                 }
             }
 

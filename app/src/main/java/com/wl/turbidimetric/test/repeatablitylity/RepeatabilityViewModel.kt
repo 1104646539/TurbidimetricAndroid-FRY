@@ -84,11 +84,6 @@ class RepeatabilityViewModel(
     private val _dialogUiState = MutableSharedFlow<RepeatabilityUiState>()
     val dialogUiState = _dialogUiState.asSharedFlow()
 
-    /**
-     * 移动已混匀样本的量
-     */
-    private val moveSampleVolume = 25
-
 
     /**
      * 当前取样的步骤
@@ -595,7 +590,7 @@ class RepeatabilityViewModel(
                     moveSample(1)
                 } else if (samplePos == 1) {
                     sampleStep++
-                    sampling(moveSampleVolume)
+                    sampling(LocalData.SamplingVolume)
                 }
             }
 
@@ -626,7 +621,7 @@ class RepeatabilityViewModel(
      */
     private fun goDripSample() {
         if (cuvetteMoveFinish && samplingFinish) {
-            dripSample(autoBlending = false, inplace = false, moveSampleVolume)
+            dripSample(autoBlending = false, inplace = false, LocalData.SamplingVolume)
         }
     }
 
@@ -1087,7 +1082,7 @@ class RepeatabilityViewModel(
                     takeReagent()
                 } else {//去清洗
                     sampleStep++
-                    sampling(moveSampleVolume)
+                    sampling(LocalData.SamplingVolume)
                     moveCuvetteDripSample()
                 }
             }

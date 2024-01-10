@@ -37,6 +37,7 @@ object SerialPortUtil {
      * 等待发送的命令队列
      */
     private val sendQueue: BlockingQueue<UByteArray> = LinkedBlockingQueue()
+
     /**
      * 已经超时 等待重发的命令
      */
@@ -55,7 +56,7 @@ object SerialPortUtil {
     /**
      * 超时重发时间
      */
-    val timeout = 30000L
+    private val timeout = 30000L
 
     init {
         open()
@@ -92,7 +93,7 @@ object SerialPortUtil {
      * 取消这条命令的超时重发
      */
     private fun removeRetry(cmd: UByte) {
-        val ret =retryJobQueue.remove(cmd)
+        val ret = retryJobQueue.remove(cmd)
         runBlocking {
             launch {
                 ret?.cancelAndJoin()
@@ -328,7 +329,7 @@ object SerialPortUtil {
                     Thread.sleep(50)
                     val take = sendQueue.take()
 //                    println("take=$take")
-                    if (take != null) {
+                    if (take != null && isNeedRetry(take)) {
                         val job = launch {
                             delay(timeout)
                             addRetry(take)
@@ -339,6 +340,14 @@ object SerialPortUtil {
                 }
             }
         }
+    }
+
+    /**
+     * 该是否需要重发
+     * 自检、获取温度不需要重发
+     */
+    private fun isNeedRetry(take: UByteArray): Boolean {
+        return !(take[0] == SerialGlobal.CMD_GetMachineState || take[0] == SerialGlobal.CMD_GetSetTemp)
     }
 
     /**

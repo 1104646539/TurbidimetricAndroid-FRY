@@ -1641,7 +1641,7 @@ class MatchingArgsViewModel(
      */
     fun dialogGetStateNotExistCancel() {
         i("dialogGetStateNotExistCancel 点击结束检测")
-
+        matchingFinish()
     }
 
     /**

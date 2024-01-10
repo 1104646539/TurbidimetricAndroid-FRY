@@ -29,6 +29,8 @@ import com.wl.turbidimetric.view.dialog.showPop
 import com.wl.wllib.LogToFile.i
 import com.wl.wllib.isIP
 import com.wl.turbidimetric.base.BaseActivity
+import com.wl.turbidimetric.ex.selectionLast
+import com.wl.turbidimetric.view.dialog.isShow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -82,6 +84,10 @@ class UploadSettingsActivity :
         vd.swAutoReconnection.setOnCheckedChangeListener { buttonView, isChecked ->
             vm.isReconnection.value = isChecked
         }
+        vd.swTwoway.setOnCheckedChangeListener { buttonView, isChecked ->
+            vm.twoway.value = isChecked
+            vd.llTimeout.visibility = isChecked.isShow()
+        }
 //        vd.swGetPatient.setOnCheckedChangeListener { buttonView, isChecked ->
 //            vm.getPatient.value = isChecked
 //        }
@@ -134,8 +140,9 @@ class UploadSettingsActivity :
             vd.tvLog.text = ""
         }
         HL7Helper.hl7Log = {
-            lifecycleScope.launch(Dispatchers.Main) {
+            vd.tvLog.post {
                 vd.tvLog.append("$it\n")
+                vd.svLog.fullScroll(View.FOCUS_DOWN)
                 i("listenerView: $it\n")
             }
         }
@@ -307,32 +314,42 @@ class UploadSettingsActivity :
 
     private fun listenerViewModel() {
         //监听viewModel的值改变view
-        lifecycleScope.launchWhenCreated {
+        lifecycleScope.launch {
             vm.autUpload.collectLatest {
                 vd.swAutoUpload.isChecked = it
             }
         }
-        lifecycleScope.launchWhenCreated {
+        lifecycleScope.launch {
             vm.ip.collectLatest {
                 vd.etSocketIp.setText(it)
+                vd.etSocketIp.selectionLast()
             }
         }
-        lifecycleScope.launchWhenCreated {
+        lifecycleScope.launch {
+            vm.twoway.collectLatest {
+                vd.llTimeout.visibility = it.isShow()
+                vd.swTwoway.isChecked = it
+            }
+        }
+        lifecycleScope.launch {
             vm.port.collectLatest {
                 vd.etSocketPort.setText(it)
+                vd.etSocketPort.selectionLast()
             }
         }
-        lifecycleScope.launchWhenCreated {
+        lifecycleScope.launch {
             vm.timeout.collectLatest {
                 vd.etTimeoutTime.setText(it)
+                vd.etTimeoutTime.selectionLast()
             }
         }
-        lifecycleScope.launchWhenCreated {
+        lifecycleScope.launch {
             vm.retryCount.collectLatest {
                 vd.etRetryCount.setText(it)
+                vd.etRetryCount.selectionLast()
             }
         }
-        lifecycleScope.launchWhenCreated {
+        lifecycleScope.launch {
             vm.serialPortBaudRate.collectLatest {
                 if (it == "9600") {
                     vd.rbBaudRate9600.isChecked = true
@@ -343,7 +360,7 @@ class UploadSettingsActivity :
                 }
             }
         }
-        lifecycleScope.launchWhenCreated {
+        lifecycleScope.launch {
             vm.serialPort.collectLatest {
                 vd.rbSerial.isChecked = it
                 vd.rbSocket.isChecked = !it
@@ -352,12 +369,12 @@ class UploadSettingsActivity :
                 vd.llSocket.visibility = if (!it) View.VISIBLE else View.GONE
             }
         }
-        lifecycleScope.launchWhenCreated {
+        lifecycleScope.launch {
             vm.isReconnection.collectLatest {
                 vd.swAutoReconnection.isChecked = it
             }
         }
-        lifecycleScope.launchWhenCreated {
+        lifecycleScope.launch {
             vm.realTimeGetPatient.collectLatest {
                 vd.llRealTime.visibility =
                     if (it && vm.getPatient.value) View.VISIBLE else View.GONE
@@ -365,18 +382,18 @@ class UploadSettingsActivity :
                 vd.rbBeforeTesting.isChecked = !it
             }
         }
-        lifecycleScope.launchWhenCreated {
+        lifecycleScope.launch {
             vm.getPatientType.collectLatest {
                 vd.rbBc.isChecked = it == GetPatientType.BC
                 vd.rbSn.isChecked = it == GetPatientType.SN
             }
         }
-        lifecycleScope.launchWhenCreated {
+        lifecycleScope.launch {
             SystemGlobal.obConnectStatus.collectLatest {
                 vd.tvConnectStatus.text = it.msg
             }
         }
-        lifecycleScope.launchWhenCreated {
+        lifecycleScope.launch {
             vm.getPatient.collectLatest {
                 vd.swGetPatient.isChecked = it
                 vd.llGetPatient1.visibility = if (it) View.VISIBLE else View.GONE

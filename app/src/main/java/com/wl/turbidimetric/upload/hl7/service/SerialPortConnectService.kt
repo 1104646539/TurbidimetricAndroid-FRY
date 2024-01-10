@@ -49,7 +49,7 @@ class SerialPortConnectService(successListener: () -> Unit) :
                     onConnectListener?.onConnectStatusChange(ConnectStatus.CONNECTED)
                     onConnectListener?.onConnectResult(ConnectResult.Success())
                     isConnect = true
-                }else{
+                } else {
                     isConnect = false
                     onConnectListener?.onConnectStatusChange(ConnectStatus.DISCONNECTED)
                     onConnectListener?.onConnectResult(
@@ -79,6 +79,8 @@ class SerialPortConnectService(successListener: () -> Unit) :
         isConnect = false
         serialPort?.close()
         serialPort = null
+        input?.close()
+        output?.close()
         handler.removeCallbacksAndMessages(WHAT_RECONNECTION)
     }
 

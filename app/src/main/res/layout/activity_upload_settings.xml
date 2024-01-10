@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
 
-    <data>
-
-        <variable
-            name="vm"
-            type="com.wl.turbidimetric.upload.view.UploadSettingsViewModel" />
-    </data>
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
@@ -146,11 +140,41 @@
                                         android:track="@drawable/selector_switch_track" />
                                 </LinearLayout>
                             </LinearLayout>
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:paddingTop="10dp">
+
+                                <TextView
+                                    style="@style/TextHilt"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="left"
+                                    android:text="双向通讯" />
+
+                                <LinearLayout
+                                    android:layout_width="150dp"
+                                    android:layout_height="match_parent"
+                                    android:layout_marginLeft="14dp"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
+
+                                    <Switch
+                                        android:id="@+id/sw_twoway"
+                                        android:layout_width="150dp"
+                                        android:layout_height="match_parent"
+                                        android:switchMinWidth="56dp"
+                                        android:thumb="@drawable/selector_switch_thumb"
+                                        android:track="@drawable/selector_switch_track" />
+                                </LinearLayout>
+                            </LinearLayout>
 
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:gravity="center_vertical"
+                                android:id="@+id/ll_timeout"
                                 android:orientation="horizontal"
                                 android:paddingTop="10dp">
 
@@ -635,6 +659,7 @@
 
                 <LinearLayout
                     android:layout_width="1200dp"
+                    android:background="@color/divider"
                     android:layout_height="match_parent"
                     android:orientation="vertical">
 
@@ -642,30 +667,26 @@
                         style="@style/TextTitle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@color/divider"
                         android:gravity="left"
                         android:text="上传日志信息"
                         android:textColor="@color/themePositiveColor"></TextView>
 
-                    <ScrollView
+                    <androidx.core.widget.NestedScrollView
                         android:id="@+id/sv_log"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:fillViewport="true">
+                        android:layout_weight="1">
 
                         <TextView
                             android:id="@+id/tv_log"
                             style="@style/TextHilt"
                             android:layout_width="match_parent"
-                            android:layout_height="0dp"
-                            android:layout_marginTop="10dp"
-                            android:layout_weight="1"
-                            android:background="@color/divider"
+                            android:layout_height="wrap_content"
+                            android:paddingTop="10dp"
                             android:gravity="left"
-                            android:padding="8dp"
+                            android:paddingBottom="20dp"
                             android:textSize="20sp"></TextView>
-                    </ScrollView>
+                    </androidx.core.widget.NestedScrollView>
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -683,8 +704,6 @@
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
-
-
         </LinearLayout>
     </LinearLayout>
 </layout>

@@ -1,6 +1,8 @@
 package com.wl.turbidimetric.upload.hl7.service
 
 import com.wl.weiqianwllib.serialport.BaseSerialPort
+import com.wl.wllib.LogToFile.i
+import java.io.IOException
 import java.io.InputStream
 
 /**
@@ -10,15 +12,23 @@ import java.io.InputStream
  * @constructor
  */
 class SerialPortInputStream(val serialPort: BaseSerialPort) : InputStream() {
-    private val ba = ByteArray(3)
+    private val TAG = "SerialPortInputStream"
+    private val ba = ByteArray(2)
+    var isOpen = true
     override fun read(): Int {
-        var len = 0
-        while (true) {
-            if (serialPort.read(ba, 1).also { len = it } > 0) {
+        while (isOpen) {
+            if (serialPort.read(ba, 1) > 0) {
                 return ba[0].toInt().also {
                     ba[0] = 0
                 }
             }
         }
+        throw IOException("$TAG read io error")
+    }
+
+    override fun close() {
+        isOpen = false
+        i(TAG, "close: ")
+        super.close()
     }
 }

@@ -7,17 +7,23 @@ import ca.uhn.hl7v2.parser.Parser
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.wl.turbidimetric.model.TestResultAndCurveModel
-import com.wl.turbidimetric.model.TestResultModel
+import com.wl.turbidimetric.upload.hl7.util.ErrorEnum
+import com.wl.turbidimetric.upload.hl7.util.MsaStatus
+import com.wl.turbidimetric.upload.hl7.util.Status
+import com.wl.turbidimetric.upload.hl7.util.UploadGlobal
+import com.wl.turbidimetric.upload.hl7.util.errorEnumForCode
+import com.wl.turbidimetric.upload.model.ConnectConfig
+import com.wl.turbidimetric.upload.model.GetPatientCondition
+import com.wl.turbidimetric.upload.model.Patient
 import com.wl.turbidimetric.upload.msg.OruMsg
 import com.wl.turbidimetric.upload.msg.QryMsg
 import com.wl.turbidimetric.upload.service.OnConnectListener
 import com.wl.turbidimetric.upload.service.OnGetPatientCallback
 import com.wl.turbidimetric.upload.service.OnUploadCallback
 import com.wl.turbidimetric.upload.service.UploadService
-import com.wl.turbidimetric.upload.hl7.util.*
-import com.wl.turbidimetric.upload.model.ConnectConfig
-import com.wl.turbidimetric.upload.model.GetPatientCondition
-import com.wl.turbidimetric.upload.model.Patient
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 typealias Hl7Log = (String) -> Any?
 
@@ -72,9 +78,7 @@ class HL7UploadService : UploadService {
                     if (msgStr.isNullOrEmpty()) {
                         canSend = true
                         onUploadCallback.onUploadFailed(1, "上传数据为空")
-                    } else {
-//                        Log.d(TAG, "上传:发送 $msgStr")
-//                        hl7Log?.invoke("发送 $msgStr")
+                    } else if(connectService.connectService!!.config!!.twoWay){//双向通讯
                         val response =
                             connectService.sendWaitResponseRetry(
                                 msgStr,
@@ -116,6 +120,13 @@ class HL7UploadService : UploadService {
                         if (response == -1) {
                             canSend = true
                             onUploadCallback.onUploadFailed(-1, "响应超时")
+                        }
+                    }else{//单向通讯
+                        connectService.sendData(msgStr)
+                        GlobalScope.launch {
+                            delay(500)
+                            canSend = true
+                            onUploadCallback.onUploadSuccess("上传成功")
                         }
                     }
                 } else {
@@ -206,7 +217,7 @@ class HL7UploadService : UploadService {
             if (connectService.isConnected()) {
                 if (msgStr.isNullOrEmpty()) {
                     onGetPatientCallback.onGetPatientFailed(1, "上传数据为空")
-                } else {
+                } else if(connectService.connectService!!.config!!.twoWay){//双向通讯
                     Log.d(TAG, "上传:发送 $msgStr")
                     val response =
                         connectService.sendWaitResponseRetry(
@@ -269,6 +280,9 @@ class HL7UploadService : UploadService {
                         canSend = true
                         onGetPatientCallback.onGetPatientFailed(-1, "响应超时")
                     }
+                }else{
+                    canSend = true
+                    onGetPatientCallback.onGetPatientFailed(-1, "非双向通讯")
                 }
             } else {
                 canSend = true

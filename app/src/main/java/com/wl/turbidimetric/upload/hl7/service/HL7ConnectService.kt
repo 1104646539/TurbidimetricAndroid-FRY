@@ -47,10 +47,11 @@ class HL7ConnectService : ConnectService {
                         return@submitThread
                     }
                     response.let {
+                        Log.d(TAG, "startListener response=$response")
                         val responseMsg = connectService?.pipeParser?.parse(response)
                         responseMsg?.let {
                             val ackID = getMsgId(responseMsg)
-                //                            Log.d(TAG, "run: ackID==$ackID response=$response")
+                            //                            Log.d(TAG, "run: ackID==$ackID response=$response")
                             if (ackID == null) {
                                 Log.d(TAG, "ackID == null")
                             } else {
@@ -59,11 +60,11 @@ class HL7ConnectService : ConnectService {
                                 } else {
                                     if (responseMsg is QCK_Q02) {
                                         log("接收:$response")
-                //                                        Log.d(TAG, "上传:接收 $response")
+                                        //                                        Log.d(TAG, "上传:接收 $response")
                                         if (responseMsg.qak.qak2_QueryResponseStatus.value == ErrorEnum.NF.msg) {
                                             responseMap?.give(ackID, response)
                                         } else {
-                //                                            Log.d(TAG, "收到QCK^Q02:responseMsg=$responseMsg")
+                                            //                                            Log.d(TAG, "收到QCK^Q02:responseMsg=$responseMsg")
                                         }
                                     } else if (responseMsg is DSR_Q03) {
                                         log("接收:$response")
@@ -73,7 +74,7 @@ class HL7ConnectService : ConnectService {
                                         responseMap?.give(ackID, response)
                                     } else {
                                         log("接收:意外的消息 responseMsg == $response")
-                //                                        Log.d(TAG, "意外的消息 responseMsg == $response")
+                                        //                                        Log.d(TAG, "意外的消息 responseMsg == $response")
                                     }
                                 }
                             }
@@ -272,7 +273,7 @@ class HL7ConnectService : ConnectService {
         return -1
     }
 
-    private fun sendData(resp1: String): Int {
+    fun sendData(resp1: String): Int {
         log("发送：$resp1")
         connectService?.putMessage(resp1)
         return 1

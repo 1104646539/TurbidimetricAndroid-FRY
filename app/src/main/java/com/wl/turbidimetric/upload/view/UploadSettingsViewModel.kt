@@ -18,6 +18,7 @@ class UploadSettingsViewModel : BaseViewModel() {
     var serialPortBaudRate = MutableStateFlow("")
     var serialPort = MutableStateFlow(false)
     var isReconnection = MutableStateFlow(false)
+    var twoway = MutableStateFlow(false)
     var realTimeGetPatient = MutableStateFlow(false)
     var getPatientType = MutableStateFlow(GetPatientType.BC)
     var getPatient = MutableStateFlow(false)
@@ -31,6 +32,7 @@ class UploadSettingsViewModel : BaseViewModel() {
         isReconnection.value = SystemGlobal.uploadConfig.isReconnection
         serialPort.value = SystemGlobal.uploadConfig.serialPort
         realTimeGetPatient.value = SystemGlobal.uploadConfig.realTimeGetPatient
+        twoway.value = SystemGlobal.uploadConfig.twoWay
         getPatientType.value = SystemGlobal.uploadConfig.getPatientType
         getPatient.value = SystemGlobal.uploadConfig.getPatient
     }
@@ -48,7 +50,8 @@ class UploadSettingsViewModel : BaseViewModel() {
             isReconnection = isReconnection.value,
             realTimeGetPatient = realTimeGetPatient.value,
             getPatientType = getPatientType.value,
-            getPatient = getPatient.value
+            getPatient = getPatient.value,
+            twoWay = twoway.value
         )
     }
 }

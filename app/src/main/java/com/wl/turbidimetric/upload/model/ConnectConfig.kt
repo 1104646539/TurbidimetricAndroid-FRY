@@ -14,6 +14,7 @@ data class ConnectConfig(
     var serialPortStopBit: Int = 1,//串口波特率
     var serialPort: Boolean = false,//是串口连接还是网络连接
     var isReconnection: Boolean = false,//是否断开重连
+    var twoWay: Boolean = true,//是否是双向通讯
     var getPatient: Boolean = false,//是否开启获取样本申请信息
     var realTimeGetPatient: Boolean = false,//是否实时获取样本申请信息
     var getPatientType: GetPatientType = GetPatientType.BC,//实时获取时的类型

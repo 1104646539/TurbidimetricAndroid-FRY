@@ -45,11 +45,13 @@ fun transitionGetMachineStateModel(data: UByteArray): ReplyModel<GetMachineState
     val door = (states shr 27) and 1
     val r1 = (states shr 28) and 1
     val cleanoutFluid = (states shr 29) and 1
+    val squeezing = (states shr 30) and 1
 
     if (removeSampleAndCuvette == 1) errorInfo.add(ErrorInfo("错误号:1", "错误信息:${MOTORS[(13)]}"))
     if (door == 1) errorInfo.add(ErrorInfo("错误号:1", "错误信息:${MOTORS[(14)]}"))
     if (r1 == 1) errorInfo.add(ErrorInfo("错误号:1", "错误信息:${MOTORS[15]}"))
     if (cleanoutFluid == 1) errorInfo.add(ErrorInfo("错误号:1", "错误信息:${MOTORS[(16)]}"))
+    if (squeezing == 1) errorInfo.add(ErrorInfo("错误号:1", "错误信息:${MOTORS[(17)]}"))
 
     return ReplyModel(
         SerialGlobal.CMD_GetMachineState, convertReplyState(data[1].toInt()), GetMachineStateModel(errorInfo)

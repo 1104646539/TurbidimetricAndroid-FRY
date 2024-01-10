@@ -444,7 +444,7 @@ class MatchingArgsViewModel(
                 viewModelScope.launch {
                     _dialogUiState.emit(
                         MatchingArgsDialogUiState(
-                            dialogState = DialogState.STATE_FAILED,
+                            dialogState = DialogState.StateFailed,
                             stateFailedText.plus("，请停止使用仪器并联系供应商维修")
                         )
                     )
@@ -492,7 +492,7 @@ class MatchingArgsViewModel(
             viewModelScope.launch {
                 _dialogUiState.emit(
                     MatchingArgsDialogUiState(
-                        dialogState = DialogState.ACCIDENT, msg = "请重新自检或重启仪器"
+                        dialogState = DialogState.Accident, msg = "请重新自检或重启仪器"
                     )
                 )
             }
@@ -502,7 +502,7 @@ class MatchingArgsViewModel(
             viewModelScope.launch {
                 _dialogUiState.emit(
                     MatchingArgsDialogUiState(
-                        dialogState = DialogState.ACCIDENT, msg = "正在检测，请勿操作"
+                        dialogState = DialogState.Accident, msg = "正在检测，请勿操作"
                     )
                 )
             }
@@ -513,7 +513,7 @@ class MatchingArgsViewModel(
             viewModelScope.launch {
                 _dialogUiState.emit(
                     MatchingArgsDialogUiState(
-                        dialogState = DialogState.ACCIDENT, msg = "请输入试剂序号"
+                        dialogState = DialogState.Accident, msg = "请输入试剂序号"
                     )
                 )
             }
@@ -1423,7 +1423,7 @@ class MatchingArgsViewModel(
             viewModelScope.launch {
                 _dialogUiState.emit(
                     MatchingArgsDialogUiState(
-                        DialogState.ACCIDENT, "检测到放入的是样本管，请在样本架上放置比色杯！"
+                        DialogState.Accident, "检测到放入的是样本管，请在样本架上放置比色杯！"
                     )
                 )
             }
@@ -1431,7 +1431,7 @@ class MatchingArgsViewModel(
             viewModelScope.launch {
                 _dialogUiState.emit(
                     MatchingArgsDialogUiState(
-                        DialogState.ACCIDENT, msg
+                        DialogState.Accident, msg
                     )
                 )
             }

@@ -464,17 +464,17 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     /**
                      * 自检中
                      */
-                    DialogState.GET_MACHINE_SHOW -> {
+                    DialogState.GetMachineShow -> {
                         dialogGetMachine.show()
                     }
 
-                    DialogState.GET_MACHINE_DISMISS -> {
+                    DialogState.GetMachineDismiss -> {
                         dialogGetMachine.dismiss()
                     }
                     /**
                      * 自检失败对话框
                      */
-                    DialogState.GET_MACHINE_FAILED_SHOW -> {
+                    DialogState.GetMachineFailedShow -> {
                         lifecycleScope.launch {
                             delay(300)
                             dialog.showPop(requireContext(), isCancelable = false) {
@@ -497,7 +497,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     /**
                      * 检测结束后 比色皿不足
                      */
-                    DialogState.CUVETTE_DEFICIENCY -> {
+                    DialogState.CuvetteDeficiency -> {
                         dialog.showPop(requireContext(), isCancelable = false) {
                             it.showDialog(
                                 msg = "比色皿检测结束，是否添加？",
@@ -517,7 +517,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     /**
                      * 开始检测 比色皿,样本，试剂不足
                      */
-                    DialogState.GET_STATE_NOT_EXIST -> {
+                    DialogState.GetStateNotExist -> {
                         dialog.showPop(requireContext(), isCancelable = false) {
                             dialog.showDialog(
                                 msg = state.dialogMsg,
@@ -538,7 +538,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     /**
                      * 正常检测 样本不足
                      */
-                    DialogState.SAMPLE_DEFICIENCY -> {
+                    DialogState.SampleDeficiency -> {
                         dialog.showPop(requireContext(), isCancelable = false) {
                             it.showDialog(
                                 msg = "样本不足，是否添加？",
@@ -557,7 +557,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     /**
                      * 检测结束 正常样本取样完成的提示
                      */
-                    DialogState.TEST_FINISH -> {
+                    DialogState.TestFinish -> {
                         dialog.showPop(requireContext(), isCancelable = false) {
                             it.showDialog(msg = if (state.dialogMsg.isEmpty()) "检测结束" else "检测结束,${state.dialogMsg}", confirmText = "确定", confirmClick = {
                                 it.dismiss()
@@ -567,7 +567,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     /**
                      * 通知
                      */
-                    DialogState.NOTIFY -> {
+                    DialogState.Notify -> {
 //                        toast(state.dialogMsg)
                         dialog.showPop(requireContext(), isCancelable = false) {
                             it.showDialog(
@@ -583,7 +583,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     /**
                      * 命令提示错误，中断所有程序
                      */
-                    DialogState.STATE_FAILED->{
+                    DialogState.StateFailed->{
                         dialog.showPop(requireContext(), isCancelable = false) {
                             it.showDialog(
                                 msg = state.dialogMsg,

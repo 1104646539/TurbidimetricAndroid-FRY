@@ -449,7 +449,7 @@ class RepeatabilityViewModel(
             viewModelScope.launch {
                 _dialogUiState.emit(
                     RepeatabilityUiState(
-                        DialogState.GET_STATE_NOT_EXIST,
+                        DialogState.GetStateNotExist,
                         failedText
                     )
                 )
@@ -1168,7 +1168,7 @@ class RepeatabilityViewModel(
                 viewModelScope.launch {
                     _dialogUiState.emit(
                         RepeatabilityUiState(
-                            dialogState = DialogState.STATE_FAILED,
+                            dialogState = DialogState.StateFailed,
                             stateFailedText.plus("，请停止使用仪器并联系供应商维修")
                         )
                     )
@@ -1211,7 +1211,7 @@ class RepeatabilityViewModel(
             viewModelScope.launch {
                 _dialogUiState.emit(
                     RepeatabilityUiState(
-                        DialogState.TEST_FINISH,
+                        DialogState.TestFinish,
                         "检测到放入的是样本管，请在样本架上放置比色杯"
                     )
                 )
@@ -1221,7 +1221,7 @@ class RepeatabilityViewModel(
             viewModelScope.launch {
                 _dialogUiState.emit(
                     RepeatabilityUiState(
-                        DialogState.TEST_FINISH,
+                        DialogState.TestFinish,
                         "重复性检测结束"
                     )
                 )

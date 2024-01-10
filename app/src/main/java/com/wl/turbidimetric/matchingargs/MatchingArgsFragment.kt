@@ -295,8 +295,7 @@ class MatchingArgsFragment :
 
     private fun listenerDialog() {
         lifecycleScope.launch {
-            vm.dialogUiState.collect {
-                state->
+            vm.dialogUiState.collect { state ->
                 when (state.dialogState) {
                     DialogState.GetStateNotExistMsg -> {//开始检测，确实清洗液等
                         dialog.showPop(requireContext()) { dialog ->
@@ -338,7 +337,7 @@ class MatchingArgsFragment :
 
                     }
 
-                    DialogState.ACCIDENT -> {//意外的检测结束等
+                    DialogState.Accident -> {//意外的检测结束等
                         dialog.showPop(requireContext()) { dialog ->
                             dialog.showDialog(
                                 msg = "${state.msg}",
@@ -361,18 +360,25 @@ class MatchingArgsFragment :
                                 vm.selectFitterType,
                                 vm.targetCons,
                                 { matchingNum: Int, autoAttenuation: Boolean, selectProject: ProjectModel?, selectFitterType: FitterType, cons: List<Int> ->
-                                    vm.matchingConfigFinish(matchingNum,autoAttenuation,selectProject,selectFitterType,cons)
+                                    vm.matchingConfigFinish(
+                                        matchingNum,
+                                        autoAttenuation,
+                                        selectProject,
+                                        selectFitterType,
+                                        cons
+                                    )
                                 }
                             ) {}
                         }
                     }
+
                     DialogState.MatchingState -> {//拟合状态
 
                     }
                     /**
                      * 命令提示错误，中断所有程序
                      */
-                    DialogState.STATE_FAILED->{
+                    DialogState.StateFailed -> {
                         dialog.showPop(requireContext(), isCancelable = false) {
                             it.showDialog(
                                 msg = state.msg,
@@ -384,6 +390,7 @@ class MatchingArgsFragment :
                             )
                         }
                     }
+
                     else -> {
 
                     }

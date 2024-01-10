@@ -38,7 +38,7 @@ enum class DialogState {
     /**
      * 意外错误等
      */
-    ACCIDENT,
+    Accident,
 
     /**
      * 拟合配置
@@ -53,5 +53,5 @@ enum class DialogState {
     /**
      * 返回状态失败、非法参数、传感器错误、电机错误等的提示
      */
-    STATE_FAILED,
+    StateFailed,
 }

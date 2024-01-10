@@ -38,7 +38,7 @@ class HomeViewModel(
     fun goGetMachineState() {
 //        dialogGetMachine.postValue(true)
         viewModelScope.launch {
-            _dialogUiState.emit(HomeDialogUiState(DialogState.GET_MACHINE_SHOW, ""))
+            _dialogUiState.emit(HomeDialogUiState(DialogState.GetMachineShow, ""))
         }
         testState = TestState.GetMachineState
         getMachineState()
@@ -484,7 +484,7 @@ class HomeViewModel(
         }
         if (errorMsg.isNotEmpty()) {
             viewModelScope.launch {
-                _dialogUiState.emit(HomeDialogUiState(dialogState = DialogState.NOTIFY, errorMsg))
+                _dialogUiState.emit(HomeDialogUiState(dialogState = DialogState.Notify, errorMsg))
             }
             return
         }
@@ -773,7 +773,7 @@ class HomeViewModel(
                 viewModelScope.launch {
                     _dialogUiState.emit(
                         HomeDialogUiState(
-                            dialogState = DialogState.STATE_FAILED,
+                            dialogState = DialogState.StateFailed,
                             stateFailedText.plus("，请停止使用仪器并联系供应商维修")
                         )
                     )
@@ -1334,7 +1334,7 @@ class HomeViewModel(
                         viewModelScope.launch {
                             _dialogUiState.emit(
                                 HomeDialogUiState(
-                                    dialogState = DialogState.CUVETTE_DEFICIENCY, ""
+                                    dialogState = DialogState.CuvetteDeficiency, ""
                                 )
                             )
                         }
@@ -1352,7 +1352,7 @@ class HomeViewModel(
                         viewModelScope.launch {
                             _dialogUiState.emit(
                                 HomeDialogUiState(
-                                    dialogState = DialogState.GET_STATE_NOT_EXIST, str
+                                    dialogState = DialogState.GetStateNotExist, str
                                 )
                             )
                         }
@@ -1368,7 +1368,7 @@ class HomeViewModel(
                     viewModelScope.launch {
                         _dialogUiState.emit(
                             HomeDialogUiState(
-                                dialogState = DialogState.CUVETTE_DEFICIENCY, ""
+                                dialogState = DialogState.CuvetteDeficiency, ""
                             )
                         )
                     }
@@ -1383,7 +1383,7 @@ class HomeViewModel(
                     viewModelScope.launch {
                         _dialogUiState.emit(
                             HomeDialogUiState(
-                                dialogState = DialogState.GET_STATE_NOT_EXIST, "试剂和清洗液不足"
+                                dialogState = DialogState.GetStateNotExist, "试剂和清洗液不足"
                             )
                         )
                     }
@@ -2006,7 +2006,7 @@ class HomeViewModel(
         var dialogMsg = getFinishDialogMsg()
 
         viewModelScope.launch {
-            _dialogUiState.emit(HomeDialogUiState(dialogState = DialogState.TEST_FINISH, dialogMsg))
+            _dialogUiState.emit(HomeDialogUiState(dialogState = DialogState.TestFinish, dialogMsg))
         }
         testState = TestState.Normal
     }
@@ -2152,7 +2152,7 @@ class HomeViewModel(
             getState()
         } else {
             viewModelScope.launch {
-                _dialogUiState.emit(HomeDialogUiState(DialogState.GET_MACHINE_DISMISS, ""))
+                _dialogUiState.emit(HomeDialogUiState(DialogState.GetMachineDismiss, ""))
             }
             testState = TestState.NotGetMachineState
             val sb = StringBuffer()
@@ -2167,7 +2167,7 @@ class HomeViewModel(
             viewModelScope.launch {
                 _dialogUiState.emit(
                     HomeDialogUiState(
-                        DialogState.GET_MACHINE_FAILED_SHOW, sb.toString()
+                        DialogState.GetMachineFailedShow, sb.toString()
                     )
                 )
             }
@@ -2195,7 +2195,7 @@ class HomeViewModel(
         if (testState == TestState.Normal) {
             i("自检完成")
             viewModelScope.launch {
-                _dialogUiState.emit(HomeDialogUiState(DialogState.GET_MACHINE_DISMISS, ""))
+                _dialogUiState.emit(HomeDialogUiState(DialogState.GetMachineDismiss, ""))
             }
         }
         if (!runningTest()) return
@@ -2233,7 +2233,7 @@ class HomeViewModel(
                 viewModelScope.launch {
                     _dialogUiState.emit(
                         HomeDialogUiState(
-                            dialogState = DialogState.GET_STATE_NOT_EXIST, "样本不足，请添加"
+                            dialogState = DialogState.GetStateNotExist, "样本不足，请添加"
                         )
                     )
                 }
@@ -2262,7 +2262,7 @@ class HomeViewModel(
             viewModelScope.launch {
                 _dialogUiState.emit(
                     HomeDialogUiState(
-                        dialogState = DialogState.GET_STATE_NOT_EXIST, "比色皿不足，请添加"
+                        dialogState = DialogState.GetStateNotExist, "比色皿不足，请添加"
                     )
                 )
             }
@@ -2275,7 +2275,7 @@ class HomeViewModel(
                 viewModelScope.launch {
                     _dialogUiState.emit(
                         HomeDialogUiState(
-                            dialogState = DialogState.GET_STATE_NOT_EXIST, "样本不足，请添加"
+                            dialogState = DialogState.GetStateNotExist, "样本不足，请添加"
                         )
                     )
                 }
@@ -2292,7 +2292,7 @@ class HomeViewModel(
             viewModelScope.launch {
                 _dialogUiState.emit(
                     HomeDialogUiState(
-                        dialogState = DialogState.GET_STATE_NOT_EXIST, str
+                        dialogState = DialogState.GetStateNotExist, str
                     )
                 )
             }

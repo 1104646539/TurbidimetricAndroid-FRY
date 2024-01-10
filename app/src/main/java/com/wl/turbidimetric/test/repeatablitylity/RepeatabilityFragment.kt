@@ -101,7 +101,7 @@ class RepeatabilityFragment :
                     /**
                      * 开始检测 比色皿,样本，试剂不足
                      */
-                    DialogState.GET_STATE_NOT_EXIST -> {
+                    DialogState.GetStateNotExist -> {
                         dialog.showPop(requireContext(), isCancelable = false) { d ->
                             d.showDialog(
                                 msg = "${state.dialogMsg}",
@@ -119,7 +119,7 @@ class RepeatabilityFragment :
                     /**
                      * 检测结束
                      */
-                    DialogState.TEST_FINISH -> {
+                    DialogState.TestFinish -> {
                         dialog.showPop(requireContext(), isCancelable = false) { d ->
                             d.showDialog(
                                 msg = state.dialogMsg,
@@ -132,7 +132,7 @@ class RepeatabilityFragment :
                     /**
                      * 报错
                      */
-                    DialogState.STATE_FAILED -> {
+                    DialogState.StateFailed -> {
                         dialog.showPop(requireContext(), isCancelable = false) { d ->
                             d.showDialog(
                                 msg = state.dialogMsg,

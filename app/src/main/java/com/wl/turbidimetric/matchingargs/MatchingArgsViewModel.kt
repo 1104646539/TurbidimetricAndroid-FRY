@@ -1124,7 +1124,9 @@ class MatchingArgsViewModel(
                     nds,
                     it.yzs!!.toList(),
                     mutableListOf(it.f0, it.f1, it.f2, it.f3),
-                    it.createTime
+                    it.createTime,
+                    it.projectName,
+                    it.reagentNO
                 )
             }
         }

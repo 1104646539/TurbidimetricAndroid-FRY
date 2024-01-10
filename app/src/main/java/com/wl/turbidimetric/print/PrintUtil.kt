@@ -8,6 +8,7 @@ import com.wl.weiqianwllib.serialport.WQSerialGlobal
 import com.wl.wllib.toTimeStr
 import java.nio.charset.Charset
 import com.wl.wllib.LogToFile.i
+
 /**
  * 热敏打印
  * @property serialPort BaseSerialPortUtil
@@ -75,14 +76,18 @@ object PrintUtil {
         nds: DoubleArray,
         yzs: List<Int>,
         params: MutableList<Double>,
-        createTime: String
+        createTime: String,
+        projectName: String,
+        reagentNo: String
     ) {
         val msg = getMatchingQualityMsg(
             absorbancys.toMutableList(),
             nds,
             yzs.toMutableList(),
             params,
-            createTime
+            createTime,
+            projectName,
+            reagentNo
         )
         send(msg)
     }
@@ -101,11 +106,15 @@ object PrintUtil {
         nds: DoubleArray,
         yzs: MutableList<Int>,
         params: MutableList<Double>,
-        createTime: String
+        createTime: String,
+        projectName: String,
+        reagentNo: String
     ): String {
 
         val sb = StringBuilder()
         sb.append("\n\n")
+        sb.append("序号:$reagentNo\n")
+        sb.append("项目名:$projectName\n")
         sb.append("质控时间:$createTime\n")
         repeat(5) {
             val nd = "${nds[it]}ng/mL".fix(15)
@@ -119,7 +128,7 @@ object PrintUtil {
 
         sb.append("\n\n")
 
-        if (yzs.size>5) {
+        if (yzs.size > 5) {
             sb.append("${yzs[5]}ng/mL")
             sb.append("\n")
             sb.append("${absorbancys[5]}")

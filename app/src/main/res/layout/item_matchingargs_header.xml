@@ -20,9 +20,17 @@
             style="@style/TextItem"
             android:layout_width="104dp"
             android:layout_height="match_parent"
-            android:visibility="gone"
             android:src="@drawable/select_cb_query_data"
-            android:text="选中" />
+            android:text="选中"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/tvID"
+            style="@style/TextItem"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="序号" />
 
         <TextView
             android:id="@+id/tvProjectName"
@@ -32,13 +40,6 @@
             android:gravity="center"
             android:text="项目名" />
 
-        <TextView
-            android:id="@+id/tvID"
-            style="@style/TextItem"
-            android:layout_width="80dp"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="序号" />
 
         <TextView
             android:id="@+id/tvA1"

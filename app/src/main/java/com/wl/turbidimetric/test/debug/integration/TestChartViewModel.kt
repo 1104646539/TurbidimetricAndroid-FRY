@@ -38,7 +38,7 @@ import java.util.Date
 import java.util.Timer
 import kotlin.concurrent.timer
 
-class IntegrationViewModel : BaseViewModel(), Callback2 {
+class TestChartViewModel : BaseViewModel(), Callback2 {
     val testMsg = MutableStateFlow("")
     val resultMsg = MutableStateFlow("")
     var debugType = DebugType.IntervalTest
@@ -49,7 +49,6 @@ class IntegrationViewModel : BaseViewModel(), Callback2 {
     }
 
     fun listener() {
-
         SerialPortUtil.callback.add(this)
         testType = TestType.Debug
         i("SerialPortUtil.callback listener")

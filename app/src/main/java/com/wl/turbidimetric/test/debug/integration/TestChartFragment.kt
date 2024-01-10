@@ -8,16 +8,16 @@ import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.wl.turbidimetric.R
-import com.wl.turbidimetric.databinding.FragmentIntegrationBinding
+import com.wl.turbidimetric.base.BaseFragment
+import com.wl.turbidimetric.databinding.FragmentTestChartBinding
 import com.wl.turbidimetric.ex.getResource
 import com.wl.turbidimetric.ex.toast
-import com.wl.turbidimetric.base.BaseFragment
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-class IntegrationFragment :
-    BaseFragment<IntegrationViewModel, FragmentIntegrationBinding>(R.layout.fragment_integration) {
-    override val vm: IntegrationViewModel by viewModels()
+class TestChartFragment :
+    BaseFragment<TestChartViewModel, FragmentTestChartBinding>(R.layout.fragment_test_chart) {
+    override val vm: TestChartViewModel by viewModels()
     private val bgGray = getResource().getColor(R.color.bg_gray)
     private val textColor = getResource().getColor(R.color.textColor)
     private val lineColor = getResource().getColor(R.color.themePositiveColor)
@@ -123,7 +123,7 @@ class IntegrationFragment :
 
     private fun listenerView() {
         lifecycleScope.launch {
-            vm.point.observe(this@IntegrationFragment) {
+            vm.point.observe(this@TestChartFragment) {
                 temp.add(0, it)
                 vd.tvMsg.post {
                     vd.tvMsg.text = temp.joinToString()
@@ -162,6 +162,6 @@ class IntegrationFragment :
 
     companion object {
         @JvmStatic
-        fun newInstance() = IntegrationFragment()
+        fun newInstance() = TestChartFragment()
     }
 }

@@ -335,8 +335,8 @@ object SerialPortUtil {
                             addRetry(take)
                         }
                         retryJobQueue[take[0]] = job
-                        write(take)
                     }
+                    write(take)
                 }
             }
         }

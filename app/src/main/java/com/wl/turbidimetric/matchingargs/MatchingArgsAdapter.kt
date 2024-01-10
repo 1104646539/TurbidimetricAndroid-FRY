@@ -35,8 +35,10 @@ class MatchingArgsAdapter :
             binding.tvA2.text = (item?.f1 ?: 0.0).scaleStr(7).toString()
             binding.tvX0.text = (item?.f2 ?: 0.0).scaleStr(7).toString()
             binding.tvP.text = (item?.f3 ?: 0.0).scaleStr(8).toString()
-            binding.tvTestTime.text = if(item?.createTime.isNullOrEmpty()) "-" else item?.createTime
+            binding.tvTestTime.text =
+                if (item?.createTime.isNullOrEmpty()) "-" else item?.createTime
             binding.tvFitGoodness.text = (item?.fitGoodness ?: 0.0).scaleStr(6).toString()
+            binding.tvProjectName.text = item?.projectName ?: "-"
         }
     }
 
@@ -58,13 +60,13 @@ class MatchingArgsAdapter :
                         item.isSelect = true
                         view.isSelected = true
 
-                        holder.binding.ivSelect.isSelected = true
+//                        holder.binding.ivSelect.isSelected = true
                         holder.binding.root.setBackgroundResource(R.drawable.bg_item_select)
                         setSelectIndex(holder.absoluteAdapterPosition)
                     }
                 }
             }
-            holder.binding.ivSelect.isSelected = item.isSelect
+//            holder.binding.ivSelect.isSelected = item.isSelect
             item.let {
                 if (it.isSelect) {
                     holder.binding.root.setBackgroundResource(R.drawable.bg_item_select)

@@ -4,14 +4,15 @@ import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import com.wl.turbidimetric.R
+import com.wl.turbidimetric.base.BaseActivity
 import com.wl.turbidimetric.databinding.ActivityDebugBinding
 import com.wl.turbidimetric.global.EventGlobal
 import com.wl.turbidimetric.global.EventMsg
 import com.wl.turbidimetric.util.ActivityDataBindingDelegate
-import com.wl.turbidimetric.base.BaseActivity
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
@@ -25,13 +26,13 @@ class DebugActivity : BaseActivity<DebugViewModel, ActivityDebugBinding>() {
         supportActionBar?.show()
 
         listener()
-        vd.vp.adapter = DebugViewPagerAdapter(this)
         vd.vp.isUserInputEnabled = false
-        vd.vp.offscreenPageLimit = 1
+        vd.vp.offscreenPageLimit = ViewPager2.OFFSCREEN_PAGE_LIMIT_DEFAULT
+        vd.vp.adapter = DebugViewPagerAdapter(this)
 
 
         vd.tl.addTab(vd.tl.newTab().setText("单步调试"))
-        vd.tl.addTab(vd.tl.newTab().setText("组合调试"))
+        vd.tl.addTab(vd.tl.newTab().setText("检测分析调试"))
 
         vd.tl.addOnTabSelectedListener(object : OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {

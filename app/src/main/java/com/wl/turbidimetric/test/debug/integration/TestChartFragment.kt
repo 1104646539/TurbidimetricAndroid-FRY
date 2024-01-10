@@ -1,5 +1,6 @@
 package com.wl.turbidimetric.test.debug.integration
 
+import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -12,6 +13,7 @@ import com.wl.turbidimetric.base.BaseFragment
 import com.wl.turbidimetric.databinding.FragmentTestChartBinding
 import com.wl.turbidimetric.ex.getResource
 import com.wl.turbidimetric.ex.toast
+import com.wl.wllib.LogToFile.i
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -31,6 +33,8 @@ class TestChartFragment :
     override fun onPause() {
         super.onPause()
         vm.clearListener()
+        vm.stopIntervalTest()
+        i("onPause")
     }
 
     override fun initViewModel() {

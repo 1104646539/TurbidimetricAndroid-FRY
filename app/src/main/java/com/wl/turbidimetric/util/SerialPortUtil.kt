@@ -459,7 +459,8 @@ object SerialPortUtil {
     }
 
     /**
-     * 是否运行发送命令
+     * 是否允许发送命令
+     *
      * 当仪器已经发生电机、传感器、非法参数等错误时，不允许再次发送命令，防止仪器损坏
      */
     private fun isAllowRunning(data: UByteArray): Boolean {

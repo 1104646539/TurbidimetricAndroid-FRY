@@ -1042,7 +1042,7 @@ class MatchingArgsViewModel(
 
         result = calcAbsorbanceDifferences(resultTest1, resultTest2, resultTest3, resultTest4)
 
-        absorbancys = result.map { it.toDouble() * 10000 }
+        absorbancys = result.map { it.toDouble() }
         val cf = matchingArg(absorbancys)
         val res = cf.params
         for (i in res.indices) {

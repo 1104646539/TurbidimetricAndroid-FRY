@@ -72,7 +72,7 @@ class App : Application() {
                         f1 = 1.1219026
                         f2 = -8.9409E-4
                         f3 = 3.2E-7
-                        fitGoodness = 1.0
+                        fitGoodness = 0.99999997
                         reactionValues = intArrayOf(0, 49, 200, 500, 1000)
                         yzs = intArrayOf(0, 49, 200, 500, 1000)
                         createTime = Date().toTimeStr()

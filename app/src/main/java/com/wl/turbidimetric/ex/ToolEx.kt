@@ -153,7 +153,7 @@ fun calcAbsorbance(
     return log10(
         65535.toBigDecimal().divide(resultTest, 5, RoundingMode.HALF_UP).toDouble()
     ).toBigDecimal()
-        .setScale(5, RoundingMode.HALF_UP).multiply(10000.toBigDecimal())
+        .multiply(10000.toBigDecimal()).setScale(0, RoundingMode.HALF_UP)
 //    return log10(BigDecimal(65535).divide(BigDecimal(resultTest),5,BigDecimal.ROUND_HALF_UP))
 }
 

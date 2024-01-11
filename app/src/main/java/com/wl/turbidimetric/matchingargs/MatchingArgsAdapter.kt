@@ -11,6 +11,8 @@ import com.wl.turbidimetric.databinding.ItemMatchingargsBinding
 import com.wl.turbidimetric.ex.scaleStr
 import com.wl.turbidimetric.model.CurveModel
 import com.wl.wllib.LogToFile.i
+import java.math.BigDecimal
+import java.math.RoundingMode
 
 class MatchingArgsAdapter :
     RecyclerView.Adapter<MatchingArgsAdapter.MatchingArgsViewHolder>() {
@@ -37,7 +39,7 @@ class MatchingArgsAdapter :
             binding.tvP.text = (item?.f3 ?: 0.0).scaleStr(8).toString()
             binding.tvTestTime.text =
                 if (item?.createTime.isNullOrEmpty()) "-" else item?.createTime
-            binding.tvFitGoodness.text = (item?.fitGoodness ?: 0.0).scaleStr(6).toString()
+            binding.tvFitGoodness.text = (item?.fitGoodness ?: 0.0).toBigDecimal().setScale(7, RoundingMode.DOWN).toPlainString()
             binding.tvProjectName.text = item?.projectName ?: "-"
         }
     }

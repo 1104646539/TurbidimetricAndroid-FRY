@@ -313,9 +313,11 @@ class MatchingArgsViewModel(
     var curProject: CurveModel? = null
 
     /**
-     * 移动样本时检测到样本管的标记
+     * 意外停止的编号
+     *
+     * 比如取样失败，加试剂失败、是采便管等
      */
-    var isDetectedSample = false
+    var accidentState = ReplyState.SUCCESS
 
     /**
      * 开始检测前的清洗取样针
@@ -534,7 +536,7 @@ class MatchingArgsViewModel(
 
     private fun initState() {
         curProject = null
-        isDetectedSample = false
+        accidentState = ReplyState.SUCCESS
         resultTest1.clear()
         resultTest2.clear()
         resultTest3.clear()
@@ -752,7 +754,7 @@ class MatchingArgsViewModel(
 
         //如果是样本管，直接检测结束，并报错，因为质控不允许使用样本管
         if (reply.data.type.isSample()) {
-            isDetectedSample = true
+            accidentState = ReplyState.ORDER
             matchingFinish()
             return
         }
@@ -1180,7 +1182,8 @@ class MatchingArgsViewModel(
         dripSamplingFinish = true
         samplingFinish = false
         if (reply.state == ReplyState.CUVETTE_NOT_EMPTY) {//比色皿非空
-            showMatchingDialog("拟合结束，比色皿非空")
+            accidentState = ReplyState.CUVETTE_NOT_EMPTY
+            matchingFinish()
             return
         }
         when (testState) {
@@ -1219,7 +1222,8 @@ class MatchingArgsViewModel(
 
         samplingFinish = true
         if (reply.state == ReplyState.SAMPLING_FAILED) {//取样失败
-            showMatchingDialog("拟合结束，取样失败")
+            accidentState = ReplyState.SAMPLING_FAILED
+            matchingFinish()
             return
         }
         when (testState) {
@@ -1304,7 +1308,8 @@ class MatchingArgsViewModel(
         i("接收到 取试剂 reply=$reply cuvettePos=$cuvettePos cuvetteMoveFinish=$cuvetteMoveFinish")
         takeReagentFinish = true
         if (reply.state == ReplyState.TAKE_REAGENT_FAILED) {//取试剂失败
-            showMatchingDialog("拟合结束，取试剂失败")
+            accidentState = ReplyState.TAKE_REAGENT_FAILED
+            matchingFinish()
             return
         }
         //取完试剂判断是否移动比色皿完成，完成就直接取样
@@ -1419,21 +1424,12 @@ class MatchingArgsViewModel(
     /**
      * 显示拟合结束对话框
      */
-    private fun showMatchingDialog(msg: String = "") {
-        if (isDetectedSample) {
-            isDetectedSample = false
+    private fun showMatchingDialog() {
+        if (accidentState != ReplyState.SUCCESS) {
             viewModelScope.launch {
                 _dialogUiState.emit(
                     MatchingArgsDialogUiState(
-                        DialogState.Accident, "检测到放入的是样本管，请在样本架上放置比色杯！"
-                    )
-                )
-            }
-        } else if (msg.isNotEmpty()) {
-            viewModelScope.launch {
-                _dialogUiState.emit(
-                    MatchingArgsDialogUiState(
-                        DialogState.Accident, msg
+                        DialogState.Accident, getAccidentFinishDialog()
                     )
                 )
             }
@@ -1447,6 +1443,49 @@ class MatchingArgsViewModel(
             }
         }
         testState = TestState.Normal
+    }
+
+    /**
+     * 当发生意外导致拟合结束时的提示信息
+     */
+    private fun getAccidentFinishDialog(): String {
+        return when (accidentState) {
+            ReplyState.SUCCESS -> {
+                "拟合结束"
+            }
+
+            ReplyState.INVALID_PARAMETER -> {
+                "拟合结束"
+            }
+
+            ReplyState.MOTOR_ERR -> {
+                "拟合结束"
+            }
+
+            ReplyState.SENSOR_ERR -> {
+                "拟合结束"
+            }
+
+            ReplyState.SAMPLING_FAILED -> {
+                "拟合结束，取样失败"
+            }
+
+            ReplyState.CUVETTE_NOT_EMPTY -> {
+                "拟合结束，比色皿非空"
+            }
+
+            ReplyState.TAKE_REAGENT_FAILED -> {
+                "拟合结束，加试剂失败"
+            }
+
+            ReplyState.ORDER -> {
+                "拟合结束，检测到样本管"
+            }
+
+            else -> {
+                "其他"
+            }
+        }
     }
 
     /**

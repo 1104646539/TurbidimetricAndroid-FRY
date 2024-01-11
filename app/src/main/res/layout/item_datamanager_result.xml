@@ -75,13 +75,6 @@
             android:visibility="gone" />
 
 
-        <TextView
-            android:id="@+id/tvAbsorbances"
-            style="@style/TextHilt"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:text="反应度" />
-
 
         <TextView
             android:id="@+id/tvConcentration"
@@ -105,7 +98,12 @@
             android:layout_width="220dp"
             android:layout_height="wrap_content"
             android:text="检测时间" />
-
+        <TextView
+            android:id="@+id/tvAbsorbances"
+            style="@style/TextHilt"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="反应度" />
 
         <TextView
             android:id="@+id/tvTestValue1"

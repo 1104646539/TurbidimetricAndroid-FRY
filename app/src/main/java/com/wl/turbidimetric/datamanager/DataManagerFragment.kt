@@ -26,6 +26,8 @@ import com.wl.turbidimetric.util.ExportExcelHelper
 import com.wl.turbidimetric.view.dialog.*
 import com.wl.wllib.LogToFile.i
 import com.wl.turbidimetric.base.BaseFragment
+import com.wl.wllib.LogToFile
+import com.wl.wllib.LogToFile.u
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
 import java.util.*
@@ -163,13 +165,16 @@ class DataManagerFragment :
         }
 
         vd.btnCondition.setOnClickListener {
+            u("数据筛选")
             showConditionDialog()
         }
 
         vd.btnExportExcel.setOnClickListener {
+            u("导出Excel")
             exportExcelSelected()
         }
         vd.btnExportExcelAll.setOnClickListener {
+            u("导出Excel全部")
             exportExcelAll()
         }
         vd.btnUpload.setOnClickListener {
@@ -182,8 +187,8 @@ class DataManagerFragment :
         }
 
         adapter.onLongClick = { id ->
+            u("详情$id")
             if (id > 0) {
-                lifecycleScope.launch {  }
                 lifecycleScope.launch {
                     val result = vm.getTestResultAndCurveModelById(id)
                     result?.let {
@@ -203,6 +208,7 @@ class DataManagerFragment :
         }
 
         vd.btnPrint.setOnClickListener {
+            u("打印")
             print()
         }
         adapter.onSelectChange = { pos, selected ->

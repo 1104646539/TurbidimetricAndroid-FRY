@@ -23,6 +23,7 @@ import com.wl.weiqianwllib.OrderUtil
 import com.wl.turbidimetric.base.BaseFragment
 import com.wl.turbidimetric.base.BaseViewModel
 import com.wl.wllib.LogToFile.i
+import com.wl.wllib.LogToFile.u
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -93,40 +94,51 @@ class SettingsFragment :
 
     private fun listenerView() {
         vd.tvOrderSettings.setOnClickListener {
+            u("其他设置")
             showDebugModeView()
         }
         vd.tvParamsSetting.setOnClickListener {
+            u("参数设置")
             showParamsSettingDialog()
 
         }
         vd.tvDetectionNumSetting.setOnClickListener {
+            u("编号设置")
             showDetectionNumDialog()
         }
 
         vd.tvMachineTestMode.setOnClickListener {
+            u("检测模式设置")
             showMachineTestModelDialog()
         }
 
         vd.tvRepeatability.setOnClickListener {
+            u("重复性测试")
             showRepeatability()
         }
         vd.tvNav.setOnClickListener {
+            u("显示隐藏导航栏")
             showHideNav()
         }
         vd.tvLauncher.setOnClickListener {
+            u("打开桌面")
             showLauncher()
             OrderUtil.showHideNav(requireActivity(), true)
         }
         vd.tvUpload.setOnClickListener {
+            u("上传设置")
             startUpload()
         }
         vd.tvExportLog.setOnClickListener {
+            u("导出日志")
             exportLog()
         }
         vd.tvDebug.setOnClickListener {
+            u("调试")
             debug()
         }
         vd.tvProjectList.setOnClickListener {
+            u("项目设置")
             projectList()
         }
         val versionAndroid = String(
@@ -141,7 +153,7 @@ class SettingsFragment :
     }
 
     private fun projectList() {
-        startActivity(Intent(requireContext(),ProjectListActivity::class.java))
+        startActivity(Intent(requireContext(), ProjectListActivity::class.java))
     }
 
     /**

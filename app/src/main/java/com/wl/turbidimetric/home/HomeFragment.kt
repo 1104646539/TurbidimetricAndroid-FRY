@@ -26,6 +26,7 @@ import com.wl.turbidimetric.view.dialog.*
 import com.wl.turbidimetric.base.BaseFragment
 import kotlinx.coroutines.launch
 import com.wl.wllib.LogToFile.i
+import com.wl.wllib.LogToFile.u
 import com.wl.wllib.toLongTimeStr
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -126,7 +127,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         vm.goGetMachineState()
         vm.goGetVersion()
 
-        lifecycleScope.launch{
+        lifecycleScope.launch {
             vm.projectDatas.collectLatest {
                 it.let { ret ->
                     projects.clear()
@@ -179,19 +180,15 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         vd.ssv3.label = "3"
         vd.ssv4.label = "4"
         vd.ssv.clickIndex = { it, item ->
-            toast("样本 index=$it item=$item")
             showDetailsDialog(item)
         }
         vd.ssv2.clickIndex = { it, item ->
-            toast("样本 index2=$it item=$item")
             showDetailsDialog(item)
         }
         vd.ssv3.clickIndex = { it, item ->
-            toast("样本 index3=$it item=$item")
             showDetailsDialog(item)
         }
         vd.ssv4.clickIndex = { it, item ->
-            toast("样本 index4=$it item=$item")
             showDetailsDialog(item)
         }
         lifecycleScope.launch {
@@ -208,19 +205,15 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         vd.csv3.label = "2"
         vd.csv4.label = "1"
         vd.csv.clickIndex = { it, item ->
-            toast("比色皿 index=$it item=$item")
             showDetailsDialog(item)
         }
         vd.csv2.clickIndex = { it, item ->
-            toast("比色皿 index2=$it item=$item")
             showDetailsDialog(item)
         }
         vd.csv3.clickIndex = { it, item ->
-            toast("比色皿 index3=$it item=$item")
             showDetailsDialog(item)
         }
         vd.csv4.clickIndex = { it, item ->
-            toast("比色皿 index4=$it item=$item")
             showDetailsDialog(item)
         }
         lifecycleScope.launch {
@@ -250,6 +243,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         }
 
         vd.btnStart.setOnClickListener {
+            u("开始")
             if (vm.selectProject == null) {
                 showConfigDialog()
                 toast("请选择标曲")
@@ -274,9 +268,11 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         }
 
         vd.btnConfig.setOnClickListener {
+            u("设置")
             showConfigDialog()
         }
         vd.btnGetTestPatientInfo.setOnClickListener {
+            u("获取待检信息")
             showGetTestPatientInfo()
         }
     }
@@ -314,13 +310,12 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
     }
 
     private fun startGetTestPatientInfo(
-        condition1: String,
-        condition2: String,
-        type: GetPatientType
+        condition1: String, condition2: String, type: GetPatientType
     ) {
         waitDialog.showPop(requireContext()) { hilt ->
             hilt.showDialog("正在获取信息，请等待……")
-            HL7Helper.getPatientInfo(GetPatientCondition(condition1, condition2, type),
+            HL7Helper.getPatientInfo(
+                GetPatientCondition(condition1, condition2, type),
                 object : OnGetPatientCallback {
                     override fun onGetPatientSuccess(patients: List<Patient>?) {
                         lifecycleScope.launch(Dispatchers.Main) {
@@ -332,21 +327,20 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                                         confirmText = "我知道了",
                                         confirmClick = {
                                             it.dismiss()
+                                            u("没有待检信息，点击取消")
                                             vm.dialogGetStateNotExistConfirm()
                                         },
                                     )
                                 }
                             } else {
                                 patientInfoDialog.showPop(
-                                    requireContext(),
-                                    width = 1000,
-                                    isCancelable = false
+                                    requireContext(), width = 1000, isCancelable = false
                                 ) { pi ->
                                     pi.showPatient(patients, {
-                                        toast("点击确定")
+                                        u("待检信息,点击确定")
                                         pi.dismiss()
                                     }, {
-                                        toast("点击取消")
+                                        u("待检信息,点击取消")
                                         pi.dismiss()
                                     })
                                 }
@@ -362,6 +356,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                                     msg = "$code $msg",
                                     confirmText = "我知道了",
                                     confirmClick = {
+                                        u("获取待检信息失败，我知道了")
                                         it.dismiss()
                                         vm.dialogGetStateNotExistConfirm()
                                     },
@@ -379,8 +374,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
     private fun showConfigDialog() {
         i("showConfigDialog before")
         homeConfigDialog.showPop(requireContext(), width = 1000) {
-            it.showDialog(
-                vm.configViewEnable.value ?: true,
+            it.showDialog(vm.configViewEnable.value ?: true,
                 projects,
                 vm.selectProject,
                 vm.cuvetteStartPos,
@@ -412,6 +406,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
      * @param item SampleItem?
      */
     private fun showDetailsDialog(item: HomeViewModel.SampleItem?) {
+        u("showDetailsDialog $item")
         homeDetailsDialog.showPop(requireContext()) {
             it.showDialog(item)
         }
@@ -422,6 +417,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
      * @param item SampleItem?
      */
     private fun showDetailsDialog(item: HomeViewModel.CuvetteItem?) {
+        u("showDetailsDialog $item")
         homeDetailsDialog.showPop(requireContext()) {
             it.showDialog(item)
         }
@@ -449,8 +445,11 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     if (dialog.isShow) {
                         dialog.showPop(requireContext(), width = 1500) { d ->
                             d.showDialog(
-                                it, "确定", confirmClick = { it.dismiss() },
-                                showIcon = false, textGravity = Gravity.LEFT
+                                it,
+                                "确定",
+                                confirmClick = { it.dismiss() },
+                                showIcon = false,
+                                textGravity = Gravity.LEFT
                             )
                         }
                     }
@@ -489,7 +488,9 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                                     cancelClick = { baseDialog ->
                                         baseDialog.dismiss()
                                         vm.dialogGetMachineFailedCancel()
-                                    }, showIcon = true, iconId = ICON_HINT
+                                    },
+                                    showIcon = true,
+                                    iconId = ICON_HINT
                                 )
                             }
                         }
@@ -510,7 +511,9 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                                 cancelClick = {
                                     it.dismiss()
                                     vm.dialogTestFinishCuvetteDeficiencyCancel()
-                                }, showIcon = true, iconId = ICON_HINT
+                                },
+                                showIcon = true,
+                                iconId = ICON_HINT
                             )
                         }
                     }
@@ -519,8 +522,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                      */
                     DialogState.GetStateNotExist -> {
                         dialog.showPop(requireContext(), isCancelable = false) {
-                            dialog.showDialog(
-                                msg = state.dialogMsg,
+                            dialog.showDialog(msg = state.dialogMsg,
                                 confirmText = "我已添加",
                                 confirmClick = {
                                     it.dismiss()
@@ -530,7 +532,9 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                                 cancelClick = {
                                     it.dismiss()
                                     vm.dialogGetStateNotExistCancel()
-                                }, showIcon = true, iconId = ICON_HINT
+                                },
+                                showIcon = true,
+                                iconId = ICON_HINT
                             )
                         }
                     }
@@ -540,8 +544,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                      */
                     DialogState.SampleDeficiency -> {
                         dialog.showPop(requireContext(), isCancelable = false) {
-                            it.showDialog(
-                                msg = "样本不足，是否添加？",
+                            it.showDialog(msg = "样本不足，是否添加？",
                                 confirmText = "我已添加",
                                 confirmClick = {
                                     it.dismiss()
@@ -559,9 +562,15 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                      */
                     DialogState.TestFinish -> {
                         dialog.showPop(requireContext(), isCancelable = false) {
-                            it.showDialog(msg = if (state.dialogMsg.isEmpty()) "检测结束" else "检测结束,${state.dialogMsg}", confirmText = "确定", confirmClick = {
-                                it.dismiss()
-                            }, showIcon = true, iconId = ICON_FINISH)
+                            it.showDialog(
+                                msg = if (state.dialogMsg.isEmpty()) "检测结束" else "检测结束,${state.dialogMsg}",
+                                confirmText = "确定",
+                                confirmClick = {
+                                    it.dismiss()
+                                },
+                                showIcon = true,
+                                iconId = ICON_FINISH
+                            )
                         }
                     }
                     /**
@@ -576,14 +585,15 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                                 confirmClick = { baseDialog ->
                                     baseDialog.dismiss()
                                 },
-                                showIcon = true, iconId = ICON_HINT
+                                showIcon = true,
+                                iconId = ICON_HINT
                             )
                         }
                     }
                     /**
                      * 命令提示错误，中断所有程序
                      */
-                    DialogState.StateFailed->{
+                    DialogState.StateFailed -> {
                         dialog.showPop(requireContext(), isCancelable = false) {
                             it.showDialog(
                                 msg = state.dialogMsg,
@@ -591,7 +601,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                                 confirmClick = { baseDialog ->
                                     baseDialog.dismiss()
                                 },
-                                showIcon = true, iconId = ICON_HINT
+                                showIcon = true,
+                                iconId = ICON_HINT
                             )
                         }
                     }

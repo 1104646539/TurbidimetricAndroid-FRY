@@ -329,14 +329,16 @@ object SerialPortUtil {
                     Thread.sleep(50)
                     val take = sendQueue.take()
 //                    println("take=$take")
-                    if (take != null && isNeedRetry(take)) {
-                        val job = launch {
-                            delay(timeout)
-                            addRetry(take)
+                    if (take != null) {
+                        if (isNeedRetry(take)) {
+                            val job = launch {
+                                delay(timeout)
+                                addRetry(take)
+                            }
+                            retryJobQueue[take[0]] = job
                         }
-                        retryJobQueue[take[0]] = job
+                        write(take)
                     }
-                    write(take)
                 }
             }
         }
@@ -347,7 +349,7 @@ object SerialPortUtil {
      * 自检、获取温度不需要重发
      */
     private fun isNeedRetry(take: UByteArray): Boolean {
-        return !(take[0] == SerialGlobal.CMD_GetMachineState || take[0] == SerialGlobal.CMD_GetSetTemp)
+        return !(take[0] == SerialGlobal.CMD_GetMachineState || take[0] == SerialGlobal.CMD_GetSetTemp || take[0] == SerialGlobal.CMD_Response)
     }
 
     /**
@@ -370,7 +372,6 @@ object SerialPortUtil {
         }
     }
 
-    @OptIn(ExperimentalUnsignedTypes::class)
     private fun addRetry(cmd: UByteArray) {
         retryQueue.add(cmd)
     }

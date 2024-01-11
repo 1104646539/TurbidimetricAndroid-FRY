@@ -26,6 +26,7 @@ import com.wl.turbidimetric.view.dialog.showPop
 import com.wl.wllib.LogToFile.i
 import com.wl.turbidimetric.base.BaseFragment
 import com.wl.turbidimetric.view.dialog.ICON_HINT
+import com.wl.wllib.LogToFile.u
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -169,22 +170,11 @@ class MatchingArgsFragment :
                         adapter.notifyItemChanged(ret.lastIndex)
                     }
                 }
-//                adapter.submit(it)
-                //默认选择最近一个
-//                if (adapter.selectPos < 0 && adapter.items.isNotEmpty()) {
-//                adapter.setSelectIndex(0)
-//                adapter.notifyItemChanged(0)
-
-//                }
             }
         }
-//        vm.toastMsg.observe(this) { msg ->
-//            i("msg=$msg")
-//            snack(vd.root, msg)
-//        }
 
         adapter.onSelectChange = { project ->
-            i("选中的=${project}")
+            u("选中的=${project}")
             changeCurve(project)
         }
 
@@ -208,13 +198,16 @@ class MatchingArgsFragment :
             }
         }
         vd.btnStart.setOnClickListener {
+            u("开始拟合")
             startMatching()
         }
         vd.btnPrint.setOnClickListener {
+            u("打印")
             vm.print()
         }
 
         vd.btnDebugDialog.setOnClickListener {
+            u("调试框")
             debugShowDetailsDialog.showPop(requireContext(), width = 1500) {
                 it.showDialog(
                     vm.testMsg.value ?: "",

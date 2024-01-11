@@ -36,7 +36,7 @@ object LocalDataGlobal {
         val SamplingVolume = 25
         val FirstOpen = true
         val DetectionNum = "1"
-        val StirDuration = 2000
+        val StirDuration = 1000
         val StirProbeCleaningDuration = 1000
         val SamplingProbeCleaningDuration = 2000
         val MachineTestModelDefault = MachineTestModel.Auto

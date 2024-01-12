@@ -22,18 +22,9 @@ class MatchingStateAdapter(private val matchingNum: Int, val items: List<List<Do
             binding.tvResult3.text = getIndexOrNullDefault(item, 2, "-")
             binding.tvResult4.text = getIndexOrNullDefault(item, 3, "-")
             binding.tvResult5.text = getIndexOrNullDefault(item, 4, "-")
-            binding.tvResult6.visibility = (item.size > 5).isShow()
-            if (matchingNum > 5) {
-                binding.tvResult6.text = getIndexOrNullDefault(item, 5, "-")
-            }
-            binding.tvResult7.visibility = (item.size > 6).isShow()
-            if (matchingNum > 6) {
-                binding.tvResult7.text = getIndexOrNullDefault(item, 6, "-")
-            }
-            binding.tvResult8.visibility = (item.size > 7).isShow()
-            if (matchingNum > 7) {
-                binding.tvResult8.text = getIndexOrNullDefault(item, 7, "-")
-            }
+            binding.tvResult6.text = getIndexOrNullDefault(item, 5, "-")
+            binding.tvResult7.text = getIndexOrNullDefault(item, 6, "-")
+            binding.tvResult8.text = getIndexOrNullDefault(item, 7, "-")
         }
 
 
@@ -50,10 +41,16 @@ class MatchingStateAdapter(private val matchingNum: Int, val items: List<List<Do
     }
 
     override fun getItemCount(): Int {
-        return items.size
+        return if (items.size < 3) 3 else items.size
     }
 
     override fun onBindViewHolder(holder: MatchingStateViewHolder, position: Int) {
-        holder.bind(items[position])
+        holder.binding.tvResult6.visibility = (matchingNum > 5).isShow()
+        holder.binding.tvResult7.visibility = (matchingNum > 6).isShow()
+        holder.binding.tvResult8.visibility = (matchingNum > 7).isShow()
+        holder.binding.tvResultHeader.text = "${position+1}"
+        items.getOrNull(position)?.let {
+            holder.bind(it)
+        }
     }
 }

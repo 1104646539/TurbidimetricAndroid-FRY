@@ -12,7 +12,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minWidth="80dp"
-            android:text="目标值" />
+            android:text="" />
 
         <TextView
             android:id="@+id/tv_result_1"
@@ -20,7 +20,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minWidth="80dp"
-            android:text="0" />
+            android:text="" />
 
         <TextView
             android:id="@+id/tv_result_2"
@@ -28,7 +28,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minWidth="80dp"
-            android:text="25" />
+            android:text="" />
 
         <TextView
             android:id="@+id/tv_result_3"
@@ -36,7 +36,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minWidth="80dp"
-            android:text="50" />
+            android:text="" />
 
         <TextView
             android:id="@+id/tv_result_4"
@@ -44,7 +44,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minWidth="80dp"
-            android:text="200" />
+            android:text="" />
 
         <TextView
             android:id="@+id/tv_result_5"
@@ -52,7 +52,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minWidth="80dp"
-            android:text="500" />
+            android:text="" />
 
         <TextView
             android:id="@+id/tv_result_6"
@@ -60,7 +60,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minWidth="80dp"
-            android:text="1000" />
+            android:text="" />
 
         <TextView
             android:id="@+id/tv_result_7"
@@ -68,7 +68,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minWidth="80dp"
-            android:text="1000" />
+            android:text="" />
 
         <TextView
             android:id="@+id/tv_result_8"
@@ -76,6 +76,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minWidth="80dp"
-            android:text="1000" />
+            android:text="" />
     </LinearLayout>
 </layout>

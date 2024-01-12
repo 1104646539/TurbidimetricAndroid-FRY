@@ -71,6 +71,7 @@ import org.greenrobot.eventbus.EventBus
 import java.math.BigDecimal
 import java.util.Date
 import kotlin.math.absoluteValue
+import kotlin.math.round
 import kotlin.random.Random
 
 /**
@@ -345,6 +346,15 @@ class MatchingArgsViewModel(
     var matchingNum = 5
 
     /**
+     * 平均值
+     */
+    var means: MutableList<Double> = mutableListOf()
+    /**
+     * 全部吸光度
+     */
+    var abss: MutableList<MutableList<Double>> = mutableListOf()
+
+    /**
      * 选择用来拟合的项目
      */
     var selectMatchingProject: ProjectModel? = null
@@ -354,16 +364,11 @@ class MatchingArgsViewModel(
      */
     var selectFitterType: FitterType = FitterType.Three
 
-
     /**
      * 拟合梯度对应的浓度
      */
     var targetCons = mutableListOf<Double>()
 
-    /**
-     * 拟合后的浓度
-     */
-    var resultCons = mutableListOf<MutableList<Int>>()
 
     /**
      * 测试用的 start
@@ -1723,7 +1728,12 @@ class MatchingArgsViewModel(
         this.targetCons.clear()
         this.targetCons.addAll(cons)
 
-
+        val t1 = mutableListOf<Double>()
+        repeat(matchingNum){
+            t1.add(round(200.0))
+        }
+        this.means.clear()
+        this.means.addAll(t1)
     }
 }
 

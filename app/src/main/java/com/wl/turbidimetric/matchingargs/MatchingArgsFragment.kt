@@ -3,7 +3,6 @@ package com.wl.turbidimetric.matchingargs
 import android.os.Bundle
 import android.view.Gravity
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.mikephil.charting.components.XAxis
@@ -434,7 +433,7 @@ class MatchingArgsFragment :
      */
     private fun showMatchingStateDialog() {
         matchingStateDialog.showPop(requireContext(), width = 1500) { dialog ->
-            dialog.show()
+            dialog.showDialog(vm.matchingNum,vm.abss,vm.targetCons,vm.means,vm.selectFitterType)
         }
     }
 

@@ -1,41 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_dialog_hint"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:orientation="horizontal"
+    android:padding="20dp">
+
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_dialog_hint"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:orientation="horizontal"
-        android:padding="20dp">
+        android:orientation="vertical">
 
-        <LinearLayout
+        <include
+            android:id="@+id/incHeader"
+            layout="@layout/item_matching_state_result" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <include
+            android:id="@+id/incFooter"
+            layout="@layout/item_matching_state_result" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <TextView
+            style="@style/TextTitle"
             android:layout_width="wrap_content"
+            android:id="@+id/tvEquation"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <include
-                android:id="@+id/incHeader"
-                layout="@layout/item_matching_state_result" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <include
-                android:id="@+id/incFooter"
-                layout="@layout/item_matching_state_result" />
-
-        </LinearLayout>
+            android:textColor="@color/themePositiveColor" />
 
         <com.github.mikephil.charting.charts.LineChart
             android:id="@+id/lcCurve"
-            android:layout_width="400dp"
-            android:layout_height="300dp"
+            android:layout_width="450dp"
+            android:layout_height="350dp"
             android:layout_marginLeft="40dp"
             android:layout_marginTop="20dp"
             android:layout_marginRight="40dp" />
     </LinearLayout>
-</layout>
+</LinearLayout>

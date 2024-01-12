@@ -26,6 +26,7 @@ import com.wl.turbidimetric.view.dialog.showPop
 import com.wl.wllib.LogToFile.i
 import com.wl.turbidimetric.base.BaseFragment
 import com.wl.turbidimetric.view.dialog.ICON_HINT
+import com.wl.turbidimetric.view.dialog.MatchingStateDialog
 import com.wl.wllib.LogToFile.u
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -79,6 +80,13 @@ class MatchingArgsFragment :
      */
     private val matchingConfigDialog: MatchingConfigDialog by lazy {
         MatchingConfigDialog(requireContext())
+    }
+
+    /**
+     * 拟合中状态对话框
+     */
+    private val matchingStateDialog: MatchingStateDialog by lazy {
+        MatchingStateDialog(requireContext())
     }
 
     override fun init(savedInstanceState: Bundle?) {
@@ -227,8 +235,8 @@ class MatchingArgsFragment :
             toast("正在检测")
             return
         }
-//        vm.showMatchingSettingsDialog()
-        showCoverDialog()
+        vm.showMatchingSettingsDialog()
+//        showCoverDialog()
     }
 
     private fun showCoverDialog() {
@@ -344,25 +352,8 @@ class MatchingArgsFragment :
                     }
 
                     DialogState.MatchingSettings -> {//拟合配置
-                        matchingConfigDialog.showPop(requireContext(), width = 1000) { dialog ->
-                            dialog.showDialog(
-                                vm.projects,
-                                vm.autoAttenuation,
-                                vm.matchingNum,
-                                vm.selectMatchingProject,
-                                vm.selectFitterType,
-                                vm.targetCons,
-                                { matchingNum: Int, autoAttenuation: Boolean, selectProject: ProjectModel?, selectFitterType: FitterType, cons: List<Int> ->
-                                    vm.matchingConfigFinish(
-                                        matchingNum,
-                                        autoAttenuation,
-                                        selectProject,
-                                        selectFitterType,
-                                        cons
-                                    )
-                                }
-                            ) {}
-                        }
+                        showMatchingConfigDialog()
+
                     }
 
                     DialogState.MatchingState -> {//拟合状态
@@ -408,6 +399,42 @@ class MatchingArgsFragment :
                     )
                 }
             }
+        }
+    }
+
+    /**
+     * 显示拟合设置对话框
+     */
+    private fun showMatchingConfigDialog() {
+        matchingConfigDialog.showPop(requireContext(), width = 900) { dialog ->
+            dialog.showDialog(
+                vm.projects,
+                vm.autoAttenuation,
+                vm.matchingNum,
+                vm.selectMatchingProject,
+                vm.selectFitterType,
+                vm.targetCons,
+                { matchingNum: Int, autoAttenuation: Boolean, selectProject: ProjectModel?, selectFitterType: FitterType, cons: List<Double> ->
+                    vm.matchingConfigFinish(
+                        matchingNum,
+                        autoAttenuation,
+                        selectProject,
+                        selectFitterType,
+                        cons
+                    )
+                    dialog.dismiss()
+                    showMatchingStateDialog()
+                }
+            ) {}
+        }
+    }
+
+    /**
+     * 显示拟合中状态对话框
+     */
+    private fun showMatchingStateDialog() {
+        matchingStateDialog.showPop(requireContext(), width = 1500) { dialog ->
+            dialog.show()
         }
     }
 

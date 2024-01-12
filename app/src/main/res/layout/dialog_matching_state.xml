@@ -1,38 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@drawable/bg_dialog_hint"
-    android:focusable="true"
-    android:focusableInTouchMode="true"
-    android:orientation="horizontal"
-    android:padding="40dp">
+<layout>
 
-    <LinearLayout
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:background="@drawable/bg_dialog_hint"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:orientation="horizontal"
+        android:padding="20dp">
 
-        <include
-            android:id="@+id/incHeader"
-            layout="@layout/item_matching_state_result" />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvData"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            <include
+                android:id="@+id/incHeader"
+                layout="@layout/item_matching_state_result" />
 
-        <include
-            android:id="@+id/incFooter"
-            layout="@layout/item_matching_state_result" />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
+            <include
+                android:id="@+id/incFooter"
+                layout="@layout/item_matching_state_result" />
+
+        </LinearLayout>
+
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/lcCurve"
+            android:layout_width="400dp"
+            android:layout_height="300dp"
+            android:layout_marginLeft="40dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="40dp" />
     </LinearLayout>
-
-    <com.github.mikephil.charting.charts.LineChart
-        android:id="@+id/lcCurve"
-        android:layout_width="400dp"
-        android:layout_height="300dp"
-        android:layout_marginLeft="40dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginRight="40dp" />
-</LinearLayout>
+</layout>

@@ -33,7 +33,7 @@ android {
         minSdk 21
         targetSdk 26
         versionCode 1
-        versionName "1.0.0.0增加检测前清洗取样针"
+        versionName "1.0.0.0增加多项目拟合"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 

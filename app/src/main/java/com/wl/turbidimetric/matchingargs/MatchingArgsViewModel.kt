@@ -358,7 +358,7 @@ class MatchingArgsViewModel(
     /**
      * 拟合梯度对应的浓度
      */
-    var targetCons = mutableListOf<Int>()
+    var targetCons = mutableListOf<Double>()
 
     /**
      * 拟合后的浓度
@@ -1714,7 +1714,7 @@ class MatchingArgsViewModel(
         autoAttenuation: Boolean,
         selectProject: ProjectModel?,
         selectFitterType: FitterType,
-        cons: List<Int>
+        cons: List<Double>
     ) {
         this.matchingNum = matchingNum
         this.autoAttenuation = autoAttenuation

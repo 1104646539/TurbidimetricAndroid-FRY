@@ -21,7 +21,7 @@ inline fun <T : BasePopupView> T.showPop(
     la: ((popup: T) -> Unit)
 ) {
     val d = XPopup.Builder(context)
-        .maxWidth(width)
+//        .maxWidth(width)
         .dismissOnTouchOutside(isCancelable)
         .dismissOnBackPressed(isCancelable)
         .autoOpenSoftInput(false)

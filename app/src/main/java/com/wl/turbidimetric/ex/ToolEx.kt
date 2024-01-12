@@ -441,3 +441,14 @@ fun CurveModel.copyForProject(project: ProjectModel): CurveModel {
         projectUnit = project.projectUnit
     }
 }
+fun <T> getIndexOrNullDefault(
+    item: List<T>,
+    index: Int,
+    defaultText: String
+): String {
+    return if (item.size > index) {
+        item[index].toString()
+    } else {
+        defaultText
+    }
+}

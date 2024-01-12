@@ -32,9 +32,11 @@ class MatchingConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
     var matchingNum = 5
     var selectProject: ProjectModel? = null
     var selectFitterType: FitterType = FitterType.Three
-    val defaultCon5 = arrayListOf(0, 50, 200, 500, 1000)
-    val defaultCon6 = arrayListOf(0, 25, 50, 200, 500, 1000)
-    var cons = mutableListOf<Int>()
+    val defaultCon5 = arrayListOf(0.0, 50.0, 200.0, 500.0, 1000.0)
+    val defaultCon6 = arrayListOf(0.0, 25.0, 50.0, 200.0, 500.0, 1000.0)
+    val defaultCon7 = arrayListOf(0.0, 25.0, 50.0, 100.0, 250.0, 500.0, 1000.0)
+    val defaultCon8 = arrayListOf(0.0, 15.625,31.25, 62.5, 125.0, 250.0, 500.0, 1000.0)
+    var cons = mutableListOf<Double>()
 
 
     var spnProject: Spinner? = null
@@ -43,6 +45,8 @@ class MatchingConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
     var rbManual: RadioButton? = null
     var rbGrad5: RadioButton? = null
     var rbGrad6: RadioButton? = null
+    var rbGrad7: RadioButton? = null
+    var rbGrad8: RadioButton? = null
 
     var etTargetCon1: EditText? = null
     var etTargetCon2: EditText? = null
@@ -50,6 +54,8 @@ class MatchingConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
     var etTargetCon4: EditText? = null
     var etTargetCon5: EditText? = null
     var etTargetCon6: EditText? = null
+    var etTargetCon7: EditText? = null
+    var etTargetCon8: EditText? = null
 
     private var spnProjectAdapter: MatchingConfigSampleAdapter? = null
     private var spnFitterTypeAdapter: MatchingConfigSampleAdapter? = null
@@ -64,12 +70,16 @@ class MatchingConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
         rbManual = findViewById(R.id.rb_manual)
         rbGrad5 = findViewById(R.id.rb_grad_5)
         rbGrad6 = findViewById(R.id.rb_grad_6)
+        rbGrad7 = findViewById(R.id.rb_grad_7)
+        rbGrad8 = findViewById(R.id.rb_grad_8)
         etTargetCon1 = findViewById(R.id.et_target_con_1)
         etTargetCon2 = findViewById(R.id.et_target_con_2)
         etTargetCon3 = findViewById(R.id.et_target_con_3)
         etTargetCon4 = findViewById(R.id.et_target_con_4)
         etTargetCon5 = findViewById(R.id.et_target_con_5)
         etTargetCon6 = findViewById(R.id.et_target_con_6)
+        etTargetCon7 = findViewById(R.id.et_target_con_7)
+        etTargetCon8 = findViewById(R.id.et_target_con_8)
 
         spnProjectAdapter = MatchingConfigSampleAdapter(rootView.context, projectNames)
         spnProject?.adapter = spnProjectAdapter
@@ -88,8 +98,8 @@ class MatchingConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
         matchingNum: Int = 5,
         selectProject: ProjectModel? = null,
         selectFitterType: FitterType = FitterType.Three,
-        cons: List<Int> = mutableListOf(),
-        onConfirmClick: (matchingNum: Int,autoAttenuation: Boolean,selectProject: ProjectModel?,selectFitterType: FitterType,cons: List<Int>) -> Unit,
+        cons: List<Double> = mutableListOf(),
+        onConfirmClick: (matchingNum: Int, autoAttenuation: Boolean, selectProject: ProjectModel?, selectFitterType: FitterType, cons: List<Double>) -> Unit,
         onCancelClick: onClick
     ) {
         this.projects.clear()
@@ -126,12 +136,12 @@ class MatchingConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
     }
 
     private fun getCons(): String {
-        val tempCons = mutableListOf<Int>()
-        val con1 = etTargetCon1?.text.toString().toIntOrNull() ?: 0
-        val con2 = etTargetCon2?.text.toString().toIntOrNull() ?: 0
-        val con3 = etTargetCon3?.text.toString().toIntOrNull() ?: 0
-        val con4 = etTargetCon4?.text.toString().toIntOrNull() ?: 0
-        val con5 = etTargetCon5?.text.toString().toIntOrNull() ?: 0
+        val tempCons = mutableListOf<Double>()
+        val con1 = etTargetCon1?.text.toString().toDoubleOrNull() ?: 0.0
+        val con2 = etTargetCon2?.text.toString().toDoubleOrNull() ?: 0.0
+        val con3 = etTargetCon3?.text.toString().toDoubleOrNull() ?: 0.0
+        val con4 = etTargetCon4?.text.toString().toDoubleOrNull() ?: 0.0
+        val con5 = etTargetCon5?.text.toString().toDoubleOrNull() ?: 0.0
 
         tempCons.add(con1)
         tempCons.add(con2)
@@ -139,8 +149,16 @@ class MatchingConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
         tempCons.add(con4)
         tempCons.add(con5)
         if (matchingNum > 5) {
-            val con6 = etTargetCon6?.text.toString().toIntOrNull() ?: 0
+            val con6 = etTargetCon6?.text.toString().toDoubleOrNull() ?: 0.0
             tempCons.add(con6)
+        }
+        if (matchingNum > 6) {
+            val con7 = etTargetCon7?.text.toString().toDoubleOrNull() ?: 0.0
+            tempCons.add(con7)
+        }
+        if (matchingNum > 7) {
+            val con8 = etTargetCon8?.text.toString().toDoubleOrNull() ?: 0.0
+            tempCons.add(con8)
         }
         this.cons = tempCons
         return ""
@@ -159,9 +177,14 @@ class MatchingConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
         rbAuto?.isChecked = autoAttenuation
 
         rbGrad5?.isChecked = matchingNum == 5
+        rbGrad6?.isChecked = matchingNum == 6
+        rbGrad7?.isChecked = matchingNum == 7
+        rbGrad8?.isChecked = matchingNum == 8
 
         changeCon()
-        etTargetCon6?.visibility = (matchingNum != 5).isShow()
+        etTargetCon6?.visibility = (matchingNum > 5).isShow()
+        etTargetCon7?.visibility = (matchingNum > 6).isShow()
+        etTargetCon8?.visibility = (matchingNum > 7).isShow()
         rbAuto?.setOnCheckedChangeListener { buttonView, isChecked ->
             autoAttenuation = isChecked
 
@@ -171,28 +194,68 @@ class MatchingConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
             etTargetCon4?.isEnabled = !autoAttenuation
             etTargetCon5?.isEnabled = !autoAttenuation
 
-            etTargetCon6?.isEnabled = !autoAttenuation && rbGrad6?.isChecked == true
+            etTargetCon6?.isEnabled = !autoAttenuation && (matchingNum > 5)
+            etTargetCon7?.isEnabled = !autoAttenuation && (matchingNum > 6)
+            etTargetCon8?.isEnabled = !autoAttenuation && (matchingNum > 7)
 
         }
 
         rbGrad5?.setOnCheckedChangeListener { buttonView, isChecked ->
-            matchingNum = if (isChecked) 5 else 6
-
-            if (matchingNum == 5) {//5可以选择自动或人工稀释
+            if (isChecked) {
+                matchingNum = 5
+                //5可以选择自动或人工稀释
                 rbAuto?.isEnabled = true
                 rbManual?.isEnabled = true
 
                 etTargetCon6?.visibility = false.isShow()
+                etTargetCon7?.visibility = false.isShow()
+                etTargetCon8?.visibility = false.isShow()
 
-            } else {//6只能人工稀释
+                changeCon()
+            }
+        }
+
+        rbGrad6?.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (isChecked) {//大于5只能人工稀释
+                matchingNum = 6
+
                 rbAuto?.isEnabled = false
                 rbManual?.isEnabled = true
 
                 rbManual?.isChecked = true
                 etTargetCon6?.visibility = true.isShow()
-
+                etTargetCon7?.visibility = false.isShow()
+                etTargetCon8?.visibility = false.isShow()
+                changeCon()
             }
-            changeCon()
+        }
+        rbGrad7?.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (isChecked) {//大于5只能人工稀释
+                matchingNum = 7
+
+                rbAuto?.isEnabled = false
+                rbManual?.isEnabled = true
+
+                rbManual?.isChecked = true
+                etTargetCon6?.visibility = true.isShow()
+                etTargetCon7?.visibility = true.isShow()
+                etTargetCon8?.visibility = false.isShow()
+                changeCon()
+            }
+        }
+        rbGrad8?.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (isChecked) {//大于5只能人工稀释
+                matchingNum = 8
+
+                rbAuto?.isEnabled = false
+                rbManual?.isEnabled = true
+
+                rbManual?.isChecked = true
+                etTargetCon6?.visibility = true.isShow()
+                etTargetCon7?.visibility = true.isShow()
+                etTargetCon8?.visibility = true.isShow()
+                changeCon()
+            }
         }
 
         spnProject?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -224,8 +287,12 @@ class MatchingConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
     private fun changeCon() {
         if (matchingNum == 5) {
             cons = defaultCon5
-        } else {
+        } else if(matchingNum == 6){
             cons = defaultCon6
+        } else if(matchingNum == 7){
+            cons = defaultCon7
+        } else if(matchingNum == 8){
+            cons = defaultCon8
         }
 
         etTargetCon1?.setText(cons[0].toString())
@@ -235,6 +302,12 @@ class MatchingConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
         etTargetCon5?.setText(cons[4].toString())
         if (cons.size > 5) {
             etTargetCon6?.setText(cons[5].toString())
+        }
+        if (cons.size > 6) {
+            etTargetCon7?.setText(cons[6].toString())
+        }
+        if (cons.size > 7) {
+            etTargetCon8?.setText(cons[7].toString())
         }
 
 

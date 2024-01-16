@@ -69,21 +69,23 @@ class App : Application() {
     }
 
     private suspend fun insertTestCurve(project: ProjectModel) {
-        //三次方
-//        mainDao.insertCurveModel(CurveModel().apply {
-//            reagentNO = "${555}"
-//            f0 = 24.756992920270594
-//            f1 = 0.8582045209676992
-//            f2 = -5.707122868757991E-4
-//            f3 = 1.950833853427454E-7
-//            fitGoodness = 0.99999997
-//            fitterType = FitterType.Three.ordinal
-//            gradsNum = 5
-//            reactionValues = intArrayOf(-27, 28, 239, 975, 1979)
-//            targets = doubleArrayOf(0.0, 50.0, 200.0, 500.0, 1000.0)
-//            yzs = intArrayOf(0, 49, 200, 500, 1000)
-//            createTime = Date().toTimeStr()
-//        }.copyForProject(project))
+        repeat(10) {
+            //三次方
+            mainDao.insertCurveModel(CurveModel().apply {
+                reagentNO = "${555 + it}"
+                f0 = 24.756992920270594
+                f1 = 0.8582045209676992
+                f2 = -5.707122868757991E-4
+                f3 = 1.950833853427454E-7
+                fitGoodness = 0.99999997
+                fitterType = FitterType.Three.ordinal
+                gradsNum = 5
+                reactionValues = intArrayOf(-27, 28, 239, 975, 1979)
+                targets = doubleArrayOf(0.0, 50.0, 200.0, 500.0, 1000.0)
+                yzs = intArrayOf(0, 49, 200, 500, 1000)
+                createTime = Date().toTimeStr()
+            }.copyForProject(project))
+        }
 //        //线性
 //        mainDao.insertCurveModel(CurveModel().apply {
 //            reagentNO = "${556}"

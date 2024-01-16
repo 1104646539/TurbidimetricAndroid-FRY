@@ -1,16 +1,9 @@
-package com.wl.mvvm_demo
+package com.wl.turbidimetric
 
 import com.wl.turbidimetric.ex.matchingArg
-import com.wl.turbidimetric.util.CurveFitter
 import com.wl.turbidimetric.util.CurveFitterUtil
 import com.wl.turbidimetric.util.FitterFactory
 import com.wl.turbidimetric.util.FitterType
-import com.wl.turbidimetric.util.FourFun
-import com.wl.turbidimetric.util.FourParameterFunction
-import com.wl.turbidimetric.util.LinearFun
-import org.apache.commons.math3.analysis.ParametricUnivariateFunction
-import org.apache.commons.math3.fitting.SimpleCurveFitter
-import org.apache.commons.math3.fitting.WeightedObservedPoints
 import org.junit.Test
 
 

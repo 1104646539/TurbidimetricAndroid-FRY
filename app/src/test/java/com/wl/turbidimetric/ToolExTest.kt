@@ -1,4 +1,4 @@
-package com.wl.mvvm_demo
+package com.wl.turbidimetric
 
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.ex.*

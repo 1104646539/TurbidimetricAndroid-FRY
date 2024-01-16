@@ -1,9 +1,6 @@
-package com.wl.mvvm_demo
+package com.wl.turbidimetric
 
-import com.wl.turbidimetric.datastore.LocalDataGlobal
-import com.wl.turbidimetric.matchingargs.MatchingArgsViewModel
 import com.wl.turbidimetric.model.ReplyState
-import dagger.hilt.android.lifecycle.HiltViewModel
 import org.junit.Test
 import kotlin.properties.ReadOnlyProperty
 import kotlin.properties.ReadWriteProperty

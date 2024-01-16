@@ -64,7 +64,7 @@ class HomeConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_ho
 
         items.clear()
         items.addAll(curveModels)
-//        projectAdapter?.notifyDataSetChanged()
+        projectAdapter?.notifyDataSetChanged()
         if (isCreated) {
             setContent()
         }

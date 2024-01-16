@@ -1,4 +1,4 @@
-package com.wl.mvvm_demo
+package com.wl.turbidimetric
 
 import kotlinx.coroutines.*
 import org.junit.Test

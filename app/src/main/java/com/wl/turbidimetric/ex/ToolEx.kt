@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.github.mikephil.charting.data.Entry
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.global.SystemGlobal
@@ -19,7 +20,12 @@ import com.wl.turbidimetric.model.CurveModel
 import com.wl.turbidimetric.model.ProjectModel
 import com.wl.turbidimetric.model.SampleType
 import com.wl.turbidimetric.model.TestState
+import com.wl.turbidimetric.util.CurveFitter
 import com.wl.turbidimetric.util.CurveFitterUtil
+import com.wl.turbidimetric.util.Fitter
+import com.wl.turbidimetric.util.FitterFactory
+import com.wl.turbidimetric.util.FitterType
+import com.wl.wllib.LogToFile.i
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.io.File
@@ -33,14 +39,14 @@ import kotlin.math.sqrt
 /**
  * 浓度梯度
  */
-val nds = doubleArrayOf(
-    0.0,
-    50.0,
-    200.0,
-    500.0,
-    1000.0,
-//    0.0, 1000.0, 500.0, 200.0, 50.0
-)
+//val nds = doubleArrayOf(
+//    0.0,
+//    50.0,
+//    200.0,
+//    500.0,
+//    1000.0,
+////    0.0, 1000.0, 500.0, 200.0, 50.0
+//)
 
 /**
  * 返回ubyte的每一位的值
@@ -152,74 +158,34 @@ fun calcAbsorbance(
     }
     return log10(
         65535.toBigDecimal().divide(resultTest, 5, RoundingMode.HALF_UP).toDouble()
-    ).toBigDecimal()
-        .multiply(10000.toBigDecimal()).setScale(0, RoundingMode.HALF_UP)
-//    return log10(BigDecimal(65535).divide(BigDecimal(resultTest),5,BigDecimal.ROUND_HALF_UP))
+    ).toBigDecimal().multiply(10000.toBigDecimal()).setScale(0, RoundingMode.HALF_UP)
 }
 
 /**
- * 计算4参数
- * @return CurveFitter
+ * 拟合
  */
-fun matchingArg(absorbances: List<Double>): CurveFitterUtil {
-    val xs = absorbances.toDoubleArray().copyOfRange(0, nds.size)
-    val curveFitter = CurveFitterUtil()
-    curveFitter.calcParams(xs, nds)
-    return curveFitter
+fun matchingArg(fitterType: FitterType, absorbances: List<Double>, targets: DoubleArray): Fitter {
+    val fitter = FitterFactory.create(fitterType)
+    fitter.calcParams(absorbances.toDoubleArray(), targets)
+    return fitter
 }
 
-///**
-// * 根据四参数，吸光度，计算浓度
-// * @param absorbance Double
-// * @param project 四参数
-// */
-//fun calcCon(absorbance: BigDecimal, project: ProjectModel): BigDecimal {
-//    val a1 = project.a1;
-//    val a2 = project.a2;
-//    val x0 = project.x0;
-//    val p = project.p;
-////    var con: Double = x0 * ((a2 - a1) / (a2 - absorbance) - 1).pow(1 / p)
-////
-////    return con.scale(2)
-//
-//    var dividend1 = BigDecimal(a2)
-//        .subtract(absorbance).setScale(10, BigDecimal.ROUND_HALF_UP)
-//    var dividend2 = p
-//    if (dividend1.compareTo(BigDecimal(0)) == 0 || dividend2 == 0.0) {
-//        println("newCalcBigD dividend1==0||dividend2==0 dividend1=$dividend1 dividend2=$dividend2")
-//        return BigDecimal(0)
-//    }
-//    val temp21 = BigDecimal(a2).subtract(BigDecimal(a1)).divide(
-//        dividend1, 10, BigDecimal.ROUND_HALF_UP
-//    ).subtract(BigDecimal(1))
-//
-//    val temp22 = temp21.toDouble().pow((1 / dividend2)).scale(10).toBigDecimal()
-//    val con = (x0.toBigDecimal() * temp22)
-//    return con
-//}
 /**
- * 根据三次曲线方程参数，吸光度，计算浓度
+ * 根据曲线方程参数，反应度度，计算浓度
  * @param absorbance Double
  * @param project 四参数
  */
 fun calcCon(absorbance: BigDecimal, project: CurveModel): Int {
-    val f0 = project.f0
-    val f1 = project.f1
-    val f2 = project.f2
-    val f3 = project.f3
-    //吸光度小于0浓度直接等于0
-//    if (absorbance < 0.toBigDecimal()) {
-//        return 0
-//    }
-    var con = CurveFitterUtil.f(
-        doubleArrayOf(f0, f1, f2, f3),
-        absorbance.toDouble()
+    val fitter = FitterFactory.create(FitterType.toValue(project.fitterType))
+    var con = fitter.f(
+        doubleArrayOf(project.f0, project.f1, project.f2, project.f3), absorbance.toDouble()
     )
+
     //浓度不能小于0
     if (con.compareTo(0.0) <= 0) {
         con = 0.0
     }
-
+    i("type=${FitterType.toValue(project.fitterType)} absorbance=${absorbance.toDouble()}")
     return con.toInt()
 }
 
@@ -337,9 +303,7 @@ fun getLauncher(): Intent {
 fun getPackageInfo(context: Context): PackageInfo? {
     var packageInfo: PackageInfo? = null
     try {
-        packageInfo = context
-            .packageManager
-            .getPackageInfo(context.packageName, 0)
+        packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
     } catch (e: PackageManager.NameNotFoundException) {
         e.printStackTrace()
     }
@@ -441,14 +405,91 @@ fun CurveModel.copyForProject(project: ProjectModel): CurveModel {
         projectUnit = project.projectUnit
     }
 }
+
 fun <T> getIndexOrNullDefault(
-    item: List<T>,
-    index: Int,
-    defaultText: String
+    item: List<T>, index: Int, defaultText: String
 ): String {
     return if (item.size > index) {
         item[index].toString()
     } else {
         defaultText
     }
+}
+
+/**
+ * 根据参数和拟合类型，返回公式
+ */
+fun getEquation(
+    fitterType: FitterType, params: MutableList<Double>
+): String {
+    return when (fitterType) {
+        FitterType.Three -> {
+            "Y=${(params.getOrNull(0) ?: 0.0).scale(8)}+${(params.getOrNull(1) ?: 0.0).scale(8)}x+${
+                (params.getOrNull(2) ?: 0.0).scale(
+                    8
+                )
+            }x²+${(params.getOrNull(3) ?: 0.0).scale(8)}x³"
+        }
+
+        FitterType.Linear -> {
+            "y=${(params.getOrNull(1) ?: 0.0).scale(8)}+${(params.getOrNull(0) ?: 0.0).scale(8)}x"
+        }
+
+        FitterType.Four -> {
+            "y=(((${(params.getOrNull(3) ?: 0.0).scale(8)}-${(params.getOrNull(0) ?: 0.0).scale(8)})/(${
+                (params.getOrNull(
+                    3
+                ) ?: 0.0).scale(8)
+            }-x)-1)^(1/${(params.getOrNull(1) ?: 0.0).scale(8)}))*${
+                (params.getOrNull(2) ?: 0.0).scale(
+                    8
+                )
+            }"
+        }
+    }
+}
+
+/**
+ * 根据参数和拟合类型，返回拟合度
+ */
+fun getFitGoodness(fitterType: FitterType, fitGoodness: Double): String {
+    return when (fitterType) {
+        FitterType.Three -> {
+            "R²=${fitGoodness.toBigDecimal().setScale(6, RoundingMode.DOWN)}"
+        }
+
+        FitterType.Linear -> {
+            "R²=${fitGoodness.toBigDecimal().setScale(6, RoundingMode.DOWN)}"
+        }
+
+        FitterType.Four -> {
+            "R²=${fitGoodness.toBigDecimal().setScale(6, RoundingMode.DOWN)}"
+        }
+    }
+}
+
+/**
+ * 获取不同拟合类型的图表数据
+ */
+fun getChartEntry(curve: CurveModel): List<Entry> {
+    val values = mutableListOf<Entry>()
+    curve.reactionValues.forEachIndexed { i, it ->
+        if (i < curve.gradsNum) {
+            val reaction = it.toFloat()
+            val target = curve.targets[i].toFloat()
+            //三种拟合方式的x,y轴不一样
+            val x = if (FitterType.toValue(curve.fitterType) == FitterType.Three) {
+                reaction
+            } else {
+                target
+            }
+            val y = if (FitterType.toValue(curve.fitterType) == FitterType.Three) {
+                target
+            } else {
+                reaction
+            }
+            values.add(Entry(x, y))
+        }
+    }
+    return values
 }

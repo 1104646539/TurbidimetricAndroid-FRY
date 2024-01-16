@@ -201,7 +201,7 @@ class MatchingArgsFragment :
         lifecycleScope.launch {
             vm.curveUiState.collectLatest {
                 vd.tvEquationText.text = it.equationText
-                vd.tvFitGoodnessText.text = it.fitGoodnessText
+                vd.tvFitgoodnessText.text = it.fitGoodnessText
             }
         }
         vd.btnStart.setOnClickListener {
@@ -227,40 +227,37 @@ class MatchingArgsFragment :
 
 
     private fun startMatching() {
-        if (testState.isNotPrepare()) {
-            toast("请重新自检")
-            return
-        } else if (testState.isRunning()) {
-            toast("正在检测")
-            return
-        }
-        vm.showMatchingSettingsDialog()
-//        showCoverDialog()
+        vm.startMatching()
     }
 
+    /**
+     * 显示选择要覆盖曲线的对话框
+     */
     private fun showCoverDialog() {
         if (adapter.items.isNullOrEmpty() || adapter.items.size < 10) {
-            vm.clickStart(null)
-            return
-        }
-        coverProjectDialog.showPop(
-            requireContext(),
-            isCancelable = false,
-            width = 1000,
-        ) {
-            it.show(adapter.items, onConfirm = { projectModel, baseDialog ->
-                if (projectModel == null) {
+            vm.saveCoverCurve(null)
+            vm.showMatchingSettingsDialog()
+        } else {
+            coverProjectDialog.showPop(
+                requireContext(),
+                isCancelable = false,
+                width = 1000,
+            ) {
+                it.show(adapter.items, onConfirm = { projectModel, baseDialog ->
+                    if (projectModel == null) {
+                        toast("未选择覆盖的标曲，取消拟合！")
+                        testState = TestState.Normal
+                    } else {
+                        vm.saveCoverCurve(projectModel)
+                        vm.showMatchingSettingsDialog()
+                    }
+                    baseDialog.dismiss()
+                }, onCancel = {
                     toast("未选择覆盖的标曲，取消拟合！")
                     testState = TestState.Normal
-                } else {
-                    vm.clickStart(projectModel)
-                }
-                baseDialog.dismiss()
-            }, onCancel = {
-                toast("未选择覆盖的标曲，取消拟合！")
-                testState = TestState.Normal
-                it.dismiss()
-            })
+                    it.dismiss()
+                })
+            }
         }
     }
 
@@ -271,12 +268,8 @@ class MatchingArgsFragment :
     private fun changeCurve(project: CurveModel) {
         val values = ArrayList<Entry>()
 
-        if (project.reactionValues != null && project.reactionValues!!.isNotEmpty()) {
-            project.reactionValues?.forEachIndexed { i, it ->
-                if (i < 5) {
-                    values.add(Entry(nds[i].toFloat(), it.toFloat()))
-                }
-            }
+        if (project.reactionValues != null && project.reactionValues.isNotEmpty()) {
+            values.addAll(getChartEntry(project))
         } else {
             return
         }
@@ -318,6 +311,7 @@ class MatchingArgsFragment :
                     DialogState.MatchingFinishMsg -> {//检测结束，提示是否保存
 //                        vm.saveProject()
                         val msg = state.msg.plus("\n确定保存该条标曲记录？\n\n")
+
                         finishCoverDialog.showPop(
                             requireContext(),
                             width = 1500,
@@ -328,9 +322,15 @@ class MatchingArgsFragment :
                                 confirmText = "保存", confirmClick = {
                                     vm.saveProject()
                                     dialog.dismiss()
+                                    if (matchingStateDialog.isShow) {
+                                        matchingStateDialog.dismiss()
+                                    }
                                 }, cancelText = "取消", cancelClick = {
                                     vm.notSaveProject()
                                     dialog.dismiss()
+                                    if (matchingStateDialog.isShow) {
+                                        matchingStateDialog.dismiss()
+                                    }
                                 }, textGravity = Gravity.LEFT
                             )
                         }
@@ -344,19 +344,26 @@ class MatchingArgsFragment :
                                 confirmText = "我知道了",
                                 confirmClick = {
                                     dialog.dismiss()
-
                                 }
                             )
                         }
                     }
 
+                    DialogState.CloseMatchingStateDialog -> {//关闭拟合中的对话框
+                        if (matchingStateDialog.isShow) {
+                            matchingStateDialog.dismiss()
+                        }
+                    }
                     DialogState.MatchingSettings -> {//拟合配置
                         showMatchingConfigDialog()
-
                     }
 
-                    DialogState.MatchingState -> {//拟合状态
+                    DialogState.MatchingState -> {//拟合中状态
+                        showMatchingStateDialog()
+                    }
 
+                    DialogState.MatchingCoverCurve -> {//选择要覆盖的曲线
+                        showCoverDialog()
                     }
                     /**
                      * 命令提示错误，中断所有程序
@@ -409,7 +416,7 @@ class MatchingArgsFragment :
             dialog.showDialog(
                 vm.projects,
                 vm.autoAttenuation,
-                vm.matchingNum,
+                vm.gradsNum,
                 vm.selectMatchingProject,
                 vm.selectFitterType,
                 vm.targetCons,
@@ -422,9 +429,10 @@ class MatchingArgsFragment :
                         cons
                     )
                     dialog.dismiss()
-                    showMatchingStateDialog()
                 }
-            ) {}
+            ) {
+                it.dismiss()
+            }
         }
     }
 
@@ -432,8 +440,27 @@ class MatchingArgsFragment :
      * 显示拟合中状态对话框
      */
     private fun showMatchingStateDialog() {
-        matchingStateDialog.showPop(requireContext(), width = 1500) { dialog ->
-            dialog.showDialog(vm.matchingNum,vm.abss,vm.targetCons,vm.means,vm.selectFitterType)
+        matchingStateDialog.showPop(
+            requireContext(),
+            width = 1500,
+            isCancelable = false
+        ) { dialog ->
+            dialog.showDialog(
+                vm.gradsNum,
+                vm.abss,
+                vm.targetCons,
+                vm.means,
+                vm.selectFitterType,
+                vm.curProject,
+                {//开始
+                    vm.clickStart()
+                }, {//拟合结束
+                    vm.showSaveMatchingDialog()
+                },
+                {
+                    vm.changeFitterType(it)
+                }
+            )
         }
     }
 

@@ -374,8 +374,8 @@ override fun stateSuccess(cmd: Int, state: Int): Boolean {
             return
         }
         val volumeR1 = msg1.toIntOrNull() ?: 0
-        if (volumeR1 !in 1..100) {
-            changeHilt("R1加试剂量错误,必须为1-100")
+        if (volumeR1 !in 1..500) {
+            changeHilt("R1加试剂量错误,必须为1-500")
             return
         }
         if (msg2.isNullOrEmpty()) {
@@ -383,8 +383,8 @@ override fun stateSuccess(cmd: Int, state: Int): Boolean {
             return
         }
         val volumeR2 = msg1.toIntOrNull() ?: 0
-        if (volumeR2 !in 1..100) {
-            changeHilt("R2加试剂量错误,必须为1-100")
+        if (volumeR2 !in 1..200) {
+            changeHilt("R2加试剂量错误,必须为1-200")
             return
         }
         enable.postValue(false)

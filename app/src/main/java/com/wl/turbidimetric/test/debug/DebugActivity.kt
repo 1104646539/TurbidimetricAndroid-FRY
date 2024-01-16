@@ -77,13 +77,13 @@ class DebugActivity : BaseActivity<DebugViewModel, ActivityDebugBinding>() {
     }
     override fun onStart() {
         EventBus.getDefault().post(EventMsg(EventGlobal.WHAT_GET_TEMP_CHANGE,false))
-        super.onStart()
         vm.listener()
+        super.onStart()
     }
 
     override fun onStop() {
         EventBus.getDefault().post(EventMsg(EventGlobal.WHAT_GET_TEMP_CHANGE,true))
-        super.onStop()
         vm.clearListener()
+        super.onStop()
     }
 }

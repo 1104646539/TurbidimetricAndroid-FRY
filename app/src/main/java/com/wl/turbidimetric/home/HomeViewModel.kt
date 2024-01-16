@@ -418,17 +418,20 @@ class HomeViewModel(
      * 测试用的 start
      */
     //检测的值
-    private val testValues1 =
-        intArrayOf(60, 20, 30, 50, 0, 0, 0, 0, 0, 0)
-    private val testValues2 = intArrayOf(
-        0, 1522, 800, 300, 30, 0, 0, 0, 0, 0
-    )
-    private val testValues3 = intArrayOf(
-        0, 1522, 800, 300, 30, 0, 0, 0, 0, 0
-    )
-    private val testValues4 = intArrayOf(
-        0, 1522, 800, 300, 30, 0, 0, 0, 0, 0
-    )
+    //测试三次方拟合
+//    private val testValues1 = doubleArrayOf(27.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+//    private val testValues2 =
+//        doubleArrayOf(0.0, 28.8, 239.6, 975.6, 1979.0, 0.3, 0.3, 0.3, 0.3, 0.3)
+    //测试线性拟合
+//    private val testValues1 = doubleArrayOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+//    private val testValues2 =
+//        doubleArrayOf(1.0, 16.0, 35.0, 140.0, 310.0, 623.0, 0.3, 0.3, 0.3, 0.3)
+    //测试四参数拟合
+    private val testValues1 = doubleArrayOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+    private val testValues2 =
+        doubleArrayOf(0.1, 15.9, 37.5, 178.8, 329.3, 437.7, 0.3, 0.3, 0.3, 0.3)
+    private val testValues3 = doubleArrayOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+    private val testValues4 = doubleArrayOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
     private val testOriginalValues1 =
         intArrayOf(65532, 65532, 65532, 65532, 65532, 65532, 65532, 65532, 65532, 65532)
     private val testOriginalValues2 =
@@ -1191,7 +1194,7 @@ class HomeViewModel(
         resultModels[pos]?.result?.let {
             viewModelScope.launch {
                 //因为结果内的姓名性别等信息可能在数据管理内修改过了，所以这里没有
-                testResultRepository.getTestResultModelById(it.resultId)?.apply {
+                testResultRepository.getTestResultModelById(it.resultId).apply {
                     testOriginalValue1 = it.testOriginalValue1
                     testOriginalValue2 = it.testOriginalValue2
                     testOriginalValue3 = it.testOriginalValue3
@@ -2424,6 +2427,7 @@ class HomeViewModel(
      * 执行检测结束动作
      */
     private fun testFinishAction() {
+        clearSingleShelf()
         testState = TestState.TestFinish
         sampleShelfPos = -1
         cuvetteShelfPos = -1
@@ -2730,10 +2734,12 @@ class HomeViewModel(
     fun recoverSelectProject(projects: MutableList<CurveModel>) {
         val selectId = LocalData.SelectProjectID
         val oldSelect = projects.filter { it.curveId == selectId }
-        if (oldSelect.isNotEmpty()) {//如果已经有选中的，就恢复
-            selectProject = oldSelect.first()
-        } else {//如果选中的不在里，就
-            selectProject = projects.first()
+        if (projects.isNotEmpty()) {
+            if (oldSelect.isNotEmpty()) {//如果已经有选中的，就恢复
+                selectProject = oldSelect.first()
+            } else {//如果选中的不在里，就
+                selectProject = projects.first()
+            }
         }
     }
 

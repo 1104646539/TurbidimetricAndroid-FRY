@@ -5,37 +5,59 @@ import org.apache.commons.math3.fitting.PolynomialCurveFitter
 import org.apache.commons.math3.fitting.SimpleCurveFitter
 import org.apache.commons.math3.fitting.WeightedObservedPoints
 import org.apache.commons.math3.stat.regression.SimpleRegression
+import kotlin.math.min
+import kotlin.math.pow
 
 
 interface Fitter {
+    var params: DoubleArray //参数
+    var fitGoodness: Double //拟合度
+    var yss: DoubleArray //验算值
     fun calcParams(values: DoubleArray, guess: DoubleArray)
     fun f(p: DoubleArray, x: Double): Double
 }
 
 enum class FitterType(val showName: String) {
     Three("三次多项式拟合"), Linear("线性拟合"), Four("四参数曲线拟合");
+
+    companion object {
+        fun toValue(index: Int): FitterType {
+            values().forEachIndexed { i, fitterType ->
+                if (index == i) {
+                    return fitterType
+                }
+            }
+            return Three
+        }
+    }
 }
 
 class FitterFactory {
-    fun create(fitterType: FitterType): Fitter {
-        return when (fitterType) {
-            FitterType.Three -> ThreeFun()
-            FitterType.Linear -> LinearFun()
-            FitterType.Four -> FourFun()
-            else -> {
-                throw Exception("没有这个类型")
+    companion object {
+        @JvmStatic
+        fun create(fitterType: FitterType): Fitter {
+            return when (fitterType) {
+                FitterType.Three -> ThreeFun()
+                FitterType.Linear -> LinearFun()
+                FitterType.Four -> FourFun()
+                else -> {
+                    throw Exception("没有这个类型")
+                }
             }
         }
     }
 }
 
-
+/**
+ * 三次方多项式拟合
+ */
 class ThreeFun : Fitter {
     var guess: DoubleArray = doubleArrayOf()
     var values: DoubleArray = doubleArrayOf()
-    var params: DoubleArray = doubleArrayOf()//参数
-    var yss: DoubleArray = doubleArrayOf()//反算验证的
-    var fitGoodness = 0.0//R方
+
+    override var params: DoubleArray = doubleArrayOf()//参数
+    override var fitGoodness = 0.0//R方
+    override var yss: DoubleArray = doubleArrayOf()//反算验证的
 
 
     override fun calcParams(values: DoubleArray, guess: DoubleArray) {
@@ -44,8 +66,8 @@ class ThreeFun : Fitter {
         //step1、拟合曲线
         val points = WeightedObservedPoints()
 
-        for (i in values!!.indices) {
-            points.add(values!![i], guess!![i])
+        for (i in guess.indices) {
+            points.add(values[i], guess[i])
         }
 
         val fitter = PolynomialCurveFitter.create(3) //指定多项式阶数
@@ -53,10 +75,10 @@ class ThreeFun : Fitter {
         params = fitter.fit(points.toList()) // 曲线拟合，结果保存于数组
 
 
-        yss = DoubleArray(guess!!.size)
+        yss = DoubleArray(guess.size)
         //step2、验算
-        for (i in guess!!.indices) {
-            yss!![i] = f(params, values!![i])
+        for (i in guess.indices) {
+            yss[i] = f(params, values[i])
         }
 
         //step3、计算R方
@@ -82,25 +104,28 @@ class ThreeFun : Fitter {
     }
 }
 
+/**
+ * 线性拟合
+ */
 class LinearFun : Fitter {
-    var params: DoubleArray = doubleArrayOf()//参数
-    var yss: DoubleArray = doubleArrayOf()//反算验证的
-    var fitGoodness = 0.0//R方
+    override var params: DoubleArray = doubleArrayOf()//参数
+    override var fitGoodness = 0.0//R方
+    override var yss: DoubleArray = doubleArrayOf()//反算验证的
 
     override fun calcParams(values: DoubleArray, guess: DoubleArray) {
         //step1、拟合曲线
         val simple = SimpleRegression()
-        values.forEachIndexed { i, v ->
-            simple.addData(guess[i], values[i])
+        guess.forEachIndexed { i, v ->
+            simple.addData(values[i], guess[i])
         }
         params = DoubleArray(2)
         params[0] = simple.slope
         params[1] = getParamK(simple)
 
         //step2、验算
-        yss = DoubleArray(guess!!.size)
-        for (i in guess!!.indices) {
-            yss[i] = f(params, values!![i])
+        yss = DoubleArray(guess.size)
+        for (i in guess.indices) {
+            yss[i] = f(params, values[i])
         }
 
         //step3、计算R方
@@ -134,20 +159,20 @@ class LinearFun : Fitter {
  * 四参数拟合
  */
 class FourFun : Fitter {
-    var params: DoubleArray = doubleArrayOf()//参数
-    var yss: DoubleArray = doubleArrayOf()//反算验证的
-    var fitGoodness = 0.0//R方
+    override var params: DoubleArray = doubleArrayOf()//参数
+    override var fitGoodness = 0.0//R方
+    override var yss: DoubleArray = doubleArrayOf()//反算验证的
 
     override fun calcParams(values: DoubleArray, guess: DoubleArray) {
         //step1、拟合曲线
-        val cf = CurveFitter(values, guess)
+        val cf = CurveFitter(guess, values)
         cf.doFit(7)
         params = cf.params
 
         //step2、验算
-        yss = DoubleArray(guess!!.size)
-        for (i in guess!!.indices) {
-            yss[i] = f(params, values!![i])
+        yss = DoubleArray(guess.size)
+        for (i in guess.indices) {
+            yss[i] = f(params, values[i])
         }
 
         //step3、计算R方
@@ -162,7 +187,8 @@ class FourFun : Fitter {
     companion object {
         @JvmStatic
         fun f2(p: DoubleArray, x: Double): Double {
-            return CurveFitter.f(7, p, x)
+            return (p[2] * (((p[3] - p[0]) / (p[3] - x)) - 1).pow((1 / p[1])))
+//            return CurveFitter.f(7, p, x)
         }
     }
 

@@ -4,7 +4,7 @@ import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
-import androidx.databinding.library.baseAdapters.BR
+//import androidx.databinding.library.baseAdapters.BR
 import androidx.recyclerview.widget.RecyclerView
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.ItemMatchingargsBinding
@@ -31,15 +31,14 @@ class MatchingArgsAdapter :
     ) :
         RecyclerView.ViewHolder(binding.root) {
         fun bindData(item: CurveModel?) {
-            binding.setVariable(BR.item, item)
-            binding.tvID.text = (item?.reagentNO ?: "-").toString()
-            binding.tvA1.text = (item?.f0 ?: 0.0).scaleStr(7).toString()
-            binding.tvA2.text = (item?.f1 ?: 0.0).scaleStr(7).toString()
-            binding.tvX0.text = (item?.f2 ?: 0.0).scaleStr(7).toString()
-            binding.tvP.text = (item?.f3 ?: 0.0).scaleStr(8).toString()
+            binding.tvId.text = (item?.reagentNO ?: "-").toString()
+            binding.tvF0.text = (item?.f0 ?: 0.0).scaleStr(8).toString()
+            binding.tvF1.text = (item?.f1 ?: 0.0).scaleStr(8).toString()
+            binding.tvF2.text = (item?.f2 ?: 0.0).scaleStr(8).toString()
+            binding.tvF3.text = (item?.f3 ?: 0.0).scaleStr(8).toString()
             binding.tvTestTime.text =
                 if (item?.createTime.isNullOrEmpty()) "-" else item?.createTime
-            binding.tvFitGoodness.text = (item?.fitGoodness ?: 0.0).toBigDecimal().setScale(7, RoundingMode.DOWN).toPlainString()
+            binding.tvFitgoodness.text = (item?.fitGoodness ?: 0.0).toBigDecimal().setScale(7, RoundingMode.DOWN).toPlainString()
             binding.tvProjectName.text = item?.projectName ?: "-"
         }
     }

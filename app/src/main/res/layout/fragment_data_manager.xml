@@ -65,7 +65,7 @@
                     android:paddingBottom="5dp">
 
                     <Button
-                        android:id="@+id/btnCondition"
+                        android:id="@+id/btn_condition"
                         style="@style/BtnPositive"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -132,7 +132,7 @@
                 app:layout_constraintRight_toRightOf="parent">
 
                 <Button
-                    android:id="@+id/btnDelete"
+                    android:id="@+id/btn_delete"
                     style="@style/BtnPositive"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -141,7 +141,7 @@
                     android:text="删除" />
 
                 <Button
-                    android:id="@+id/btnClean"
+                    android:id="@+id/btn_clean"
                     style="@style/BtnPositive"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -151,28 +151,7 @@
                     android:text="清空" />
 
                 <Button
-                    android:id="@+id/btnInsert"
-                    style="@style/BtnPositive"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:visibility="gone"
-                    android:layout_marginLeft="20dp"
-                    android:minWidth="150dp"
-                    android:text="添加" />
-
-                <Button
-                    android:id="@+id/btnInsert2"
-                    style="@style/BtnPositive"
-                    android:visibility="gone"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="20dp"
-                    android:minWidth="150dp"
-                    android:text="添加1000" />
-
-
-                <Button
-                    android:id="@+id/btnPrint"
+                    android:id="@+id/btn_print"
                     style="@style/BtnPositive"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -181,7 +160,7 @@
                     android:text="打印" />
 
                 <Button
-                    android:id="@+id/btnExportExcel"
+                    android:id="@+id/btn_export_excel"
                     style="@style/BtnPositive"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -191,7 +170,7 @@
                     android:text="导出Excel"
                     android:textAllCaps="false" />
                 <Button
-                    android:id="@+id/btnExportExcelAll"
+                    android:id="@+id/btn_export_excel_all"
                     style="@style/BtnPositive"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -201,7 +180,7 @@
                     android:textAllCaps="false" />
 
                 <Button
-                    android:id="@+id/btnUpload"
+                    android:id="@+id/btn_upload"
                     style="@style/BtnPositive"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

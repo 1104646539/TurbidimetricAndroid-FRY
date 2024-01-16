@@ -3,6 +3,8 @@ package com.wl.mvvm_demo
 import com.wl.turbidimetric.ex.matchingArg
 import com.wl.turbidimetric.util.CurveFitter
 import com.wl.turbidimetric.util.CurveFitterUtil
+import com.wl.turbidimetric.util.FitterFactory
+import com.wl.turbidimetric.util.FitterType
 import com.wl.turbidimetric.util.FourFun
 import com.wl.turbidimetric.util.FourParameterFunction
 import com.wl.turbidimetric.util.LinearFun
@@ -15,7 +17,7 @@ import org.junit.Test
 class CurveFitterTest {
 
     /**
-     * 三次多项式拟合
+     * 三次多项式拟合测试
      */
     @Test
     fun threadFunTest() {
@@ -27,15 +29,50 @@ class CurveFitterTest {
 
 
         val m1 = 0.toDouble()
-        val m2 = 1000.toDouble()
-        val m3 = 500.toDouble()
-        val m4 = 200.toDouble()
-        val m5 = 50.toDouble()
+        val m2 = 50.toDouble()
+        val m3 = 200.toDouble()
+        val m4 = 500.toDouble()
+        val m5 = 1000.toDouble()
 
         val ps = doubleArrayOf(p1, p2, p3, p4, p5)
+        val ms = doubleArrayOf(m1, m2, m3, m4, m5)
+//        FitterType.values().forEach { type ->
 
+        val fitter = FitterFactory.create(FitterType.Three)
+        fitter.calcParams(ps, ms)
+//            println("type=$type \n参数")
+        fitter.params.forEach {
+            print("it=$it")
+        }
+        println("\n验算")
+        ps.forEach { v ->
+            val con = fitter.f(fitter.params, v)
+            print("con=$con")
+        }
+        println()
+    }
+    /**
+     * 三次多项式拟合测试
+     */
+    @Test
+    fun threadFunTest2() {
+        val p1 = -27.5.toDouble()
+        val p2 = 28.8.toDouble()
+        val p3 = 239.6.toDouble()
+        val p4 = 975.6.toDouble()
+        val p5 = 1979.toDouble()
+
+
+        val m1 = 0.toDouble()
+        val m5 = 50.toDouble()
+        val m3 = 500.toDouble()
+        val m2 = 1000.toDouble()
+        val m4 = 200.toDouble()
+
+        val ps = doubleArrayOf(p1, p2, p3, p4, p5)
+        val ms = doubleArrayOf(m1, m2, m3, m4, m5)
         val cf = CurveFitterUtil()
-        cf.calcParams(ps, doubleArrayOf(m1, m2, m3, m4, m5))
+        cf.calcParams(ps, ms)
 
         val a = cf.params[0]
         val b = cf.params[1]
@@ -58,7 +95,7 @@ class CurveFitterTest {
             println("con2=$con2")
         }
         println("-------------------------------------")
-        val cf2 = matchingArg(ps.map { it })
+        val cf2 = matchingArg(FitterType.Three,ps.map { it }, ms)
 
         for (p in cf2.params) {
             println("params=$p")
@@ -154,16 +191,16 @@ class CurveFitterTest {
     }
 
     /**
-     * 线性拟合
+     * 线性拟合测试
      */
     @Test
     fun linearFunTest() {
-        val p1 = -7.toDouble()
-        val p2 = 22.toDouble()
-        val p3 = 48.toDouble()
-        val p4 = 200.toDouble()
-        val p5 = 500.toDouble()
-        val p6 = 1000.toDouble()
+        val p1 = 1.toDouble()
+        val p2 = 16.toDouble()
+        val p3 = 35.toDouble()
+        val p4 = 140.toDouble()
+        val p5 = 310.toDouble()
+        val p6 = 623.toDouble()
 
 
         val m1 = 0.toDouble()
@@ -174,56 +211,27 @@ class CurveFitterTest {
         val m6 = 1000.toDouble()
 
         val ps = doubleArrayOf(p1, p2, p3, p4, p5, p6)
+        val ms = doubleArrayOf(m1, m2, m3, m4, m5, m6)
 
-        val cf = LinearFun()
-        cf.calcParams(ps, doubleArrayOf(m1, m2, m3, m4, m5, m6))
+        val fitter = FitterFactory.create(FitterType.Linear)
+        fitter.calcParams(ps, ms)
 
-        for (p in cf.params) {
+        for (p in fitter.params) {
             println("params=$p")
         }
 
         for (p in ps) {
-            val con = cf.f(cf.params, p)
+            val con = fitter.f(fitter.params, p)
             println("con=$con")
         }
-        println("fitGoodness${cf.fitGoodness}")
+        println("fitGoodness${fitter.fitGoodness}")
     }
 
+    /**
+     * 四参数拟合测试
+     */
     @Test
     fun fourFunTest() {
-        val p1 = 0.1.toDouble()
-//        val p2 = 15.9.toDouble()
-        val p3 = 37.5.toDouble()
-        val p4 = 178.8.toDouble()
-        val p5 = 329.3.toDouble()
-        val p6 = 437.7.toDouble()
-
-
-        val m1 = 0.toDouble()
-//        val m2 = 25.toDouble()
-        val m3 = 50.toDouble()
-        val m4 = 200.toDouble()
-        val m5 = 500.toDouble()
-        val m6 = 1000.toDouble()
-
-        val ps = doubleArrayOf(p1, p3, p4, p5, p6)
-
-        val cf = FourFun()
-        cf.calcParams(ps, doubleArrayOf(m1, m3, m4, m5, m6))
-
-        for (p in cf.params) {
-            println("params=$p")
-        }
-
-        for (p in ps) {
-            val con = cf.f(cf.params, p)
-            println("con=$con")
-        }
-        println("fitGoodness${cf.fitGoodness}")
-    }
-
-    @Test
-    fun kl() {
         val p1 = 0.1.toDouble()
         val p2 = 15.9.toDouble()
         val p3 = 37.5.toDouble()
@@ -231,60 +239,48 @@ class CurveFitterTest {
         val p5 = 329.3.toDouble()
         val p6 = 437.7.toDouble()
 
-
         val m1 = 0.toDouble()
         val m2 = 25.toDouble()
         val m3 = 50.toDouble()
         val m4 = 200.toDouble()
         val m5 = 500.toDouble()
         val m6 = 1000.toDouble()
-
         val ps = doubleArrayOf(p1, p2, p3, p4, p5, p6)
+        val ms = doubleArrayOf(m1, m2, m3, m4, m5, m6)
 
-        val cf = FourFun()
-        val ppp = curveFit(
-            arrayOf(
-                doubleArrayOf(p1, m1),
-                doubleArrayOf(p2, m2),
-                doubleArrayOf(p3, m3),
-                doubleArrayOf(p4, m4),
-                doubleArrayOf(p5, m5),
-                doubleArrayOf(p6, m6),
-            ), FourParameterFunction()
-        )
-
-        for (p in ppp) {
-            println("params=$p")
+        val fitter = FitterFactory.create(FitterType.Four)
+        fitter.calcParams(ps, ms)
+        println("参数")
+        fitter.params.forEach {
+            print("it=$it ")
         }
-
-//        for (p in ps) {
-//            val con = cf.f(cf.params, p)
-//            println("con=$con")
-//        }
-//        println("fitGoodness${cf.fitGoodness}")
+        println("\n验算")
+        ps.forEach { v ->
+            val con = fitter.f(fitter.params, v)
+            print("con=$con ")
+        }
+        println()
     }
 
 
-    fun curveFit(xy: Array<DoubleArray>, function: ParametricUnivariateFunction?): DoubleArray {
+    @Test
+    fun fitterFactory() {
+//        val p1 = 0.1.toDouble()
+////        val p2 = 15.9.toDouble()
+//        val p3 = 37.5.toDouble()
+//        val p4 = 178.8.toDouble()
+//        val p5 = 329.3.toDouble()
+//        val p6 = 437.7.toDouble()
+//
+//
 //        val m1 = 0.toDouble()
-//        val m2 = 25.toDouble()
+////        val m2 = 25.toDouble()
 //        val m3 = 50.toDouble()
 //        val m4 = 200.toDouble()
 //        val m5 = 500.toDouble()
 //        val m6 = 1000.toDouble()
-
-        val guess = doubleArrayOf(1.0, 1.0, 1.0, 1.0)
-//        val guess = doubleArrayOf(m1, m2, m3, m4, m5, m6)
-        val curveFitter = SimpleCurveFitter.create(function, guess)
-        val observedPoints = WeightedObservedPoints()
-        for (i in xy.indices) {
-            observedPoints.add(xy[i][0], xy[i][1])
-        }
-        return curveFitter.fit(observedPoints.toList())
-    }
-
-    @Test
-    fun test2() {
+//        val ps = doubleArrayOf(p1, p3, p4, p5, p6)
+//        val ms = doubleArrayOf(m1, m3, m4, m5, m6)
         val p1 = 0.00001.toDouble()
         val p2 = 0.00159.toDouble()
         val p3 = 0.00375.toDouble()
@@ -307,13 +303,24 @@ class CurveFitterTest {
         val m6 = 1000.toDouble()
         val ps = doubleArrayOf(p1, p2, p3, p4, p5, p6)
         val ms = doubleArrayOf(m1, m2, m3, m4, m5, m6)
-        val cf = CurveFitter(ps, ms)
-        cf.doFit(7)
 
-        println("params a1=${cf.params[0]} a2=${cf.params[3]} x0=${cf.params[2]} p=${cf.params[1]}")
-        println("fitGoodness=${cf.fitGoodness}")
-        cf.f(cf.params,0.00252)
+
+//        FitterType.values().forEach { type ->
+        val fitter = FitterFactory.create(FitterType.Four)
+        fitter.calcParams(ps, ms)
+//            println("type=$type \n参数")
+        fitter.params.forEach {
+            print("it=$it")
+        }
+        println("\n验算")
+        ps.forEach { v ->
+            val con = fitter.f(fitter.params, v)
+            print("con=$con")
+        }
+        println()
+//        }
 
     }
+
 
 }

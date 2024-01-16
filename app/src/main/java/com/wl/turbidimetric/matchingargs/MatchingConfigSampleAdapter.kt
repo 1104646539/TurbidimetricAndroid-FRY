@@ -34,8 +34,8 @@ class MatchingConfigSampleAdapter @JvmOverloads constructor(
             root = LayoutInflater.from(context).inflate(R.layout.item_matching_sample, null)
         }
         root?.let {
-            val tvName = root.findViewById<TextView>(R.id.tvName)
-            tvName.setText(items?.get(position) ?: "")
+            val tvName = root.findViewById<TextView>(R.id.tv_name)
+            tvName.text = items?.get(position) ?: ""
         }
 
 
@@ -61,8 +61,8 @@ class MatchingConfigSampleAdapter @JvmOverloads constructor(
             root = LayoutInflater.from(context).inflate(R.layout.item_matching_sample, null)
         }
         root?.let {
-            val tvName = root.findViewById<TextView>(R.id.tvName)
-            tvName.setText(items?.get(position) ?: "")
+            val tvName = root.findViewById<TextView>(R.id.tv_name)
+            tvName.text = items?.get(position) ?: ""
         }
         return root
     }

@@ -28,9 +28,7 @@ data class ProjectModel(
         if (projectLjz != other.projectLjz) return false
         if (projectUnit != other.projectUnit) return false
         if (createTime != other.createTime) return false
-        if (isSelect != other.isSelect) return false
-
-        return true
+        return isSelect == other.isSelect
     }
 
     override fun hashCode(): Int {

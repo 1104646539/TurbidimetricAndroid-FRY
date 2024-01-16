@@ -30,11 +30,15 @@ data class CurveModel(
     /**
      * 反应值 ，指拟合时各个梯度的反应值
      */
-    var reactionValues: IntArray? = intArrayOf(),
+    var reactionValues: IntArray = intArrayOf(),
+    /**
+     * 拟合时的浓度目标值
+     */
+    var targets: DoubleArray = doubleArrayOf(),
     /**
      * 验证值 ，指拟合时使用的拟合参数反算出的值
      */
-    var yzs: IntArray? = intArrayOf(),
+    var yzs: IntArray = intArrayOf(),
     /**
      * 曲线类型 ，指拟合时使用的曲线类型
      */
@@ -49,7 +53,7 @@ data class CurveModel(
     var isValid: Boolean = true
 ) {
     override fun toString(): String {
-        return "CurveModel(id=$curveId,projectName=$projectName,projectCode=$projectCode,projectLjz=$projectLjz,projectUnit=$projectUnit,f0=$f0,f1=$f1,f2=$f2,f3=$f3,fitGoodness=$fitGoodness,createTime=$createTime,reagentNO=$reagentNO,yzs=$yzs,fitterType=$fitterType,gradsNum=$gradsNum)"
+        return "CurveModel(id=$curveId,projectName=$projectName,projectCode=$projectCode,projectLjz=$projectLjz,projectUnit=$projectUnit,f0=$f0,f1=$f1,f2=$f2,f3=$f3,fitGoodness=$fitGoodness,createTime=$createTime,reagentNO=$reagentNO,yzs=$yzs,fitterType=$fitterType,gradsNum=$gradsNum,reactionValues=$reactionValues,targets=$targets)"
     }
 
     override fun equals(other: Any?): Boolean {
@@ -73,13 +77,16 @@ data class CurveModel(
             if (other.reactionValues == null) return false
             if (!reactionValues.contentEquals(other.reactionValues)) return false
         } else if (other.reactionValues != null) return false
+        if (targets != null) {
+            if (other.targets == null) return false
+            if (!targets.contentEquals(other.targets)) return false
+        } else if (other.targets != null) return false
         if (yzs != null) {
             if (other.yzs == null) return false
             if (!yzs.contentEquals(other.yzs)) return false
         } else if (other.yzs != null) return false
         if (fitterType != other.fitterType) return false
-        if (gradsNum != other.gradsNum) return false
-        return true
+        return gradsNum == other.gradsNum
     }
 
     override fun hashCode(): Int {
@@ -96,8 +103,9 @@ data class CurveModel(
         result = 31 * result + createTime.hashCode()
         result = 31 * result + isSelect.hashCode()
         result = 31 * result + reagentNO.hashCode()
-        result = 31 * result + (reactionValues?.contentHashCode() ?: 0)
-        result = 31 * result + (yzs?.contentHashCode() ?: 0)
+        result = 31 * result + reactionValues.contentHashCode()
+        result = 31 * result + targets.contentHashCode()
+        result = 31 * result + yzs.contentHashCode()
         result = 31 * result + fitterType.hashCode()
         result = 31 * result + gradsNum.hashCode()
         return result

@@ -34,17 +34,9 @@ class HomeProjectAdapter @JvmOverloads constructor(
             root = LayoutInflater.from(context).inflate(R.layout.item_select_project, null)
         }
         root?.let {
-            val tvA1 = root.findViewById<TextView>(R.id.tvA1)
-            val tvA2 = root.findViewById<TextView>(R.id.tvA2)
-            val tvX0 = root.findViewById<TextView>(R.id.tvX0)
-            val tvP = root.findViewById<TextView>(R.id.tvP)
-            val tvTime = root.findViewById<TextView>(R.id.tvTime)
-            val tvNO = root.findViewById<TextView>(R.id.tvNO)
+            val tvTime = root.findViewById<TextView>(R.id.tv_time)
+            val tvNO = root.findViewById<TextView>(R.id.tv_no)
 
-            tvA1?.text = "f0:" + items?.get(position)?.f0?.scaleStr(6).toString()
-            tvA2?.text = "f1:" + items?.get(position)?.f1?.scaleStr(6).toString()
-            tvX0?.text = "f2:" + items?.get(position)?.f2?.scaleStr(6).toString()
-            tvP?.text = "f3:" + items?.get(position)?.f3?.scaleStr(6).toString()
             tvTime?.text = "时间:" + items?.get(position)?.createTime
             tvNO?.text =
                 "序号:" + if (items?.get(position)?.reagentNO.isNullOrEmpty()) "-" else items?.get(
@@ -75,17 +67,9 @@ class HomeProjectAdapter @JvmOverloads constructor(
             root = LayoutInflater.from(context).inflate(R.layout.item_select_project, null)
         }
         root?.let {
-            val tvA1 = root.findViewById<TextView>(R.id.tvA1)
-            val tvA2 = root.findViewById<TextView>(R.id.tvA2)
-            val tvX0 = root.findViewById<TextView>(R.id.tvX0)
-            val tvP = root.findViewById<TextView>(R.id.tvP)
-            val tvTime = root.findViewById<TextView>(R.id.tvTime)
-            val tvNO = root.findViewById<TextView>(R.id.tvNO)
+            val tvTime = root.findViewById<TextView>(R.id.tv_time)
+            val tvNO = root.findViewById<TextView>(R.id.tv_no)
 
-            tvA1?.text = "f0:" + items?.get(position)?.f0?.scaleStr(6).toString()
-            tvA2?.text = "f1:" + items?.get(position)?.f1?.scaleStr(6).toString()
-            tvX0?.text = "f2:" + items?.get(position)?.f2?.scaleStr(6).toString()
-            tvP?.text = "f3:" + items?.get(position)?.f3?.scaleStr(6).toString()
             tvTime?.text = "时间:" + items?.get(position)?.createTime
             tvNO?.text =
                 "序号:" + if (items?.get(position)?.reagentNO.isNullOrEmpty()) "-" else items?.get(

@@ -95,12 +95,12 @@ class SelectCoverAdapter(
 //                binding.root.minimumHeight
             }
             binding.apply {
-                tvA1.text = "f0:" + item.f0.scale(6).toString()
-                tvA2.text = "f1:" + item.f1.scale(6).toString()
-                tvX0.text = "f2:" + item.f2.scale(6).toString()
-                tvP.text = "f3:" + item.f3.scale(6).toString()
+//                tvA1.text = "f0:" + item.f0.scale(6).toString()
+//                tvA2.text = "f1:" + item.f1.scale(6).toString()
+//                tvX0.text = "f2:" + item.f2.scale(6).toString()
+//                tvP.text = "f3:" + item.f3.scale(6).toString()
                 tvTime.text = "时间:" + item.createTime
-                tvNO.text =
+                tvNo.text =
                     "序号:" + if (item.reagentNO.isNullOrEmpty()) "-" else item.reagentNO
             }
 

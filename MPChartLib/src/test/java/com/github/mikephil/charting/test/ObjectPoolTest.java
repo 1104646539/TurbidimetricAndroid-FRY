@@ -210,7 +210,7 @@ public class ObjectPoolTest {
         }catch (Exception ex){
             e = ex;
         }finally{
-            Assert.assertTrue(e.getMessage(), e != null);
+            Assert.assertNotNull(e.getMessage(), e);
         }
 
         testPoolables.clear();

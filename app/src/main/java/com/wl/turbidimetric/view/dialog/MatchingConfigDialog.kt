@@ -35,7 +35,7 @@ class MatchingConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
     val defaultCon5 = arrayListOf(0.0, 50.0, 200.0, 500.0, 1000.0)
     val defaultCon6 = arrayListOf(0.0, 25.0, 50.0, 200.0, 500.0, 1000.0)
     val defaultCon7 = arrayListOf(0.0, 25.0, 50.0, 100.0, 250.0, 500.0, 1000.0)
-    val defaultCon8 = arrayListOf(0.0, 15.625,31.25, 62.5, 125.0, 250.0, 500.0, 1000.0)
+    val defaultCon8 = arrayListOf(0.0, 15.625, 31.25, 62.5, 125.0, 250.0, 500.0, 1000.0)
     var cons = mutableListOf<Double>()
 
 
@@ -116,7 +116,7 @@ class MatchingConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
         this.confirmText = "确定"
         this.confirmClick = {
             getCons()
-            onConfirmClick?.invoke(
+            onConfirmClick.invoke(
                 this@MatchingConfigDialog.matchingNum,
                 this@MatchingConfigDialog.autoAttenuation,
                 this@MatchingConfigDialog.selectProject,
@@ -168,9 +168,18 @@ class MatchingConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
         super.setContent()
 
         val selectProjectIndex = projects.indexOf(selectProject)
-        this.spnProject?.setSelection(selectProjectIndex)
+        if(selectProjectIndex < 0 && projects.isNotEmpty()){//没有已选择的但有项目就默认选择第一个
+            selectProject = projects[0]
+            this.spnProject?.setSelection(0)
 
-        val selectFitterIndex = fitterTypes?.indexOf(selectFitterType)
+        }else{
+            selectProject = projects[selectProjectIndex]
+            this.spnProject?.setSelection(selectProjectIndex)
+
+        }
+
+
+        val selectFitterIndex = fitterTypes.indexOf(selectFitterType)
         this.spnFitterType?.setSelection(selectFitterIndex)
 
 
@@ -280,19 +289,21 @@ class MatchingConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
                 selectFitterType = FitterType.Three
             }
         }
-
-
     }
 
     private fun changeCon() {
         if (matchingNum == 5) {
-            cons = defaultCon5
-        } else if(matchingNum == 6){
-            cons = defaultCon6
-        } else if(matchingNum == 7){
-            cons = defaultCon7
-        } else if(matchingNum == 8){
-            cons = defaultCon8
+            cons.clear()
+            cons.addAll(defaultCon5)
+        } else if (matchingNum == 6) {
+            cons.clear()
+            cons.addAll(defaultCon6)
+        } else if (matchingNum == 7) {
+            cons.clear()
+            cons.addAll(defaultCon7)
+        } else if (matchingNum == 8) {
+            cons.clear()
+            cons.addAll(defaultCon8)
         }
 
         etTargetCon1?.setText(cons[0].toString())

@@ -48,7 +48,7 @@ class MachineTestModelDialog(val ct: Context) :
     private fun confirm(onConfirm: (MachineTestModel, Boolean, Boolean, BasePopupView?) -> Unit) {
         val machineTestModel = if (rbAuto?.isChecked == true) {
             MachineTestModel.Auto
-        } else if (machineTestModel == MachineTestModel.Manual) {
+        } else if (rbManual?.isChecked == true) {
             MachineTestModel.Manual
         } else {
             MachineTestModel.ManualSampling

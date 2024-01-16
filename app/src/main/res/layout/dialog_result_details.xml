@@ -19,7 +19,7 @@
             android:text="ID" />
 
         <TextView
-            android:id="@+id/tvID"
+            android:id="@+id/tv_id"
             style="@style/TextHilt"
             android:layout_width="200dp"
             android:layout_height="wrap_content" />
@@ -32,7 +32,7 @@
             android:text="编号：" />
 
         <TextView
-            android:id="@+id/tvDetectionNum"
+            android:id="@+id/tv_detectionNum"
             style="@style/TextHilt"
             android:layout_width="200dp"
             android:layout_height="wrap_content" />
@@ -51,7 +51,7 @@
             android:text="姓名：" />
 
         <EditText
-            android:id="@+id/etName"
+            android:id="@+id/et_name"
             style="@style/TextHilt"
             android:layout_width="200dp"
             android:layout_height="wrap_content" />
@@ -64,7 +64,7 @@
             android:text="性别：" />
 
         <EditText
-            android:id="@+id/etGender"
+            android:id="@+id/et_gender"
             style="@style/TextHilt"
             android:layout_width="200dp"
             android:layout_height="wrap_content" />
@@ -83,7 +83,7 @@
             android:text="吸光度：" />
 
         <EditText
-            android:id="@+id/etAbs"
+            android:id="@+id/et_abs"
             style="@style/TextHilt"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
@@ -98,7 +98,7 @@
             android:text="浓度：" />
 
         <EditText
-            android:id="@+id/etCon"
+            android:id="@+id/et_con"
             style="@style/TextHilt"
             android:layout_width="200dp"
             android:layout_height="wrap_content" />
@@ -117,7 +117,7 @@
             android:text="结果：" />
 
         <EditText
-            android:id="@+id/etResult"
+            android:id="@+id/et_result"
             style="@style/TextHilt"
             android:layout_width="200dp"
             android:layout_height="wrap_content" />
@@ -130,7 +130,7 @@
             android:text="检测时间：" />
 
         <TextView
-            android:id="@+id/tvTestTime"
+            android:id="@+id/tv_test_time"
             style="@style/TextHilt"
             android:layout_width="200dp"
             android:layout_height="wrap_content" />
@@ -150,7 +150,7 @@
             android:text="样本条码：" />
 
         <EditText
-            android:id="@+id/etSampleBarcode"
+            android:id="@+id/et_sample_barcode"
             style="@style/TextHilt"
             android:layout_width="200dp"
             android:layout_height="wrap_content" />
@@ -158,31 +158,5 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/btnConfirm"
-            style="@style/BtnDefault"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="30dp"
-            android:layout_weight="1"
-            android:text="确定" />
-
-        <Button
-            android:id="@+id/btnCancel"
-            style="@style/BtnDefault"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="30dp"
-            android:layout_marginRight="30dp"
-            android:layout_weight="1"
-            android:text="取消" />
-
-    </LinearLayout>
 
 </LinearLayout>

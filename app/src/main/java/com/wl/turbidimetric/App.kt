@@ -6,17 +6,16 @@ import android.content.Context
 import com.lxj.xpopup.XPopup
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.db.MainRoomDatabase
-import com.wl.turbidimetric.db.putTestResultAndCurve
 import com.wl.turbidimetric.ex.copyForProject
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.CurveModel
 import com.wl.turbidimetric.model.ProjectModel
 import com.wl.turbidimetric.upload.hl7.util.getLocalConfig
 import com.wl.turbidimetric.util.CrashHandler
+import com.wl.turbidimetric.util.FitterType
 import com.wl.wllib.LogToFile
 import com.wl.wllib.ToastUtil
 import com.wl.wllib.ktxRunOnBgCache
-import com.wl.wllib.toLongTimeStr
 import com.wl.wllib.toTimeStr
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.first
@@ -64,22 +63,57 @@ class App : Application() {
                     projectLjz = 100
                 }
                 mainDao.insertProjectModel(project)
-
-                repeat(1) {
-                    mainDao.insertCurveModel(CurveModel().apply {
-                        reagentNO = "${555 }"
-                        f0 = 8.14617614
-                        f1 = 1.1219026
-                        f2 = -8.9409E-4
-                        f3 = 3.2E-7
-                        fitGoodness = 0.99999997
-                        reactionValues = intArrayOf(0, 49, 200, 500, 1000)
-                        yzs = intArrayOf(0, 49, 200, 500, 1000)
-                        createTime = Date().toTimeStr()
-                    }.copyForProject(project))
-                }
+                insertTestCurve(project)
             }
         }
+    }
+
+    private suspend fun insertTestCurve(project: ProjectModel) {
+        //三次方
+//        mainDao.insertCurveModel(CurveModel().apply {
+//            reagentNO = "${555}"
+//            f0 = 24.756992920270594
+//            f1 = 0.8582045209676992
+//            f2 = -5.707122868757991E-4
+//            f3 = 1.950833853427454E-7
+//            fitGoodness = 0.99999997
+//            fitterType = FitterType.Three.ordinal
+//            gradsNum = 5
+//            reactionValues = intArrayOf(-27, 28, 239, 975, 1979)
+//            targets = doubleArrayOf(0.0, 50.0, 200.0, 500.0, 1000.0)
+//            yzs = intArrayOf(0, 49, 200, 500, 1000)
+//            createTime = Date().toTimeStr()
+//        }.copyForProject(project))
+//        //线性
+//        mainDao.insertCurveModel(CurveModel().apply {
+//            reagentNO = "${556}"
+//            f0 = 1.614742835
+//            f1 = -6.930948268
+//            f2 = 0.0
+//            f3 = 0.0
+//            fitGoodness = 0.99999997
+//            gradsNum = 6
+//            fitterType = FitterType.Linear.ordinal
+//            reactionValues = intArrayOf(1, 16, 35, 140, 310,623)
+//            targets = doubleArrayOf(0.0, 25.0,50.0, 200.0, 500.0, 1000.0)
+//            yzs = intArrayOf(0, 49, 200, 500, 1000)
+//            createTime = Date().toTimeStr()
+//        }.copyForProject(project))
+//        //四参数
+//        mainDao.insertCurveModel(CurveModel().apply {
+//            reagentNO = "${557}"
+//            f0 = -1.818473101
+//            f1 = 1.253206105
+//            f2 = 374.2468309
+//            f3 = 564.4612105
+//            fitGoodness = 0.99999997
+//            fitterType = FitterType.Four.ordinal
+//            gradsNum = 6
+//            reactionValues = intArrayOf(0, 49, 200, 500, 1000)
+//            targets = doubleArrayOf(0.0, 50.0, 200.0, 500.0, 1000.0)
+//            yzs = intArrayOf(0, 49, 200, 500, 1000)
+//            createTime = Date().toTimeStr()
+//        }.copyForProject(project))
     }
 
     private fun initPop() {

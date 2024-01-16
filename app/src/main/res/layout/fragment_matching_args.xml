@@ -65,7 +65,7 @@
                     android:layout_height="70dp"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/llTop" />
+                    app:layout_constraintTop_toBottomOf="@id/ll_top" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv"
@@ -169,7 +169,7 @@
                 </LinearLayout>
 
                 <TextView
-                    android:id="@+id/tvEquationText"
+                    android:id="@+id/tv_equation_text"
                     style="@style/TextHilt"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -180,7 +180,7 @@
                     android:textColor="@color/themePositiveColor" />
 
                 <TextView
-                    android:id="@+id/tvFitGoodnessText"
+                    android:id="@+id/tv_fitgoodness_text"
                     style="@style/TextHilt"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -190,7 +190,7 @@
                     android:textColor="@color/themePositiveColor" />
 
                 <com.github.mikephil.charting.charts.LineChart
-                    android:id="@+id/lcCurve"
+                    android:id="@+id/lc_curve"
                     android:layout_width="match_parent"
                     android:layout_height="400dp"
                     android:layout_marginLeft="40dp"

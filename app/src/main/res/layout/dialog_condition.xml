@@ -2,10 +2,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:gravity="center_vertical"
-    android:orientation="vertical"
-    android:focusableInTouchMode="true"
     android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:gravity="center_vertical"
+    android:minWidth="650dp"
+    android:orientation="vertical"
     android:padding="15dp">
 
     <LinearLayout
@@ -124,7 +125,7 @@
             android:text="检测时间:" />
 
         <TextView
-            android:id="@+id/tv_testtime_min"
+            android:id="@+id/tv_test_time_min"
             style="@style/EtDefault"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -139,12 +140,18 @@
             android:text="至:" />
 
         <TextView
-            android:id="@+id/tv_testtime_max"
+            android:id="@+id/tv_test_time_max"
             style="@style/EtDefault"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:inputType="numberSigned"
             android:minWidth="240dp" />
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:id="@+id/cb_today"
+            android:layout_height="wrap_content"
+            android:text="检索当日" />
     </LinearLayout>
 
 </LinearLayout>

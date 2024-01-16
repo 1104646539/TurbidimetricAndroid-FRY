@@ -52,7 +52,7 @@ class DataManagerViewModel(
         return testResultRepository.updateTestResult(model.result)
     }
 
-    suspend fun getTestResultAndCurveModelById(id: Long): TestResultAndCurveModel? {
+    suspend fun getTestResultAndCurveModelById(id: Long): TestResultAndCurveModel {
         return testResultRepository.getTestResultAndCurveModelById(id)
     }
 

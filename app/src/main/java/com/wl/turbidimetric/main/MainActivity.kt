@@ -56,10 +56,6 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         }
     }
 
-    override fun onMessageEvent(event: EventMsg<Any>) {
-        super.onMessageEvent(event)
-    }
-
     private fun showOpenDocumentTree() {
         StorageUtil.showOpenDocumentTree(this, OPEN_DOCUMENT_TREE_CODE)
     }

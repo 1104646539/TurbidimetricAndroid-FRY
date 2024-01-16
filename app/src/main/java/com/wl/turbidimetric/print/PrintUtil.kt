@@ -3,6 +3,7 @@ package com.wl.turbidimetric.print
 import com.wl.turbidimetric.ex.scale
 import com.wl.turbidimetric.model.TestResultAndCurveModel
 import com.wl.turbidimetric.print.PrintUtil.serialPort
+import com.wl.turbidimetric.util.FitterType
 import com.wl.weiqianwllib.serialport.BaseSerialPort
 import com.wl.weiqianwllib.serialport.WQSerialGlobal
 import com.wl.wllib.toTimeStr
@@ -78,7 +79,8 @@ object PrintUtil {
         params: MutableList<Double>,
         createTime: String,
         projectName: String,
-        reagentNo: String
+        reagentNo: String,
+        matchingNum: Int
     ) {
         val msg = getMatchingQualityMsg(
             absorbancys.toMutableList(),
@@ -87,7 +89,8 @@ object PrintUtil {
             params,
             createTime,
             projectName,
-            reagentNo
+            reagentNo,
+            matchingNum
         )
         send(msg)
     }
@@ -108,7 +111,8 @@ object PrintUtil {
         params: MutableList<Double>,
         createTime: String,
         projectName: String,
-        reagentNo: String
+        reagentNo: String,
+        matchingNum: Int
     ): String {
 
         val sb = StringBuilder()
@@ -128,14 +132,14 @@ object PrintUtil {
 
         sb.append("\n\n")
 
-        if (yzs.size > 5) {
-            sb.append("${yzs[5]}ng/mL")
+        if (yzs.size > matchingNum && absorbancys.size > matchingNum) {
+            sb.append("${yzs[matchingNum]}ng/mL")
             sb.append("\n")
-            sb.append("${absorbancys[5]}")
+            sb.append("${absorbancys[matchingNum]}")
             sb.append("\n\n")
-            sb.append("${yzs[6]}ng/mL")
+            sb.append("${yzs[matchingNum + 1]}ng/mL")
             sb.append("\n")
-            sb.append("${absorbancys[6]}")
+            sb.append("${absorbancys[matchingNum + 1]}")
             sb.append("\n\n")
         }
 

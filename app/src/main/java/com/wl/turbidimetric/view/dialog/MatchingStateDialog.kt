@@ -2,6 +2,9 @@ package com.wl.turbidimetric.view.dialog
 
 import android.content.Context
 import android.view.View
+import android.widget.AdapterView
+import android.widget.AdapterView.OnItemSelectedListener
+import android.widget.Spinner
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -11,13 +14,18 @@ import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.wl.turbidimetric.R
+import com.wl.turbidimetric.ex.getEquation
+import com.wl.turbidimetric.ex.getFitGoodness
 import com.wl.turbidimetric.ex.getIndexOrNullDefault
 import com.wl.turbidimetric.ex.getResource
-import com.wl.turbidimetric.ex.nds
+import com.wl.turbidimetric.ex.scale
 import com.wl.turbidimetric.ex.toast
+import com.wl.turbidimetric.matchingargs.MatchingConfigSampleAdapter
 import com.wl.turbidimetric.matchingargs.MatchingStateAdapter
+import com.wl.turbidimetric.model.CurveModel
 import com.wl.turbidimetric.util.FitterType
 import com.wl.wllib.LogToFile.i
+import java.math.RoundingMode
 
 /**
  * 显示拟合中的状态
@@ -50,22 +58,26 @@ class MatchingStateDialog(val ct: Context) :
     var selectFitterType: FitterType = FitterType.Three
     var tvEquation: TextView? = null
     var lcCurve: LineChart? = null
-
+    var spnFitterType: Spinner? = null
     var abss: MutableList<MutableList<Double>> = mutableListOf()
-    var matchingNum: Int = 5
+    var gradsNum: Int = 5
     var targets: MutableList<Double> = mutableListOf()
     var means: MutableList<Double> = mutableListOf()
-
-    var adapter: MatchingStateAdapter? = null
+    private var spnFitterTypeAdapter: MatchingConfigSampleAdapter? = null
+    private var stateAdapter: MatchingStateAdapter? = null
     private val bgGray = getResource().getColor(R.color.bg_gray)
     private val textColor = getResource().getColor(R.color.textColor)
     private val lineColor = getResource().getColor(R.color.themePositiveColor)
+    var fitterTypes = mutableListOf<FitterType>()
+    var fitterTypeNames = mutableListOf<String>()
+    var curProject: CurveModel? = null
     override fun initDialogView() {
-        vHeader = findViewById(R.id.incHeader)
-        vFooter = findViewById(R.id.incFooter)
+        vHeader = findViewById(R.id.inc_header)
+        vFooter = findViewById(R.id.inc_footer)
         rv = findViewById(R.id.rv)
-        tvEquation = findViewById(R.id.tvEquation)
-        lcCurve = findViewById(R.id.lcCurve)
+        tvEquation = findViewById(R.id.tv_equation)
+        lcCurve = findViewById(R.id.lc_curve)
+        spnFitterType = findViewById(R.id.spn_fitter_type)
         vHeader?.let { it ->
             tvHeaderTitle = it.findViewById(R.id.tv_result_header)
             tvHeader1 = it.findViewById(R.id.tv_result_1)
@@ -88,6 +100,11 @@ class MatchingStateDialog(val ct: Context) :
             tvFooter7 = it.findViewById(R.id.tv_result_7)
             tvFooter8 = it.findViewById(R.id.tv_result_8)
         }
+        fitterTypes.addAll(FitterType.values())
+        fitterTypeNames.addAll(fitterTypes.map { it.showName })
+        spnFitterTypeAdapter = MatchingConfigSampleAdapter(rootView.context, fitterTypeNames)
+        spnFitterType?.adapter = spnFitterTypeAdapter
+
         initChart()
         i("$tvHeaderTitle $tvFooterTitle")
     }
@@ -156,19 +173,36 @@ class MatchingStateDialog(val ct: Context) :
         setTarget()
         setMean()
 
-
-        adapter = MatchingStateAdapter(matchingNum, abss)
+        stateAdapter = MatchingStateAdapter(gradsNum, abss)
         rv?.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-        rv?.adapter = adapter
+        rv?.adapter = stateAdapter
 
         changeEquation()
+        spnFitterType?.onItemSelectedListener = object : OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                onFitterTypeChange?.invoke(fitterTypes[position])
+            }
 
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+
+            }
+        }
+        val index = fitterTypes.indexOf(selectFitterType)
+        if (index >= 0) {
+            spnFitterType?.setSelection(index)
+        }
     }
 
+
     private fun setMean() {
-        tvFooter6?.visibility = (matchingNum > 5).isShow()
-        tvFooter7?.visibility = (matchingNum > 6).isShow()
-        tvFooter8?.visibility = (matchingNum > 7).isShow()
+        tvFooter6?.visibility = (gradsNum > 5).isShow()
+        tvFooter7?.visibility = (gradsNum > 6).isShow()
+        tvFooter8?.visibility = (gradsNum > 7).isShow()
         tvFooter1?.text = getIndexOrNullDefault(means, 0, "-")
         tvFooter2?.text = getIndexOrNullDefault(means, 1, "-")
         tvFooter3?.text = getIndexOrNullDefault(means, 2, "-")
@@ -187,7 +221,7 @@ class MatchingStateDialog(val ct: Context) :
         val values = ArrayList<Entry>()
         if (means != null && means.isNotEmpty()) {
             means.forEachIndexed { i, it ->
-                if (i < matchingNum) {
+                if (i < gradsNum) {
                     values.add(Entry(targets[i].toFloat(), it.toFloat()))
                 }
             }
@@ -203,12 +237,23 @@ class MatchingStateDialog(val ct: Context) :
                 chart.animateXY(300, 300)
             }
         }
+        curProject?.let {
+            tvEquation?.text =
+                "${
+                    getEquation(
+                        selectFitterType,
+                        mutableListOf(it.f0, it.f1, it.f2, it.f3)
+                    )
+                }\n ${getFitGoodness(selectFitterType, it.fitGoodness)}"
+
+        }
     }
 
+
     private fun setTarget() {
-        tvHeader6?.visibility = (matchingNum > 5).isShow()
-        tvHeader7?.visibility = (matchingNum > 6).isShow()
-        tvHeader8?.visibility = (matchingNum > 7).isShow()
+        tvHeader6?.visibility = (gradsNum > 5).isShow()
+        tvHeader7?.visibility = (gradsNum > 6).isShow()
+        tvHeader8?.visibility = (gradsNum > 7).isShow()
         tvHeader1?.text = getIndexOrNullDefault(targets, 0, "-")
         tvHeader2?.text = getIndexOrNullDefault(targets, 1, "-")
         tvHeader3?.text = getIndexOrNullDefault(targets, 2, "-")
@@ -219,14 +264,19 @@ class MatchingStateDialog(val ct: Context) :
         tvHeader8?.text = getIndexOrNullDefault(targets, 7, "-")
     }
 
+    var onFitterTypeChange: ((selectFitterType: FitterType) -> Unit)? = null
     fun showDialog(
-        matchingNum: Int,
+        gradsNum: Int,
         abss: MutableList<MutableList<Double>>,
         targets: List<Double>,
         means: List<Double>,
-        selectFitterType: FitterType
+        selectFitterType: FitterType,
+        curProject: CurveModel?,
+        onConfirm: onClick,
+        onConfirm2: onClick,
+        onFitterTypeChange: (selectFitterType: FitterType) -> Unit,
     ) {
-        this.matchingNum = matchingNum
+        this.gradsNum = gradsNum
         this.abss.clear()
         this.abss.addAll(abss)
         this.targets.clear()
@@ -236,17 +286,15 @@ class MatchingStateDialog(val ct: Context) :
         this.selectFitterType = selectFitterType
 
         this.confirmText = "添加拟合数据"
-        this.confirmClick = {
-            toast("click confirm")
-        }
-        this.confirmText2 = "拟合"
-        this.confirmClick2 = {
-            toast("click matching")
-        }
-        this.cancelText = "取消"
-        this.cancelClick = {
-            toast("click cancel")
-        }
+        this.confirmClick = onConfirm
+        this.confirmText2 = "拟合结束"
+        this.confirmClick2 = onConfirm2
+
+        this.curProject = curProject
+
+        this.onFitterTypeChange = onFitterTypeChange
+//        this.cancelText = "取消"
+//        this.cancelClick = onCancel
 
         if (isCreated) {
             setContent()

@@ -61,15 +61,15 @@ class ResultDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog
     }
 
     override fun initDialogView() {
-        tvID = findViewById(R.id.tvID)
-        tvDetectionNum = findViewById(R.id.tvDetectionNum)
-        tvTestTime = findViewById(R.id.tvTestTime)
-        etName = findViewById(R.id.etName)
-        etGender = findViewById(R.id.etGender)
-        etAbs = findViewById(R.id.etAbs)
-        etCon = findViewById(R.id.etCon)
-        etResult = findViewById(R.id.etResult)
-        etSampleBarcode = findViewById(R.id.etSampleBarcode)
+        tvID = findViewById(R.id.tv_id)
+        tvDetectionNum = findViewById(R.id.tv_detection_num)
+        tvTestTime = findViewById(R.id.tv_test_time)
+        etName = findViewById(R.id.et_name)
+        etGender = findViewById(R.id.et_gender)
+        etAbs = findViewById(R.id.et_abs)
+        etCon = findViewById(R.id.et_con)
+        etResult = findViewById(R.id.et_result)
+        etSampleBarcode = findViewById(R.id.et_sample_barcode)
     }
 
     override fun setContent() {

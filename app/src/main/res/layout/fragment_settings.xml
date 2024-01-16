@@ -44,7 +44,7 @@
             android:textSize="26sp" />
 
         <TextView
-            android:id="@+id/tvParamsSetting"
+            android:id="@+id/tv_params_setting"
             style="@style/TextTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -54,7 +54,7 @@
             android:textSize="26sp" />
 
         <TextView
-            android:id="@+id/tvDetectionNumSetting"
+            android:id="@+id/tv_detection_num_setting"
             style="@style/TextTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

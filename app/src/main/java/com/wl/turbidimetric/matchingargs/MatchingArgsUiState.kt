@@ -41,6 +41,11 @@ enum class DialogState {
     Accident,
 
     /**
+     * 拟合选择覆盖曲线
+     */
+    MatchingCoverCurve,
+
+    /**
      * 拟合配置
      */
     MatchingSettings,
@@ -54,4 +59,9 @@ enum class DialogState {
      * 返回状态失败、非法参数、传感器错误、电机错误等的提示
      */
     StateFailed,
+
+    /**
+     * 关闭拟合中的对话框，在未拟合就点击结束的时候用
+     */
+    CloseMatchingStateDialog
 }

@@ -160,10 +160,6 @@ class DataManagerFragment :
 
     private fun listenerView() {
 
-        vd.btnInsert.setOnClickListener {
-
-        }
-
         vd.btnCondition.setOnClickListener {
             u("数据筛选")
             showConditionDialog()

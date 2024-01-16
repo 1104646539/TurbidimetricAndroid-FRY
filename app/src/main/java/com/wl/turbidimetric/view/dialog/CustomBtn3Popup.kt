@@ -44,7 +44,7 @@ abstract class CustomBtn3Popup(val ctx: Context, val viewId: Int) : CenterPopupV
     var cancelText: String? = null
     var cancelClick: onClick? = null
     val imm: InputMethodManager =
-        ctx.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager;
+        ctx.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
 
     // 返回自定义弹窗的布局
     override fun getImplLayoutId(): Int {
@@ -69,7 +69,7 @@ abstract class CustomBtn3Popup(val ctx: Context, val viewId: Int) : CenterPopupV
     }
 
     override fun dismiss() {
-        imm.hideSoftInputFromWindow(rootView.windowToken, 0);
+        imm.hideSoftInputFromWindow(rootView.windowToken, 0)
         super.dismiss()
     }
 

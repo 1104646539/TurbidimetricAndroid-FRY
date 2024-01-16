@@ -48,7 +48,7 @@ class DataManagerAdapter :
         RecyclerView.ViewHolder(binding.root) {
         fun bindData(item: TestResultAndCurveModel?, onLongClick: ((pos: Long) -> Unit)?) {
 //            binding.setVariable(BR.item, item)
-            binding.tvID.text = item?.result?.resultId.toString()
+            binding.tvId.text = item?.result?.resultId.toString()
             binding.tvDetectionNum.text = item?.result?.detectionNum ?: "-"
             binding.tvProjectName.text = item?.curve?.projectName ?: "-"
             binding.tvName.text = item?.result?.name ?: "-"

@@ -2,7 +2,6 @@ package com.wl.turbidimetric.view.dialog
 
 import android.app.Activity
 import android.content.Context
-import android.view.WindowManager
 import android.widget.*
 import com.github.gzuliyujiang.wheelpicker.DatimePicker
 import com.github.gzuliyujiang.wheelpicker.annotation.DateMode
@@ -14,9 +13,11 @@ import com.wl.turbidimetric.R
 import com.wl.turbidimetric.datamanager.SelectQueryAdapter
 import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.model.ConditionModel
-import com.wl.wllib.longStrToDate
+import com.wl.wllib.DateUtil
 import com.wl.wllib.longStrToLong
-import com.wl.wllib.toLongTimeStr
+import com.wl.wllib.toDate
+import com.wl.wllib.toLong
+import com.wl.wllib.toTimeStr
 import java.util.*
 
 /**
@@ -38,11 +39,12 @@ open class ConditionDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
     var tvResults: TextView? = null
     var tvTestTimeMin: TextView? = null
     var tvTestTimeMax: TextView? = null
+    var cbToday: CheckBox? = null
     var resultAdapter: SelectQueryAdapter? = null
     var results = getResource().getStringArray(R.array.results)
-
     var testTimeMin = ""
     var testTimeMax = ""
+    var today = true
 
     /**
      * 时间选择器
@@ -64,10 +66,12 @@ open class ConditionDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
             calendar.set(Calendar.HOUR_OF_DAY, hour)
             calendar.set(Calendar.MINUTE, minute)
             calendar.set(Calendar.SECOND, second)
-            onDateSet(calendar.time.toLongTimeStr(), calendar.time.time)
-//            var text = "$year-$month-$day $hour:$minute:$second"
-//            text += if (wheelLayout.timeWheelLayout.isAnteMeridiem) " 上午" else " 下午"
-//            toast(text)
+            onDateSet(calendar.time.toTimeStr(DateUtil.Time4Format), calendar.time.time)
+
+            if (today && calendar.time.time !in getTodayStartTime()..(getTodayStartTime() + oneday)) {//如果选中的日期不在当天就取消选中
+                today = false
+                updateToday()
+            }
         }
         wheelLayout.setDateMode(DateMode.YEAR_MONTH_DAY)
         wheelLayout.setTimeMode(TimeMode.HOUR_24_NO_SECOND)
@@ -99,7 +103,7 @@ open class ConditionDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
             val calendar =
                 if (tvTestTimeMin?.text.isNullOrEmpty()) Calendar.getInstance() else Calendar.getInstance()
                     .apply {
-                        time = tvTestTimeMin?.text.toString().longStrToDate()
+                        time = tvTestTimeMin?.text.toString().toDate(DateUtil.Time4Format)
                     }
             showSelectTimeDialog(calendar) { longStr, time ->
                 tvTestTimeMin?.text = longStr
@@ -110,14 +114,49 @@ open class ConditionDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
             val calendar =
                 if (tvTestTimeMax?.text.isNullOrEmpty()) Calendar.getInstance() else Calendar.getInstance()
                     .apply {
-                        time = tvTestTimeMax?.text.toString().longStrToDate()
+                        time = tvTestTimeMax?.text.toString().toDate(DateUtil.Time4Format)
                     }
             showSelectTimeDialog(calendar) { longStr, time ->
                 tvTestTimeMax?.text = longStr
                 testTimeMax = longStr
             }
         }
+        cbToday?.setOnCheckedChangeListener { buttonView, isChecked ->
+            today = isChecked
+        }
 
+        updateToday()
+    }
+
+    val oneday = 1000L * 60 * 60 * 24
+
+    /**
+     * 更新到当天的时间检索
+     */
+    private fun updateToday() {
+        cbToday?.isChecked = today
+        if (cbToday?.isChecked == true) {
+            val todayStartTime = getTodayStartTime()
+            testTimeMin = todayStartTime.toTimeStr(DateUtil.Time4Format)
+            testTimeMax = (todayStartTime + oneday).toTimeStr(DateUtil.Time4Format)
+
+            tvTestTimeMin?.text = testTimeMin
+            tvTestTimeMax?.text = testTimeMax
+        }
+    }
+
+    /**
+     * 获取当天的零点时间戳
+     *
+     * @return 当天的零点时间戳
+     */
+    open fun getTodayStartTime(): Long {
+        //设置时区
+        val calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT+8"))
+        calendar[Calendar.HOUR_OF_DAY] = 0
+        calendar[Calendar.MINUTE] = 0
+        calendar[Calendar.SECOND] = 0
+        return calendar.timeInMillis
     }
 
     fun showDialog(
@@ -147,7 +186,7 @@ open class ConditionDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
      */
     private fun verify(): Boolean {
         if (testTimeMin.isNotEmpty() && testTimeMax.isNotEmpty()) {
-            if (testTimeMin.longStrToLong() > testTimeMax.longStrToLong()) {
+            if (testTimeMin.toLong(DateUtil.Time4Format) > testTimeMax.toLong(DateUtil.Time4Format)) {
                 toast("检测时间最大值不能小于最小值")
                 return false
             }
@@ -169,13 +208,14 @@ open class ConditionDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
         tvTestTimeMax?.text = ""
         testTimeMin = ""
         testTimeMax = ""
+        today = true
     }
 
     private fun getCondition(): ConditionModel {
         val name = etName?.text.toString().ifEmpty { "" }
         val qrcode = etQRCode?.text.toString().ifEmpty { "" }
-        val testTimeMax = if (testTimeMax.isEmpty()) 0 else testTimeMax.longStrToLong()
-        val testTimeMin = if (testTimeMin.isEmpty()) 0 else testTimeMin.longStrToLong()
+        val testTimeMax = if (testTimeMax.isEmpty()) 0 else testTimeMax.toLong(DateUtil.Time4Format)
+        val testTimeMin = if (testTimeMin.isEmpty()) 0 else testTimeMin.toLong(DateUtil.Time4Format)
 
         return ConditionModel(
             name = name,
@@ -195,10 +235,9 @@ open class ConditionDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
         etConMax = findViewById(R.id.et_con_max)
         spnResults = findViewById(R.id.spn_results)
         tvResults = findViewById(R.id.tv_spn_results)
-        tvTestTimeMin = findViewById(R.id.tv_testtime_min)
-        tvTestTimeMax = findViewById(R.id.tv_testtime_max)
-
-
+        tvTestTimeMin = findViewById(R.id.tv_test_time_min)
+        tvTestTimeMax = findViewById(R.id.tv_test_time_max)
+        cbToday = findViewById(R.id.cb_today)
     }
 
 

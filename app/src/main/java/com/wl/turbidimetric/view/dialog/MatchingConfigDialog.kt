@@ -29,7 +29,7 @@ class MatchingConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
     var fitterTypeNames = mutableListOf<String>()
 
     var autoAttenuation = false
-    var matchingNum = 5
+    var gradsNum = 5
     var selectProject: ProjectModel? = null
     var selectFitterType: FitterType = FitterType.Three
     val defaultCon5 = arrayListOf(0.0, 50.0, 200.0, 500.0, 1000.0)
@@ -95,11 +95,11 @@ class MatchingConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
     fun showDialog(
         projects: List<ProjectModel>,
         autoAttenuation: Boolean,
-        matchingNum: Int = 5,
+        gradsNum: Int = 5,
         selectProject: ProjectModel? = null,
         selectFitterType: FitterType = FitterType.Three,
-        cons: List<Double> = mutableListOf(),
-        onConfirmClick: (matchingNum: Int, autoAttenuation: Boolean, selectProject: ProjectModel?, selectFitterType: FitterType, cons: List<Double>) -> Unit,
+        targetCons: List<Double> = mutableListOf(),
+        onConfirmClick: (gradsNum: Int, autoAttenuation: Boolean, selectProject: ProjectModel?, selectFitterType: FitterType, cons: List<Double>) -> Unit,
         onCancelClick: onClick
     ) {
         this.projects.clear()
@@ -107,17 +107,17 @@ class MatchingConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
         this.projectNames.clear()
         this.projectNames.addAll(this.projects.map { it.projectName })
         this.autoAttenuation = autoAttenuation
-        this.matchingNum = matchingNum
+        this.gradsNum = gradsNum
         this.selectProject = selectProject
         this.selectFitterType = selectFitterType
         this.cons.clear()
-        this.cons.addAll(cons)
+        this.cons.addAll(targetCons)
 
         this.confirmText = "确定"
         this.confirmClick = {
             getCons()
             onConfirmClick.invoke(
-                this@MatchingConfigDialog.matchingNum,
+                this@MatchingConfigDialog.gradsNum,
                 this@MatchingConfigDialog.autoAttenuation,
                 this@MatchingConfigDialog.selectProject,
                 this@MatchingConfigDialog.selectFitterType,
@@ -148,15 +148,15 @@ class MatchingConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
         tempCons.add(con3)
         tempCons.add(con4)
         tempCons.add(con5)
-        if (matchingNum > 5) {
+        if (gradsNum > 5) {
             val con6 = etTargetCon6?.text.toString().toDoubleOrNull() ?: 0.0
             tempCons.add(con6)
         }
-        if (matchingNum > 6) {
+        if (gradsNum > 6) {
             val con7 = etTargetCon7?.text.toString().toDoubleOrNull() ?: 0.0
             tempCons.add(con7)
         }
-        if (matchingNum > 7) {
+        if (gradsNum > 7) {
             val con8 = etTargetCon8?.text.toString().toDoubleOrNull() ?: 0.0
             tempCons.add(con8)
         }
@@ -168,11 +168,11 @@ class MatchingConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
         super.setContent()
 
         val selectProjectIndex = projects.indexOf(selectProject)
-        if(selectProjectIndex < 0 && projects.isNotEmpty()){//没有已选择的但有项目就默认选择第一个
+        if (selectProjectIndex < 0 && projects.isNotEmpty()) {//没有已选择的但有项目就默认选择第一个
             selectProject = projects[0]
             this.spnProject?.setSelection(0)
 
-        }else{
+        } else {
             selectProject = projects[selectProjectIndex]
             this.spnProject?.setSelection(selectProjectIndex)
 
@@ -185,15 +185,15 @@ class MatchingConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
 
         rbAuto?.isChecked = autoAttenuation
 
-        rbGrad5?.isChecked = matchingNum == 5
-        rbGrad6?.isChecked = matchingNum == 6
-        rbGrad7?.isChecked = matchingNum == 7
-        rbGrad8?.isChecked = matchingNum == 8
+        rbGrad5?.isChecked = gradsNum == 5
+        rbGrad6?.isChecked = gradsNum == 6
+        rbGrad7?.isChecked = gradsNum == 7
+        rbGrad8?.isChecked = gradsNum == 8
 
         changeCon()
-        etTargetCon6?.visibility = (matchingNum > 5).isShow()
-        etTargetCon7?.visibility = (matchingNum > 6).isShow()
-        etTargetCon8?.visibility = (matchingNum > 7).isShow()
+        etTargetCon6?.visibility = (gradsNum > 5).isShow()
+        etTargetCon7?.visibility = (gradsNum > 6).isShow()
+        etTargetCon8?.visibility = (gradsNum > 7).isShow()
         rbAuto?.setOnCheckedChangeListener { buttonView, isChecked ->
             autoAttenuation = isChecked
 
@@ -203,15 +203,15 @@ class MatchingConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
             etTargetCon4?.isEnabled = !autoAttenuation
             etTargetCon5?.isEnabled = !autoAttenuation
 
-            etTargetCon6?.isEnabled = !autoAttenuation && (matchingNum > 5)
-            etTargetCon7?.isEnabled = !autoAttenuation && (matchingNum > 6)
-            etTargetCon8?.isEnabled = !autoAttenuation && (matchingNum > 7)
+            etTargetCon6?.isEnabled = !autoAttenuation && (gradsNum > 5)
+            etTargetCon7?.isEnabled = !autoAttenuation && (gradsNum > 6)
+            etTargetCon8?.isEnabled = !autoAttenuation && (gradsNum > 7)
 
         }
 
         rbGrad5?.setOnCheckedChangeListener { buttonView, isChecked ->
             if (isChecked) {
-                matchingNum = 5
+                gradsNum = 5
                 //5可以选择自动或人工稀释
                 rbAuto?.isEnabled = true
                 rbManual?.isEnabled = true
@@ -226,7 +226,7 @@ class MatchingConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
 
         rbGrad6?.setOnCheckedChangeListener { buttonView, isChecked ->
             if (isChecked) {//大于5只能人工稀释
-                matchingNum = 6
+                gradsNum = 6
 
                 rbAuto?.isEnabled = false
                 rbManual?.isEnabled = true
@@ -240,7 +240,7 @@ class MatchingConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
         }
         rbGrad7?.setOnCheckedChangeListener { buttonView, isChecked ->
             if (isChecked) {//大于5只能人工稀释
-                matchingNum = 7
+                gradsNum = 7
 
                 rbAuto?.isEnabled = false
                 rbManual?.isEnabled = true
@@ -254,7 +254,7 @@ class MatchingConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
         }
         rbGrad8?.setOnCheckedChangeListener { buttonView, isChecked ->
             if (isChecked) {//大于5只能人工稀释
-                matchingNum = 8
+                gradsNum = 8
 
                 rbAuto?.isEnabled = false
                 rbManual?.isEnabled = true
@@ -292,16 +292,16 @@ class MatchingConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
     }
 
     private fun changeCon() {
-        if (matchingNum == 5) {
+        if (gradsNum == 5) {
             cons.clear()
             cons.addAll(defaultCon5)
-        } else if (matchingNum == 6) {
+        } else if (gradsNum == 6) {
             cons.clear()
             cons.addAll(defaultCon6)
-        } else if (matchingNum == 7) {
+        } else if (gradsNum == 7) {
             cons.clear()
             cons.addAll(defaultCon7)
-        } else if (matchingNum == 8) {
+        } else if (gradsNum == 8) {
             cons.clear()
             cons.addAll(defaultCon8)
         }

@@ -289,8 +289,8 @@ class MatchingArgsFragment :
     private fun listenerDialog() {
         lifecycleScope.launch {
             vm.dialogUiState.collect { state ->
-                when (state.dialogState) {
-                    DialogState.GetStateNotExistMsg -> {//开始检测，确实清洗液等
+                when (state) {
+                    is MatchingArgsDialogUiState.GetStateNotExistMsg -> {//开始检测，确实清洗液等
                         dialog.showPop(requireContext()) { dialog ->
                             dialog.showDialog(
                                 msg = "${state.msg}",
@@ -308,7 +308,7 @@ class MatchingArgsFragment :
                         }
                     }
 
-                    DialogState.MatchingFinishMsg -> {//检测结束，提示是否保存
+                    is MatchingArgsDialogUiState.MatchingFinishMsg -> {//检测结束，提示是否保存
 //                        vm.saveProject()
                         val msg = state.msg.plus("\n确定保存该条标曲记录？\n\n")
 
@@ -337,7 +337,7 @@ class MatchingArgsFragment :
 
                     }
 
-                    DialogState.Accident -> {//意外的检测结束等
+                    is MatchingArgsDialogUiState.Accident -> {//意外的检测结束等
                         dialog.showPop(requireContext()) { dialog ->
                             dialog.showDialog(
                                 msg = "${state.msg}",
@@ -349,26 +349,27 @@ class MatchingArgsFragment :
                         }
                     }
 
-                    DialogState.CloseMatchingStateDialog -> {//关闭拟合中的对话框
+                    is MatchingArgsDialogUiState.CloseMatchingStateDialog -> {//关闭拟合中的对话框
                         if (matchingStateDialog.isShow) {
                             matchingStateDialog.dismiss()
                         }
                     }
-                    DialogState.MatchingSettings -> {//拟合配置
-                        showMatchingConfigDialog()
+
+                    is MatchingArgsDialogUiState.MatchingSettings -> {//拟合配置
+                        showMatchingConfigDialog(state.projects,state.autoAttenuation,state.gradsNum,state.selectProject,state.selectFitterType,state.targetCons)
                     }
 
-                    DialogState.MatchingState -> {//拟合中状态
-                        showMatchingStateDialog()
+                    is MatchingArgsDialogUiState.MatchingState -> {//拟合中状态
+                        showMatchingStateDialog(state.gradsNum,state.abss,state.targets,state.means,state.selectFitterType,state.curProject)
                     }
 
-                    DialogState.MatchingCoverCurve -> {//选择要覆盖的曲线
+                    is MatchingArgsDialogUiState.MatchingCoverCurve -> {//选择要覆盖的曲线
                         showCoverDialog()
                     }
                     /**
                      * 命令提示错误，中断所有程序
                      */
-                    DialogState.StateFailed -> {
+                    is MatchingArgsDialogUiState.StateFailed -> {
                         dialog.showPop(requireContext(), isCancelable = false) {
                             it.showDialog(
                                 msg = state.msg,
@@ -411,15 +412,20 @@ class MatchingArgsFragment :
     /**
      * 显示拟合设置对话框
      */
-    private fun showMatchingConfigDialog() {
+    private fun showMatchingConfigDialog( projects: List<ProjectModel>,
+                                          autoAttenuation: Boolean,
+                                          gradsNum: Int = 5,
+                                          selectProject: ProjectModel? = null,
+                                          selectFitterType: FitterType = FitterType.Three,
+                                          targetCons: List<Double> = mutableListOf(),) {
         matchingConfigDialog.showPop(requireContext(), width = 900) { dialog ->
             dialog.showDialog(
-                vm.projects,
-                vm.autoAttenuation,
-                vm.gradsNum,
-                vm.selectMatchingProject,
-                vm.selectFitterType,
-                vm.targetCons,
+                projects,
+                autoAttenuation,
+                gradsNum,
+                selectProject,
+                selectFitterType,
+                targetCons,
                 { matchingNum: Int, autoAttenuation: Boolean, selectProject: ProjectModel?, selectFitterType: FitterType, cons: List<Double> ->
                     vm.matchingConfigFinish(
                         matchingNum,
@@ -439,19 +445,24 @@ class MatchingArgsFragment :
     /**
      * 显示拟合中状态对话框
      */
-    private fun showMatchingStateDialog() {
+    private fun showMatchingStateDialog( gradsNum: Int,
+                                         abss: MutableList<MutableList<Double>>,
+                                         targets: List<Double>,
+                                         means: List<Double>,
+                                         selectFitterType: FitterType,
+                                         curProject: CurveModel?) {
         matchingStateDialog.showPop(
             requireContext(),
             width = 1500,
             isCancelable = false
         ) { dialog ->
             dialog.showDialog(
-                vm.gradsNum,
-                vm.abss,
-                vm.targetCons,
-                vm.means,
-                vm.selectFitterType,
-                vm.curProject,
+                gradsNum,
+                abss,
+                targets,
+                means,
+                selectFitterType,
+                curProject,
                 {//开始
                     vm.clickStart()
                 }, {//拟合结束

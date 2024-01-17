@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.res.Resources
 import android.view.View
 import android.widget.Toast
+import androidx.annotation.StringRes
 import com.google.android.material.snackbar.Snackbar
 import com.wl.turbidimetric.App
 import com.wl.turbidimetric.home.HomeViewModel
@@ -43,6 +44,7 @@ fun Double.scaleStr(scale: Int): String {
         "0.0"
     }
 }
+
 /**
  * 显示snack提示
  * @param view View
@@ -64,6 +66,10 @@ fun toast(msg: String, duration: Int = Toast.LENGTH_SHORT) {
 
 fun getResource(): Resources {
     return App.instance!!.resources
+}
+
+fun getString(@StringRes id: Int): String {
+    return getResource().getString(id)
 }
 
 inline fun Array<Array<CuvetteItem>?>.print(): String {

@@ -8,6 +8,12 @@
     <string name="nav_shutdown">关机</string>
     <string name="result_negative">阴性</string>
     <string name="result_positive">阳性</string>
+    <string name="dialog_btn_i_know">我知道了</string>
+    <string name="dialog_btn_confirm">确定</string>
+    <string name="dialog_btn_added">我已添加</string>
+    <string name="dialog_btn_finish_test">检测检测</string>
+    <string name="dialog_btn_re_get_machine_state">重新自检</string>
+    <string name="dialog_hilt_cuvette_test_finish">比色皿检测结束，是否添加？</string>
 
     <string-array name="results">
         <item>阴性</item>

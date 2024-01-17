@@ -1,6 +1,7 @@
 package com.wl.turbidimetric.home
 
 import androidx.lifecycle.*
+import com.wl.turbidimetric.R
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.SystemGlobal
@@ -38,7 +39,7 @@ class HomeViewModel(
     fun goGetMachineState() {
 //        dialogGetMachine.postValue(true)
         viewModelScope.launch {
-            _dialogUiState.emit(HomeDialogUiState(DialogState.GetMachineShow, ""))
+            _dialogUiState.emit(HomeDialogUiState.GetMachineShow)
         }
         testState = TestState.GetMachineState
         getMachineState()
@@ -487,7 +488,7 @@ class HomeViewModel(
         }
         if (errorMsg.isNotEmpty()) {
             viewModelScope.launch {
-                _dialogUiState.emit(HomeDialogUiState(dialogState = DialogState.Notify, errorMsg))
+                _dialogUiState.emit(HomeDialogUiState.Notify(errorMsg))
             }
             return
         }
@@ -775,8 +776,7 @@ class HomeViewModel(
                 stateErrorStopRunning()
                 viewModelScope.launch {
                     _dialogUiState.emit(
-                        HomeDialogUiState(
-                            dialogState = DialogState.StateFailed,
+                        HomeDialogUiState.StateFailed(
                             stateFailedText.plus("，请停止使用仪器并联系供应商维修")
                         )
                     )
@@ -1336,9 +1336,7 @@ class HomeViewModel(
                         //提示，比色皿不足了
                         viewModelScope.launch {
                             _dialogUiState.emit(
-                                HomeDialogUiState(
-                                    dialogState = DialogState.CuvetteDeficiency, ""
-                                )
+                                HomeDialogUiState.CuvetteDeficiency
                             )
                         }
                     }
@@ -1354,9 +1352,7 @@ class HomeViewModel(
                         continueTestGetState = true
                         viewModelScope.launch {
                             _dialogUiState.emit(
-                                HomeDialogUiState(
-                                    dialogState = DialogState.GetStateNotExist, str
-                                )
+                                HomeDialogUiState.GetStateNotExist(str)
                             )
                         }
                     })
@@ -1370,9 +1366,7 @@ class HomeViewModel(
                     //提示，比色皿不足了
                     viewModelScope.launch {
                         _dialogUiState.emit(
-                            HomeDialogUiState(
-                                dialogState = DialogState.CuvetteDeficiency, ""
-                            )
+                            HomeDialogUiState.CuvetteDeficiency
                         )
                     }
                 }
@@ -1385,9 +1379,7 @@ class HomeViewModel(
                     continueTestGetState = true
                     viewModelScope.launch {
                         _dialogUiState.emit(
-                            HomeDialogUiState(
-                                dialogState = DialogState.GetStateNotExist, "试剂和清洗液不足"
-                            )
+                            HomeDialogUiState.GetStateNotExist("试剂和清洗液不足")
                         )
                     }
                 })
@@ -2009,7 +2001,7 @@ class HomeViewModel(
         var dialogMsg = getFinishDialogMsg()
 
         viewModelScope.launch {
-            _dialogUiState.emit(HomeDialogUiState(dialogState = DialogState.TestFinish, dialogMsg))
+            _dialogUiState.emit(HomeDialogUiState.TestFinish(dialogMsg))
         }
         testState = TestState.Normal
     }
@@ -2155,7 +2147,7 @@ class HomeViewModel(
             getState()
         } else {
             viewModelScope.launch {
-                _dialogUiState.emit(HomeDialogUiState(DialogState.GetMachineDismiss, ""))
+                _dialogUiState.emit(HomeDialogUiState.GetMachineDismiss)
             }
             testState = TestState.NotGetMachineState
             val sb = StringBuffer()
@@ -2169,9 +2161,7 @@ class HomeViewModel(
             i("自检失败，错误信息=${sb}")
             viewModelScope.launch {
                 _dialogUiState.emit(
-                    HomeDialogUiState(
-                        DialogState.GetMachineFailedShow, sb.toString()
-                    )
+                    HomeDialogUiState.GetMachineFailedShow(sb.toString())
                 )
             }
         }
@@ -2198,7 +2188,7 @@ class HomeViewModel(
         if (testState == TestState.Normal) {
             i("自检完成")
             viewModelScope.launch {
-                _dialogUiState.emit(HomeDialogUiState(DialogState.GetMachineDismiss, ""))
+                _dialogUiState.emit(HomeDialogUiState.GetMachineDismiss)
             }
         }
         if (!runningTest()) return
@@ -2231,13 +2221,9 @@ class HomeViewModel(
             getInitSampleShelfPos()
             if (sampleShelfPos == -1) {
                 i("没有样本架")
-//                sampleDeficiency = true
-//                showTestSampleDeficiencyDialog()
                 viewModelScope.launch {
                     _dialogUiState.emit(
-                        HomeDialogUiState(
-                            dialogState = DialogState.GetStateNotExist, "样本不足，请添加"
-                        )
+                        HomeDialogUiState.GetStateNotExist("样本不足，请添加")
                     )
                 }
                 return
@@ -2261,12 +2247,9 @@ class HomeViewModel(
         i("cuvetteShelfPos=${cuvetteShelfPos} sampleShelfPos=${sampleShelfPos}")
         if (cuvetteShelfPos == -1) {
             i("没有比色皿架")
-//            getStateNotExistMsg.postValue("比色皿不足，请添加")
             viewModelScope.launch {
                 _dialogUiState.emit(
-                    HomeDialogUiState(
-                        dialogState = DialogState.GetStateNotExist, "比色皿不足，请添加"
-                    )
+                    HomeDialogUiState.GetStateNotExist("比色皿不足，请添加")
                 )
             }
             return
@@ -2274,12 +2257,9 @@ class HomeViewModel(
         if (!isManualSampling()) {
             if (sampleShelfPos == -1) {
                 i("没有样本架")
-//            getStateNotExistMsg.postValue("样本不足，请添加")
                 viewModelScope.launch {
                     _dialogUiState.emit(
-                        HomeDialogUiState(
-                            dialogState = DialogState.GetStateNotExist, "样本不足，请添加"
-                        )
+                        HomeDialogUiState.GetStateNotExist("样本不足，请添加")
                     )
                 }
                 return
@@ -2291,12 +2271,9 @@ class HomeViewModel(
             cleaningBeforeStartTest = true
             samplingProbeCleaning()
         }, discrepancy = { str ->
-//            getStateNotExistMsg.postValue(str)
             viewModelScope.launch {
                 _dialogUiState.emit(
-                    HomeDialogUiState(
-                        dialogState = DialogState.GetStateNotExist, str
-                    )
+                    HomeDialogUiState.GetStateNotExist(str)
                 )
             }
             return@checkTestState
@@ -2310,7 +2287,6 @@ class HomeViewModel(
     private fun moveCuvetteShelfNext() {
         if (cuvetteShelfPos == lastCuvetteShelfPos) {
             i("已经是最后一排比色皿了")
-//            cuvetteDeficiency = true
             cuvetteShelfPos = -1
             moveCuvetteShelf(cuvetteShelfPos)
             return
@@ -2478,27 +2454,6 @@ class HomeViewModel(
     fun dialogTestFinishCuvetteDeficiencyCancel() {
         i("dialogTestFinishCuvetteDeficiencyCancel 点击结束检测")
 
-        testFinishAction()
-    }
-
-    /**
-     * 正常检测中
-     * 样本不足
-     * 点击我已添加
-     */
-    fun dialogTestSampleDeficiencyConfirm() {
-        i("dialogDripSampleSampleDeficiencyConfirm 点击我已添加")
-        continueTestSampleState = true
-        getState()
-    }
-
-    /**
-     * 正常检测中
-     * 样本不足
-     * 点击结束检测
-     */
-    fun dialogTestSampleDeficiencyCancel() {
-        i("dialogDripSampleSampleDeficiencyCancel 点击结束检测")
         testFinishAction()
     }
 
@@ -2753,7 +2708,8 @@ class HomeViewModel(
     /**
      * 曲线更新了，选中最新的曲线
      */
-    fun selectLastProject(projects: List<CurveModel>) {
+    suspend fun selectLastProject() {
+        var projects = getCurveModels()
         LocalData.SelectProjectID = projects.first().curveId
         recoverSelectProject(projects.toMutableList())
     }

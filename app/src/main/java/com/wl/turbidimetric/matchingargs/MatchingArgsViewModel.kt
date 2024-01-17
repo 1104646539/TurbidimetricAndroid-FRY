@@ -462,8 +462,7 @@ class MatchingArgsViewModel(
                 stateErrorStopRunning()
                 viewModelScope.launch {
                     _dialogUiState.emit(
-                        MatchingArgsDialogUiState(
-                            dialogState = DialogState.StateFailed,
+                        MatchingArgsDialogUiState.StateFailed(
                             stateFailedText.plus("，请停止使用仪器并联系供应商维修")
                         )
                     )
@@ -496,8 +495,13 @@ class MatchingArgsViewModel(
     fun showMatchingSettingsDialog() {
         viewModelScope.launch {
             _dialogUiState.emit(
-                MatchingArgsDialogUiState(
-                    dialogState = DialogState.MatchingSettings, msg = ""
+                MatchingArgsDialogUiState.MatchingSettings(
+                    projects,
+                    autoAttenuation,
+                    gradsNum,
+                    selectMatchingProject,
+                    selectFitterType,
+                    targetCons,
                 )
             )
         }
@@ -509,8 +513,13 @@ class MatchingArgsViewModel(
     fun showMatchingStateDialog() {
         viewModelScope.launch {
             _dialogUiState.emit(
-                MatchingArgsDialogUiState(
-                    dialogState = DialogState.MatchingState, msg = ""
+                MatchingArgsDialogUiState.MatchingState(
+                    gradsNum,
+                    abss,
+                    targetCons,
+                    means,
+                    selectFitterType,
+                    curProject
                 )
             )
         }
@@ -530,9 +539,7 @@ class MatchingArgsViewModel(
         if (!machineStateNormal()) {
             viewModelScope.launch {
                 _dialogUiState.emit(
-                    MatchingArgsDialogUiState(
-                        dialogState = DialogState.Accident, msg = "请重新自检或重启仪器"
-                    )
+                    MatchingArgsDialogUiState.Accident("请重新自检或重启仪器")
                 )
             }
             return
@@ -540,9 +547,7 @@ class MatchingArgsViewModel(
         if (testState != TestState.Normal) {
             viewModelScope.launch {
                 _dialogUiState.emit(
-                    MatchingArgsDialogUiState(
-                        dialogState = DialogState.Accident, msg = "正在检测，请勿操作"
-                    )
+                    MatchingArgsDialogUiState.Accident("正在检测，请勿操作")
                 )
             }
             return
@@ -551,9 +556,7 @@ class MatchingArgsViewModel(
         if (reagentNOStr.isNullOrEmpty()) {
             viewModelScope.launch {
                 _dialogUiState.emit(
-                    MatchingArgsDialogUiState(
-                        dialogState = DialogState.Accident, msg = "请输入试剂序号"
-                    )
+                    MatchingArgsDialogUiState.Accident("请输入试剂序号")
                 )
             }
             return
@@ -649,9 +652,7 @@ class MatchingArgsViewModel(
         if (errorMsg.isNotEmpty()) {
             viewModelScope.launch {
                 _dialogUiState.emit(
-                    MatchingArgsDialogUiState(
-                        DialogState.GetStateNotExistMsg, errorMsg
-                    )
+                    MatchingArgsDialogUiState.GetStateNotExistMsg(errorMsg)
                 )
             }
             return
@@ -1584,9 +1585,7 @@ class MatchingArgsViewModel(
         if (accidentState != ReplyState.SUCCESS) {
             viewModelScope.launch {
                 _dialogUiState.emit(
-                    MatchingArgsDialogUiState(
-                        DialogState.Accident, getAccidentFinishDialog()
-                    )
+                    MatchingArgsDialogUiState.Accident(getAccidentFinishDialog())
                 )
             }
 
@@ -1609,9 +1608,7 @@ class MatchingArgsViewModel(
         if (testState.isRunning()) {
             viewModelScope.launch {
                 _dialogUiState.emit(
-                    MatchingArgsDialogUiState(
-                        DialogState.Accident, "正在检测，请稍后"
-                    )
+                    MatchingArgsDialogUiState.Accident("正在检测，请稍后")
                 )
             }
             return
@@ -1620,16 +1617,12 @@ class MatchingArgsViewModel(
         if (abss.isEmpty() || means.isEmpty()) {
             viewModelScope.launch {
                 _dialogUiState.emit(
-                    MatchingArgsDialogUiState(
-                        DialogState.CloseMatchingStateDialog, ""
-                    )
+                    MatchingArgsDialogUiState.CloseMatchingStateDialog("")
                 )
             }
             viewModelScope.launch {
                 _dialogUiState.emit(
-                    MatchingArgsDialogUiState(
-                        DialogState.Accident, "拟合质控结束"
-                    )
+                    MatchingArgsDialogUiState.Accident("拟合质控结束")
                 )
             }
             return
@@ -1639,9 +1632,7 @@ class MatchingArgsViewModel(
 
         viewModelScope.launch {
             _dialogUiState.emit(
-                MatchingArgsDialogUiState(
-                    DialogState.MatchingFinishMsg, testMsg.value ?: ""
-                )
+                MatchingArgsDialogUiState.MatchingFinishMsg(testMsg.value ?: "")
             )
         }
         testState = TestState.Normal
@@ -1932,7 +1923,7 @@ class MatchingArgsViewModel(
         } else {
             //没有选择项目
             viewModelScope.launch {
-                _dialogUiState.emit(MatchingArgsDialogUiState(DialogState.Accident, "没有选择项目"))
+                _dialogUiState.emit(MatchingArgsDialogUiState.Accident("没有选择项目"))
             }
         }
 //        val t1 = mutableListOf<Double>()
@@ -1961,9 +1952,9 @@ class MatchingArgsViewModel(
                 ""
             }
             if (hiltText.isNotEmpty()) {
-                _dialogUiState.emit(MatchingArgsDialogUiState(DialogState.Accident, hiltText))
+                _dialogUiState.emit(MatchingArgsDialogUiState.Accident(hiltText))
             } else {
-                _dialogUiState.emit(MatchingArgsDialogUiState(DialogState.MatchingCoverCurve, ""))
+                _dialogUiState.emit(MatchingArgsDialogUiState.MatchingCoverCurve(""))
             }
         }
     }

@@ -288,7 +288,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 
             EventGlobal.WHAT_PROJECT_ADD -> {
                 lifecycleScope.launch {
-                    vm.selectLastProject(vm.getCurveModels())
+                    vm.selectLastProject()
                 }
             }
 
@@ -458,27 +458,27 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         }
         lifecycleScope.launch {
             vm.dialogUiState.collect { state ->
-                i("launchAndRepeatWithViewLifecycle state=${state.dialogState}")
-                when (state.dialogState) {
+                i("launchAndRepeatWithViewLifecycle state=${state}")
+                when (state) {
                     /**
                      * 自检中
                      */
-                    DialogState.GetMachineShow -> {
+                    is HomeDialogUiState.GetMachineShow -> {
                         dialogGetMachine.show()
                     }
 
-                    DialogState.GetMachineDismiss -> {
+                    is HomeDialogUiState.GetMachineDismiss -> {
                         dialogGetMachine.dismiss()
                     }
                     /**
                      * 自检失败对话框
                      */
-                    DialogState.GetMachineFailedShow -> {
+                    is HomeDialogUiState.GetMachineFailedShow -> {
                         lifecycleScope.launch {
                             delay(300)
                             dialog.showPop(requireContext(), isCancelable = false) {
                                 it.showDialog(
-                                    msg = state.dialogMsg,
+                                    msg = state.msg,
                                     confirmText = "重新自检",
                                     confirmClick = { baseDialog ->
                                         baseDialog.dismiss()
@@ -496,9 +496,9 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                         }
                     }
                     /**
-                     * 检测结束后 比色皿不足
+                     * 正常检测 比色皿不足
                      */
-                    DialogState.CuvetteDeficiency -> {
+                    is HomeDialogUiState.CuvetteDeficiency -> {
                         dialog.showPop(requireContext(), isCancelable = false) {
                             it.showDialog(
                                 msg = "比色皿检测结束，是否添加？",
@@ -520,9 +520,10 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     /**
                      * 开始检测 比色皿,样本，试剂不足
                      */
-                    DialogState.GetStateNotExist -> {
+                    is HomeDialogUiState.GetStateNotExist -> {
                         dialog.showPop(requireContext(), isCancelable = false) {
-                            dialog.showDialog(msg = state.dialogMsg,
+                            dialog.showDialog(
+                                msg = state.msg,
                                 confirmText = "我已添加",
                                 confirmClick = {
                                     it.dismiss()
@@ -538,32 +539,13 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                             )
                         }
                     }
-
-                    /**
-                     * 正常检测 样本不足
-                     */
-                    DialogState.SampleDeficiency -> {
-                        dialog.showPop(requireContext(), isCancelable = false) {
-                            it.showDialog(msg = "样本不足，是否添加？",
-                                confirmText = "我已添加",
-                                confirmClick = {
-                                    it.dismiss()
-                                    vm.dialogTestSampleDeficiencyConfirm()
-                                },
-                                cancelText = "结束检测",
-                                cancelClick = {
-                                    it.dismiss()
-                                    vm.dialogTestSampleDeficiencyCancel()
-                                })
-                        }
-                    }
                     /**
                      * 检测结束 正常样本取样完成的提示
                      */
-                    DialogState.TestFinish -> {
+                    is HomeDialogUiState.TestFinish -> {
                         dialog.showPop(requireContext(), isCancelable = false) {
                             it.showDialog(
-                                msg = if (state.dialogMsg.isEmpty()) "检测结束" else "检测结束,${state.dialogMsg}",
+                                msg = if (state.msg.isEmpty()) "检测结束" else "检测结束,${state.msg}",
                                 confirmText = "确定",
                                 confirmClick = {
                                     it.dismiss()
@@ -576,11 +558,10 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     /**
                      * 通知
                      */
-                    DialogState.Notify -> {
-//                        toast(state.dialogMsg)
+                    is HomeDialogUiState.Notify -> {
                         dialog.showPop(requireContext(), isCancelable = false) {
                             it.showDialog(
-                                msg = state.dialogMsg,
+                                msg = state.msg,
                                 confirmText = "我知道了",
                                 confirmClick = { baseDialog ->
                                     baseDialog.dismiss()
@@ -593,10 +574,10 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     /**
                      * 命令提示错误，中断所有程序
                      */
-                    DialogState.StateFailed -> {
+                    is HomeDialogUiState.StateFailed -> {
                         dialog.showPop(requireContext(), isCancelable = false) {
                             it.showDialog(
-                                msg = state.dialogMsg,
+                                msg = state.msg,
                                 confirmText = "我知道了",
                                 confirmClick = { baseDialog ->
                                     baseDialog.dismiss()

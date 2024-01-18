@@ -16,6 +16,7 @@ import com.wl.turbidimetric.util.SerialPortUtil
 import com.wl.wllib.LogToFile.c
 import com.wl.wllib.LogToFile.i
 import com.wl.turbidimetric.base.BaseViewModel
+import com.wl.wllib.toLongTimeStr
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.math.BigDecimal
@@ -38,7 +39,7 @@ class HomeViewModel(
      */
     fun goGetMachineState() {
 //        dialogGetMachine.postValue(true)
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             _dialogUiState.emit(HomeDialogUiState.GetMachineShow)
         }
         testState = TestState.GetMachineState

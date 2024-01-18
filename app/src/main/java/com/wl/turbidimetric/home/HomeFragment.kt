@@ -31,6 +31,7 @@ import com.wl.wllib.toLongTimeStr
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.withContext
 import java.util.Date
 
 class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.fragment_home) {
@@ -114,19 +115,18 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
     }
 
     override fun initViewModel() {
-        vd.model = vm
+//        vd.model = vm
     }
 
 
     override fun init(savedInstanceState: Bundle?) {
-        test()
-
+//        test()
+//
         initView()
         listener()
         initUploadClient()
         vm.goGetMachineState()
         vm.goGetVersion()
-
         lifecycleScope.launch {
             vm.projectDatas.collectLatest {
                 it.let { ret ->
@@ -142,15 +142,20 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
     }
 
     private fun initUploadClient() {
-        HL7Helper.connect(object : OnConnectListener {
-            override fun onConnectResult(connectResult: ConnectResult) {
-                i("onConnectResult connectResult=$connectResult")
-            }
+        lifecycleScope.launch(Dispatchers.IO) {
+            delay(3000)
+            withContext(Dispatchers.Main) {
+                HL7Helper.connect(object : OnConnectListener {
+                    override fun onConnectResult(connectResult: ConnectResult) {
+                        i("onConnectResult connectResult=$connectResult")
+                    }
 
-            override fun onConnectStatusChange(connectStatus: ConnectStatus) {
-                i("onConnectStatusChange connectStatus=$connectStatus")
+                    override fun onConnectStatusChange(connectStatus: ConnectStatus) {
+                        i("onConnectStatusChange connectStatus=$connectStatus")
+                    }
+                })
             }
-        })
+        }
     }
 
     private fun initView() {

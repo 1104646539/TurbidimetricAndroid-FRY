@@ -20,10 +20,10 @@ class TestDataFragment :
     }
 
     override fun init(savedInstanceState: Bundle?) {
-        vd.btnMoveSampleShelf.setOnClickListener {
-            proxy.cmd = MoveSampleShelfCmd(0)
-            proxy.exec()
-        }
+//        vd.btnMoveSampleShelf.setOnClickListener {
+//            proxy.cmd = MoveSampleShelfCmd(0)
+//            proxy.exec()
+//        }
     }
 
     companion object {

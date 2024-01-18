@@ -14,7 +14,7 @@ import com.wl.turbidimetric.test.TestDataFragment
 class MainViewPagerAdapter(fragmentActivity: FragmentActivity) :
     FragmentStateAdapter(fragmentActivity) {
     override fun getItemCount(): Int {
-        return SystemGlobal.navItems.size
+        return 1
     }
 
     override fun createFragment(position: Int): Fragment {
@@ -22,18 +22,18 @@ class MainViewPagerAdapter(fragmentActivity: FragmentActivity) :
             0 -> {
                 HomeFragment.newInstance()
             }
-            1 -> {
-                DataManagerFragment.newInstance()
-            }
-            2 -> {
-                MatchingArgsFragment.newInstance()
-            }
-            3 -> {
-                SettingsFragment.newInstance()
-            }
-            4 -> {
-                RepeatabilityFragment.newInstance()
-            }
+//            1 -> {
+//                DataManagerFragment.newInstance()
+//            }
+//            2 -> {
+//                MatchingArgsFragment.newInstance()
+//            }
+//            3 -> {
+//                SettingsFragment.newInstance()
+//            }
+//            4 -> {
+//                RepeatabilityFragment.newInstance()
+//            }
             else -> {
                 TestDataFragment.newInstance()
             }

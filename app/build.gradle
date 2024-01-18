@@ -73,7 +73,7 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             zipAlignEnabled true
-//            buildConfigField("int", "buildNo", "${appBuildNo}")
+//            buildConfigField("int", "buildNo", "${appBuildNo}")、
         }
     }
     compileOptions {

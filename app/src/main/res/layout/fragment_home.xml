@@ -2,12 +2,6 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data>
-
-        <variable
-            name="model"
-            type="com.wl.turbidimetric.home.HomeViewModel" />
-    </data>
 
     <LinearLayout
         android:layout_width="match_parent"

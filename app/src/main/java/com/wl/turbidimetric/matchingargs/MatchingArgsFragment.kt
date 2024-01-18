@@ -27,8 +27,11 @@ import com.wl.turbidimetric.base.BaseFragment
 import com.wl.turbidimetric.view.dialog.ICON_HINT
 import com.wl.turbidimetric.view.dialog.MatchingStateDialog
 import com.wl.wllib.LogToFile.u
+import com.wl.wllib.toLongTimeStr
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import java.util.Date
 
 /**
  * 拟合参数
@@ -356,11 +359,25 @@ class MatchingArgsFragment :
                     }
 
                     is MatchingArgsDialogUiState.MatchingSettings -> {//拟合配置
-                        showMatchingConfigDialog(state.projects,state.autoAttenuation,state.gradsNum,state.selectProject,state.selectFitterType,state.targetCons)
+                        showMatchingConfigDialog(
+                            state.projects,
+                            state.autoAttenuation,
+                            state.gradsNum,
+                            state.selectProject,
+                            state.selectFitterType,
+                            state.targetCons
+                        )
                     }
 
                     is MatchingArgsDialogUiState.MatchingState -> {//拟合中状态
-                        showMatchingStateDialog(state.gradsNum,state.abss,state.targets,state.means,state.selectFitterType,state.curProject)
+                        showMatchingStateDialog(
+                            state.gradsNum,
+                            state.abss,
+                            state.targets,
+                            state.means,
+                            state.selectFitterType,
+                            state.curProject
+                        )
                     }
 
                     is MatchingArgsDialogUiState.MatchingCoverCurve -> {//选择要覆盖的曲线
@@ -412,12 +429,14 @@ class MatchingArgsFragment :
     /**
      * 显示拟合设置对话框
      */
-    private fun showMatchingConfigDialog( projects: List<ProjectModel>,
-                                          autoAttenuation: Boolean,
-                                          gradsNum: Int = 5,
-                                          selectProject: ProjectModel? = null,
-                                          selectFitterType: FitterType = FitterType.Three,
-                                          targetCons: List<Double> = mutableListOf(),) {
+    private fun showMatchingConfigDialog(
+        projects: List<ProjectModel>,
+        autoAttenuation: Boolean,
+        gradsNum: Int = 5,
+        selectProject: ProjectModel? = null,
+        selectFitterType: FitterType = FitterType.Three,
+        targetCons: List<Double> = mutableListOf(),
+    ) {
         matchingConfigDialog.showPop(requireContext(), width = 900) { dialog ->
             dialog.showDialog(
                 projects,
@@ -445,12 +464,14 @@ class MatchingArgsFragment :
     /**
      * 显示拟合中状态对话框
      */
-    private fun showMatchingStateDialog( gradsNum: Int,
-                                         abss: MutableList<MutableList<Double>>,
-                                         targets: List<Double>,
-                                         means: List<Double>,
-                                         selectFitterType: FitterType,
-                                         curProject: CurveModel?) {
+    private fun showMatchingStateDialog(
+        gradsNum: Int,
+        abss: MutableList<MutableList<Double>>,
+        targets: List<Double>,
+        means: List<Double>,
+        selectFitterType: FitterType,
+        curProject: CurveModel?
+    ) {
         matchingStateDialog.showPop(
             requireContext(),
             width = 1500,

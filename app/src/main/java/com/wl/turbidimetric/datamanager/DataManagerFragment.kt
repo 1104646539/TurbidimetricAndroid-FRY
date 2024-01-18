@@ -10,11 +10,11 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.wl.turbidimetric.R
+import com.wl.turbidimetric.base.BaseFragment
 import com.wl.turbidimetric.databinding.FragmentDataManagerBinding
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.ex.PD
 import com.wl.turbidimetric.ex.isTestRunning
-import com.wl.turbidimetric.ex.launchAndRepeatWithViewLifecycle
 import com.wl.turbidimetric.ex.toast
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.ConditionModel
@@ -25,8 +25,6 @@ import com.wl.turbidimetric.upload.hl7.HL7Helper
 import com.wl.turbidimetric.util.ExportExcelHelper
 import com.wl.turbidimetric.view.dialog.*
 import com.wl.wllib.LogToFile.i
-import com.wl.turbidimetric.base.BaseFragment
-import com.wl.wllib.LogToFile
 import com.wl.wllib.LogToFile.u
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
@@ -321,8 +319,7 @@ class DataManagerFragment :
                 }
             }
         }
-
-        lifecycleScope.launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             vm.conditionModel.collectLatest {
                 queryData(it)
             }

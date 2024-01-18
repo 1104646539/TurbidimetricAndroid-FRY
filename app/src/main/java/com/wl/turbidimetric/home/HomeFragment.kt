@@ -115,7 +115,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
     }
 
     override fun initViewModel() {
-//        vd.model = vm
     }
 
 

@@ -437,7 +437,7 @@ class MatchingArgsFragment :
         selectFitterType: FitterType = FitterType.Three,
         targetCons: List<Double> = mutableListOf(),
     ) {
-        matchingConfigDialog.showPop(requireContext(), width = 900) { dialog ->
+        matchingConfigDialog.showPop(requireContext(), width = 900, isCancelable = false) { dialog ->
             dialog.showDialog(
                 projects,
                 autoAttenuation,

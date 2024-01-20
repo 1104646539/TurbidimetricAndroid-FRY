@@ -53,7 +53,7 @@ data class CurveModel(
     var isValid: Boolean = true
 ) {
     override fun toString(): String {
-        return "CurveModel(id=$curveId,projectName=$projectName,projectCode=$projectCode,projectLjz=$projectLjz,projectUnit=$projectUnit,f0=$f0,f1=$f1,f2=$f2,f3=$f3,fitGoodness=$fitGoodness,createTime=$createTime,reagentNO=$reagentNO,yzs=$yzs,fitterType=$fitterType,gradsNum=$gradsNum,reactionValues=$reactionValues,targets=$targets)"
+        return "CurveModel(id=$curveId,projectName=$projectName,projectCode=$projectCode,projectLjz=$projectLjz,projectUnit=$projectUnit,f0=$f0,f1=$f1,f2=$f2,f3=$f3,fitGoodness=$fitGoodness,createTime=$createTime,reagentNO=$reagentNO,yzs=$yzs,fitterType=$fitterType,gradsNum=$gradsNum,reactionValues=${reactionValues.joinToString()},targets=${targets.joinToString()})"
     }
 
     override fun equals(other: Any?): Boolean {

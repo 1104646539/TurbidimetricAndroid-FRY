@@ -1,6 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!--android:sharedUserId="android.uid.system"-->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:sharedUserId="android.uid.system"
     package="com.wl.turbidimetric">
 
     <uses-permission
@@ -19,6 +20,7 @@
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Mvvmdemo"
@@ -39,8 +41,7 @@
         <activity
             android:name=".test.debug.DebugActivity"
             android:configChanges="orientation|keyboardHidden|keyboard"
-            android:windowSoftInputMode="adjustPan|stateAlwaysHidden">
-        </activity>
+            android:windowSoftInputMode="adjustPan|stateAlwaysHidden"></activity>
         <activity android:name=".project.list.ProjectListActivity"></activity>
         <activity android:name=".project.details.ProjectDetailsActivity"></activity>
         <activity

@@ -31,7 +31,7 @@ object SystemGlobal {
     /**
      * 是否是在只使用安卓板时调试用的
      */
-    var isCodeDebug = true
+    var isCodeDebug = false
 
     /**
      * 是否是调试模式
@@ -54,7 +54,7 @@ object SystemGlobal {
     private val _obUploadConfig = MutableStateFlow(uploadConfig)
     val obUploadConfig = _obUploadConfig.asStateFlow()
 
-    /**·
+    /**
      * 上传连接状态
      */
     var connectStatus: ConnectStatus = ConnectStatus.NONE

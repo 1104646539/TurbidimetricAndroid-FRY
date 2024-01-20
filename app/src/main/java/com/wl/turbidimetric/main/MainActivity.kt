@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.hardware.usb.UsbDevice
 import android.hardware.usb.UsbManager
 import android.os.Handler
 import android.os.Message
@@ -13,6 +14,7 @@ import android.util.Log
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.wl.turbidimetric.R
+import com.wl.turbidimetric.base.BaseActivity
 import com.wl.turbidimetric.databinding.ActivityMainBinding
 import com.wl.turbidimetric.global.EventGlobal
 import com.wl.turbidimetric.global.EventMsg
@@ -26,10 +28,10 @@ import com.wl.weiqianwllib.upan.StorageUtil
 import com.wl.weiqianwllib.upan.StorageUtil.OPEN_DOCUMENT_TREE_CODE
 import com.wl.wllib.LogToFile.i
 import com.wl.wllib.ktxRunOnBgCache
-import com.wl.turbidimetric.base.BaseActivity
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
+
 
 class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     val TAG = "MainActivity"
@@ -273,11 +275,13 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
             val action = intent.action
             Log.d(TAG, "action=$action")
             if (action == UsbManager.ACTION_USB_DEVICE_DETACHED) {
-                Log.d(TAG, "设备 已拔出action=\$action")
+                Log.d(TAG, "设备 已拔出action=$action")
                 StorageUtil.remove()
                 changeStorageState(StorageState.NONE)
             } else if (action == UsbManager.ACTION_USB_DEVICE_ATTACHED) {
-                Log.d(TAG, "设备 已插入action=\$action")
+                Log.d(TAG, "设备 已插入action=$action")
+                val device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE) as UsbDevice?
+                Log.d(TAG, "设备 已插入device=${device} ${device?.productId} ${device?.vendorId}")
                 changeStorageState(StorageState.INSERTED)
             }
         }

@@ -4,6 +4,9 @@ import com.wl.turbidimetric.ex.matchingArg
 import com.wl.turbidimetric.util.CurveFitterUtil
 import com.wl.turbidimetric.util.FitterFactory
 import com.wl.turbidimetric.util.FitterType
+import com.wl.turbidimetric.util.FourFun
+import com.wl.turbidimetric.util.LinearFun
+import com.wl.turbidimetric.util.ThreeFun
 import org.junit.Test
 
 
@@ -44,6 +47,7 @@ class CurveFitterTest {
         }
         println()
     }
+
     /**
      * 三次多项式拟合测试
      */
@@ -88,7 +92,7 @@ class CurveFitterTest {
             println("con2=$con2")
         }
         println("-------------------------------------")
-        val cf2 = matchingArg(FitterType.Three,ps.map { it }, ms)
+        val cf2 = matchingArg(FitterType.Three, ps.map { it }, ms)
 
         for (p in cf2.params) {
             println("params=$p")
@@ -316,4 +320,43 @@ class CurveFitterTest {
     }
 
 
+    @Test
+    fun testFourFunCalc() {
+        val f0 = -1.818473101
+        val f1 = 1.253206105
+        val f2 = 374.2468309
+        val f3 = 564.4612105
+
+        val abss = doubleArrayOf(43.0, 41.0, -16.0)
+        abss.forEach {
+            val con = FourFun.f2(doubleArrayOf(f0, f1, f2, f3), it)
+            println("con=$con")
+        }
+    }
+    @Test
+    fun testThreeFunCalc() {
+        val f0 = 24.756992920270594
+        val f1 = 0.8582045209676992
+        val f2 = -5.707122868757991E-4
+        val f3 = 1.950833853427454E-7
+
+        val abss = doubleArrayOf(43.0, 41.0, -16.0)
+        abss.forEach {
+            val con = ThreeFun.f2(doubleArrayOf(f0, f1, f2, f3), it)
+            println("con=$con")
+        }
+    }
+    @Test
+    fun testLinearFunCalc() {
+        val f0 = 1.614742835
+        val f1 = -6.930948268
+        val f2 = 0.0
+        val f3 = 0.0
+
+        val abss = doubleArrayOf(43.0, 41.0, -16.0)
+        abss.forEach {
+            val con = LinearFun.f2(doubleArrayOf(f0, f1, f2, f3), it)
+            println("con=$con")
+        }
+    }
 }

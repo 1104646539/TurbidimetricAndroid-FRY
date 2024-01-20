@@ -57,19 +57,26 @@ class App : Application() {
 
             if (ps.isEmpty()) {
                 val project = ProjectModel().apply {
-                    projectName = "项目1"
+                    projectName = "血红蛋白"
                     projectCode = "FOB"
                     projectUnit = "ug/mL"
                     projectLjz = 100
                 }
+                val project2 = ProjectModel().apply {
+                    projectName = "转铁蛋白"
+                    projectCode = "FT"
+                    projectUnit = "ug/mL"
+                    projectLjz = 40
+                }
                 mainDao.insertProjectModel(project)
+                mainDao.insertProjectModel(project2)
                 insertTestCurve(project)
             }
         }
     }
 
     private suspend fun insertTestCurve(project: ProjectModel) {
-        repeat(10) {
+        repeat(1) {
             //三次方
             mainDao.insertCurveModel(CurveModel().apply {
                 reagentNO = "${555 + it}"
@@ -86,36 +93,36 @@ class App : Application() {
                 createTime = Date().toTimeStr()
             }.copyForProject(project))
         }
-//        //线性
-//        mainDao.insertCurveModel(CurveModel().apply {
-//            reagentNO = "${556}"
-//            f0 = 1.614742835
-//            f1 = -6.930948268
-//            f2 = 0.0
-//            f3 = 0.0
-//            fitGoodness = 0.99999997
-//            gradsNum = 6
-//            fitterType = FitterType.Linear.ordinal
-//            reactionValues = intArrayOf(1, 16, 35, 140, 310,623)
-//            targets = doubleArrayOf(0.0, 25.0,50.0, 200.0, 500.0, 1000.0)
-//            yzs = intArrayOf(0, 49, 200, 500, 1000)
-//            createTime = Date().toTimeStr()
-//        }.copyForProject(project))
-//        //四参数
-//        mainDao.insertCurveModel(CurveModel().apply {
-//            reagentNO = "${557}"
-//            f0 = -1.818473101
-//            f1 = 1.253206105
-//            f2 = 374.2468309
-//            f3 = 564.4612105
-//            fitGoodness = 0.99999997
-//            fitterType = FitterType.Four.ordinal
-//            gradsNum = 6
-//            reactionValues = intArrayOf(0, 49, 200, 500, 1000)
-//            targets = doubleArrayOf(0.0, 50.0, 200.0, 500.0, 1000.0)
-//            yzs = intArrayOf(0, 49, 200, 500, 1000)
-//            createTime = Date().toTimeStr()
-//        }.copyForProject(project))
+        //线性
+        mainDao.insertCurveModel(CurveModel().apply {
+            reagentNO = "${556}"
+            f0 = 1.614742835
+            f1 = -6.930948268
+            f2 = 0.0
+            f3 = 0.0
+            fitGoodness = 0.99999998
+            gradsNum = 6
+            fitterType = FitterType.Linear.ordinal
+            reactionValues = intArrayOf(1, 16, 35, 140, 310,623)
+            targets = doubleArrayOf(0.0, 25.0,50.0, 200.0, 500.0, 1000.0)
+            yzs = intArrayOf(0, 24,49, 200, 500, 1000)
+            createTime = Date().toTimeStr()
+        }.copyForProject(project))
+        //四参数
+        mainDao.insertCurveModel(CurveModel().apply {
+            reagentNO = "${557}"
+            f0 = -1.818473101
+            f1 = 1.253206105
+            f2 = 374.2468309
+            f3 = 564.4612105
+            fitGoodness = 0.99999999
+            fitterType = FitterType.Four.ordinal
+            gradsNum = 6
+            reactionValues = intArrayOf(0, 24,49, 200, 500, 1000)
+            targets = doubleArrayOf(0.0, 25.0, 50.0, 200.0, 500.0, 1000.0)
+            yzs = intArrayOf(0, 24,49, 200, 500, 1000)
+            createTime = Date().toTimeStr()
+        }.copyForProject(project))
     }
 
     private fun initPop() {

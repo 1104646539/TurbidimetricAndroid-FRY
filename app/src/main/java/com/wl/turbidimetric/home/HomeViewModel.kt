@@ -1793,6 +1793,7 @@ class HomeViewModel(
         samplingNum++
         if (reply.state == ReplyState.SAMPLING_FAILED) {//取样失败
             updateSampleState(samplePos - 1, SampleState.SamplingFailed)
+            samplingProbeCleaning()
             nextStepDripReagent()
             return
         } else {//取样成功

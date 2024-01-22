@@ -4,17 +4,16 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
     id("kotlin-parcelize")
-//    id("io.objectbox")
 }
 
 android {
     signingConfigs {
-        debug {
-            storeFile file('E:\\platform.keystore')
-            storePassword '123456'
-            keyAlias 'platform'
-            keyPassword '123456'
-        }
+//        debug {
+//            storeFile file('E:\\platform.keystore')
+//            storePassword '123456'
+//            keyAlias 'platform'
+//            keyPassword '123456'
+//        }
 //        release {
 ////            manifestPlaceholders = [
 ////                    APP_NAME: "@string/app_name",
@@ -31,7 +30,7 @@ android {
     defaultConfig {
         applicationId "com.wl.turbidimetric"
         minSdk 21
-        targetSdk 26
+        targetSdk 21
         versionCode 1
         versionName "1.0.0.0增加多项目拟合"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

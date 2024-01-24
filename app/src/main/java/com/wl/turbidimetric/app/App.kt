@@ -1,9 +1,14 @@
-package com.wl.turbidimetric
+package com.wl.turbidimetric.app
 
 import android.app.Activity
 import android.app.Application
 import android.content.Context
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelStore
+import androidx.lifecycle.ViewModelStoreOwner
 import com.lxj.xpopup.XPopup
+import com.wl.turbidimetric.R
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.db.MainRoomDatabase
 import com.wl.turbidimetric.ex.copyForProject
@@ -27,7 +32,6 @@ class App : Application() {
     private val activityList = mutableListOf<Activity>()
     val database by lazy { MainRoomDatabase.getDatabase(this) }
     val mainDao by lazy { database.mainDao() }
-
     override fun attachBaseContext(base: Context?) {
         super.attachBaseContext(base)
     }
@@ -50,6 +54,7 @@ class App : Application() {
 
         }
     }
+
 
     private fun initDB() {
         GlobalScope.launch {
@@ -103,9 +108,9 @@ class App : Application() {
             fitGoodness = 0.99999998
             gradsNum = 6
             fitterType = FitterType.Linear.ordinal
-            reactionValues = intArrayOf(1, 16, 35, 140, 310,623)
-            targets = doubleArrayOf(0.0, 25.0,50.0, 200.0, 500.0, 1000.0)
-            yzs = intArrayOf(0, 24,49, 200, 500, 1000)
+            reactionValues = intArrayOf(1, 16, 35, 140, 310, 623)
+            targets = doubleArrayOf(0.0, 25.0, 50.0, 200.0, 500.0, 1000.0)
+            yzs = intArrayOf(0, 24, 49, 200, 500, 1000)
             createTime = Date().toTimeStr()
         }.copyForProject(project))
         //四参数
@@ -118,9 +123,9 @@ class App : Application() {
             fitGoodness = 0.99999999
             fitterType = FitterType.Four.ordinal
             gradsNum = 6
-            reactionValues = intArrayOf(0, 24,49, 200, 500, 1000)
+            reactionValues = intArrayOf(0, 24, 49, 200, 500, 1000)
             targets = doubleArrayOf(0.0, 25.0, 50.0, 200.0, 500.0, 1000.0)
-            yzs = intArrayOf(0, 24,49, 200, 500, 1000)
+            yzs = intArrayOf(0, 24, 49, 200, 500, 1000)
             createTime = Date().toTimeStr()
         }.copyForProject(project))
     }
@@ -167,4 +172,21 @@ class App : Application() {
         activityList.clear()
     }
 
+    object AppViewModelStoreOwner : ViewModelStoreOwner {
+        private val viewModelStore = ViewModelStore()
+        private val viewModelProvider: ViewModelProvider by lazy {
+            ViewModelProvider(
+                this,
+                ViewModelProvider.AndroidViewModelFactory.getInstance(instance!!)
+            )
+        }
+
+        override fun getViewModelStore(): ViewModelStore {
+            return viewModelStore
+        }
+
+        fun <T : ViewModel> getAppViewModel(classVm: Class<T>): T {
+            return viewModelProvider[classVm]
+        }
+    }
 }

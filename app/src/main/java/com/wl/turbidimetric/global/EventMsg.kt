@@ -18,4 +18,9 @@ object EventGlobal {
      * 拟合增加了曲线
      */
     const val WHAT_PROJECT_ADD = 120
+
+    /**
+     * 自检结束
+     */
+    const val WHAT_HIDE_SPLASH = 130
 }

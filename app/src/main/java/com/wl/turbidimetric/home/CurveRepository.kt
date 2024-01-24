@@ -1,8 +1,7 @@
 package com.wl.turbidimetric.home
 
-import com.wl.turbidimetric.App
+import com.wl.turbidimetric.app.App
 import com.wl.turbidimetric.model.CurveModel
-import com.wl.turbidimetric.model.ProjectModel
 
 class CurveRepository {
     val dao = App.instance!!.mainDao

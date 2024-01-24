@@ -9,6 +9,8 @@ import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
+import com.wl.turbidimetric.app.AppViewModel
+import com.wl.turbidimetric.ex.getAppViewModel
 import com.wl.turbidimetric.global.EventMsg
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -17,6 +19,8 @@ import org.greenrobot.eventbus.ThreadMode
 open abstract class BaseFragment<VM : ViewModel, VD : ViewDataBinding>(@LayoutRes val layoutId: Int) : Fragment() {
     protected abstract val vm: VM
     lateinit var vd: VD
+    val appVm: AppViewModel by lazy { getAppViewModel(AppViewModel::class.java) }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

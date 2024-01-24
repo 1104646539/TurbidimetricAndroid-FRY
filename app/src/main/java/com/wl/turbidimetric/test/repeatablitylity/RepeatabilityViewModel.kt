@@ -4,10 +4,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.wl.turbidimetric.app.AppViewModel
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.SystemGlobal
-import com.wl.turbidimetric.global.SystemGlobal.testState
 import com.wl.turbidimetric.global.SystemGlobal.testType
 import com.wl.turbidimetric.home.CurveRepository
 import com.wl.turbidimetric.home.TestResultRepository
@@ -32,6 +32,7 @@ import kotlinx.coroutines.flow.asSharedFlow
  * @property quality Boolean
  */
 class RepeatabilityViewModel(
+    private val appViewModel: AppViewModel,
     val curveRepository: CurveRepository,
     val testResultRepository: TestResultRepository
 ) : BaseViewModel(),
@@ -307,16 +308,16 @@ class RepeatabilityViewModel(
 //            toast("舱门未关")
 //            return
 //        }
-        if (!machineStateNormal()) {
+        if (appViewModel.testState.isNotPrepare()) {
             toastMsg.postValue("请重新自检或重启仪器！")
             return
         }
-        if (testState != TestState.Normal) {
+        if (appViewModel.testState != TestState.Normal) {
             toastMsg.postValue("正在检测，请勿操作！")
             return
         }
         initState()
-        testState = TestState.GetState
+        appViewModel.testState = TestState.GetState
         testType = TestType.Repeatability
         getState()
     }
@@ -366,7 +367,7 @@ class RepeatabilityViewModel(
         resultOriginalTest2.clear()
         resultOriginalTest3.clear()
         resultOriginalTest4.clear()
-        testState = TestState.None
+        appViewModel.testState = TestState.None
         sampleStep = 0
         testMsg.postValue("")
         samplePos = -1
@@ -411,7 +412,7 @@ class RepeatabilityViewModel(
      */
     override fun readDataGetStateModel(reply: ReplyModel<GetStateModel>) {
         if (!runningRepeatability()) return
-        if (!machineStateNormal()) return
+        if (appViewModel.testState.isNotPrepare()) return
         i("接收到 获取状态 reply=$reply")
         cuvetteShelfStates = reply.data.cuvetteShelfs
         sampleShelfStates = reply.data.sampleShelfs
@@ -451,7 +452,7 @@ class RepeatabilityViewModel(
             }
             return
         }
-        testState = TestState.MoveSample
+        appViewModel.testState = TestState.MoveSample
         //开始检测
         cleaningBeforeStartTest = true
         samplingProbeCleaning()
@@ -503,7 +504,7 @@ class RepeatabilityViewModel(
      * @param reply ReplyModel<MoveCuvetteShelfModel>
      */
     override fun readDataMoveCuvetteShelfModel(reply: ReplyModel<MoveCuvetteShelfModel>) {
-        if (testState == TestState.TestFinish) {
+        if (appViewModel.testState == TestState.TestFinish) {
             cuvetteShelfMoveFinish = true
             if (isMatchingFinish()) {
                 showMatchingDialog()
@@ -511,10 +512,10 @@ class RepeatabilityViewModel(
             }
         }
         if (!runningRepeatability()) return
-        if (!machineStateNormal()) return
+        if (appViewModel.testState.isNotPrepare()) return
         i("接收到 移动比色皿架 reply=$reply")
         cuvettePos = 0
-        when (testState) {
+        when (appViewModel.testState) {
             TestState.MoveSample -> {
                 moveCuvetteDripSample()
             }
@@ -564,7 +565,7 @@ class RepeatabilityViewModel(
     }
 
     private fun isMatchingFinish(): Boolean {
-        return testState == TestState.TestFinish && cuvetteShelfMoveFinish && sampleShelfMoveFinish
+        return appViewModel.testState == TestState.TestFinish && cuvetteShelfMoveFinish && sampleShelfMoveFinish
     }
 
 
@@ -574,11 +575,11 @@ class RepeatabilityViewModel(
      */
     override fun readDataMoveSampleModel(reply: ReplyModel<MoveSampleModel>) {
         if (!runningRepeatability()) return
-        if (!machineStateNormal()) return
-        i("接收到 移动样本 reply=$reply samplePos=$samplePos testState=$testState sampleStep=$sampleStep")
+        if (appViewModel.testState.isNotPrepare()) return
+        i("接收到 移动样本 reply=$reply samplePos=$samplePos testState=${appViewModel.testState} sampleStep=$sampleStep")
         sampleMoveFinish = true
 
-        when (testState) {
+        when (appViewModel.testState) {
             TestState.MoveSample -> {//因为需要检测第一个样本是否是比色杯，所以一次移动一个位置
                 if (samplePos == 0) {
                     //如果是样本管，直接检测结束，并报错，因为质控不允许使用样本管
@@ -608,7 +609,7 @@ class RepeatabilityViewModel(
      */
     override fun readDataMoveCuvetteDripSampleModel(reply: ReplyModel<MoveCuvetteDripSampleModel>) {
         if (!runningRepeatability()) return
-        if (!machineStateNormal()) return
+        if (appViewModel.testState.isNotPrepare()) return
         i("接收到 移动比色皿到加样位 reply=$reply cuvetteStates=$cuvetteStates")
 
         cuvetteMoveFinish = true
@@ -631,7 +632,7 @@ class RepeatabilityViewModel(
      */
     override fun readDataMoveCuvetteDripReagentModel(reply: ReplyModel<MoveCuvetteDripReagentModel>) {
         if (!runningRepeatability()) return
-        if (!machineStateNormal()) return
+        if (appViewModel.testState.isNotPrepare()) return
         i("接收到 移动比色皿到加试剂位 reply=$reply cuvetteStates=$cuvetteStates")
 
         cuvetteMoveFinish = true
@@ -681,7 +682,7 @@ class RepeatabilityViewModel(
 
         if (cuvettePos == 14) {
             //最后一个也检测结束了
-            testState = TestState.Test2
+            appViewModel.testState = TestState.Test2
             cuvettePos = -1
 
             moveCuvetteTest()
@@ -699,8 +700,8 @@ class RepeatabilityViewModel(
      * @param reply ReplyModel<MoveSampleShelfModel>
      */
     override fun readDataMoveSampleShelfModel(reply: ReplyModel<MoveSampleShelfModel>) {
-        i("接收到 移动样本架 reply=$reply testState=$testState")
-        if (testState == TestState.TestFinish) {
+        i("接收到 移动样本架 reply=$reply testState=${appViewModel.testState}")
+        if (appViewModel.testState == TestState.TestFinish) {
             sampleShelfMoveFinish = true
             if (isMatchingFinish()) {
                 showMatchingDialog()
@@ -708,9 +709,9 @@ class RepeatabilityViewModel(
             }
         }
         if (!runningRepeatability()) return
-        if (!machineStateNormal()) return
+        if (appViewModel.testState.isNotPrepare()) return
         sampleShelfMoveFinish = true
-        if (testState != TestState.TestFinish) {
+        if (appViewModel.testState != TestState.TestFinish) {
             //一开始就要移动到第二个位置去取第一个位置的稀释液
             moveSample(1)
         }
@@ -723,14 +724,14 @@ class RepeatabilityViewModel(
      */
     override fun readDataTestModel(reply: ReplyModel<TestModel>) {
         if (!runningRepeatability()) return
-        if (!machineStateNormal()) return
-        i("接收到 检测 reply=$reply cuvettePos=$cuvettePos testState=$testState 检测值=${reply.data.value}")
+        if (appViewModel.testState.isNotPrepare()) return
+        i("接收到 检测 reply=$reply cuvettePos=$cuvettePos testState=${appViewModel.testState} 检测值=${reply.data.value}")
 
         calcTestResult(reply.data.value)
     }
 
     private fun calcTestResult(value: Int) {
-        when (testState) {
+        when (appViewModel.testState) {
             TestState.DripReagent -> {
                 updateCuvetteState(cuvettePos - 5, CuvetteState.Test1)
                 resultTest1.add(calcAbsorbance(value.toBigDecimal()))
@@ -746,7 +747,7 @@ class RepeatabilityViewModel(
                 updateResult()
                 //检测结束,开始检测第三次
                 if (cuvettePos == 9) {
-                    testState = TestState.Test3
+                    appViewModel.testState = TestState.Test3
 
                     moveCuvetteTest(-cuvettePos)
                 } else {
@@ -762,7 +763,7 @@ class RepeatabilityViewModel(
                 updateResult()
                 //检测结束,开始检测第四次
                 if (cuvettePos == 9) {
-                    testState = TestState.Test4
+                    appViewModel.testState = TestState.Test4
 
                     moveCuvetteTest(-cuvettePos)
                 } else {
@@ -795,7 +796,7 @@ class RepeatabilityViewModel(
      * 拟合结束，复位
      */
     private fun matchingFinish() {
-        testState = TestState.TestFinish
+        appViewModel.testState = TestState.TestFinish
         moveCuvetteShelf(-1)
         moveSampleShelf(-1)
     }
@@ -914,7 +915,7 @@ class RepeatabilityViewModel(
      */
     override fun readDataStirModel(reply: ReplyModel<StirModel>) {
         if (!runningRepeatability()) return
-        if (!machineStateNormal()) return
+        if (appViewModel.testState.isNotPrepare()) return
         i("接收到 搅拌 reply=$reply cuvettePos=$cuvettePos")
         stirFinish = true
         updateStirTime()
@@ -936,7 +937,7 @@ class RepeatabilityViewModel(
      */
     override fun readDataDripReagentModel(reply: ReplyModel<DripReagentModel>) {
         if (!runningRepeatability()) return
-        if (!machineStateNormal()) return
+        if (appViewModel.testState.isNotPrepare()) return
         i("接收到 加试剂 reply=$reply cuvettePos=$cuvettePos")
         dripReagentFinish = true
         takeReagentFinish = false
@@ -951,8 +952,8 @@ class RepeatabilityViewModel(
      */
     override fun readDataDripSampleModel(reply: ReplyModel<DripSampleModel>) {
         if (!runningRepeatability()) return
-        if (!machineStateNormal()) return
-        i("接收到 加样 reply=$reply cuvettePos=$cuvettePos testState=$testState sampleStep=$sampleStep samplePos=$samplePos cuvetteStates=$cuvetteStates")
+        if (appViewModel.testState.isNotPrepare()) return
+        i("接收到 加样 reply=$reply cuvettePos=$cuvettePos testState=${appViewModel.testState} sampleStep=$sampleStep samplePos=$samplePos cuvetteStates=$cuvetteStates")
 
         dripSamplingFinish = true
 
@@ -967,12 +968,12 @@ class RepeatabilityViewModel(
      */
     override fun readDataSamplingModel(reply: ReplyModel<SamplingModel>) {
         if (!runningRepeatability()) return
-        if (!machineStateNormal()) return
-        i("接收到 取样 reply=$reply testState=$testState sampleStep=$sampleStep samplePos=$samplePos")
+        if (appViewModel.testState.isNotPrepare()) return
+        i("接收到 取样 reply=$reply testState=${appViewModel.testState} sampleStep=$sampleStep samplePos=$samplePos")
 
         samplingFinish = true
 
-        when (testState) {
+        when (appViewModel.testState) {
             TestState.MoveSample -> {//去加已混匀的样本
                 goDripSample()
             }
@@ -1016,15 +1017,15 @@ class RepeatabilityViewModel(
      */
     override fun readDataMoveCuvetteTestModel(reply: ReplyModel<MoveCuvetteTestModel>) {
         if (!runningRepeatability()) return
-        if (!machineStateNormal()) return
-        i("接收到 移动比色皿到检测位 reply=$reply cuvetteStates=$cuvetteStates testState=$testState")
+        if (appViewModel.testState.isNotPrepare()) return
+        i("接收到 移动比色皿到检测位 reply=$reply cuvetteStates=$cuvetteStates testState=${appViewModel.testState}")
 
-        when (testState) {
+        when (appViewModel.testState) {
             TestState.Test2,
             TestState.Test3,
             TestState.Test4 -> {
                 val targetTime =
-                    if (testState == TestState.Test2) testShelfInterval2 else if (testState == TestState.Test3) testShelfInterval3 else testShelfInterval4
+                    if (appViewModel.testState == TestState.Test2) testShelfInterval2 else if (appViewModel.testState == TestState.Test3) testShelfInterval3 else testShelfInterval4
                 val stirTime = stirTimes[cuvettePos]
                 val intervalTemp = targetTime - (Date().time - stirTime) - 3
                 i("intervalTemp=$intervalTemp stirTime=$stirTime targetTime=$targetTime")
@@ -1044,7 +1045,7 @@ class RepeatabilityViewModel(
      */
     override fun readDataTakeReagentModel(reply: ReplyModel<TakeReagentModel>) {
         if (!runningRepeatability()) return
-        if (!machineStateNormal()) return
+        if (appViewModel.testState.isNotPrepare()) return
         i("接收到 取试剂 reply=$reply")
         takeReagentFinish = true
 
@@ -1060,7 +1061,7 @@ class RepeatabilityViewModel(
      */
     override fun readDataSamplingProbeCleaningModelModel(reply: ReplyModel<SamplingProbeCleaningModel>) {
         if (!runningRepeatability()) return
-        if (!machineStateNormal()) return
+        if (appViewModel.testState.isNotPrepare()) return
         i("接收到 取样针清洗 reply=$reply samplePos=$samplePos sampleStep=$sampleStep")
         if (cleaningBeforeStartTest) {
             //是开始检测前的清洗，清洗完才开始检测
@@ -1069,12 +1070,12 @@ class RepeatabilityViewModel(
             moveCuvetteShelf(cuvetteShelfPos)
             return
         }
-        when (testState) {
+        when (appViewModel.testState) {
             TestState.MoveSample -> {//加完样判断是否结束
                 updateCuvetteState(cuvettePos - 1, CuvetteState.DripSample)
                 if ((sampleStep == 10)) {
                     //开始加试剂的步骤
-                    testState = TestState.DripReagent
+                    appViewModel.testState = TestState.DripReagent
                     sampleStep = 0
                     cuvettePos = -1
                     moveCuvetteDripReagent()
@@ -1098,7 +1099,7 @@ class RepeatabilityViewModel(
      */
     override fun readDataStirProbeCleaningModel(reply: ReplyModel<StirProbeCleaningModel>) {
         if (!runningRepeatability()) return
-        if (!machineStateNormal()) return
+        if (appViewModel.testState.isNotPrepare()) return
         i("接收到 搅拌针清洗 reply=$reply")
         stirProbeCleaningFinish = true
         dripReagentAndStirAndTestFinish()
@@ -1111,7 +1112,7 @@ class RepeatabilityViewModel(
      */
     override fun readDataPiercedModel(reply: ReplyModel<PiercedModel>) {
         if (!runningRepeatability()) return
-        if (!machineStateNormal()) return
+        if (appViewModel.testState.isNotPrepare()) return
         i("接收到 刺破 reply=$reply")
     }
 
@@ -1121,7 +1122,7 @@ class RepeatabilityViewModel(
      */
     override fun readDataGetVersionModel(reply: ReplyModel<GetVersionModel>) {
         if (!runningRepeatability()) return
-        if (!machineStateNormal()) return
+        if (appViewModel.testState.isNotPrepare()) return
         i("接收到 获取版本号 reply=$reply")
     }
 
@@ -1177,7 +1178,7 @@ class RepeatabilityViewModel(
      * 停止运行
      */
     private fun stateErrorStopRunning() {
-        testState = TestState.RunningError
+        appViewModel.testState = TestState.RunningError
     }
 
     /**
@@ -1202,7 +1203,7 @@ class RepeatabilityViewModel(
     fun showMatchingDialog() {
         if (isDetectedSample) {
             isDetectedSample = false
-            testState = TestState.Normal
+            appViewModel.testState = TestState.Normal
             viewModelScope.launch {
                 _dialogUiState.emit(
                     RepeatabilityUiState(
@@ -1212,7 +1213,7 @@ class RepeatabilityViewModel(
                 )
             }
         } else {
-            testState = TestState.Normal
+            appViewModel.testState = TestState.Normal
             viewModelScope.launch {
                 _dialogUiState.emit(
                     RepeatabilityUiState(
@@ -1288,7 +1289,7 @@ class RepeatabilityViewModel(
      * 移动比色皿到 检测位
      */
     private fun moveCuvetteTest(step: Int = 1) {
-        i("发送 移动比色皿到 检测位 testState=$testState step=$step")
+        i("发送 移动比色皿到 检测位 testState=${appViewModel.testState} step=$step")
         cuvettePos += step
         SerialPortUtil.moveCuvetteTest(step > 0, step.absoluteValue)
     }
@@ -1394,18 +1395,19 @@ class RepeatabilityViewModel(
      * 是否正在测试重复性
      */
     fun runningRepeatability(): Boolean {
-        return isTestRunning()
+        return appViewModel.testState.isTestRunning()
     }
 }
 
 class RepeatabilityViewModelFactory(
+    private val appViewModel: AppViewModel = getAppViewModel(AppViewModel::class.java),
     private val curveRepository: CurveRepository = CurveRepository(),
     private val testResultRepository: TestResultRepository = TestResultRepository()
 ) :
     ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(RepeatabilityViewModel::class.java)) {
-            return RepeatabilityViewModel(curveRepository, testResultRepository) as T
+            return RepeatabilityViewModel(appViewModel,curveRepository, testResultRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

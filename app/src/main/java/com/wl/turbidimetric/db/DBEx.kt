@@ -1,7 +1,6 @@
 package com.wl.turbidimetric.db
 
-import android.util.Log
-import com.wl.turbidimetric.App
+import com.wl.turbidimetric.app.App
 import com.wl.turbidimetric.dao.MainDao
 import com.wl.turbidimetric.model.TestResultAndCurveModel
 import kotlinx.coroutines.GlobalScope

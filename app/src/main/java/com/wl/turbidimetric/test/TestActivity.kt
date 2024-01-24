@@ -39,7 +39,7 @@ class TestActivity : BaseActivity<BaseViewModel, ActivityTestBinding>() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
-            if (SystemGlobal.testState != TestState.Normal) {
+            if (appVm.testState != TestState.Normal) {
                 toast("正在检测，请稍后……")
                 return false
             }

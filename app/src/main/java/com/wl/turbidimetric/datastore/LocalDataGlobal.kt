@@ -1,17 +1,13 @@
 package com.wl.turbidimetric.datastore
 
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.core.stringPreferencesKey
-import com.wl.turbidimetric.App
+import com.wl.turbidimetric.app.App
 import com.wl.turbidimetric.ex.dataStore
 import com.wl.turbidimetric.model.MachineTestModel
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 object LocalDataGlobal {
 

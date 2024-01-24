@@ -1,0 +1,112 @@
+package com.wl.turbidimetric.app
+
+import androidx.lifecycle.viewModelScope
+import com.wl.turbidimetric.base.BaseViewModel
+import com.wl.turbidimetric.model.TestState
+import com.wl.turbidimetric.upload.hl7.util.ConnectStatus
+import com.wl.wllib.DateUtil
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import java.util.Date
+import kotlin.concurrent.timer
+
+/**
+ * 全局唯一的ViewModel，用来保存全局通用的属性
+ */
+class AppViewModel : BaseViewModel() {
+    /**
+     * 仪器状态
+     */
+    private val _machineState = MutableStateFlow(MachineState.None)
+    val machineState = _machineState.asSharedFlow()
+
+    /**
+     * 上传状态
+     */
+    private val _uploadState = MutableStateFlow(UploadState.None)
+    val uploadState = _uploadState.asSharedFlow()
+
+    /**
+     * u盘状态
+     */
+    private val _storageState = MutableStateFlow(StorageState.None)
+    val storageState = _storageState.asSharedFlow()
+
+    /**
+     * 当前时间
+     */
+    private val _nowTimeStr = MutableStateFlow("00:00")
+    val nowTimeStr = _nowTimeStr.asSharedFlow()
+
+    /**
+     * 检测模式状态
+     */
+    var testState = TestState.None
+        set(value) {
+            field = value
+            _obTestState.value = value
+            changeMachineState(value)
+        }
+    private val _obTestState = MutableStateFlow(TestState.None)
+    val obTestState = _obTestState.asStateFlow()
+
+
+    /**
+     * 更新当前时间
+     */
+    fun listenerTime() {
+        timer("更新时间", false, Date(), 1000 * 10) {
+            viewModelScope.launch {
+                _nowTimeStr.emit(DateUtil.date2Str(Date(), DateUtil.Time6Format))
+            }
+        }
+    }
+
+    /**
+     * 更新u盘状态
+     */
+    fun changeStorageState(state: com.wl.weiqianwllib.upan.StorageState) {
+        val s = when (state) {
+            com.wl.weiqianwllib.upan.StorageState.NONE -> StorageState.None
+            com.wl.weiqianwllib.upan.StorageState.INSERTED -> StorageState.Inserted
+            com.wl.weiqianwllib.upan.StorageState.EXIST -> StorageState.Exist
+            com.wl.weiqianwllib.upan.StorageState.UNAUTHORIZED -> StorageState.Unauthorized
+        }
+        viewModelScope.launch {
+            _storageState.emit(s)
+        }
+    }
+
+    /**
+     * 更新上传状态
+     */
+    fun changeUploadState(state: ConnectStatus) {
+        val s = when (state) {
+            ConnectStatus.NONE -> UploadState.None
+            ConnectStatus.RECONNECTION -> UploadState.ReConnection
+            ConnectStatus.CONNECTED -> UploadState.Connected
+            ConnectStatus.DISCONNECTED -> UploadState.Disconnected
+        }
+        viewModelScope.launch {
+            _uploadState.emit(s)
+        }
+    }
+
+    /**
+     * 更新上传状态
+     */
+    fun changeMachineState(state: TestState) {
+        val s = when (state) {
+            TestState.NotGetMachineState -> MachineState.MachineError
+            TestState.RunningError -> MachineState.MachineRunningError
+            TestState.Normal -> MachineState.MachineNormal
+            else -> MachineState.None
+        }
+        viewModelScope.launch {
+            _machineState.emit(s)
+        }
+    }
+}
+

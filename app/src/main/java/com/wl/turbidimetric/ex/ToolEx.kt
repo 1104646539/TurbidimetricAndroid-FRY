@@ -9,10 +9,13 @@ import android.content.pm.PackageManager
 import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.github.mikephil.charting.data.Entry
 import com.wl.turbidimetric.R
+import com.wl.turbidimetric.app.App
+import com.wl.turbidimetric.app.AppViewModel
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.MachineTestModel
@@ -243,13 +246,6 @@ fun calculateMean(numArray: DoubleArray): Double {
     return mean
 }
 
-/**
- * 判断是否是在运行中
- * @return Boolean
- */
-fun isTestRunning(): Boolean {
-    return TestState.None != SystemGlobal.testState && TestState.TestFinish != SystemGlobal.testState && TestState.Normal != SystemGlobal.testState
-}
 
 /**
  * 是否是自动模式
@@ -275,14 +271,7 @@ fun isManual(machineTestModel: MachineTestModel = MachineTestModel.valueOf(Local
     return machineTestModel == MachineTestModel.Manual
 }
 
-/**
- * 仪器是否可正常运行
- * @see MachineState
- * @return Boolean
- */
-fun machineStateNormal(): Boolean {
-    return !SystemGlobal.testState.isNotPrepare()
-}
+
 
 /**
  * 获取打开桌面的intent
@@ -492,4 +481,11 @@ fun getChartEntry(curve: CurveModel): List<Entry> {
         }
     }
     return values
+}
+
+/**
+ * 获取全局唯一的ViewModel示例
+ */
+fun <T : ViewModel> getAppViewModel(classVm: Class<T> ): T {
+    return App.AppViewModelStoreOwner.getAppViewModel(classVm)
 }

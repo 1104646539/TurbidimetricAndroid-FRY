@@ -1,0 +1,69 @@
+package com.wl.turbidimetric.view.dialog
+
+import android.content.Context
+import android.util.AttributeSet
+import android.view.LayoutInflater
+import android.view.View
+import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.annotation.DrawableRes
+import com.wl.turbidimetric.R
+
+class TopNavView @JvmOverloads constructor(
+    context: Context,
+    attributeSet: AttributeSet? = null,
+    defStyleAttr: Int = 0
+) : FrameLayout(context, attributeSet) {
+    private var root: View? = null
+    private var ivLogo: ImageView? = null
+    private var ivStateMachine: ImageView? = null
+    private var ivStateUpload: ImageView? = null
+    private var ivStateStorage: ImageView? = null
+    private var llShutdown: View? = null
+    private var tvTime: TextView? = null
+
+    init {
+        root = LayoutInflater.from(context).inflate(R.layout.layout_main_top_nav, this, true)
+        initView()
+        listenerView()
+
+    }
+
+    private fun listenerView() {
+        ivLogo?.setOnClickListener { }
+    }
+
+    fun setTime(timeStr: String) {
+        tvTime?.text = timeStr
+    }
+
+    fun setShutdownListener(onClick: OnClickListener) {
+        llShutdown?.setOnClickListener(onClick)
+    }
+
+    fun setStateMachineSrc(@DrawableRes id: Int) {
+        ivStateMachine?.setImageResource(id)
+    }
+
+    fun setStateUploadSrc(@DrawableRes id: Int) {
+        ivStateUpload?.setImageResource(id)
+    }
+
+    fun setStateStorageSrc(@DrawableRes id: Int) {
+        ivStateStorage?.setImageResource(id)
+    }
+
+    private fun initView() {
+        root?.apply {
+            ivLogo = findViewById(R.id.iv_logo)
+            ivStateMachine = findViewById(R.id.iv_state_machine)
+            ivStateUpload = findViewById(R.id.iv_state_upload)
+            ivStateStorage = findViewById(R.id.iv_state_storage)
+            llShutdown = findViewById(R.id.ll_shutdown)
+            tvTime = findViewById(R.id.tv_time)
+        }
+    }
+
+
+}

@@ -1,6 +1,6 @@
 package com.wl.turbidimetric.util
 
-import com.wl.turbidimetric.App
+import com.wl.turbidimetric.app.App
 import com.wl.wllib.LogToFile.e
 import java.io.PrintWriter
 import java.io.StringWriter

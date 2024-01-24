@@ -12,8 +12,6 @@ import com.github.mikephil.charting.data.LineDataSet
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.FragmentMatchingArgsBinding
 import com.wl.turbidimetric.ex.*
-import com.wl.turbidimetric.global.SystemGlobal.obTestState
-import com.wl.turbidimetric.global.SystemGlobal.testState
 import com.wl.turbidimetric.model.CurveModel
 import com.wl.turbidimetric.model.ProjectModel
 import com.wl.turbidimetric.model.TestState
@@ -189,7 +187,7 @@ class MatchingArgsFragment :
         }
 
         lifecycleScope.launch {
-            obTestState.collectLatest {
+            appVm.obTestState.collectLatest {
                 if (it.isRunning()) {
                     vd.btnStart.setBackgroundResource(R.drawable.rip_positive2)
                     vd.btnStart.setText("正在拟合")
@@ -249,7 +247,7 @@ class MatchingArgsFragment :
                 it.show(adapter.items, onConfirm = { projectModel, baseDialog ->
                     if (projectModel == null) {
                         toast("未选择覆盖的标曲，取消拟合！")
-                        testState = TestState.Normal
+                        appVm.testState = TestState.Normal
                     } else {
                         vm.saveCoverCurve(projectModel)
                         vm.showMatchingSettingsDialog()
@@ -257,7 +255,7 @@ class MatchingArgsFragment :
                     baseDialog.dismiss()
                 }, onCancel = {
                     toast("未选择覆盖的标曲，取消拟合！")
-                    testState = TestState.Normal
+                    appVm.testState = TestState.Normal
                     it.dismiss()
                 })
             }

@@ -58,6 +58,13 @@ object SerialPortUtil {
      */
     private val timeout = 30000L
 
+    /**
+     * 是否允许发送命令
+     *
+     * 当仪器已经发生电机、传感器、非法参数等错误时，不允许再次发送命令，防止仪器损坏
+     */
+    var allowRunning = true
+
     init {
         open()
     }
@@ -458,13 +465,14 @@ object SerialPortUtil {
         }
     }
 
+
     /**
      * 是否允许发送命令
      *
      * 当仪器已经发生电机、传感器、非法参数等错误时，不允许再次发送命令，防止仪器损坏
      */
     private fun isAllowRunning(data: UByteArray): Boolean {
-        if (TestState.RunningError == SystemGlobal.testState) {
+        if (!allowRunning) {
             if (data[0] != SerialGlobal.CMD_GetSetTemp) {
                 return false
             }

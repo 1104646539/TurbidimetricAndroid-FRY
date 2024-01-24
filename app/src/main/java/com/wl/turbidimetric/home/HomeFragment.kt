@@ -7,12 +7,12 @@ import android.view.Gravity
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.*
 import com.wl.turbidimetric.R
+import com.wl.turbidimetric.app.AppViewModel
 import com.wl.turbidimetric.databinding.FragmentHomeBinding
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.EventGlobal
 import com.wl.turbidimetric.global.EventMsg
-import com.wl.turbidimetric.global.SystemGlobal.obTestState
 import com.wl.turbidimetric.model.CurveModel
 import com.wl.turbidimetric.upload.hl7.HL7Helper
 import com.wl.turbidimetric.upload.hl7.util.ConnectResult
@@ -123,7 +123,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 //
         initView()
         listener()
-        initUploadClient()
+
         vm.goGetMachineState()
         vm.goGetVersion()
         lifecycleScope.launch {
@@ -140,22 +140,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 
     }
 
-    private fun initUploadClient() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            delay(3000)
-            withContext(Dispatchers.Main) {
-                HL7Helper.connect(object : OnConnectListener {
-                    override fun onConnectResult(connectResult: ConnectResult) {
-                        i("onConnectResult connectResult=$connectResult")
-                    }
-
-                    override fun onConnectStatusChange(connectStatus: ConnectStatus) {
-                        i("onConnectStatusChange connectStatus=$connectStatus")
-                    }
-                })
-            }
-        }
-    }
 
     private fun initView() {
 
@@ -229,7 +213,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             }
         }
         lifecycleScope.launch {
-            obTestState.collectLatest {
+            appVm.obTestState.collectLatest {
                 if (it.isNotPrepare()) {
                     vd.btnStart.setBackgroundResource(R.drawable.rip_positive2)
                     vd.btnStart.setText("重新自检")
@@ -388,7 +372,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     if (projectModel == null) {
                         toast("请选择标曲")
                     } else {
-                        if (isTestRunning()) {
+                        if (appVm.testState.isTestRunning()) {
                             toast("正在检测，请稍后")
                             return@showDialog
                         }
@@ -468,11 +452,11 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                      * 自检中
                      */
                     is HomeDialogUiState.GetMachineShow -> {
-                        dialogGetMachine.show()
+//                        dialogGetMachine.show()
                     }
 
                     is HomeDialogUiState.GetMachineDismiss -> {
-                        dialogGetMachine.dismiss()
+//                        dialogGetMachine.dismiss()
                     }
                     /**
                      * 自检失败对话框

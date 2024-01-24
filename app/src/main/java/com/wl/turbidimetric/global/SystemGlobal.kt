@@ -12,16 +12,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 object SystemGlobal {
-    /**
-     * 检测模式状态
-     */
-    var testState = TestState.None
-        set(value) {
-            field = value
-            _obTestState.value = value
-        }
-    private val _obTestState = MutableStateFlow(TestState.None)
-    val obTestState = _obTestState.asStateFlow()
+//    /**
+//     * 检测模式状态
+//     */
+//    var testState = TestState.None
+//        set(value) {
+//            field = value
+//            _obTestState.value = value
+//        }
+//    private val _obTestState = MutableStateFlow(TestState.None)
+//    val obTestState = _obTestState.asStateFlow()
 
     /**
      * 检测类型
@@ -31,7 +31,7 @@ object SystemGlobal {
     /**
      * 是否是在只使用安卓板时调试用的
      */
-    var isCodeDebug = false
+    var isCodeDebug = true
 
     /**
      * 是否是调试模式

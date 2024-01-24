@@ -1,19 +1,14 @@
 package com.wl.turbidimetric.ex
 
-import android.app.Activity
-import android.content.Intent
 import android.content.res.Resources
 import android.view.View
 import android.widget.Toast
 import androidx.annotation.StringRes
 import com.google.android.material.snackbar.Snackbar
-import com.wl.turbidimetric.App
-import com.wl.turbidimetric.home.HomeViewModel
+import com.wl.turbidimetric.app.App
 import com.wl.turbidimetric.home.HomeViewModel.*
 import com.wl.wllib.ToastUtil
 import java.math.BigDecimal
-import java.util.*
-import javax.inject.Inject
 
 /**
  * 用来将double类型的值四舍五入下保留几位小数

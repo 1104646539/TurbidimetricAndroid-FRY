@@ -12,32 +12,46 @@ import android.os.Handler
 import android.os.Message
 import android.util.Log
 import androidx.activity.viewModels
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
 import com.wl.turbidimetric.R
+import com.wl.turbidimetric.app.AppViewModel
+import com.wl.turbidimetric.app.MachineState
 import com.wl.turbidimetric.base.BaseActivity
 import com.wl.turbidimetric.databinding.ActivityMainBinding
+import com.wl.turbidimetric.ex.getAppViewModel
 import com.wl.turbidimetric.global.EventGlobal
 import com.wl.turbidimetric.global.EventMsg
 import com.wl.turbidimetric.global.SystemGlobal
+import com.wl.turbidimetric.main.splash.SplashFragment
+import com.wl.turbidimetric.upload.hl7.HL7Helper
+import com.wl.turbidimetric.upload.hl7.util.ConnectResult
+import com.wl.turbidimetric.upload.hl7.util.ConnectStatus
+import com.wl.turbidimetric.upload.service.OnConnectListener
 import com.wl.turbidimetric.util.ActivityDataBindingDelegate
 import com.wl.turbidimetric.util.SerialPortUtil
 import com.wl.turbidimetric.view.dialog.HiltDialog
 import com.wl.turbidimetric.view.dialog.showPop
+import com.wl.weiqianwllib.OrderUtil
 import com.wl.weiqianwllib.upan.StorageState
 import com.wl.weiqianwllib.upan.StorageUtil
 import com.wl.weiqianwllib.upan.StorageUtil.OPEN_DOCUMENT_TREE_CODE
+import com.wl.wllib.DateUtil
 import com.wl.wllib.LogToFile.i
 import com.wl.wllib.ktxRunOnBgCache
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.greenrobot.eventbus.EventBus
+import kotlin.concurrent.timer
 
 
 class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     val TAG = "MainActivity"
     override val vd: ActivityMainBinding by ActivityDataBindingDelegate(R.layout.activity_main)
     override val vm: MainViewModel by viewModels()
-
     var mPermissionIntent: PendingIntent? = null
 
     private val handler_init_qrcode = 1000
@@ -105,43 +119,92 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     }
 
     override fun init() {
+        showSplash()
         listener()
-        initNav()
+//        initNav()
+        initNav2()
         test()
+        initTime()
+        initUploadClient()
+        OrderUtil.showHideNav(this, false)
     }
 
-    /**
-     * 初始化导航栏
-     */
-    private fun initNav() {
-        i("initNav")
+    private fun initNav2() {
         vd.vp.adapter = MainViewPagerAdapter(this)
         vd.vp.isUserInputEnabled = false
         vd.vp.offscreenPageLimit = 6
-        vd.rnv.setResIds(
-            R.drawable.icon_shutdown,
-            vm.navItems,
-            R.drawable.icon_logo
+        vd.lnv.setItem(
+            mutableListOf(
+                R.drawable.left_nav_analyse,
+                R.drawable.left_nav_datamanager,
+                R.drawable.left_nav_matching,
+                R.drawable.left_nav_settings
+            ),
+            mutableListOf(
+                R.drawable.left_nav_analyse_selected,
+                R.drawable.left_nav_datamanager_selected,
+                R.drawable.left_nav_matching_selected,
+                R.drawable.left_nav_settings_selected
+            ),
+            mutableListOf("样本分析", "数据管理", "曲线拟合", "参数设置"),
+            R.drawable.left_nav_item_bg
         )
-        vd.rnv.setNavigationSelectedIndexChangeListener { it ->
+        vd.lnv.onItemChangeListener = {
             vm.curIndex.value = it
-            i("nav it=$it")
-        }
-        vd.rnv.setNavigationShutdownListener {
-//            toast("点击关机……")
-            showShutdownDialog()
         }
         vm.curIndex.observe(this) {
             vd.vp.setCurrentItem(it, false)
         }
     }
 
+    private fun initTime() {
+        appVm.listenerTime()
+    }
+
+    val splashFragment: SplashFragment = SplashFragment()
+
+    private fun showSplash() {
+        supportFragmentManager.beginTransaction().add(R.id.cl_root, splashFragment, "splash")
+            .show(splashFragment).commitAllowingStateLoss()
+    }
+
+    private fun hideSplash() {
+        supportFragmentManager.findFragmentByTag("splash")?.let {
+            supportFragmentManager.beginTransaction().hide(it).commitAllowingStateLoss()
+        }
+    }
+
+//    /**
+//     * 初始化导航栏
+//     */
+//    private fun initNav() {
+//        i("initNav")
+//        vd.vp.adapter = MainViewPagerAdapter(this)
+//        vd.vp.isUserInputEnabled = false
+//        vd.vp.offscreenPageLimit = 6
+//        vd.rnv.setResIds(
+//            R.drawable.icon_shutdown,
+//            vm.navItems,
+//            R.drawable.icon_logo
+//        )
+//        vd.rnv.setNavigationSelectedIndexChangeListener { it ->
+//            vm.curIndex.value = it
+//            i("nav it=$it")
+//        }
+//        vd.tnv.setShutdownListener {
+//            showShutdownDialog()
+//        }
+//        vm.curIndex.observe(this) {
+//            vd.vp.setCurrentItem(it, false)
+//        }
+//    }
+
 
     /**
      * 关机提示
      */
     private fun showShutdownDialog() {
-        if (!SystemGlobal.testState.isRunning()) {
+        if (!appVm.testState.isRunning()) {
             shutdownDialog.showPop(this) {
                 it.showDialog(
                     "确定要关机吗？请确定仪器检测结束。",
@@ -182,10 +245,33 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     private fun listener() {
         listenerSDCard()
         listenerView()
+
     }
 
     private fun listenerView() {
-
+        lifecycleScope.launch {
+            appVm.nowTimeStr.collectLatest {
+                vd.tnv.setTime(it)
+            }
+        }
+        lifecycleScope.launch {
+            appVm.machineState.collectLatest {
+                vd.tnv.setStateMachineSrc(it.id)
+                if (it == MachineState.MachineRunningError) {
+                    SerialPortUtil.allowRunning = false
+                }
+            }
+        }
+        lifecycleScope.launch {
+            appVm.uploadState.collectLatest {
+                vd.tnv.setStateUploadSrc(it.id)
+            }
+        }
+        lifecycleScope.launch {
+            appVm.storageState.collectLatest {
+                vd.tnv.setStateStorageSrc(it.id)
+            }
+        }
 
     }
 
@@ -259,12 +345,31 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         StorageUtil.state = state!!
         i("U盘状态=${StorageUtil.state.stateName}")
 
-        if (state != StorageState.NONE) {
-            vd.rnv.setUpanResId(if (state.isExist()) R.drawable.upan_enable_true else R.drawable.upan_enable_false)
-        } else {
-            vd.rnv.setUpanResId(0)
-        }
+//        if (state != StorageState.NONE) {
+//            vd.rnv.setUpanResId(if (state.isExist()) R.drawable.upan_enable_true else R.drawable.upan_enable_false)
+//        } else {
+//            vd.rnv.setUpanResId(0)
+//        }
+        appVm.changeStorageState(state)
 //        vd.tvState!!.text = "U盘状态:" + StorageUtil.state.stateName
+    }
+
+    private fun initUploadClient() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            delay(3000)
+            withContext(Dispatchers.Main) {
+                HL7Helper.connect(object : OnConnectListener {
+                    override fun onConnectResult(connectResult: ConnectResult) {
+                        i("onConnectResult connectResult=$connectResult")
+                    }
+
+                    override fun onConnectStatusChange(connectStatus: ConnectStatus) {
+                        i("onConnectStatusChange connectStatus=$connectStatus")
+                        appVm.changeUploadState(connectStatus)
+                    }
+                })
+            }
+        }
     }
 
     /**
@@ -284,6 +389,13 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
                 Log.d(TAG, "设备 已插入device=${device} ${device?.productId} ${device?.vendorId}")
                 changeStorageState(StorageState.INSERTED)
             }
+        }
+    }
+
+    override fun onMessageEvent(event: EventMsg<Any>) {
+        super.onMessageEvent(event)
+        if (event.what == EventGlobal.WHAT_HIDE_SPLASH) {
+            hideSplash()
         }
     }
 }

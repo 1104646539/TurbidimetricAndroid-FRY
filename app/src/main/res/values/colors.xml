@@ -28,4 +28,5 @@
     <color name="circle_error">#eb9c2a</color>
     <color name="tempColor">#eb9c2a</color>
     <color name="bg_item">#e7eeff</color>
+    <color name="left_nav_text_selected">#FF000000</color>
 </resources>

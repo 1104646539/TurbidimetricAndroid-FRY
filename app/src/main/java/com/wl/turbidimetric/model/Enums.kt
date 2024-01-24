@@ -61,9 +61,25 @@ enum class TestState(val state: Int) {
     DripReagent(106),//取试剂加试剂中
     Test1(107),//检测过第一次
     Test2(108),//检测过第二次
-    Test3(109),//检测过第三次
+    Test3(109),//检测过第三次。
     Test4(110),//检测过第四次
     TestFinish(111); //正在执行结束流程
+
+    /**
+     * 判断是否是在运行中
+     */
+    fun isTestRunning(): Boolean {
+        return None != this && TestFinish != this && Normal != this
+    }
+
+    /**
+     * 仪器是否可正常运行
+     *
+     * @return Boolean
+     */
+    fun machineStateNormal(): Boolean {
+        return this.isNotPrepare()
+    }
 
     /**
      * 是否正在运行
@@ -111,8 +127,9 @@ enum class TestType {
     fun isRepeatability(): Boolean {
         return this == Repeatability
     }
-    fun isDebug():Boolean{
-        return this== Debug
+
+    fun isDebug(): Boolean {
+        return this == Debug
     }
 }
 

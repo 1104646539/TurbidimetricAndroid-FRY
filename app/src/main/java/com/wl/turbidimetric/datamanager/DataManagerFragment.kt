@@ -14,7 +14,6 @@ import com.wl.turbidimetric.base.BaseFragment
 import com.wl.turbidimetric.databinding.FragmentDataManagerBinding
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.ex.PD
-import com.wl.turbidimetric.ex.isTestRunning
 import com.wl.turbidimetric.ex.toast
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.ConditionModel
@@ -267,7 +266,7 @@ class DataManagerFragment :
             return "请选择数据"
         }
 
-        if (isTestRunning() && SystemGlobal.uploadConfig.autoUpload) {
+        if (appVm.testState.isTestRunning() && SystemGlobal.uploadConfig.autoUpload) {
             return "请等待检测结束后上传"
         }
 

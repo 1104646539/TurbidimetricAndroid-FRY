@@ -6,17 +6,20 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.wl.turbidimetric.app.AppViewModel
 import com.wl.turbidimetric.home.ProjectRepository
 import com.wl.turbidimetric.home.TestResultRepository
 import com.wl.turbidimetric.model.ConditionModel
 import com.wl.turbidimetric.model.TestResultAndCurveModel
 import com.wl.turbidimetric.model.TestResultModel
 import com.wl.turbidimetric.base.BaseViewModel
+import com.wl.turbidimetric.ex.getAppViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 
 class DataManagerViewModel(
+    private val appViewModel: AppViewModel,
     private val projectRepository: ProjectRepository = ProjectRepository(),
     private val testResultRepository: TestResultRepository = TestResultRepository()
 ) : BaseViewModel() {
@@ -81,52 +84,10 @@ class DataManagerViewModel(
         _resultSize.value = testResultRepository.countTestResultAndCurveModels(conditionModel)
     }
 
-//    open fun ConditionModel.buildQuery(): Query<TestResultModel> {
-//        val condition: QueryBuilder<TestResultModel> = DBManager.TestResultBox.query().orderDesc(
-//            TestResultModel_.id
-//        )
-//
-//        if (name.isNotEmpty()) {
-//            condition.contains(
-//                TestResultModel_.name,
-//                name,
-//                QueryBuilder.StringOrder.CASE_INSENSITIVE
-//            )
-//        }
-//        if (qrcode.isNotEmpty()) {
-//            condition.contains(
-//                TestResultModel_.sampleBarcode,
-//                qrcode,
-//                QueryBuilder.StringOrder.CASE_INSENSITIVE
-//            )
-//        }
-//        if (conMin != 0) {
-//            condition.greaterOrEqual(TestResultModel_.concentration, conMin.toLong())
-//        }
-//        if (conMax != 0) {
-//            condition.lessOrEqual(TestResultModel_.concentration, conMax.toLong())
-//        }
-//        if (testTimeMin != 0L) {
-//            condition.greaterOrEqual(TestResultModel_.testTime, testTimeMin)
-//        }
-//        if (testTimeMax != 0L) {
-//            condition.lessOrEqual(TestResultModel_.testTime, testTimeMax)
-//        }
-//
-//
-//        if (results.isNotEmpty()) {
-//            condition.`in`(
-//                TestResultModel_.testResult,
-//                results,
-//                QueryBuilder.StringOrder.CASE_INSENSITIVE
-//            )
-//        }
-//
-//        return condition.build()
-//    }
 }
 
 class DataManagerViewModelFactory(
+    private val appViewModel: AppViewModel = getAppViewModel(AppViewModel::class.java),
     private val projectRepository: ProjectRepository = ProjectRepository(),
     private val testResultRepository: TestResultRepository = TestResultRepository()
 ) :
@@ -135,7 +96,7 @@ class DataManagerViewModelFactory(
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
 
         if (modelClass.isAssignableFrom(DataManagerViewModel::class.java)) {
-            return DataManagerViewModel(projectRepository, testResultRepository) as T
+            return DataManagerViewModel(appViewModel,projectRepository, testResultRepository) as T
         }
 
         throw IllegalArgumentException("Unknown ViewModel class")

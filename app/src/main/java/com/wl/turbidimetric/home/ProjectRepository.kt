@@ -1,10 +1,8 @@
 package com.wl.turbidimetric.home
 
-import com.wl.turbidimetric.App
-import com.wl.turbidimetric.model.CurveModel
+import com.wl.turbidimetric.app.App
 import com.wl.turbidimetric.model.ProjectModel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
 
 class ProjectRepository {
     val dao = App.instance!!.mainDao

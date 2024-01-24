@@ -1,11 +1,13 @@
 package com.wl.turbidimetric.home
 
 import androidx.lifecycle.*
-import com.wl.turbidimetric.R
+import com.wl.turbidimetric.app.AppViewModel
+import com.wl.turbidimetric.base.BaseViewModel
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.ex.*
+import com.wl.turbidimetric.global.EventGlobal
+import com.wl.turbidimetric.global.EventMsg
 import com.wl.turbidimetric.global.SystemGlobal
-import com.wl.turbidimetric.global.SystemGlobal.testState
 import com.wl.turbidimetric.global.SystemGlobal.testType
 import com.wl.turbidimetric.model.*
 import com.wl.turbidimetric.upload.hl7.HL7Helper
@@ -15,16 +17,16 @@ import com.wl.turbidimetric.util.ScanCodeUtil
 import com.wl.turbidimetric.util.SerialPortUtil
 import com.wl.wllib.LogToFile.c
 import com.wl.wllib.LogToFile.i
-import com.wl.turbidimetric.base.BaseViewModel
-import com.wl.wllib.toLongTimeStr
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import org.greenrobot.eventbus.EventBus
 import java.math.BigDecimal
 import java.util.*
 import kotlin.concurrent.timer
 import kotlin.math.absoluteValue
 
 class HomeViewModel(
+    private val appViewModel: AppViewModel,
     private val projectRepository: ProjectRepository,
     private val curveRepository: CurveRepository,
     private val testResultRepository: TestResultRepository
@@ -42,7 +44,7 @@ class HomeViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             _dialogUiState.emit(HomeDialogUiState.GetMachineShow)
         }
-        testState = TestState.GetMachineState
+        appViewModel.testState = TestState.GetMachineState
         getMachineState()
     }
 
@@ -474,9 +476,9 @@ class HomeViewModel(
      * 测试用的 end
      */
     fun clickStart() {
-        val errorMsg = if (testState.isRunning()) {
+        val errorMsg = if (appViewModel.testState.isRunning()) {
             "正在检测，请勿操作！"
-        } else if (testState.isRunningError()) {
+        } else if (appViewModel.testState.isRunningError()) {
             "请停止使用仪器并联系供应商维修"
         } else if (selectProject == null) {
             "未选择标曲"
@@ -494,7 +496,7 @@ class HomeViewModel(
             return
         }
         //需要重新自检
-        if (testState.isNotPrepare()) {
+        if (appViewModel.testState.isNotPrepare()) {
             goGetMachineState()
             return
         }
@@ -509,7 +511,7 @@ class HomeViewModel(
         allowDripSample = true
         allowTakeReagent = true
         testMsg.value = ""
-        testState = TestState.DripSample
+        appViewModel.testState = TestState.DripSample
         cuvetteShelfPos = -1
         sampleShelfPos = -1
         samplingNum = 0
@@ -591,7 +593,7 @@ class HomeViewModel(
         r1Reagent = reply.data.r1Reagent
         r2Volume = reply.data.r2Volume
         if (!runningTest()) return
-        if (!machineStateNormal()) return
+        if (appViewModel.testState.isNotPrepare()) return
         c("接收到 取试剂 reply=$reply cuvettePos=$cuvettePos")
         takeReagentFinish = true
         if (reply.state == ReplyState.TAKE_REAGENT_FAILED) {//取试剂失败
@@ -640,7 +642,7 @@ class HomeViewModel(
     override fun readDataSamplingProbeCleaningModelModel(reply: ReplyModel<SamplingProbeCleaningModel>) {
         cleanoutFluid = reply.data.cleanoutFluid
         if (!runningTest()) return
-        if (!machineStateNormal()) return
+        if (appViewModel.testState.isNotPrepare()) return
         c("接收到 取样针清洗 reply=$reply samplingProbeCleaningRecoverSampling=$samplingProbeCleaningRecoverSampling")
 
         samplingProbeCleaningFinish = true
@@ -671,7 +673,7 @@ class HomeViewModel(
 //        cleanoutFluidState.postValue(reply.data.cleanoutFluid)
 
         if (!runningTest()) return
-        if (!machineStateNormal()) return
+        if (appViewModel.testState.isNotPrepare()) return
         c("接收到 搅拌针清洗 reply=$reply stirProbeCleaningRecoverStir=$stirProbeCleaningRecoverStir")
 
         stirProbeCleaningFinish = true
@@ -690,7 +692,7 @@ class HomeViewModel(
      */
     override fun readDataPiercedModel(reply: ReplyModel<PiercedModel>) {
         if (!runningTest()) return
-        if (!machineStateNormal()) return
+        if (appViewModel.testState.isNotPrepare()) return
         c("接收到 刺破 reply=$reply samplePos=$samplePos")
 
         piercedFinish = true
@@ -725,7 +727,7 @@ class HomeViewModel(
      */
     override fun readDataGetVersionModel(reply: ReplyModel<GetVersionModel>) {
 //        if (!runningTest()) return
-//        if (!machineStateNormal()) return
+//        if (appViewModel.testState.isNotPrepare()) return
         c("接收到 获取版本号 reply=$reply")
         SystemGlobal.mcuVersion = reply.data.version
     }
@@ -793,7 +795,7 @@ class HomeViewModel(
      */
     override fun readDataSqueezing(reply: ReplyModel<SqueezingModel>) {
         if (!runningTest()) return
-        if (!machineStateNormal()) return
+        if (appViewModel.testState.isNotPrepare()) return
         c("接收到 挤压 reply=$reply")
 
         updateSampleState(samplePos - 1, SampleState.Squeezing)
@@ -812,7 +814,7 @@ class HomeViewModel(
     override fun readDataSampleDoorModel(reply: ReplyModel<SampleDoorModel>) {
         c("接收到 样本门状态 reply=$reply")
         if (!runningTest()) return
-        if (!machineStateNormal()) return
+        if (appViewModel.testState.isNotPrepare()) return
 
     }
 
@@ -823,7 +825,7 @@ class HomeViewModel(
     override fun readDataCuvetteDoorModel(reply: ReplyModel<CuvetteDoorModel>) {
         c("接收到 比色皿门状态 reply=$reply")
         if (!runningTest()) return
-        if (!machineStateNormal()) return
+        if (appViewModel.testState.isNotPrepare()) return
     }
 
     /**
@@ -831,7 +833,7 @@ class HomeViewModel(
      */
     override fun readDataMoveSampleModel(reply: ReplyModel<MoveSampleModel>) {
         if (!runningTest()) return
-        if (!machineStateNormal()) return
+        if (appViewModel.testState.isNotPrepare()) return
         c("接收到 移动样本 reply=$reply cuvettePos=$cuvettePos lastCuvetteShelfPos=$lastCuvetteShelfPos cuvetteShelfPos=$cuvetteShelfPos samplePos=$samplePos samplingProbeCleaningFinish=$samplingProbeCleaningFinish")
 
         sampleMoveFinish = true
@@ -1045,8 +1047,8 @@ class HomeViewModel(
      */
     override fun readDataTestModel(reply: ReplyModel<TestModel>) {
         if (!runningTest()) return
-        if (!machineStateNormal()) return
-        c("接收到 检测完成 reply=$reply cuvettePos=$cuvettePos testState=$testState")
+        if (appViewModel.testState.isNotPrepare()) return
+        c("接收到 检测完成 reply=$reply cuvettePos=$cuvettePos appViewModel.testState=$appViewModel.testState")
 
         testFinish = true
 
@@ -1057,7 +1059,7 @@ class HomeViewModel(
      * 计算结果
      */
     private fun calcTestResult(value: Int) {
-        when (testState) {
+        when (appViewModel.testState) {
             TestState.DripReagent -> {
                 updateCuvetteState(cuvettePos - 5, CuvetteState.Test1)
                 updateTestResultModel(value, cuvettePos - 5, CuvetteState.Test1)
@@ -1312,7 +1314,7 @@ class HomeViewModel(
      */
     private fun continueTestNextCuvette() {
         //重置这排比色皿架的位置和检测状态
-        testState = TestState.DripSample
+        appViewModel.testState = TestState.DripSample
         cuvettePos = -1
 
         if (!allowTakeReagent || !allowDripSample) {//取试剂失败|比色皿非空，不允许再检测
@@ -1392,7 +1394,7 @@ class HomeViewModel(
      * 判断是否进行下一次加试剂
      */
     private fun nextDripReagent() {
-        if (testState != TestState.DripReagent) return
+        if (appViewModel.testState != TestState.DripReagent) return
         i("nextDripReagent cuvettePos=$cuvettePos dripReagentFinish=$dripReagentFinish testFinish=$testFinish stirFinish=$stirFinish stirProbeCleaningFinish=$stirProbeCleaningFinish takeReagentFinish=$takeReagentFinish cuvetteMoveFinish=$cuvetteMoveFinish allowTakeReagent=$allowTakeReagent")
         if (cuvettePos < 15) {
             //当取试剂完成，检测完成，搅拌完成，加试剂完成，移动比色皿完成时，
@@ -1432,7 +1434,7 @@ class HomeViewModel(
      */
     private fun stepTest(state: TestState) {
         i(" ———————— stepTest state=$state  cuvettePos=$cuvettePos————————————————————————————————————————————————————————————————————————————————————————————————=")
-        testState = state
+        appViewModel.testState = state
         //获取跳过的步数
         val needMoveStep = getFirstCuvetteStartPos()
         //切换到TestState.Test2时，当前下位机的比色皿位置cuvettePos == 0，则不需要计算需要回退多少格，直接往前移动
@@ -1556,7 +1558,7 @@ class HomeViewModel(
      */
     override fun readDataStirModel(reply: ReplyModel<StirModel>) {
         if (!runningTest()) return
-        if (!machineStateNormal()) return
+        if (appViewModel.testState.isNotPrepare()) return
         c("接收到 搅拌 reply=$reply cuvettePos=$cuvettePos")
 
         updateStirTime()
@@ -1578,7 +1580,7 @@ class HomeViewModel(
      */
     override fun readDataDripReagentModel(reply: ReplyModel<DripReagentModel>) {
         if (!runningTest()) return
-        if (!machineStateNormal()) return
+        if (appViewModel.testState.isNotPrepare()) return
         c("接收到 加试剂 reply=$reply cuvettePos=$cuvettePos")
 
         dripReagentFinish = true
@@ -1616,7 +1618,7 @@ class HomeViewModel(
      */
     override fun readDataDripSampleModel(reply: ReplyModel<DripSampleModel>) {
         if (!runningTest()) return
-        if (!machineStateNormal()) return
+        if (appViewModel.testState.isNotPrepare()) return
         c("接收到 加样 reply=$reply cuvettePos=$cuvettePos samplePos=$samplePos")
 
         dripSampleFinish = true
@@ -1762,8 +1764,8 @@ class HomeViewModel(
      * 因为跨命令的移动比色皿后重置位置，所以移动前，先把当前位置置为-1，这样移动后记录的位置才是真实的
      */
     private fun stepDripReagent() {
-        i(" ———————— stepDripReagent testState=$testState ————————————————————————————————————————————————————————————————————————————————————————————————=")
-        testState = TestState.DripReagent
+        i(" ———————— stepDripReagent appViewModel.testState=$appViewModel.testState ————————————————————————————————————————————————————————————————————————————————————————————————=")
+        appViewModel.testState = TestState.DripReagent
         cuvettePos = -1
         val step = getNextStepCuvetteStartPos()
         moveCuvetteDripReagent(step + 2)
@@ -1787,7 +1789,7 @@ class HomeViewModel(
      */
     override fun readDataSamplingModel(reply: ReplyModel<SamplingModel>) {
         if (!runningTest()) return
-        if (!machineStateNormal()) return
+        if (appViewModel.testState.isNotPrepare()) return
         c("接收到 取样 reply=$reply cuvettePos=$cuvettePos samplePos=$samplePos cuvetteShelfPos=$cuvetteShelfPos sampleShelfPos=$sampleShelfPos")
         samplingFinish = true
         samplingNum++
@@ -1808,14 +1810,14 @@ class HomeViewModel(
      */
     override fun readDataMoveCuvetteTestModel(reply: ReplyModel<MoveCuvetteTestModel>) {
         if (!runningTest()) return
-        if (!machineStateNormal()) return
+        if (appViewModel.testState.isNotPrepare()) return
         c("接收到 移动比色皿 检测位 reply=$reply")
 
         cuvetteMoveFinish = true
 
         if (cuvettePos in 0 until 10) {
             val targetTime =
-                if (testState == TestState.Test2) testShelfInterval2 else if (testState == TestState.Test3) testShelfInterval3 else testShelfInterval4
+                if (appViewModel.testState == TestState.Test2) testShelfInterval2 else if (appViewModel.testState == TestState.Test3) testShelfInterval3 else testShelfInterval4
             val stirTime = stirTimes[cuvettePos]
             val intervalTemp = targetTime - (Date().time - stirTime) - 3
             i("intervalTemp=$intervalTemp stirTime=$stirTime targetTime=$targetTime")
@@ -1831,7 +1833,7 @@ class HomeViewModel(
      */
     override fun readDataMoveCuvetteDripReagentModel(reply: ReplyModel<MoveCuvetteDripReagentModel>) {
         if (!runningTest()) return
-        if (!machineStateNormal()) return
+        if (appViewModel.testState.isNotPrepare()) return
         c("接收到 移动比色皿 加试剂位 reply=$reply cuvettePos=$cuvettePos takeReagentFinish=$takeReagentFinish dripReagentFinish=$dripReagentFinish stirFinish=$stirFinish testFinish=$testFinish stirProbeCleaningFinish=$stirProbeCleaningFinish stirProbeCleaningRecoverStir=$stirProbeCleaningRecoverStir takeReagentFinish=$takeReagentFinish")
 
         cuvetteMoveFinish = true
@@ -1913,7 +1915,7 @@ class HomeViewModel(
      */
     override fun readDataMoveCuvetteDripSampleModel(reply: ReplyModel<MoveCuvetteDripSampleModel>) {
         if (!runningTest()) return
-        if (!machineStateNormal()) return
+        if (appViewModel.testState.isNotPrepare()) return
         c("接收到 移动比色皿 加样位 reply=$reply cuvetteStartPos=$cuvetteStartPos cuvettePos=$cuvettePos samplingFinish=$samplingFinish")
         cuvetteMoveFinish = true
         goDripSample()
@@ -1924,14 +1926,14 @@ class HomeViewModel(
      * 停止运行
      */
     private fun stateErrorStopRunning() {
-        testState = TestState.RunningError
+        appViewModel.testState = TestState.RunningError
     }
 
     /**
      * 接收到移动比色皿架
      */
     override fun readDataMoveCuvetteShelfModel(reply: ReplyModel<MoveCuvetteShelfModel>) {
-        if (testState == TestState.TestFinish && testType.isTest()) {
+        if (appViewModel.testState == TestState.TestFinish && testType.isTest()) {
             cuvetteShelfMoveFinish = true
             if (isTestFinish()) {
                 showFinishDialog()
@@ -1939,12 +1941,12 @@ class HomeViewModel(
             }
         }
         if (!runningTest()) return
-        if (!machineStateNormal()) return
+        if (appViewModel.testState.isNotPrepare()) return
         c("接收到 移动比色皿架 reply=$reply cuvetteShelfPos=$cuvetteShelfPos cuvetteStartPos=$cuvetteStartPos")
         cuvetteShelfMoveFinish = true
 
 
-        if (testState != TestState.TestFinish) {
+        if (appViewModel.testState != TestState.TestFinish) {
             if (isManualSampling()) {//手动加样模式，不需要自动加样，直接设为已加样后加加试剂
                 initManualSamplingCuvetteStatus()
                 stepDripReagent()
@@ -2005,7 +2007,7 @@ class HomeViewModel(
         viewModelScope.launch {
             _dialogUiState.emit(HomeDialogUiState.TestFinish(dialogMsg))
         }
-        testState = TestState.Normal
+        appViewModel.testState = TestState.Normal
     }
 
     /**
@@ -2029,7 +2031,7 @@ class HomeViewModel(
     }
 
     private fun isTestFinish(): Boolean {
-        return testState == TestState.TestFinish && testType.isTest() && sampleShelfMoveFinish && cuvetteShelfMoveFinish
+        return appViewModel.testState == TestState.TestFinish && testType.isTest() && sampleShelfMoveFinish && cuvetteShelfMoveFinish
     }
 
 
@@ -2037,8 +2039,8 @@ class HomeViewModel(
      * 接收到移动样本架
      */
     override fun readDataMoveSampleShelfModel(reply: ReplyModel<MoveSampleShelfModel>) {
-        c("接收到 移动样本架 reply=$reply sampleShelfPos=$sampleShelfPos $testState")
-        if (testState == TestState.TestFinish && testType.isTest()) {
+        c("接收到 移动样本架 reply=$reply sampleShelfPos=$sampleShelfPos $appViewModel.testState")
+        if (appViewModel.testState == TestState.TestFinish && testType.isTest()) {
             sampleShelfMoveFinish = true
             if (isTestFinish()) {
                 showFinishDialog()
@@ -2046,11 +2048,11 @@ class HomeViewModel(
             }
         }
         if (!runningTest()) return
-        if (!machineStateNormal()) return
+        if (appViewModel.testState.isNotPrepare()) return
 
         sampleShelfMoveFinish = true
 
-        if (testState != TestState.TestFinish) {
+        if (appViewModel.testState != TestState.TestFinish) {
             samplePos = -1
             scanResults.clear()
 //            samplesStates = initSampleStates()
@@ -2140,18 +2142,18 @@ class HomeViewModel(
         if (testType.isDebug()) {
             return
         }
-
+        EventBus.getDefault().post(EventMsg<Any>(what = EventGlobal.WHAT_HIDE_SPLASH))
         errorInfo = reply.data.errorInfo
-        testState = TestState.None
+        appViewModel.testState = TestState.None
         if (errorInfo.isNullOrEmpty()) {
-            testState = TestState.Normal
+            appViewModel.testState = TestState.Normal
             //自检成功后获取一下r1,r2，清洗液状态
             getState()
         } else {
             viewModelScope.launch {
                 _dialogUiState.emit(HomeDialogUiState.GetMachineDismiss)
             }
-            testState = TestState.NotGetMachineState
+            appViewModel.testState = TestState.NotGetMachineState
             val sb = StringBuffer()
             errorInfo?.let {
                 for (error in it) {
@@ -2186,15 +2188,15 @@ class HomeViewModel(
         r2Reagent = reply.data.r2Reagent
         r2Volume = reply.data.r2Volume
         cleanoutFluid = reply.data.cleanoutFluid
-        c("接收到 获取状态 testState=$testState reply=$reply continueTestCuvetteState=$continueTestCuvetteState continueTestSampleState=$continueTestSampleState clickStart=$clickStart r1Reagent=$r1Reagent r2Reagent=$r2Reagent cleanoutFluid=$cleanoutFluid continueTestGetState=$continueTestGetState")
-        if (testState == TestState.Normal) {
+        c("接收到 获取状态 appViewModel.testState=$appViewModel.testState reply=$reply continueTestCuvetteState=$continueTestCuvetteState continueTestSampleState=$continueTestSampleState clickStart=$clickStart r1Reagent=$r1Reagent r2Reagent=$r2Reagent cleanoutFluid=$cleanoutFluid continueTestGetState=$continueTestGetState")
+        if (appViewModel.testState == TestState.Normal) {
             i("自检完成")
             viewModelScope.launch {
                 _dialogUiState.emit(HomeDialogUiState.GetMachineDismiss)
             }
         }
         if (!runningTest()) return
-        if (!machineStateNormal()) return
+        if (appViewModel.testState.isNotPrepare()) return
 
 //        c("接收到 获取状态 reply=$reply continueTestCuvetteState=$continueTestCuvetteState continueTestSampleState=$continueTestSampleState clickStart=$clickStart r1Reagent=$r1Reagent r2Reagent=$r2Reagent cleanoutFluid=$cleanoutFluid continueTestGetState=$continueTestGetState")
         //比色皿不足才获取的状态
@@ -2406,7 +2408,7 @@ class HomeViewModel(
      */
     private fun testFinishAction() {
         clearSingleShelf()
-        testState = TestState.TestFinish
+        appViewModel.testState = TestState.TestFinish
         sampleShelfPos = -1
         cuvetteShelfPos = -1
         cuvetteStartPos = 0
@@ -2552,7 +2554,7 @@ class HomeViewModel(
      * 移动比色皿到 检测位
      */
     private fun moveCuvetteTest(step: Int = 1) {
-        c("发送 移动比色皿到 检测位 testState=$testState step=$step")
+        c("发送 移动比色皿到 检测位 appViewModel.testState=$appViewModel.testState step=$step")
         cuvettePos += step
         testFinish = false
         testing = true
@@ -2650,7 +2652,7 @@ class HomeViewModel(
      * 是否正在检测
      */
     private fun runningTest(): Boolean {
-        return testState.isRunning() && testType.isTest()
+        return appViewModel.testState.isRunning() && testType.isTest()
     }
 
     /**
@@ -2730,13 +2732,14 @@ class HomeViewModel(
 }
 
 class HomeViewModelFactory(
+    private val appViewModel: AppViewModel = getAppViewModel(AppViewModel::class.java),
     private val projectRepository: ProjectRepository = ProjectRepository(),
     private val curveRepository: CurveRepository = CurveRepository(),
     private val testResultRepository: TestResultRepository = TestResultRepository()
 ) : ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(HomeViewModel::class.java)) {
-            return HomeViewModel(projectRepository, curveRepository, testResultRepository) as T
+            return HomeViewModel(appViewModel,projectRepository, curveRepository, testResultRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

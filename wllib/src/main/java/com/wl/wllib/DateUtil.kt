@@ -42,6 +42,11 @@ object DateUtil {
      */
     @JvmStatic
     val PATTERN_TIME_5 = "yyyyMMddHHmmss"
+    /**
+     * 例：15:30
+     */
+    @JvmStatic
+    val PATTERN_TIME_6 = "HH:mm"
 
     /**
      * @see PATTERN_TIME_1
@@ -71,6 +76,11 @@ object DateUtil {
      */
     @JvmStatic
     val Time5Format by lazy { SimpleDateFormat(PATTERN_TIME_5) }
+    /**
+     * @see PATTERN_TIME_5
+     */
+    @JvmStatic
+    val Time6Format by lazy { SimpleDateFormat(PATTERN_TIME_6) }
 
     /**
      * @see PATTERN_DATE_1

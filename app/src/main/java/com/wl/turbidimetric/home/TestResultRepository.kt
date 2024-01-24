@@ -2,11 +2,10 @@ package com.wl.turbidimetric.home
 
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
-import com.wl.turbidimetric.App
+import com.wl.turbidimetric.app.App
 import com.wl.turbidimetric.model.ConditionModel
 import com.wl.turbidimetric.model.TestResultAndCurveModel
 import com.wl.turbidimetric.model.TestResultModel
-import kotlinx.coroutines.Dispatchers
 
 class TestResultRepository {
     val dao = App.instance!!.mainDao

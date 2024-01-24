@@ -1,11 +1,9 @@
 package com.wl.turbidimetric.util
 
 import android.content.Context
-import com.wl.turbidimetric.App
 import com.wl.weiqianwllib.upan.StorageUtil
 import com.wl.wllib.DateUtil
 import com.wl.wllib.LogToFile
-import com.wl.wllib.toLongTimeStr
 import com.wl.wllib.toTimeStr
 import java.io.File
 import java.util.*

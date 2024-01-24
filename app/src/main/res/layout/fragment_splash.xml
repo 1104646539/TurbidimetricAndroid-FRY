@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:background="@color/white"
         android:layout_height="match_parent"
+        android:background="@color/white"
         android:gravity="center"
         android:orientation="vertical">
 
@@ -13,6 +13,143 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="仪器自检中……"
-            android:textSize="36sp" />
-    </LinearLayout>
+            android:textSize="70sp"
+            app:layout_constraintBottom_toTopOf="@id/iv1"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/iv1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/splash_item_bg"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintHorizontal_chainStyle="spread_inside"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/iv2" />
+
+        <ImageView
+            android:id="@+id/iv2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/splash_item_bg"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintHorizontal_chainStyle="spread_inside"
+            app:layout_constraintLeft_toRightOf="@id/iv1"
+            app:layout_constraintRight_toLeftOf="@id/iv3" />
+
+        <ImageView
+            android:id="@+id/iv3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/splash_item_bg"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintHorizontal_chainStyle="spread_inside"
+            app:layout_constraintLeft_toRightOf="@id/iv2"
+            app:layout_constraintRight_toLeftOf="@id/iv4" />
+
+        <ImageView
+            android:id="@+id/iv4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/splash_item_bg2"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintHorizontal_chainStyle="spread_inside"
+            app:layout_constraintLeft_toRightOf="@id/iv3"
+            app:layout_constraintRight_toRightOf="parent" />
+
+        <ImageView
+            android:id="@+id/iv_icon1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="100dp"
+            android:layout_marginTop="100dp"
+            android:layout_marginBottom="50dp"
+            android:src="@drawable/splash_analyse"
+            app:layout_constraintBottom_toTopOf="@id/tv_title1"
+            app:layout_constraintLeft_toLeftOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_title1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="56dp"
+            android:layout_marginBottom="100dp"
+            android:text="@string/nav_analyse"
+            android:textColor="@color/white"
+            android:textSize="60sp"
+            app:layout_constraintBottom_toBottomOf="@id/iv1"
+            app:layout_constraintLeft_toLeftOf="@id/iv_icon1" />
+
+        <ImageView
+            android:id="@+id/iv_icon2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="100dp"
+            android:layout_marginTop="100dp"
+            android:layout_marginBottom="50dp"
+            android:src="@drawable/splash_datamanager"
+            app:layout_constraintBottom_toTopOf="@id/tv_title2"
+            app:layout_constraintLeft_toRightOf="@id/iv1" />
+
+        <TextView
+            android:id="@+id/tv_title2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="56dp"
+            android:layout_marginBottom="100dp"
+            android:text="@string/nav_datamanager"
+            android:textColor="@color/white"
+            android:textSize="60sp"
+            app:layout_constraintBottom_toBottomOf="@id/iv2"
+            app:layout_constraintLeft_toLeftOf="@id/iv_icon2" />
+
+        <ImageView
+            android:id="@+id/iv_icon3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="100dp"
+            android:layout_marginTop="100dp"
+            android:layout_marginBottom="50dp"
+            android:src="@drawable/splash_matching"
+            app:layout_constraintBottom_toTopOf="@id/tv_title3"
+            app:layout_constraintLeft_toRightOf="@id/iv2" />
+
+        <TextView
+            android:id="@+id/tv_title3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="56dp"
+            android:layout_marginBottom="100dp"
+            android:text="@string/nav_matching"
+            android:textColor="@color/white"
+            android:textSize="60sp"
+            app:layout_constraintBottom_toBottomOf="@id/iv3"
+            app:layout_constraintLeft_toLeftOf="@id/iv_icon3" />
+
+        <ImageView
+            android:id="@+id/iv_icon4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="100dp"
+            android:layout_marginTop="100dp"
+            android:layout_marginBottom="50dp"
+            android:src="@drawable/splash_settings"
+            app:layout_constraintBottom_toTopOf="@id/tv_title4"
+            app:layout_constraintLeft_toRightOf="@id/iv3" />
+
+        <TextView
+            android:id="@+id/tv_title4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="56dp"
+            android:layout_marginBottom="100dp"
+            android:text="@string/nav_settings"
+            android:textColor="@color/white"
+            android:textSize="60sp"
+            app:layout_constraintBottom_toBottomOf="@id/iv4"
+            app:layout_constraintLeft_toLeftOf="@id/iv_icon4" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

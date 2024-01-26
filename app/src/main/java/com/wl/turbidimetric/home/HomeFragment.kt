@@ -24,6 +24,9 @@ import com.wl.turbidimetric.upload.service.OnConnectListener
 import com.wl.turbidimetric.upload.service.OnGetPatientCallback
 import com.wl.turbidimetric.view.dialog.*
 import com.wl.turbidimetric.base.BaseFragment
+import com.wl.turbidimetric.model.Item
+import com.wl.turbidimetric.model.SampleState
+import com.wl.turbidimetric.view.ShelfView
 import kotlinx.coroutines.launch
 import com.wl.wllib.LogToFile.i
 import com.wl.wllib.LogToFile.u
@@ -42,10 +45,10 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
      */
     private val projects: MutableList<CurveModel> = mutableListOf()
     private val r2VolumeIds = intArrayOf(
-        R.drawable.icon_r2_0,
-        R.drawable.icon_r2_1,
-        R.drawable.icon_r2_2,
-        R.drawable.icon_r2_3,
+        R.drawable.state_reagent_r2_0,
+        R.drawable.state_reagent_r2_1,
+        R.drawable.state_reagent_r2_2,
+        R.drawable.state_reagent_r2_3,
     )
 
     /**
@@ -147,90 +150,92 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 
     private fun listener() {
         listenerView()
-        listenerDialog()
+        listenerData()
     }
 
     private fun listenerView() {
         lifecycleScope.launch {
             vm.testMachineUiState.collectLatest {
-                vd.ivR1.setImageResource(if (it.r1State.not()) R.drawable.icon_r1_empty else R.drawable.icon_r1_full)
+                vd.ivReagentR1.setImageResource(if (it.r1State.not()) R.drawable.state_reagent_r1_empty else R.drawable.state_reagent_r1_full)
                 if (it.r2State in r2VolumeIds.indices) {
-                    vd.ivR2.setImageResource(r2VolumeIds[it.r2State])
+                    vd.ivReagentR2.setImageResource(r2VolumeIds[it.r2State])
                 } else {
-                    vd.ivR2.setImageResource(r2VolumeIds[0])
+                    vd.ivReagentR2.setImageResource(r2VolumeIds[0])
                 }
-                vd.ivCleanoutFluid.setImageResource(if (it.cleanoutFluidState.not()) R.drawable.icon_cleanout_fluid_empty else R.drawable.icon_cleanout_fluid_full)
+                vd.ivCleanoutFluid.setImageResource(if (it.cleanoutFluidState.not()) R.drawable.state_cleanout_fluid_empty else R.drawable.state_cleanout_fluid_full)
                 vd.tvTemp.text = it.reactionTemp.toString().plus("℃")
             }
         }
-        vd.ssv.label = "1"
-        vd.ssv2.label = "2"
-        vd.ssv3.label = "3"
-        vd.ssv4.label = "4"
-        vd.ssv.clickIndex = { it, item ->
-            showDetailsDialog(item)
+        vd.svSample1.clickIndex = { it, item ->
+            showDetails(0, it, item)
         }
-        vd.ssv2.clickIndex = { it, item ->
-            showDetailsDialog(item)
+        vd.svSample2.clickIndex = { it, item ->
+            showDetails(1, it, item)
         }
-        vd.ssv3.clickIndex = { it, item ->
-            showDetailsDialog(item)
+        vd.svSample3.clickIndex = { it, item ->
+            showDetails(2, it, item)
         }
-        vd.ssv4.clickIndex = { it, item ->
-            showDetailsDialog(item)
+        vd.svSample4.clickIndex = { it, item ->
+            showDetails(3, it, item)
         }
+        vd.svSample1.shape = ShelfView.Shape.Circle
+        vd.svSample2.shape = ShelfView.Shape.Circle
+        vd.svSample3.shape = ShelfView.Shape.Circle
+        vd.svSample4.shape = ShelfView.Shape.Circle
         lifecycleScope.launch {
             vm.sampleStates.collectLatest {
-                vd.ssv.sampleStates = it[0]
-                vd.ssv2.sampleStates = it[1]
-                vd.ssv3.sampleStates = it[2]
-                vd.ssv4.sampleStates = it[3]
+                vd.svSample1.itemStates = it[0]
+                vd.svSample2.itemStates = it[1]
+                vd.svSample3.itemStates = it[2]
+                vd.svSample4.itemStates = it[3]
             }
         }
-
-        vd.csv.label = "4"
-        vd.csv2.label = "3"
-        vd.csv3.label = "2"
-        vd.csv4.label = "1"
-        vd.csv.clickIndex = { it, item ->
-            showDetailsDialog(item)
+        vd.svCuvette1.shape = ShelfView.Shape.Rectangle
+        vd.svCuvette2.shape = ShelfView.Shape.Rectangle
+        vd.svCuvette3.shape = ShelfView.Shape.Rectangle
+        vd.svCuvette4.shape = ShelfView.Shape.Rectangle
+        vd.svCuvette1.clickIndex = { it, item ->
+            showDetails(3, it, item)
         }
-        vd.csv2.clickIndex = { it, item ->
-            showDetailsDialog(item)
+        vd.svCuvette2.clickIndex = { it, item ->
+            showDetails(2, it, item)
         }
-        vd.csv3.clickIndex = { it, item ->
-            showDetailsDialog(item)
+        vd.svCuvette3.clickIndex = { it, item ->
+            showDetails(1, it, item)
         }
-        vd.csv4.clickIndex = { it, item ->
-            showDetailsDialog(item)
+        vd.svCuvette4.clickIndex = { it, item ->
+            showDetails(0, it, item)
         }
         lifecycleScope.launch {
             vm.cuvetteStates.collectLatest {
-                vd.csv.cuvetteStates = it[3]
-                vd.csv2.cuvetteStates = it[2]
-                vd.csv3.cuvetteStates = it[1]
-                vd.csv4.cuvetteStates = it[0]
+                vd.svCuvette1.itemStates = it[3]
+                vd.svCuvette2.itemStates = it[2]
+                vd.svCuvette3.itemStates = it[1]
+                vd.svCuvette4.itemStates = it[0]
             }
         }
         lifecycleScope.launch {
             appVm.obTestState.collectLatest {
                 if (it.isNotPrepare()) {
-                    vd.btnStart.setBackgroundResource(R.drawable.rip_positive2)
-                    vd.btnStart.setText("重新自检")
+                    vd.tvAnalyse.setText("重新自检")
+                    vd.tvAnalyse2.setText("(请重新自检)")
+                    vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg)
                     vm.enableView(true)
                 } else if (it.isRunning()) {
-                    vd.btnStart.setBackgroundResource(R.drawable.rip_positive2)
-                    vd.btnStart.setText("正在检测")
+                    vd.tvAnalyse.setText("检测中")
+                    vd.tvAnalyse2.setText("(仓门已锁，请勿打开,请等待检测结束)")
+                    vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg)
                     vm.enableView(false)
                 } else {
-                    vd.btnStart.setBackgroundResource(R.drawable.rip_positive)
-                    vd.btnStart.setText("分析")
+                    vd.tvAnalyse.setText("分析")
+                    vd.tvAnalyse2.setText("(点击分析)")
+                    vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg2)
                     vm.enableView(true)
                 }
             }
         }
 
-        vd.btnStart.setOnClickListener {
+        vd.vTest.setOnClickListener {
             u("开始")
             if (vm.selectProject == null) {
                 showConfigDialog()
@@ -242,27 +247,27 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 vm.clickStart()
             }
         }
-        vd.btnDebugDialog.setOnClickListener {
-            debugShowDetailsDialog.showPop(requireContext(), width = 1500) {
-                it.showDialog(
-                    vm.testMsg.value ?: "",
-                    "确定",
-                    confirmClick = { it.dismiss() },
-                    scMaxHeight = 600,
-                    textGravity = Gravity.LEFT
-                )
-            }
+//        vd.btnDebugDialog.setOnClickListener {
+//            debugShowDetailsDialog.showPop(requireContext(), width = 1500) {
+//                it.showDialog(
+//                    vm.testMsg.value ?: "",
+//                    "确定",
+//                    confirmClick = { it.dismiss() },
+//                    scMaxHeight = 600,
+//                    textGravity = Gravity.LEFT
+//                )
+//            }
+//
+//        }
 
-        }
-
-        vd.btnConfig.setOnClickListener {
+        vd.vConfig.setOnClickListener {
             u("设置")
             showConfigDialog()
         }
-        vd.btnGetTestPatientInfo.setOnClickListener {
-            u("获取待检信息")
-            showGetTestPatientInfo()
-        }
+//        vd.btnGetTestPatientInfo.setOnClickListener {
+//            u("获取待检信息")
+//            showGetTestPatientInfo()
+//        }
     }
 
     override fun onMessageEvent(event: EventMsg<Any>) {
@@ -393,23 +398,26 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
      * 显示样本详情
      * @param item SampleItem?
      */
-    private fun showDetailsDialog(item: HomeViewModel.SampleItem?) {
+    private fun showDetails(shelfIndex: Int, curFocIndex: Int, item: Item?) {
         u("showDetailsDialog $item")
-        homeDetailsDialog.showPop(requireContext()) {
-            it.showDialog(item)
+//        homeDetailsDialog.showPop(requireContext()) {
+//            it.showDialog(item)
+//        }
+        item?.let {
+            vm.selectFocChange(shelfIndex, curFocIndex, it)
         }
     }
 
-    /**
-     * 显示比色皿详情
-     * @param item SampleItem?
-     */
-    private fun showDetailsDialog(item: HomeViewModel.CuvetteItem?) {
-        u("showDetailsDialog $item")
-        homeDetailsDialog.showPop(requireContext()) {
-            it.showDialog(item)
-        }
-    }
+//    /**
+//     * 显示比色皿详情
+//     * @param item SampleItem?
+//     */
+//    private fun showDetailsDialog(item: Item?) {
+//        u("showDetailsDialog $item")
+//        homeDetailsDialog.showPop(requireContext()) {
+//            it.showDialog(item)
+//        }
+//    }
 
 
     private fun test() {
@@ -423,7 +431,16 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 //        DBManager.ProjectBox.put(project)
     }
 
-    private fun listenerDialog() {
+    var arraySample = mutableListOf<ShelfView>()
+    var arrayCuvette = mutableListOf<ShelfView>()
+    private fun listenerData() {
+        arraySample.add(vd.svSample1)
+        arraySample.add(vd.svSample3)
+        arraySample.add(vd.svSample4)
+        arrayCuvette.add(vd.svCuvette4)
+        arrayCuvette.add(vd.svCuvette3)
+        arrayCuvette.add(vd.svCuvette2)
+        arrayCuvette.add(vd.svCuvette1)
         lifecycleScope.launch {
             /**
              * 显示调试的数据
@@ -576,6 +593,44 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                         }
                     }
                 }
+            }
+        }
+        lifecycleScope.launch {
+            vm.configUiState.collectLatest {
+                vd.tvSettingsCurve.text =
+                    "选择标曲:   ${if (it.curveModel == null) "无" else it.curveModel.reagentNO}"
+                vd.tvSettingsSkip.text = "跳过比色皿:   ${it.cuvetteStartPos}"
+                vd.tvSettingsStartNum.text = "起始编号:   ${it.startNum}"
+                vd.tvSettingsTestNum.text = "检测数量:   ${it.detectionNum}"
+            }
+        }
+        lifecycleScope.launch {
+            vm.itemDetailsUiState.collectLatest {
+                //更新详情显示
+                vd.gpDetails.visibility = (!it.hiltDetails).isShow()
+                vd.tvDetailsState.text = "${it.item.state.state ?: "-"}"
+                vd.tvDetailsNo.text = "${it.item.id ?: "-"}"
+                vd.tvDetailsNum.text = "${it.item.testResult?.detectionNum ?: "-"}"
+                vd.tvDetailsBarcode.text = "${it.item.testResult?.sampleBarcode ?: "-"}"
+                vd.tvDetailsId.text = "${it.item.testResult?.resultId ?: "-"}"
+                vd.tvDetailsResult.text = "${it.item.testResult?.testResult ?: "-"}"
+
+                arraySample.forEach { v ->
+                    v.curFocIndex = -1
+                }
+                arrayCuvette.forEach { v ->
+                    v.curFocIndex = -1
+                }
+                if (it.item.state is SampleState) {
+                    vd.tvDetailsNoHilt.text = "对应比色皿序号："
+
+                    arraySample[it.shelfIndex].curFocIndex = it.curFocIndex
+                } else {
+                    vd.tvDetailsNoHilt.text = "对应样本序号："
+
+                    arrayCuvette[it.shelfIndex].curFocIndex = it.curFocIndex
+                }
+
             }
         }
     }

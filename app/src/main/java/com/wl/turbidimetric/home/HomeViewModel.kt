@@ -1,6 +1,8 @@
 package com.wl.turbidimetric.home
 
 import androidx.lifecycle.*
+import ca.uhn.hl7v2.util.Home
+import ca.uhn.hl7v2.util.MessageIterator.Index
 import com.wl.turbidimetric.app.AppViewModel
 import com.wl.turbidimetric.base.BaseViewModel
 import com.wl.turbidimetric.datastore.LocalData
@@ -97,6 +99,19 @@ class HomeViewModel(
     val dialogUiState = _dialogUiState.asSharedFlow()
 
     /**
+     * 配置状态,标曲，起始编号，跳过比色皿，检测数量等
+     */
+    private val _configUiState = MutableSharedFlow<HomeConfigUiState>()
+    val configUiState = _configUiState.asSharedFlow()
+
+    /**
+     * 详情状态，当前选中的item的详情
+     */
+    private val _itemDetailsUiState = MutableSharedFlow<HomeDetailsUiState>()
+    val itemDetailsUiState = _itemDetailsUiState.asSharedFlow()
+
+
+    /**
      * 界面的其他状态
      */
     private val _testMachineUiState = MutableStateFlow(
@@ -131,7 +146,7 @@ class HomeViewModel(
      *
      */
     private val _cuvetteStates = MutableStateFlow(initCuvetteStates())
-    val cuvetteStates: StateFlow<Array<Array<CuvetteItem>?>> = _cuvetteStates.asStateFlow()
+    val cuvetteStates: StateFlow<Array<Array<Item>?>> = _cuvetteStates.asStateFlow()
 
     /**当前排所有比色皿的状态
      *
@@ -143,7 +158,7 @@ class HomeViewModel(
      *
      */
     private var _samplesStates = MutableStateFlow(initSampleStates())
-    val sampleStates: StateFlow<Array<Array<SampleItem>?>> = _samplesStates.asStateFlow()
+    val sampleStates: StateFlow<Array<Array<Item>?>> = _samplesStates.asStateFlow()
 
 
     /**当前排所有样本的状态
@@ -307,7 +322,6 @@ class HomeViewModel(
      * 输入的起始编号，在第一次开始的时候才赋值 ,使用过就会为空
      */
     var detectionNumInput = ""
-
 
     /**
      * 第一次的检测间隔
@@ -508,6 +522,7 @@ class HomeViewModel(
 
 
     private fun initState() {
+        hiltDetails()
         allowDripSample = true
         allowTakeReagent = true
         testMsg.value = ""
@@ -558,8 +573,8 @@ class HomeViewModel(
      * 重置比色皿状态
      * @return MutableList<CuvetteState>
      */
-    private fun initCuvetteStates(): Array<Array<CuvetteItem>?> {
-        val arrays = mutableListOf<Array<CuvetteItem>?>()
+    private fun initCuvetteStates(): Array<Array<Item>?> {
+        val arrays = mutableListOf<Array<Item>?>()
         for (j in 0 until 4) {
             arrays.add(null)
         }
@@ -571,8 +586,8 @@ class HomeViewModel(
      * 重置样本状态
      * @return MutableList<CuvetteState>
      */
-    private fun initSampleStates(): Array<Array<SampleItem>?> {
-        val arrays = mutableListOf<Array<SampleItem>?>()
+    private fun initSampleStates(): Array<Array<Item>?> {
+        val arrays = mutableListOf<Array<Item>?>()
         for (j in 0 until 4) {
             val array = null
 //            for (i in 0 until 10) {
@@ -916,7 +931,7 @@ class HomeViewModel(
             mSamplesStates[sampleShelfPos]!![samplePos].testResult = testResult
         }
         samplePos.let {
-            mSamplesStates[sampleShelfPos]!![samplePos].cuvetteID = cuvettePos
+            mSamplesStates[sampleShelfPos]!![samplePos].id = cuvettePos
         }
         sampleType?.let {
             mSamplesStates[sampleShelfPos]!![samplePos].sampleType = sampleType
@@ -941,7 +956,7 @@ class HomeViewModel(
         }
         mCuvetteStates[cuvetteShelfPos]!![cuvettePos].state = state
         testResult?.let { mCuvetteStates[cuvetteShelfPos]!![cuvettePos].testResult = testResult }
-        samplePos?.let { mCuvetteStates[cuvetteShelfPos]!![cuvettePos].sampleID = samplePos }
+        samplePos?.let { mCuvetteStates[cuvetteShelfPos]!![cuvettePos].id = samplePos }
         _cuvetteStates.value = mCuvetteStates.copyOf()
         i("updateCuvetteState ShelfPos=$cuvetteShelfPos cuvettePos=$cuvettePos cuvetteStates=${mCuvetteStates.print()}")
     }
@@ -1016,7 +1031,7 @@ class HomeViewModel(
      * 新建检测记录
      * @param str String?
      */
-    private suspend fun createResultModel(str: String?, sampleItem: SampleItem?): TestResultModel {
+    private suspend fun createResultModel(str: String?, sampleItem: Item?): TestResultModel {
         val resultModel = TestResultModel(
             sampleBarcode = str ?: "",
             createTime = Date().time,
@@ -2318,21 +2333,21 @@ class HomeViewModel(
      * 获取样本架初始位置和最后一排的位置
      */
     private fun getInitSampleShelfPos() {
-        val arrays: Array<Array<SampleItem>?> = arrayOfNulls(4)
+        val arrays: Array<Array<Item>?> = arrayOfNulls(4)
         for (i in sampleShelfStates.indices) {
-            var array: Array<SampleItem>? = null
+            var array: Array<Item>? = null
             if (sampleShelfStates[i] == 1) {
                 array = arrayOf(
-                    SampleItem(SampleState.None),
-                    SampleItem(SampleState.None),
-                    SampleItem(SampleState.None),
-                    SampleItem(SampleState.None),
-                    SampleItem(SampleState.None),
-                    SampleItem(SampleState.None),
-                    SampleItem(SampleState.None),
-                    SampleItem(SampleState.None),
-                    SampleItem(SampleState.None),
-                    SampleItem(SampleState.None),
+                    Item(SampleState.None),
+                    Item(SampleState.None),
+                    Item(SampleState.None),
+                    Item(SampleState.None),
+                    Item(SampleState.None),
+                    Item(SampleState.None),
+                    Item(SampleState.None),
+                    Item(SampleState.None),
+                    Item(SampleState.None),
+                    Item(SampleState.None),
                 )
                 if (sampleShelfPos == -1) {
                     sampleShelfPos = i
@@ -2350,21 +2365,21 @@ class HomeViewModel(
      * 获取比色皿架初始位置和最后一排的位置
      */
     private fun getInitCuvetteShelfPos() {
-        val arrays: Array<Array<CuvetteItem>?> = arrayOfNulls(4)
+        val arrays: Array<Array<Item>?> = arrayOfNulls(4)
         for (i in cuvetteShelfStates.indices) {
-            var array: Array<CuvetteItem>? = null
+            var array: Array<Item>? = null
             if (cuvetteShelfStates[i] == 1) {
                 array = arrayOf(
-                    CuvetteItem(CuvetteState.None),
-                    CuvetteItem(CuvetteState.None),
-                    CuvetteItem(CuvetteState.None),
-                    CuvetteItem(CuvetteState.None),
-                    CuvetteItem(CuvetteState.None),
-                    CuvetteItem(CuvetteState.None),
-                    CuvetteItem(CuvetteState.None),
-                    CuvetteItem(CuvetteState.None),
-                    CuvetteItem(CuvetteState.None),
-                    CuvetteItem(CuvetteState.None),
+                    Item(CuvetteState.None),
+                    Item(CuvetteState.None),
+                    Item(CuvetteState.None),
+                    Item(CuvetteState.None),
+                    Item(CuvetteState.None),
+                    Item(CuvetteState.None),
+                    Item(CuvetteState.None),
+                    Item(CuvetteState.None),
+                    Item(CuvetteState.None),
+                    Item(CuvetteState.None),
                 )
                 if (cuvetteShelfPos == -1) {
                     cuvetteShelfPos = i
@@ -2663,7 +2678,7 @@ class HomeViewModel(
      * @param sampleNum Int
      */
     fun changeConfig(
-        curveModel: CurveModel,
+        curveModel: CurveModel?,
         skipNum: Int,
         detectionNum: String,
         sampleNum: Int,
@@ -2675,6 +2690,16 @@ class HomeViewModel(
 
         selectProject?.let {
             LocalData.SelectProjectID = it.curveId
+        }
+        viewModelScope.launch {
+            _configUiState.emit(
+                HomeConfigUiState(
+                    selectProject,
+                    detectionNumInput,
+                    cuvetteStartPos,
+                    needSamplingNum
+                )
+            )
         }
         i("changeConfig project=$curveModel")
     }
@@ -2699,6 +2724,7 @@ class HomeViewModel(
             } else {//如果选中的不在里，就
                 selectProject = projects.first()
             }
+            changeConfig(selectProject, cuvetteStartPos,if(detectionNumInput.isEmpty()) LocalData.DetectionNum else detectionNumInput,samplingNum)
         }
     }
 
@@ -2718,17 +2744,31 @@ class HomeViewModel(
         recoverSelectProject(projects.toMutableList())
     }
 
+    fun hiltDetails() {
+        viewModelScope.launch {
+            _itemDetailsUiState.emit(HomeDetailsUiState(0, 0, Item(SampleState.None), true))
+        }
+    }
 
-    data class CuvetteItem(
-        var state: CuvetteState, var testResult: TestResultModel? = null, var sampleID: String? = ""
-    )
+    /**
+     * 点击了样本或比色皿，更新详情
+     */
+    fun selectFocChange(shelfIndex: Int, index: Int, item: Item) {
+        viewModelScope.launch {
+            _itemDetailsUiState.emit(HomeDetailsUiState(shelfIndex, index, item, false))
+        }
+    }
 
-    data class SampleItem(
-        var state: SampleState,
-        var testResult: TestResultModel? = null,
-        var cuvetteID: String? = "",
-        var sampleType: SampleType? = null
-    )
+//    data class CuvetteItem(
+//        var state: CuvetteState, var testResult: TestResultModel? = null, var sampleID: String? = ""
+//    )
+//
+//    data class SampleItem(
+//        var state: SampleState,
+//        var testResult: TestResultModel? = null,
+//        var cuvetteID: String? = "",
+//        var sampleType: SampleType? = null
+//    )
 }
 
 class HomeViewModelFactory(
@@ -2739,7 +2779,12 @@ class HomeViewModelFactory(
 ) : ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(HomeViewModel::class.java)) {
-            return HomeViewModel(appViewModel,projectRepository, curveRepository, testResultRepository) as T
+            return HomeViewModel(
+                appViewModel,
+                projectRepository,
+                curveRepository,
+                testResultRepository
+            ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

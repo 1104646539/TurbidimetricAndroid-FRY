@@ -101,8 +101,8 @@ class AppViewModel : BaseViewModel() {
         val s = when (state) {
             TestState.NotGetMachineState -> MachineState.MachineError
             TestState.RunningError -> MachineState.MachineRunningError
-            TestState.Normal -> MachineState.MachineNormal
-            else -> MachineState.None
+            TestState.None -> MachineState.None
+            else -> MachineState.MachineNormal
         }
         viewModelScope.launch {
             _machineState.emit(s)

@@ -7,9 +7,9 @@ import com.wl.turbidimetric.R
  */
 enum class MachineState(val id: Int, val str: String) {
     None(R.drawable.state_machine_none, "未自检"),
-    MachineError(R.drawable.state_machine_none, "自检失败"),
-    MachineNormal(R.drawable.state_machine_none, "正常的"),
-    MachineRunningError(R.drawable.state_machine_none, "运行错误"),
+    MachineError(R.drawable.state_machine_error, "自检失败"),
+    MachineNormal(R.drawable.state_machine_normal, "正常的"),
+    MachineRunningError(R.drawable.state_machine_error, "运行错误"),
 }
 
 /**

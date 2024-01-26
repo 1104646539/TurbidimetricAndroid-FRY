@@ -23,25 +23,25 @@ class HomeDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_h
     var llSampleType: LinearLayout? = null
 
 
-    fun showDialog(
-        item: HomeViewModel.CuvetteItem?
-    ) {
-        if (item == null) return
-        this.confirmText = "确定"
-        this.confirmClick = { dismiss() }
-
-        show(
-            (item.testResult?.resultId ?: "-").toString(),
-            item.testResult?.detectionNum ?: "-",
-            item.testResult?.sampleBarcode ?: "-",
-            item.sampleID ?: "-",
-            "对应样本序号:",
-            getState(item.state),
-            item.testResult?.testResult ?: "-",
-            null,
-            item.testResult
-        )
-    }
+//    fun showDialog(
+//        item: HomeViewModel.CuvetteItem?
+//    ) {
+//        if (item == null) return
+//        this.confirmText = "确定"
+//        this.confirmClick = { dismiss() }
+//
+//        show(
+//            (item.testResult?.resultId ?: "-").toString(),
+//            item.testResult?.detectionNum ?: "-",
+//            item.testResult?.sampleBarcode ?: "-",
+//            item.sampleID ?: "-",
+//            "对应样本序号:",
+//            getState(item.state),
+//            item.testResult?.testResult ?: "-",
+//            null,
+//            item.testResult
+//        )
+//    }
 
     private fun getState(state: CuvetteState): String {
         return when (state) {
@@ -62,24 +62,24 @@ class HomeDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_h
         }
     }
 
-    fun showDialog(
-        item: HomeViewModel.SampleItem?
-    ) {
-        if (item == null) return
-        this.confirmText = "确定"
-        this.confirmClick = { dismiss() }
-        show(
-            (item.testResult?.resultId ?: "-").toString(),
-            item.testResult?.detectionNum ?: "-",
-            item.testResult?.sampleBarcode ?: "-",
-            item.cuvetteID ?: "-",
-            "对应比色皿序号:",
-            getState(item.state),
-            item.testResult?.testResult ?: "-",
-            item.sampleType ?: SampleType.NONEXISTENT,
-            item.testResult
-        )
-    }
+//    fun showDialog(
+//        item: HomeViewModel.SampleItem?
+//    ) {
+//        if (item == null) return
+//        this.confirmText = "确定"
+//        this.confirmClick = { dismiss() }
+//        show(
+//            (item.testResult?.resultId ?: "-").toString(),
+//            item.testResult?.detectionNum ?: "-",
+//            item.testResult?.sampleBarcode ?: "-",
+//            item.cuvetteID ?: "-",
+//            "对应比色皿序号:",
+//            getState(item.state),
+//            item.testResult?.testResult ?: "-",
+//            item.sampleType ?: SampleType.NONEXISTENT,
+//            item.testResult
+//        )
+//    }
 
     private fun getState(state: SampleState): String {
         return when (state) {

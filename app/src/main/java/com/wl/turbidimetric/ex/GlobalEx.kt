@@ -7,6 +7,7 @@ import androidx.annotation.StringRes
 import com.google.android.material.snackbar.Snackbar
 import com.wl.turbidimetric.app.App
 import com.wl.turbidimetric.home.HomeViewModel.*
+import com.wl.turbidimetric.model.Item
 import com.wl.wllib.ToastUtil
 import java.math.BigDecimal
 
@@ -67,18 +68,18 @@ fun getString(@StringRes id: Int): String {
     return getResource().getString(id)
 }
 
-inline fun Array<Array<CuvetteItem>?>.print(): String {
-    val sb = StringBuffer()
-    this.forEachIndexed { i, ts ->
-        ts?.forEachIndexed { j, t ->
-            sb.append("[${t.state},${t.testResult?.resultId}] ")
-        }
-//        sb.append("\n")
-    }
-    return sb.toString()
-}
+//inline fun Array<Array<Item>?>.print(): String {
+//    val sb = StringBuffer()
+//    this.forEachIndexed { i, ts ->
+//        ts?.forEachIndexed { j, t ->
+//            sb.append("[${t.state},${t.testResult?.resultId}] ")
+//        }
+////        sb.append("\n")
+//    }
+//    return sb.toString()
+//}
 
-inline fun Array<Array<SampleItem>?>.print(): String {
+inline fun Array<Array<Item>?>.print(): String {
     val sb = StringBuffer()
     this.forEachIndexed { i, ts ->
         ts?.forEachIndexed { j, t ->

@@ -1,195 +1,176 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/bg_gray"
-        android:orientation="vertical"
-        android:padding="40dp">
+        android:background="@color/white"
+        android:orientation="vertical">
 
-        <LinearLayout
+        <ImageView
+            android:id="@+id/iv_indicate"
+            android:layout_width="5dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="30dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/iv_indicate1"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_title"
+            style="@style/TextHilt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="12dp"
+            android:text="数据管理"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/iv_indicate"
+            app:layout_constraintLeft_toRightOf="@id/iv_indicate"
+            app:layout_constraintTop_toTopOf="@id/iv_indicate" />
+
+        <TextView
+            android:id="@+id/tvCount"
+            style="@style/TextHilt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="12dp"
+            android:text="(100)"
+            android:textColor="@color/themePositiveColor"
+            app:layout_constraintBottom_toBottomOf="@id/iv_indicate"
+            app:layout_constraintLeft_toRightOf="@id/tv_title"
+            app:layout_constraintTop_toTopOf="@id/iv_indicate" />
+
+        <com.wl.turbidimetric.view.TextImageButton
+            android:id="@+id/btn_condition"
+            style="@style/BtnPositive"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:layout_marginRight="20dp"
+            android:minWidth="150dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:src="@drawable/datamanager_zoom"
+            android:text="数据筛选"
+            app:layout_constraintBottom_toBottomOf="@id/iv_indicate"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <include
+            android:id="@+id/header"
+            layout="@layout/item_datamanager_result_header"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginRight="20dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/iv_indicate" />
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="50dp"
+            android:background="@color/white"
+            app:layout_constraintBottom_toTopOf="@id/gl_bottom"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/header" />
+
+        <TextView
+            android:id="@+id/empty"
+            style="@style/TextTitle"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@drawable/bg_round_white"
-            android:orientation="vertical">
+            android:gravity="center"
+            android:text="没有数据"
+            app:layout_constraintBottom_toTopOf="@id/gl_bottom"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/header"
+            app:layout_constraintVertical_bias="0.542" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/gl_bottom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_end="103dp" />
 
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingLeft="20dp"
-                    android:paddingTop="20dp"
-                    android:paddingBottom="20dp">
+        <View
+            android:id="@+id/v_bottom_bg"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@color/themePositiveColor"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/gl_bottom" />
 
-                    <ImageView
-                        android:layout_width="5dp"
-                        android:layout_height="wrap_content"
-                        android:scaleType="centerCrop"
-                        android:src="@drawable/iv_indicate1" />
-
-                    <TextView
-                        style="@style/TextHilt"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="12dp"
-                        android:text="数据管理"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        style="@style/TextHilt"
-                        android:id="@+id/tvCount"
-                        android:layout_width="wrap_content"
-                        android:textColor="@color/themePositiveColor"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="12dp"
-                        android:text="(100)"/>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="right|center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingTop="5dp"
-                    android:paddingRight="20dp"
-                    android:paddingBottom="5dp">
-
-                    <Button
-                        android:id="@+id/btn_condition"
-                        style="@style/BtnPositive"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="20dp"
-                        android:minWidth="150dp"
-                        android:paddingTop="5dp"
-                        android:paddingBottom="5dp"
-                        android:text="数据筛选" />
-
-                </LinearLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_margin="20dp"
-                android:layout_weight="1"
-                android:background="@drawable/bg_rv"
-                android:orientation="vertical"
-                android:padding="1dp">
-
-                <include
-                    android:id="@+id/header"
-                    layout="@layout/item_datamanager_result_header"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintBottom_toTopOf="@id/rv"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+        <Button
+            android:id="@+id/btn_delete"
+            style="@style/BtnDataManager"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="20dp"
+            android:minWidth="150dp"
+            android:text="删除"
+            app:layout_constraintBottom_toBottomOf="@id/v_bottom_bg"
+            app:layout_constraintRight_toLeftOf="@id/btn_print"
+            app:layout_constraintTop_toTopOf="@id/v_bottom_bg" />
 
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rv"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@color/white"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/header" />
+        <Button
+            android:id="@+id/btn_print"
+            style="@style/BtnDataManager"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:minWidth="150dp"
+            android:text="打印"
+            app:layout_constraintBottom_toBottomOf="@id/v_bottom_bg"
+            app:layout_constraintRight_toLeftOf="@id/btn_export_excel"
+            app:layout_constraintTop_toTopOf="@id/v_bottom_bg" />
 
-                <TextView
-                    android:id="@+id/empty"
-                    style="@style/TextTitle"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:text="没有数据"
-                    app:layout_constraintBottom_toTopOf="@id/llBottom"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/header" />
 
-            </LinearLayout>
+        <Button
+            android:id="@+id/btn_export_excel"
+            style="@style/BtnDataManager"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:minWidth="150dp"
+            android:text="导出Excel"
+            android:textAllCaps="false"
+            app:layout_constraintBottom_toBottomOf="@id/v_bottom_bg"
+            app:layout_constraintRight_toLeftOf="@id/btn_upload"
+            app:layout_constraintTop_toTopOf="@id/v_bottom_bg" />
 
-            <LinearLayout
-                android:id="@+id/llBottom"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="10dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent">
-
-                <Button
-                    android:id="@+id/btn_delete"
-                    style="@style/BtnPositive"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="20dp"
-                    android:minWidth="150dp"
-                    android:text="删除" />
-
-                <Button
-                    android:id="@+id/btn_clean"
-                    style="@style/BtnPositive"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:visibility="gone"
-                    android:layout_marginLeft="20dp"
-                    android:minWidth="150dp"
-                    android:text="清空" />
-
-                <Button
-                    android:id="@+id/btn_print"
-                    style="@style/BtnPositive"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="20dp"
-                    android:minWidth="150dp"
-                    android:text="打印" />
-
-                <Button
-                    android:id="@+id/btn_export_excel"
-                    style="@style/BtnPositive"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="20dp"
-                    android:visibility="gone"
-                    android:minWidth="150dp"
-                    android:text="导出Excel"
-                    android:textAllCaps="false" />
-                <Button
-                    android:id="@+id/btn_export_excel_all"
-                    style="@style/BtnPositive"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="20dp"
-                    android:minWidth="150dp"
-                    android:text="导出筛选到Excel"
-                    android:textAllCaps="false" />
-
-                <Button
-                    android:id="@+id/btn_upload"
-                    style="@style/BtnPositive"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="20dp"
-                    android:minWidth="150dp"
-                    android:text="上传数据"
-                    android:textAllCaps="false" />
-            </LinearLayout>
-
-        </LinearLayout>
-    </LinearLayout>
+        <Button
+            android:id="@+id/btn_upload"
+            style="@style/BtnDataManager"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:minWidth="150dp"
+            android:text="上传数据"
+            android:textAllCaps="false"
+            app:layout_constraintBottom_toBottomOf="@id/v_bottom_bg"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="@id/v_bottom_bg" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

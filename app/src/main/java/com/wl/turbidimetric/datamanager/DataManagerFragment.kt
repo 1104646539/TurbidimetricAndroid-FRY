@@ -166,10 +166,10 @@ class DataManagerFragment :
             u("导出Excel")
             exportExcelSelected()
         }
-        vd.btnExportExcelAll.setOnClickListener {
-            u("导出Excel全部")
-            exportExcelAll()
-        }
+//        vd.btnExportExcelAll.setOnClickListener {
+//            u("导出Excel全部")
+//            exportExcelAll()
+//        }
         vd.btnUpload.setOnClickListener {
             upload()
         }

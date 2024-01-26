@@ -60,6 +60,10 @@
     <style name="BtnNegative" parent="BtnDefault">
         <item name="android:background">@drawable/rip_negative</item>
     </style>
+    <style name="BtnDataManager" parent="BtnDefault">
+        <item name="android:background">@drawable/rip_datamanager</item>
+        <item name="android:textColor">@color/black2</item>
+    </style>
 
     <style name="BtnPositive" parent="BtnDefault">
         <item name="android:background">@drawable/rip_positive</item>

@@ -21,6 +21,7 @@ import com.wl.wllib.LogToFile.c
 import com.wl.wllib.LogToFile.i
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.selects.select
 import org.greenrobot.eventbus.EventBus
 import java.math.BigDecimal
 import java.util.*
@@ -1068,6 +1069,7 @@ class HomeViewModel(
         testFinish = true
 
         calcTestResult(reply.data.value)
+
     }
 
     /**
@@ -1084,6 +1086,10 @@ class HomeViewModel(
             TestState.Test2 -> {
                 updateCuvetteState(cuvettePos, CuvetteState.Test2)
                 updateTestResultModel(value, cuvettePos, CuvetteState.Test2)
+                selectFocChange(
+                    cuvetteShelfPos, cuvettePos,
+                    _cuvetteStates.value[cuvetteShelfPos]?.get(cuvettePos)!!
+                )
                 if (lastNeed(cuvettePos, CuvetteState.Test1)) {
                     //检测结束，下一个步骤，检测第三次
                     stepTest(TestState.Test3)
@@ -1096,6 +1102,10 @@ class HomeViewModel(
             TestState.Test3 -> {
                 updateCuvetteState(cuvettePos, CuvetteState.Test3)
                 updateTestResultModel(value, cuvettePos, CuvetteState.Test3)
+                selectFocChange(
+                    cuvetteShelfPos, cuvettePos,
+                    _cuvetteStates.value[cuvetteShelfPos]?.get(cuvettePos)!!
+                )
                 if (lastNeed(cuvettePos, CuvetteState.Test2)) {
                     //检测结束，下一个步骤，检测第四次
                     stepTest(TestState.Test4)
@@ -1108,6 +1118,10 @@ class HomeViewModel(
             TestState.Test4 -> {
                 updateCuvetteState(cuvettePos, CuvetteState.Test4)
                 updateTestResultModel(value, cuvettePos, CuvetteState.Test4)
+                selectFocChange(
+                    cuvetteShelfPos, cuvettePos,
+                    _cuvetteStates.value[cuvetteShelfPos]?.get(cuvettePos)!!
+                )
                 if (lastNeed(cuvettePos, CuvetteState.Test3)) {
                     //检测结束，下一个步骤，计算值
                     showResultFinishAndNext()
@@ -1601,6 +1615,10 @@ class HomeViewModel(
         dripReagentFinish = true
         updateCuvetteState(cuvettePos, CuvetteState.DripReagent)
         nextDripReagent()
+        selectFocChange(
+            cuvetteShelfPos, cuvettePos-1,
+            _cuvetteStates.value[cuvetteShelfPos]?.get(cuvettePos-1)!!
+        )
     }
 
     /**
@@ -1817,6 +1835,10 @@ class HomeViewModel(
             updateSampleState(samplePos - 1, SampleState.Sampling)
             goDripSample()
         }
+        selectFocChange(
+            sampleShelfPos, samplePos - 1,
+            _samplesStates.value[sampleShelfPos]?.get(samplePos - 1)!!
+        )
     }
 
 
@@ -2724,7 +2746,12 @@ class HomeViewModel(
             } else {//如果选中的不在里，就
                 selectProject = projects.first()
             }
-            changeConfig(selectProject, cuvetteStartPos,if(detectionNumInput.isEmpty()) LocalData.DetectionNum else detectionNumInput,samplingNum)
+            changeConfig(
+                selectProject,
+                cuvetteStartPos,
+                if (detectionNumInput.isEmpty()) LocalData.DetectionNum else detectionNumInput,
+                samplingNum
+            )
         }
     }
 

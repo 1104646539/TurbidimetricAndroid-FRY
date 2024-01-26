@@ -147,7 +147,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
                 R.drawable.left_nav_settings_selected
             ),
             mutableListOf("样本分析", "数据管理", "曲线拟合", "参数设置"),
-            R.drawable.left_nav_item_bg
+            R.drawable.left_nav_item_bg,R.drawable.left_nav_item_bg2
         )
         vd.lnv.onItemChangeListener = {
             vm.curIndex.value = it

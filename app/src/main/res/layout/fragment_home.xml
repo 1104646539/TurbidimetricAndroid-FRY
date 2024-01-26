@@ -207,7 +207,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_end="190dp" />
+            app:layout_constraintGuide_end="192dp" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/gl_center"
@@ -315,6 +315,16 @@
             app:layout_constraintLeft_toLeftOf="@id/gl_center"
             app:layout_constraintTop_toBottomOf="@id/tv_reagent_r1" />
 
+        <Button
+            android:layout_width="wrap_content"
+            android:id="@+id/btn_debug_dialog"
+            android:layout_height="wrap_content"
+            style="@style/BtnPositive"
+            android:layout_marginLeft="10dp"
+            android:text="调试框"
+            app:layout_constraintLeft_toRightOf="@id/v_info_bg"
+            app:layout_constraintTop_toTopOf="@id/v_info_bg" />
+
         <TextView
             android:id="@+id/tv_details_state_hilt"
             android:layout_width="wrap_content"
@@ -333,10 +343,10 @@
             android:layout_height="wrap_content"
             android:text="未知"
             android:textColor="@color/text_details_state"
-            android:textStyle="bold"
             android:textSize="34sp"
-            app:layout_constraintLeft_toRightOf="@id/tv_details_state_hilt"
+            android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@id/tv_details_state_hilt"
+            app:layout_constraintLeft_toRightOf="@id/tv_details_state_hilt"
             app:layout_constraintTop_toTopOf="@id/tv_details_state_hilt" />
 
         <TextView
@@ -354,7 +364,7 @@
             android:id="@+id/tv_details_no"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="20"
+            android:text="-"
             android:textColor="@color/black2"
             android:textSize="30sp"
             app:layout_constraintLeft_toRightOf="@id/tv_details_no_hilt"
@@ -375,7 +385,7 @@
             android:id="@+id/tv_details_num"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="20"
+            android:text="-"
             android:textColor="@color/black2"
             android:textSize="30sp"
             app:layout_constraintLeft_toRightOf="@id/tv_details_num_hilt"
@@ -396,7 +406,7 @@
             android:id="@+id/tv_details_barcode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="20"
+            android:text="-"
             android:textColor="@color/black2"
             android:textSize="30sp"
             app:layout_constraintLeft_toRightOf="@id/tv_details_barcode_hilt"
@@ -417,7 +427,7 @@
             android:id="@+id/tv_details_id"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="20"
+            android:text="-"
             android:textColor="@color/black2"
             android:textSize="30sp"
             app:layout_constraintLeft_toRightOf="@id/tv_details_id_hilt"
@@ -471,11 +481,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="7dp"
-            android:layout_marginBottom="50dp"
             android:text="出现异常"
             android:textColor="@color/textColor"
             android:textSize="22sp"
-            app:layout_constraintBottom_toBottomOf="@id/gl_bottom"
+            app:layout_constraintBottom_toBottomOf="@id/v_info_bg"
             app:layout_constraintLeft_toRightOf="@id/v_state_1" />
 
         <View

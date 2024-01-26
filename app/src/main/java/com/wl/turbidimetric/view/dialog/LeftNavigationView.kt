@@ -61,7 +61,8 @@ class LeftNavigationView @JvmOverloads constructor(
     private val selectSrcs = mutableListOf<Int>()
     private val texts = mutableListOf<String>()
     private var bg: Int = 0
-    fun setItem(srcs: List<Int>, selectSrcs: List<Int>, texts: List<String>, bg: Int) {
+    private var bg2: Int = 0
+    fun setItem(srcs: List<Int>, selectSrcs: List<Int>, texts: List<String>, bg: Int, bg2: Int) {
         if (srcs.size != texts.size) throw Exception("item数量不一致")
         this.srcs.clear()
         this.srcs.addAll(srcs)
@@ -70,6 +71,7 @@ class LeftNavigationView @JvmOverloads constructor(
         this.texts.clear()
         this.texts.addAll(texts)
         this.bg = bg
+        this.bg2 = bg2
 
     }
 
@@ -101,6 +103,15 @@ class LeftNavigationView @JvmOverloads constructor(
     //背景需要绘制区域
     private var itemBgSrcRangeRect = Rect()
 
+    //背景bitmap2
+    private lateinit var itemBgBitmap2: Bitmap
+
+    //背景需要绘制区域2
+    private var itemBgSrcRangeRect2 = Rect()
+
+    //背景绘制区域2,只用来定位左下角背景的位置
+    private var itemBgRect = Rect()
+
     var onItemChangeListener: OnItemChangeListener? = null
 
     override fun onDraw(canvas: Canvas?) {
@@ -108,7 +119,17 @@ class LeftNavigationView @JvmOverloads constructor(
             srcs.forEachIndexed { index, item ->
                 drawItem(canvas, index)
             }
+            drawBg2(canvas)
         }
+    }
+
+    private fun drawBg2(canvas: Canvas) {
+        canvas.drawBitmap(
+            itemBgBitmap2,
+            itemBgSrcRangeRect2,
+            itemBgRect,
+            paintBg
+        )
     }
 
     var clickX: Int = 0
@@ -213,9 +234,16 @@ class LeftNavigationView @JvmOverloads constructor(
                     item.top + topPadding + itemSrcRangeRect[index].height()
                 )
             )
-            //文字
-
         }
+        itemBgBitmap2 = (resources.getDrawable(bg2) as BitmapDrawable).bitmap
+        itemBgRect = Rect(0, measuredHeight - itemBgBitmap2.height, measuredWidth, measuredHeight)
+        itemBgSrcRangeRect2 =
+            Rect(
+                0,
+                0,
+                itemBgBitmap2.width,
+                itemBgBitmap2.height
+            )
     }
 
     private fun drawIcon(canvas: Canvas, index: Int) {
@@ -239,10 +267,10 @@ class LeftNavigationView @JvmOverloads constructor(
             canvas.drawRect(itemRect[index], paintBg)
         } else {
             canvas.drawBitmap(
-                itemBgBitmap,
-                itemBgSrcRangeRect,
-                itemRect[index],
-                paintBg
+                    itemBgBitmap,
+            itemBgSrcRangeRect,
+            itemRect[index],
+            paintBg
             )
         }
     }

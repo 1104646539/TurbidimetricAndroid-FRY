@@ -247,18 +247,18 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 vm.clickStart()
             }
         }
-//        vd.btnDebugDialog.setOnClickListener {
-//            debugShowDetailsDialog.showPop(requireContext(), width = 1500) {
-//                it.showDialog(
-//                    vm.testMsg.value ?: "",
-//                    "确定",
-//                    confirmClick = { it.dismiss() },
-//                    scMaxHeight = 600,
-//                    textGravity = Gravity.LEFT
-//                )
-//            }
-//
-//        }
+        vd.btnDebugDialog.setOnClickListener {
+            debugShowDetailsDialog.showPop(requireContext(), width = 1500) {
+                it.showDialog(
+                    vm.testMsg.value ?: "",
+                    "确定",
+                    confirmClick = { it.dismiss() },
+                    scMaxHeight = 600,
+                    textGravity = Gravity.LEFT
+                )
+            }
+
+        }
 
         vd.vConfig.setOnClickListener {
             u("设置")
@@ -400,24 +400,12 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
      */
     private fun showDetails(shelfIndex: Int, curFocIndex: Int, item: Item?) {
         u("showDetailsDialog $item")
-//        homeDetailsDialog.showPop(requireContext()) {
-//            it.showDialog(item)
-//        }
+
         item?.let {
             vm.selectFocChange(shelfIndex, curFocIndex, it)
         }
     }
 
-//    /**
-//     * 显示比色皿详情
-//     * @param item SampleItem?
-//     */
-//    private fun showDetailsDialog(item: Item?) {
-//        u("showDetailsDialog $item")
-//        homeDetailsDialog.showPop(requireContext()) {
-//            it.showDialog(item)
-//        }
-//    }
 
 
     private fun test() {

@@ -1616,8 +1616,8 @@ class HomeViewModel(
         updateCuvetteState(cuvettePos, CuvetteState.DripReagent)
         nextDripReagent()
         selectFocChange(
-            cuvetteShelfPos, cuvettePos-1,
-            _cuvetteStates.value[cuvetteShelfPos]?.get(cuvettePos-1)!!
+            cuvetteShelfPos, cuvettePos - 1,
+            _cuvetteStates.value[cuvetteShelfPos]?.get(cuvettePos - 1)!!
         )
     }
 
@@ -2045,7 +2045,11 @@ class HomeViewModel(
             _dialogUiState.emit(HomeDialogUiState.TestFinish(dialogMsg))
         }
         appViewModel.testState = TestState.Normal
+
+        updateConfig()
     }
+
+
 
     /**
      * 获取检测结束的问题提示
@@ -2693,6 +2697,17 @@ class HomeViewModel(
     }
 
     /**
+     * 更新为当前的配置
+     */
+    fun updateConfig() {
+        changeConfig(
+            selectProject,
+            cuvetteStartPos,
+            if (detectionNumInput.isEmpty()) LocalData.DetectionNum else detectionNumInput,
+            samplingNum
+        )
+    }
+    /**
      * 更改了配置
      * @param curveModel ProjectModel
      * @param skipNum Int
@@ -2746,12 +2761,7 @@ class HomeViewModel(
             } else {//如果选中的不在里，就
                 selectProject = projects.first()
             }
-            changeConfig(
-                selectProject,
-                cuvetteStartPos,
-                if (detectionNumInput.isEmpty()) LocalData.DetectionNum else detectionNumInput,
-                samplingNum
-            )
+            updateConfig()
         }
     }
 

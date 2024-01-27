@@ -275,6 +275,7 @@ class SettingsFragment :
                         LocalData.SampleExist = sampleExist
                         LocalData.ScanCode = scanCode
                     }
+                    appVm.changeMachineTestModel(machineTestModel)
                     i("machineTestModel=$machineTestModel sampleExist=$sampleExist scanCode=$scanCode")
                     baseDialog?.dismiss()
                 },

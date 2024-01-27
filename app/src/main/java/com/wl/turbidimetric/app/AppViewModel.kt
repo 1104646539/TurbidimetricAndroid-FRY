@@ -2,6 +2,9 @@ package com.wl.turbidimetric.app
 
 import androidx.lifecycle.viewModelScope
 import com.wl.turbidimetric.base.BaseViewModel
+import com.wl.turbidimetric.datastore.LocalData
+import com.wl.turbidimetric.datastore.LocalDataGlobal
+import com.wl.turbidimetric.model.MachineTestModel
 import com.wl.turbidimetric.model.TestState
 import com.wl.turbidimetric.upload.hl7.util.ConnectStatus
 import com.wl.wllib.DateUtil
@@ -52,7 +55,15 @@ class AppViewModel : BaseViewModel() {
     private val _obTestState = MutableStateFlow(TestState.None)
     val obTestState = _obTestState.asStateFlow()
 
+    /**
+     * 仪器检测模式
+     */
+    private val _machineTestMode = MutableStateFlow(MachineTestModel.valueOf(LocalData.CurMachineTestModel))
+    val machineTestModel = _machineTestMode.asSharedFlow()
 
+    fun changeMachineTestModel(machineTestModel: MachineTestModel){
+        this._machineTestMode.value = machineTestModel
+    }
     /**
      * 更新当前时间
      */

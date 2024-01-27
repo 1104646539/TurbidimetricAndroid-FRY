@@ -407,7 +407,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
     }
 
 
-
     private fun test() {
 //        val project = ProjectModel().apply {
 //            f0 = 22.834258698728
@@ -619,6 +618,12 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     arrayCuvette[it.shelfIndex].curFocIndex = it.curFocIndex
                 }
 
+            }
+        }
+
+        lifecycleScope.launch {
+            appVm.machineTestModel.collectLatest {
+                vd.tvSettingsTestNum.visibility = (!isAuto()).isShow()
             }
         }
     }

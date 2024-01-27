@@ -321,6 +321,7 @@
             android:layout_height="wrap_content"
             style="@style/BtnPositive"
             android:layout_marginLeft="10dp"
+            android:minWidth="150dp"
             android:text="调试框"
             app:layout_constraintLeft_toRightOf="@id/v_info_bg"
             app:layout_constraintTop_toTopOf="@id/v_info_bg" />

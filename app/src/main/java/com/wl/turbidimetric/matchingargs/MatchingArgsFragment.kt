@@ -22,6 +22,7 @@ import com.wl.turbidimetric.view.dialog.MatchingConfigDialog
 import com.wl.turbidimetric.view.dialog.showPop
 import com.wl.wllib.LogToFile.i
 import com.wl.turbidimetric.base.BaseFragment
+import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.view.dialog.ICON_HINT
 import com.wl.turbidimetric.view.dialog.MatchingStateDialog
 import com.wl.wllib.LogToFile.u
@@ -95,7 +96,7 @@ class MatchingArgsFragment :
     }
 
     private fun listener() {
-        listenerDialog()
+        listenerData()
         listenerView()
     }
 
@@ -189,12 +190,12 @@ class MatchingArgsFragment :
         lifecycleScope.launch {
             appVm.obTestState.collectLatest {
                 if (it.isRunning()) {
-                    vd.btnStart.setBackgroundResource(R.drawable.rip_positive2)
-                    vd.btnStart.setText("正在拟合")
+                    vd.vMatching.setBackgroundResource(R.drawable.shape_analyse_test_bg)
+                    vd.tvMatching.setText("生成曲线中……")
                     vm.configEnable.postValue(false)
                 } else {
-                    vd.btnStart.setBackgroundResource(R.drawable.rip_positive)
-                    vd.btnStart.setText("开始拟合")
+                    vd.vMatching.setBackgroundResource(R.drawable.shape_analyse_test_bg2)
+                    vd.tvMatching.setText("开始拟合")
                     vm.configEnable.postValue(true)
                 }
             }
@@ -205,25 +206,29 @@ class MatchingArgsFragment :
                 vd.tvFitgoodnessText.text = it.fitGoodnessText
             }
         }
-        vd.btnStart.setOnClickListener {
+        vd.vMatching.setOnClickListener {
             u("开始拟合")
             startMatching()
+        }
+        vd.vConfig.setOnClickListener {
+            u("拟合配置")
+            vm.showMatchingSettingsDialog()
         }
         vd.btnPrint.setOnClickListener {
             u("打印")
             vm.print()
         }
 
-        vd.btnDebugDialog.setOnClickListener {
-            u("调试框")
-            debugShowDetailsDialog.showPop(requireContext(), width = 1500) {
-                it.showDialog(
-                    vm.testMsg.value ?: "",
-                    "确定",
-                    confirmClick = { it.dismiss() }, textGravity = Gravity.LEFT
-                )
-            }
-        }
+//        vd.btnDebugDialog.setOnClickListener {
+//            u("调试框")
+//            debugShowDetailsDialog.showPop(requireContext(), width = 1500) {
+//                it.showDialog(
+//                    vm.testMsg.value ?: "",
+//                    "确定",
+//                    confirmClick = { it.dismiss() }, textGravity = Gravity.LEFT
+//                )
+//            }
+//        }
     }
 
 
@@ -235,30 +240,25 @@ class MatchingArgsFragment :
      * 显示选择要覆盖曲线的对话框
      */
     private fun showCoverDialog() {
-        if (adapter.items.isNullOrEmpty() || adapter.items.size < 10) {
-            vm.saveCoverCurve(null)
-            vm.showMatchingSettingsDialog()
-        } else {
-            coverProjectDialog.showPop(
-                requireContext(),
-                isCancelable = false,
-                width = 1000,
-            ) {
-                it.show(adapter.items, onConfirm = { projectModel, baseDialog ->
-                    if (projectModel == null) {
-                        toast("未选择覆盖的标曲，取消拟合！")
-                        appVm.testState = TestState.Normal
-                    } else {
-                        vm.saveCoverCurve(projectModel)
-                        vm.showMatchingSettingsDialog()
-                    }
-                    baseDialog.dismiss()
-                }, onCancel = {
+        coverProjectDialog.showPop(
+            requireContext(),
+            isCancelable = false,
+            width = 1000,
+        ) {
+            it.show(adapter.items, onConfirm = { projectModel, baseDialog ->
+                if (projectModel == null) {
                     toast("未选择覆盖的标曲，取消拟合！")
                     appVm.testState = TestState.Normal
-                    it.dismiss()
-                })
-            }
+                } else {
+                    vm.saveCoverCurve(projectModel)
+                    vm.showMatchingSettingsDialog()
+                }
+                baseDialog.dismiss()
+            }, onCancel = {
+                toast("未选择覆盖的标曲，取消拟合！")
+                appVm.testState = TestState.Normal
+                it.dismiss()
+            })
         }
     }
 
@@ -287,7 +287,7 @@ class MatchingArgsFragment :
         }
     }
 
-    private fun listenerDialog() {
+    private fun listenerData() {
         lifecycleScope.launch {
             vm.dialogUiState.collect { state ->
                 when (state) {
@@ -358,6 +358,8 @@ class MatchingArgsFragment :
 
                     is MatchingArgsDialogUiState.MatchingSettings -> {//拟合配置
                         showMatchingConfigDialog(
+                            state.reagentNo,
+                            state.quality,
                             state.projects,
                             state.autoAttenuation,
                             state.gradsNum,
@@ -422,12 +424,29 @@ class MatchingArgsFragment :
                 }
             }
         }
+        /**
+         * 拟合配置信息
+         */
+        lifecycleScope.launch {
+            vm.matchingConfigUiState.collectLatest {
+                vd.tvSettingsReagentNo.text = "序号：${it.reagentNo}"
+                vd.tvSettingsQuality.text = "同时质控：${if (it.quality) "是" else "否"}"
+                vd.tvSettingsProject.text = "选择项目：${it.project?.projectName ?: "-"}"
+                vd.tvSettingsGradsNum.text = "梯度数量：${it.gradsNum}"
+                vd.tvSettingsFun.text = "选择方程：${it.selectFitterType.showName}"
+                vd.tvSettingsAutoAttenuation.text =
+                    "自动稀释：${if (it.autoAttenuation) "是" else "否"}"
+                vd.tvSettingsTargetCon.text = "目标浓度：${it.targetCons.joinToString("  ")}"
+            }
+        }
     }
 
     /**
      * 显示拟合设置对话框
      */
     private fun showMatchingConfigDialog(
+        reagentNo: String,
+        quality: Boolean,
         projects: List<ProjectModel>,
         autoAttenuation: Boolean,
         gradsNum: Int = 5,
@@ -435,16 +454,25 @@ class MatchingArgsFragment :
         selectFitterType: FitterType = FitterType.Three,
         targetCons: List<Double> = mutableListOf(),
     ) {
-        matchingConfigDialog.showPop(requireContext(), width = 900, isCancelable = false) { dialog ->
+        matchingConfigDialog.showPop(
+            requireContext(),
+            width = 900,
+            isCancelable = false
+        ) { dialog ->
             dialog.showDialog(
+                reagentNo,
+                quality,
                 projects,
                 autoAttenuation,
                 gradsNum,
                 selectProject,
                 selectFitterType,
                 targetCons,
-                { matchingNum: Int, autoAttenuation: Boolean, selectProject: ProjectModel?, selectFitterType: FitterType, cons: List<Double> ->
+                { reagentNo: String,
+                  quality: Boolean, matchingNum: Int, autoAttenuation: Boolean, selectProject: ProjectModel?, selectFitterType: FitterType, cons: List<Double> ->
                     vm.matchingConfigFinish(
+                        reagentNo,
+                        quality,
                         matchingNum,
                         autoAttenuation,
                         selectProject,
@@ -489,6 +517,17 @@ class MatchingArgsFragment :
                 },
                 {
                     vm.changeFitterType(it)
+                },
+                SystemGlobal.isDebugMode,
+                {
+                    u("调试框")
+                    debugShowDetailsDialog.showPop(requireContext(), width = 1500) {
+                        it.showDialog(
+                            vm.testMsg.value ?: "",
+                            "确定",
+                            confirmClick = { it.dismiss() }, textGravity = Gravity.LEFT
+                        )
+                    }
                 }
             )
         }

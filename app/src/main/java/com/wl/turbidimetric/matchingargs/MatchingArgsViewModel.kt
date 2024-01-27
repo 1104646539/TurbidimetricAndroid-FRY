@@ -55,17 +55,14 @@ import com.wl.turbidimetric.model.TestType
 import com.wl.turbidimetric.model.convertReplyState
 import com.wl.turbidimetric.print.PrintUtil
 import com.wl.turbidimetric.util.Callback2
-import com.wl.turbidimetric.util.CurveFitterUtil
 import com.wl.turbidimetric.util.FitterType
 import com.wl.turbidimetric.util.SerialPortUtil
 import com.wl.wllib.LogToFile.i
 import com.wl.wllib.toTimeStr
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -270,8 +267,11 @@ class MatchingArgsViewModel(
     private val _dialogUiState = MutableSharedFlow<MatchingArgsDialogUiState>()
     val dialogUiState: SharedFlow<MatchingArgsDialogUiState> = _dialogUiState.asSharedFlow()
 
-    private val _curveUiState = MutableStateFlow(MatchingArgsCurveUiState("", ""))
-    val curveUiState = _curveUiState.asStateFlow()
+    private val _curveUiState = MutableSharedFlow<MatchingArgsCurveUiState>()
+    val curveUiState = _curveUiState.asSharedFlow()
+
+    private val _matchingConfigUiState = MutableSharedFlow<MatchingConfigUiState>()
+    val matchingConfigUiState = _matchingConfigUiState.asSharedFlow()
 
     val testMsg = MutableLiveData("")
 
@@ -498,6 +498,8 @@ class MatchingArgsViewModel(
         viewModelScope.launch {
             _dialogUiState.emit(
                 MatchingArgsDialogUiState.MatchingSettings(
+                    reagentNOStr,
+                    quality,
                     projects,
                     autoAttenuation,
                     gradsNum,
@@ -577,6 +579,7 @@ class MatchingArgsViewModel(
 
     private fun initState() {
         curProject = null
+        sampled = false
         accidentState = ReplyState.SUCCESS
         resultTest1.clear()
         resultTest2.clear()
@@ -811,7 +814,9 @@ class MatchingArgsViewModel(
                 } else {
                     val volume = getSamplingVolume(appViewModel.testState, sampleStep - 1)
                     dripSample(
-                        appViewModel.testState == TestState.DripStandardVolume, inplace = true, volume
+                        appViewModel.testState == TestState.DripStandardVolume,
+                        inplace = true,
+                        volume
                     )
                 }
                 sampled = !sampled
@@ -1124,23 +1129,23 @@ class MatchingArgsViewModel(
         if (means.isEmpty()) return
         var cf = matchingArg(selectFitterType, means, targetCons.toDoubleArray())
         yzs = cf.yss.toList()
-        if (autoAttenuation && selectFitterType == FitterType.Three) {
-            //**修正start**
-            var dif50 = 50 - yzs[1]
-            println("50差值：$dif50")
-            dif50 = if (dif50 >= 0) {
-                dif50 * 2
-            } else {
-                dif50 / 2
-            }
-            println("50差值计算后：$dif50")
-
-            val dif0 = means[0] - dif50
-            println("0原始吸光度-50差值计算后：$dif0")
-
-            means[0] = dif0
-            cf = matchingArg(selectFitterType, means, targetCons.toDoubleArray())
-        }
+//        if (autoAttenuation && selectFitterType == FitterType.Three) {
+//            //**修正start**
+//            var dif50 = 50 - yzs[1]
+//            println("50差值：$dif50")
+//            dif50 = if (dif50 >= 0) {
+//                dif50 * 2
+//            } else {
+//                dif50 / 2
+//            }
+//            println("50差值计算后：$dif50")
+//
+//            val dif0 = means[0] - dif50
+//            println("0原始吸光度-50差值计算后：$dif0")
+//
+//            means[0] = dif0
+//            cf = matchingArg(selectFitterType, means, targetCons.toDoubleArray())
+//        }
         //**修正end**
         var msg: StringBuilder = StringBuilder(
             "拟合类型$selectFitterType \n 第一次原始:$resultOriginalTest1 \n" + "第一次:$resultTest1 \n" + "第二次原始:$resultOriginalTest2 \n" + "第二次:$resultTest2 \n" + "第三次原始:$resultOriginalTest3 \n" + "第三次:$resultTest3 \n" + "第四次原始:$resultOriginalTest4 \n" + "第四次:$resultTest4 \n" +
@@ -1169,107 +1174,6 @@ class MatchingArgsViewModel(
         testMsg.postValue(msg.toString())
         showMatchingStateDialog()
     }
-//    /**
-//     * 计算拟合曲线
-//     */
-//    private fun calcMatchingArg() {
-//        if (SystemGlobal.isCodeDebug) {
-//            resultTest1.clear()
-//            resultTest2.clear()
-//            resultTest3.clear()
-//            resultTest4.clear()
-//            resultOriginalTest1.clear()
-//            resultOriginalTest2.clear()
-//            resultOriginalTest3.clear()
-//            resultOriginalTest4.clear()
-//            val size = if (quality) 7 else 5
-//            repeat(size) {
-//                resultTest1.add(roundResult())
-//                resultTest2.add(roundResult())
-//                resultTest3.add(roundResult())
-//                resultTest4.add(roundResult())
-//
-//                resultOriginalTest1.add(testOriginalValues1[it])
-//                resultOriginalTest2.add(testOriginalValues2[it])
-//                resultOriginalTest3.add(testOriginalValues3[it])
-//                resultOriginalTest4.add(testOriginalValues4[it])
-//            }
-//
-//        }
-//        i("开始计算拟合曲线 $resultTest1 $resultTest2 $resultTest3 $resultTest4")
-//
-//        result = calcAbsorbanceDifferences(resultTest1, resultTest2, resultTest3, resultTest4)
-//
-//        absorbancys = result.map { it.toDouble() }
-//        val cf = matchingArg(absorbancys)
-//        val res = cf.params
-//        for (i in res.indices) {
-//            println(res[i])
-//        }
-//        i("拟合度：${cf.fitGoodness}")
-////        i("四参数：a1=${res[0]} a2=${res[3]} x0=${res[2]} p=${res[1]}")
-//        val f0 = res[0]
-//        val f1 = res[1]
-//        val f2 = res[2]
-//        val f3 = res[3]
-//
-//        i("四参数：f0=${f0} f1=${f1} f2=${f2} f3=${f3}")
-//
-//        yzs = absorbancys.map {
-//            val yz = CurveFitterUtil.f(res, it).scale(2)
-//            yz
-//        }
-//        //**修正start**
-//        var dif50 = 50 - yzs[1]
-//        println("50差值：$dif50")
-//        dif50 = if (dif50 >= 0) {
-//            dif50 * 2
-//        } else {
-//            dif50 / 2
-//        }
-//        println("50差值计算后：$dif50")
-//
-//        val dif0 = absorbancys[0] - dif50
-//        println("0原始吸光度-50差值计算后：$dif0")
-//
-//        val np1 = dif0
-//        var absorbancys2 = absorbancys.toMutableList()
-//        absorbancys2[0] = np1
-//
-//        val cf2 = matchingArg(absorbancys2)
-//        val res2 = cf2.params
-//        val yzs2 = absorbancys2.map {
-//            val yz2 = CurveFitterUtil.f(res2, it).scale(2)
-//            yz2
-//        }
-//
-//        //**修正end**
-//        var msg: StringBuilder = StringBuilder(
-//            "第一次原始:$resultOriginalTest1 \n" + "第一次:$resultTest1 \n" + "第二次原始:$resultOriginalTest2 \n" + "第二次:$resultTest2 \n" + "第三次原始:$resultOriginalTest3 \n" + "第三次:$resultTest3 \n" + "第四次原始:$resultOriginalTest4 \n" + "第四次:$resultTest4 \n" +
-////                    "吸光度:$result \n" +
-////                    "拟合度：${cf.fitGoodness} \n" +
-////                    "四参数：f0=${f0} f1=${f1} f2=${f2} f3=${f3} \n " +
-////                    "验算 ${yzs}\n" +
-//                    "吸光度:$absorbancys2 \n" + "拟合度：${cf2.fitGoodness} \n" + "四参数：f0=${cf2.params[0]} f1=${cf2.params[1]} f2=${cf2.params[2]} f3=${cf2.params[3]} \n" + "验算 ${yzs2}\n"
-//        )
-//        curProject = CurveModel().apply {
-//            this.f0 = cf2.params[0]
-//            this.f1 = cf2.params[1]
-//            this.f2 = cf2.params[2]
-//            this.f3 = cf2.params[3]
-//            this.fitGoodness = cf2.fitGoodness
-//            this.createTime = Date().toTimeStr()
-//            this.projectLjz = 100
-//            this.reagentNO = reagentNOStr
-//            this.reactionValues = absorbancys2.map { it.toInt() }.toIntArray()
-//            this.yzs = yzs2.map { it.toInt() }.toIntArray()
-//        }
-////        print()
-//        testMsg.postValue(msg.toString())
-//
-//        //添加到参数列表，刷新
-////        projectRepository.addProject(project)
-//    }
 
     /**
      * 打印上次的
@@ -1627,6 +1531,17 @@ class MatchingArgsViewModel(
                     MatchingArgsDialogUiState.CloseMatchingStateDialog("")
                 )
             }
+            reagentNOStr = ""
+            changeConfig(
+                reagentNOStr,
+                quality,
+                gradsNum,
+                autoAttenuation,
+                selectMatchingProject,
+                selectFitterType,
+                targetCons
+            )
+
             viewModelScope.launch {
                 _dialogUiState.emit(
                     MatchingArgsDialogUiState.Accident("拟合质控结束")
@@ -1709,6 +1624,16 @@ class MatchingArgsViewModel(
                 EventBus.getDefault().post(EventMsg<String>(EventGlobal.WHAT_PROJECT_ADD))
             }
         }
+        reagentNOStr = ""
+        changeConfig(
+            reagentNOStr,
+            quality,
+            gradsNum,
+            autoAttenuation,
+            selectMatchingProject,
+            selectFitterType,
+            targetCons
+        )
     }
 
     /**
@@ -1719,6 +1644,16 @@ class MatchingArgsViewModel(
 //            curProject =
             coverCurveModel = null
         }
+        reagentNOStr = ""
+        changeConfig(
+            reagentNOStr,
+            quality,
+            gradsNum,
+            autoAttenuation,
+            selectMatchingProject,
+            selectFitterType,
+            targetCons
+        )
     }
 
     /**
@@ -1894,16 +1829,18 @@ class MatchingArgsViewModel(
 
     fun changeSelectProject(project: CurveModel) {
         selectProject = project
-        _curveUiState.update {
-            it.copy(
-                equationText = getEquation(
-                    FitterType.toValue(project.fitterType),
-                    mutableListOf(project.f0, project.f1, project.f2, project.f3)
-                ),
-                fitGoodnessText = getFitGoodness(
-                    FitterType.toValue(project.fitterType),
-                    project.fitGoodness
-                ),
+        viewModelScope.launch {
+            _curveUiState.emit(
+                MatchingArgsCurveUiState(
+                    equationText = getEquation(
+                        FitterType.toValue(project.fitterType),
+                        mutableListOf(project.f0, project.f1, project.f2, project.f3)
+                    ),
+                    fitGoodnessText = getFitGoodness(
+                        FitterType.toValue(project.fitterType),
+                        project.fitGoodness
+                    )
+                )
             )
         }
     }
@@ -1912,12 +1849,16 @@ class MatchingArgsViewModel(
      * 拟合配置完毕
      */
     fun matchingConfigFinish(
+        reagentNo: String,
+        quality: Boolean,
         gradsNum: Int,
         autoAttenuation: Boolean,
         selectProject: ProjectModel?,
         selectFitterType: FitterType,
         cons: List<Double>
     ) {
+        this.reagentNOStr = reagentNo
+        this.quality = quality
         this.gradsNum = gradsNum
         this.autoAttenuation = autoAttenuation
         this.selectMatchingProject = selectProject
@@ -1925,20 +1866,54 @@ class MatchingArgsViewModel(
         this.targetCons.clear()
         this.targetCons.addAll(cons)
 
-        if (selectMatchingProject != null) {
+        val hilt = if (selectMatchingProject == null) {
+            "没有选择项目"
+        } else if (reagentNOStr.isNullOrEmpty()) {
+            "请输入序号"
+        } else {
+            ""
+        }
+        if (hilt.isNullOrEmpty()) {
             showMatchingStateDialog()
         } else {
-            //没有选择项目
             viewModelScope.launch {
-                _dialogUiState.emit(MatchingArgsDialogUiState.Accident("没有选择项目"))
+                _dialogUiState.emit(MatchingArgsDialogUiState.Accident(hilt))
             }
         }
-//        val t1 = mutableListOf<Double>()
-//        repeat(gradsNum) {
-//            t1.add(round(200.0))
-//        }
-//        this.means.clear()
-//        this.means.addAll(t1)
+        changeConfig(
+            reagentNOStr,
+            quality,
+            gradsNum,
+            autoAttenuation,
+            selectProject,
+            selectFitterType,
+            cons
+        )
+
+    }
+
+    private fun changeConfig(
+        reagentNOStr: String,
+        quality: Boolean,
+        gradsNum: Int,
+        autoAttenuation: Boolean,
+        selectProject: ProjectModel?,
+        selectFitterType: FitterType,
+        cons: List<Double>
+    ) {
+        viewModelScope.launch {
+            _matchingConfigUiState.emit(
+                MatchingConfigUiState(
+                    selectProject,
+                    autoAttenuation,
+                    gradsNum,
+                    selectFitterType,
+                    cons.toMutableList(),
+                    quality,
+                    reagentNOStr,
+                )
+            )
+        }
     }
 
     fun changeFitterType(fitterType: FitterType) {
@@ -1953,16 +1928,24 @@ class MatchingArgsViewModel(
         viewModelScope.launch {
             val hiltText = if (appViewModel.testState.isNotPrepare()) {
                 "请重新自检"
-            } else if (reagentNOStr.isNullOrEmpty()) {
-                "请输入序号"
             } else {
                 ""
             }
             if (hiltText.isNotEmpty()) {
+                //不能拟合
                 _dialogUiState.emit(MatchingArgsDialogUiState.Accident(hiltText))
-            } else {
+            } else if (curveRepository.getCurveModels().size >= SystemGlobal.showCurveSize) {
+                //显示选择覆盖标曲对话框
                 _dialogUiState.emit(MatchingArgsDialogUiState.MatchingCoverCurve(""))
+            } else if (reagentNOStr.isNullOrEmpty() || selectMatchingProject == null) {
+                //显示配置对话框
+                saveCoverCurve(null)
+                showMatchingSettingsDialog()
+            } else {
+                //开始拟合
+                showMatchingStateDialog()
             }
+
         }
     }
 }
@@ -1974,7 +1957,7 @@ class MatchingArgsViewModelFactory(
 ) : ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MatchingArgsViewModel::class.java)) {
-            return MatchingArgsViewModel(appViewModel,projectRepository, curveRepository) as T
+            return MatchingArgsViewModel(appViewModel, projectRepository, curveRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

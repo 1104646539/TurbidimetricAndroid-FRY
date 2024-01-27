@@ -105,6 +105,8 @@ class MatchingStateDialog(val ct: Context) :
         spnFitterTypeAdapter = MatchingConfigSampleAdapter(rootView.context, fitterTypeNames)
         spnFitterType?.adapter = spnFitterTypeAdapter
 
+        vHeader?.setBackgroundResource(R.drawable.bg_item)
+
         initChart()
         i("$tvHeaderTitle $tvFooterTitle")
     }
@@ -275,6 +277,8 @@ class MatchingStateDialog(val ct: Context) :
         onConfirm: onClick,
         onConfirm2: onClick,
         onFitterTypeChange: (selectFitterType: FitterType) -> Unit,
+        debug: Boolean = false,
+        onClickDebug: onClick
     ) {
         this.gradsNum = gradsNum
         this.abss.clear()
@@ -295,6 +299,10 @@ class MatchingStateDialog(val ct: Context) :
         this.onFitterTypeChange = onFitterTypeChange
 //        this.cancelText = "取消"
 //        this.cancelClick = onCancel
+        if (debug) {
+            this.cancelText = "调试框"
+            this.cancelClick = onClickDebug
+        }
 
         if (isCreated) {
             setContent()

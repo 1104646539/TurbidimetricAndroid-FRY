@@ -34,6 +34,8 @@ sealed class MatchingArgsDialogUiState {
      * 拟合配置
      */
     class MatchingSettings(
+        val reagentNo: String,
+        val quality: Boolean,
         val projects: List<ProjectModel>,
         val autoAttenuation: Boolean,
         val gradsNum: Int = 5,
@@ -77,3 +79,12 @@ data class MatchingArgsCurveUiState(
     val fitGoodnessText: String,
 )
 
+data class MatchingConfigUiState(
+    val project: ProjectModel?,
+    val autoAttenuation: Boolean,
+    val gradsNum: Int,
+    val selectFitterType: FitterType,
+    val targetCons: MutableList<Double>,
+    val quality: Boolean,
+    val reagentNo: String
+)

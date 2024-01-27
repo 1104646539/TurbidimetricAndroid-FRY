@@ -19,7 +19,7 @@
 
         <ImageView
             android:id="@+id/iv_indicate"
-            android:layout_width="5dp"
+            android:layout_width="3dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
             android:layout_marginTop="30dp"
@@ -73,12 +73,27 @@
             app:layout_constraintTop_toBottomOf="@id/header" />
 
         <TextView
+            android:id="@+id/tv_equation_text"
+            style="@style/TextHilt"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
+            android:text="asldjflsadjfkasldfjas;ldfasljdxzn,cnv,1321354653213465sadfsadfjlskdfj2131313546"
+            android:textColor="@color/themePositiveColor"
+            android:gravity="left|center_vertical"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintBottom_toTopOf="@id/tv_fitgoodness_text"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintLeft_toRightOf="@id/gl_center" />
+
+        <TextView
             android:id="@+id/tv_fitgoodness_text"
             style="@style/TextHilt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="40dp"
-            android:layout_marginTop="150dp"
+            android:layout_marginTop="10dp"
             android:layout_marginRight="40dp"
             android:textColor="@color/themePositiveColor"
             app:layout_constraintBottom_toTopOf="@id/lc_curve"
@@ -92,8 +107,23 @@
             android:layout_marginLeft="40dp"
             android:layout_marginTop="50dp"
             android:layout_marginRight="40dp"
-            app:layout_constraintBottom_toBottomOf="@id/rv"
+            android:layout_marginBottom="20dp"
+            app:layout_constraintBottom_toTopOf="@id/btn_print"
             app:layout_constraintLeft_toLeftOf="@id/gl_center"
+            app:layout_constraintRight_toRightOf="parent" />
+
+
+        <com.wl.turbidimetric.view.TextImageButton
+            android:id="@+id/btn_print"
+            style="@style/BtnPositive"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="20dp"
+            android:minWidth="150dp"
+            android:src="@drawable/datamanager_zoom"
+            android:text="打印"
+            app:layout_constraintBottom_toBottomOf="@id/gl_bottom"
             app:layout_constraintRight_toRightOf="parent" />
 
         <androidx.constraintlayout.widget.Guideline
@@ -109,12 +139,14 @@
             android:layout_height="0dp"
             android:background="@drawable/shape_analyse_config_bg"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toLeftOf="@id/gl_center"
-            app:layout_constraintTop_toBottomOf="@id/gl_bottom" />
+            app:layout_constraintTop_toBottomOf="@id/gl_bottom"
+            app:layout_constraintVertical_bias="1.0" />
 
         <View
-            android:id="@+id/v_test"
+            android:id="@+id/v_matching"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:background="@drawable/shape_analyse_test_bg"
@@ -124,12 +156,12 @@
             app:layout_constraintTop_toBottomOf="@id/gl_bottom" />
 
         <TextView
-            android:id="@+id/tv_settings_test"
+            android:id="@+id/tv_settings_matching"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="50dp"
-            android:layout_marginTop="10dp"
-            android:text="检测设置"
+            android:layout_marginTop="3dp"
+            android:text="拟合设置"
             android:textColor="@color/black2"
             android:textSize="23sp"
             android:textStyle="bold"
@@ -137,47 +169,80 @@
             app:layout_constraintTop_toTopOf="@id/gl_bottom" />
 
         <TextView
-            android:id="@+id/tv_settings_curve"
+            android:id="@+id/tv_settings_reagent_no"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="选择标曲"
+            android:layout_marginTop="3dp"
+            android:text="序号"
             android:textColor="@color/black2"
             android:textSize="23sp"
-            app:layout_constraintLeft_toLeftOf="@id/tv_settings_test"
-            app:layout_constraintTop_toBottomOf="@id/tv_settings_test" />
+            app:layout_constraintLeft_toLeftOf="@id/tv_settings_matching"
+            app:layout_constraintTop_toBottomOf="@id/tv_settings_matching" />
 
         <TextView
-            android:id="@+id/tv_settings_start_num"
+            android:id="@+id/tv_settings_quality"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="起始编号"
+            android:layout_marginTop="3dp"
+            android:text="是否同时质控"
             android:textColor="@color/black2"
             android:textSize="23sp"
-            app:layout_constraintLeft_toLeftOf="@id/tv_settings_curve"
-            app:layout_constraintTop_toBottomOf="@id/tv_settings_curve" />
+            app:layout_constraintLeft_toLeftOf="@id/gl_bottom2"
+            app:layout_constraintTop_toTopOf="@id/tv_settings_reagent_no" />
 
         <TextView
-            android:id="@+id/tv_settings_skip"
+            android:id="@+id/tv_settings_project"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="跳过比色皿"
+            android:layout_marginTop="3dp"
+            android:text="选择项目"
             android:textColor="@color/black2"
             android:textSize="23sp"
-            app:layout_constraintLeft_toLeftOf="@id/tv_settings_curve"
-            app:layout_constraintTop_toBottomOf="@id/tv_settings_start_num" />
+            app:layout_constraintLeft_toLeftOf="@id/tv_settings_reagent_no"
+            app:layout_constraintTop_toBottomOf="@id/tv_settings_reagent_no" />
+
+        <TextView
+            android:id="@+id/tv_settings_fun"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:text="选择方程"
+            android:textColor="@color/black2"
+            android:textSize="23sp"
+            app:layout_constraintLeft_toLeftOf="@id/tv_settings_project"
+            app:layout_constraintTop_toBottomOf="@id/tv_settings_project" />
+
+        <TextView
+            android:id="@+id/tv_settings_target_con"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:text="目标浓度"
+            android:textColor="@color/black2"
+            android:textSize="23sp"
+            app:layout_constraintLeft_toLeftOf="@id/tv_settings_project"
+            app:layout_constraintTop_toBottomOf="@id/tv_settings_fun" />
+
 
         <TextView
             android:id="@+id/tv_settings_grads_num"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="检测数量"
+            android:text="拟合梯度数量"
             android:textColor="@color/black2"
             android:textSize="23sp"
             app:layout_constraintLeft_toRightOf="@id/gl_bottom2"
-            app:layout_constraintTop_toTopOf="@id/tv_settings_curve" />
+            app:layout_constraintTop_toTopOf="@id/tv_settings_project" />
+
+        <TextView
+            android:id="@+id/tv_settings_auto_attenuation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="是否自动稀释"
+            android:textColor="@color/black2"
+            android:textSize="23sp"
+            app:layout_constraintLeft_toRightOf="@id/gl_bottom2"
+            app:layout_constraintTop_toTopOf="@id/tv_settings_fun" />
 
         <ImageView
             android:layout_width="wrap_content"
@@ -202,32 +267,32 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="134dp"
             android:src="@drawable/analyse_test_btn"
-            app:layout_constraintBottom_toBottomOf="@id/v_test"
-            app:layout_constraintLeft_toLeftOf="@id/v_test"
-            app:layout_constraintTop_toTopOf="@id/v_test" />
+            app:layout_constraintBottom_toBottomOf="@id/v_matching"
+            app:layout_constraintLeft_toLeftOf="@id/v_matching"
+            app:layout_constraintTop_toTopOf="@id/v_matching" />
 
         <TextView
-            android:id="@+id/tv_analyse"
+            android:id="@+id/tv_matching"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
-            android:text="分析中……"
+            android:text="生成曲线中……"
             android:textColor="@color/white"
             android:textSize="58sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@id/v_test"
+            app:layout_constraintBottom_toBottomOf="@id/v_matching"
             app:layout_constraintLeft_toRightOf="@id/iv_analyse"
-            app:layout_constraintTop_toTopOf="@id/v_test" />
+            app:layout_constraintTop_toTopOf="@id/v_matching" />
 
         <TextView
-            android:id="@+id/tv_analyse2"
+            android:id="@+id/tv_matching2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="仓门已锁，请勿打开,请等待检测结束"
+            android:text=""
             android:textColor="@color/white"
             android:textSize="20sp"
-            app:layout_constraintLeft_toLeftOf="@id/tv_analyse"
-            app:layout_constraintTop_toBottomOf="@id/tv_analyse" />
+            app:layout_constraintLeft_toLeftOf="@id/tv_matching"
+            app:layout_constraintTop_toBottomOf="@id/tv_matching" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

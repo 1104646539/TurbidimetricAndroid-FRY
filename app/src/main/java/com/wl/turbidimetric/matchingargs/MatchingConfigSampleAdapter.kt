@@ -31,7 +31,7 @@ class MatchingConfigSampleAdapter @JvmOverloads constructor(
     override fun getView(position: Int, view: View?, parent: ViewGroup): View? {
         var root: View? = view
         if (root == null) {
-            root = LayoutInflater.from(context).inflate(R.layout.item_matching_sample, null)
+            root = LayoutInflater.from(context).inflate(R.layout.item_matching_sample, parent,false)
         }
         root?.let {
             val tvName = root.findViewById<TextView>(R.id.tv_name)
@@ -58,7 +58,7 @@ class MatchingConfigSampleAdapter @JvmOverloads constructor(
     override fun getDropDownView(position: Int, view: View?, parent: ViewGroup): View? {
         var root: View? = view
         if (root == null) {
-            root = LayoutInflater.from(context).inflate(R.layout.item_matching_sample, null)
+            root = LayoutInflater.from(context).inflate(R.layout.item_matching_sample_pop,  parent,false)
         }
         root?.let {
             val tvName = root.findViewById<TextView>(R.id.tv_name)

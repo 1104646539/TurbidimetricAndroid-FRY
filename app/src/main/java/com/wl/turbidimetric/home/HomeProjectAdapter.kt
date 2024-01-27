@@ -31,7 +31,7 @@ class HomeProjectAdapter @JvmOverloads constructor(
     override fun getView(position: Int, view: View?, parent: ViewGroup): View? {
         var root: View? = view
         if (root == null) {
-            root = LayoutInflater.from(context).inflate(R.layout.item_select_project, null)
+            root = LayoutInflater.from(context).inflate(R.layout.item_select_project,  parent,false)
         }
         root?.let {
             val tvTime = root.findViewById<TextView>(R.id.tv_time)
@@ -64,7 +64,7 @@ class HomeProjectAdapter @JvmOverloads constructor(
     override fun getDropDownView(position: Int, view: View?, parent: ViewGroup): View? {
         var root: View? = view
         if (root == null) {
-            root = LayoutInflater.from(context).inflate(R.layout.item_select_project, null)
+            root = LayoutInflater.from(context).inflate(R.layout.item_select_project, parent,false)
         }
         root?.let {
             val tvTime = root.findViewById<TextView>(R.id.tv_time)

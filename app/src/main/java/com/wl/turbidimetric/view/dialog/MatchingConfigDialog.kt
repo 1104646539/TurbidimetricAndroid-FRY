@@ -8,6 +8,7 @@ import android.widget.EditText
 import android.widget.RadioButton
 import android.widget.SimpleAdapter
 import android.widget.Spinner
+import android.widget.Switch
 import android.widget.TextView
 import androidx.core.view.isVisible
 import com.lxj.xpopup.core.BasePopupView
@@ -28,6 +29,8 @@ class MatchingConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
     var fitterTypes = mutableListOf<FitterType>()
     var fitterTypeNames = mutableListOf<String>()
 
+    var reagentNoStr: String = ""
+    var quality: Boolean = false
     var autoAttenuation = false
     var gradsNum = 5
     var selectProject: ProjectModel? = null
@@ -47,6 +50,8 @@ class MatchingConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
     var rbGrad6: RadioButton? = null
     var rbGrad7: RadioButton? = null
     var rbGrad8: RadioButton? = null
+    var swQuality: Switch? = null
+    var etReagentNo: EditText? = null
 
     var etTargetCon1: EditText? = null
     var etTargetCon2: EditText? = null
@@ -64,6 +69,8 @@ class MatchingConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
     //6个梯度只能人工稀释
     //人工稀释时才可以手动输入目标浓度，自动稀释则是按照固定的浓度比例去稀释
     override fun initDialogView() {
+        swQuality = findViewById(R.id.sw_quality)
+        etReagentNo = findViewById(R.id.et_reagent_no)
         spnProject = findViewById(R.id.spn_project)
         spnFitterType = findViewById(R.id.spn_fitter_type)
         rbAuto = findViewById(R.id.rb_auto)
@@ -93,15 +100,19 @@ class MatchingConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
 
 
     fun showDialog(
+        reagentNo: String = "",
+        quality: Boolean = false,
         projects: List<ProjectModel>,
         autoAttenuation: Boolean,
         gradsNum: Int = 5,
         selectProject: ProjectModel? = null,
         selectFitterType: FitterType = FitterType.Three,
         targetCons: List<Double> = mutableListOf(),
-        onConfirmClick: (gradsNum: Int, autoAttenuation: Boolean, selectProject: ProjectModel?, selectFitterType: FitterType, cons: List<Double>) -> Unit,
+        onConfirmClick: (reagentNo: String, quality: Boolean, gradsNum: Int, autoAttenuation: Boolean, selectProject: ProjectModel?, selectFitterType: FitterType, cons: List<Double>) -> Unit,
         onCancelClick: onClick
     ) {
+        this.reagentNoStr = reagentNo
+        this.quality = quality
         this.projects.clear()
         this.projects.addAll(projects)
         this.projectNames.clear()
@@ -115,8 +126,10 @@ class MatchingConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
 
         this.confirmText = "确定"
         this.confirmClick = {
-            getCons()
+            getCurInput()
             onConfirmClick.invoke(
+                this@MatchingConfigDialog.reagentNoStr,
+                this@MatchingConfigDialog.quality,
                 this@MatchingConfigDialog.gradsNum,
                 this@MatchingConfigDialog.autoAttenuation,
                 this@MatchingConfigDialog.selectProject,
@@ -133,6 +146,12 @@ class MatchingConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
         }
 
         super.show()
+    }
+
+    private fun getCurInput() {
+        getCons()
+
+        reagentNoStr = etReagentNo?.text.toString()
     }
 
     private fun getCons(): String {
@@ -182,6 +201,9 @@ class MatchingConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
         val selectFitterIndex = fitterTypes.indexOf(selectFitterType)
         this.spnFitterType?.setSelection(selectFitterIndex)
 
+        etReagentNo?.setText("${reagentNoStr ?: ""}")
+
+        swQuality?.isChecked = quality
 
         rbAuto?.isChecked = autoAttenuation
 
@@ -194,6 +216,11 @@ class MatchingConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
         etTargetCon6?.visibility = (gradsNum > 5).isShow()
         etTargetCon7?.visibility = (gradsNum > 6).isShow()
         etTargetCon8?.visibility = (gradsNum > 7).isShow()
+
+        swQuality?.setOnCheckedChangeListener { buttonView, isChecked ->
+            quality = isChecked
+        }
+
         rbAuto?.setOnCheckedChangeListener { buttonView, isChecked ->
             autoAttenuation = isChecked
 

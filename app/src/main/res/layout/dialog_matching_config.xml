@@ -1,55 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_dialog_hint"
     android:focusable="true"
     android:focusableInTouchMode="true"
+    android:minWidth="900dp"
     android:orientation="vertical"
     android:padding="40dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            style="@style/TextTitle"
+            android:layout_width="160dp"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:text="试剂序号:" />
+
+        <EditText
+            android:id="@+id/et_reagent_no"
+            android:layout_width="200dp"
+            android:layout_height="48dp"
+            android:layout_marginLeft="14dp"
+            android:background="@drawable/bg_et_gray"
+            android:inputType="number"
+            android:paddingLeft="10dp"
+            android:textColor="@color/textColor"
+            android:textSize="18sp" />
+
+        <TextView
+            style="@style/TextTitle"
+            android:layout_width="160dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="70dp"
+            android:gravity="left"
+            android:text="是否质控:" />
+
+        <LinearLayout
+            android:layout_width="200dp"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <Switch
+                android:id="@+id/sw_quality"
+                android:layout_width="200dp"
+                android:layout_height="match_parent"
+                android:switchMinWidth="50dp"
+                android:thumb="@drawable/selector_switch_thumb"
+                android:track="@drawable/selector_switch_track" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
         <TextView
-            style="@style/TextHilt"
-            android:layout_width="140dp"
+            style="@style/TextTitle"
+            android:layout_width="160dp"
             android:layout_height="wrap_content"
             android:gravity="left|center_vertical"
             android:text="选择项目:" />
 
         <Spinner
             android:id="@+id/spn_project"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:minHeight="50dp" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
+            android:layout_width="250dp"
+            android:layout_height="50dp"
+            android:layout_marginLeft="10dp" />
 
         <TextView
-            style="@style/TextHilt"
-            android:layout_width="140dp"
+            style="@style/TextTitle"
+            android:layout_width="160dp"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="25dp"
             android:gravity="left|center_vertical"
-            android:text="选择拟合方程:" />
+            android:text="拟合方程:" />
 
         <Spinner
             android:id="@+id/spn_fitter_type"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:minHeight="50dp" />
+            android:layout_width="250dp"
+            android:layout_height="50dp"/>
     </LinearLayout>
 
 
@@ -61,8 +99,8 @@
         android:orientation="horizontal">
 
         <TextView
-            style="@style/TextHilt"
-            android:layout_width="140dp"
+            style="@style/TextTitle"
+            android:layout_width="160dp"
             android:layout_height="match_parent"
             android:gravity="left|center_vertical"
             android:text="拟合梯度数量:" />
@@ -70,7 +108,7 @@
         <RadioGroup
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-
+            android:layout_marginLeft="10dp"
             android:orientation="horizontal">
 
             <RadioButton
@@ -122,15 +160,16 @@
         android:orientation="horizontal">
 
         <TextView
-            style="@style/TextHilt"
-            android:layout_width="140dp"
+            style="@style/TextTitle"
+            android:layout_width="160dp"
             android:layout_height="wrap_content"
             android:gravity="left|center_vertical"
-            android:text="是否自动稀释:" />
+            android:text="稀释方式:" />
 
         <RadioGroup
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
             android:orientation="horizontal">
 
             <RadioButton
@@ -164,8 +203,8 @@
         android:orientation="horizontal">
 
         <TextView
-            style="@style/TextHilt"
-            android:layout_width="140dp"
+            style="@style/TextTitle"
+            android:layout_width="160dp"
             android:layout_height="wrap_content"
             android:gravity="left|center_vertical"
             android:text="目标浓度:" />
@@ -236,7 +275,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="140dp"
+        android:layout_marginLeft="160dp"
         android:layout_marginTop="10dp"
         android:orientation="horizontal">
 

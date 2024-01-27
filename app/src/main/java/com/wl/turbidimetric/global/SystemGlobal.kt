@@ -43,6 +43,7 @@ object SystemGlobal {
         }
     private val _obDebugMode = MutableStateFlow(false)
     val obDebugMode = _obDebugMode.asStateFlow()
+
     /**
      * 上传配置
      */
@@ -53,6 +54,9 @@ object SystemGlobal {
         }
     private val _obUploadConfig = MutableStateFlow(uploadConfig)
     val obUploadConfig = _obUploadConfig.asStateFlow()
+
+    //显示的曲线数量
+    val showCurveSize = 10;
 
     /**
      * 上传连接状态

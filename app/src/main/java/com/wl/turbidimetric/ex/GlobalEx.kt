@@ -111,3 +111,7 @@ fun <T> Boolean.PD(t1: () -> T, t2: () -> T): T {
 fun <T> Boolean.PD(t1: T, t2: T): T {
     return this.PD({ t1 }, { t2 })
 }
+
+fun String?.nullOfDefault(defaultValue: String): String {
+    return this ?: defaultValue
+}

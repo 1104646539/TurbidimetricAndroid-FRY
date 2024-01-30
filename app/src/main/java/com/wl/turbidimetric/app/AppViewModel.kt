@@ -64,6 +64,16 @@ class AppViewModel : BaseViewModel() {
     fun changeMachineTestModel(machineTestModel: MachineTestModel){
         this._machineTestMode.value = machineTestModel
     }
+
+    /**
+     * 检测编号
+     */
+    private val _detectionNum = MutableStateFlow(LocalData.DetectionNum.toLong())
+    val detectionNum = _detectionNum.asSharedFlow()
+
+    fun changeDetectionNum(detectionNum:Long){
+        this._detectionNum.value = detectionNum
+    }
     /**
      * 更新当前时间
      */

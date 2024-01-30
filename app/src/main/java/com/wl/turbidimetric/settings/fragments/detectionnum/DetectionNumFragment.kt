@@ -52,9 +52,10 @@ class DetectionNumFragment :
 
     private fun listenerView() {
         vd.btnChange.setOnClickListener {
-            vm.change(
-                vd.tietDetectionNum.text.toString().toLongOrNull() ?: -1,
-            )
+            (vd.tietDetectionNum.text.toString().toLongOrNull() ?: -1).let {
+                vm.change(it)
+                appVm.changeDetectionNum(it)
+            }
         }
     }
 

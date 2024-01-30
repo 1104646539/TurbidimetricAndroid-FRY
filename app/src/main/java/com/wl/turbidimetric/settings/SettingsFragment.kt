@@ -108,20 +108,17 @@ class SettingsFragment :
         }
         vd.sivParamsSetting.setOnClickListener {
             u("参数设置")
-//            showParamsSettingDialog()
             changeContent(ParamsFragment.instance)
             vd.wgpSelectable.setSelected(it.id)
         }
         vd.sivDetectionNumSetting.setOnClickListener {
             u("编号设置")
-//            showDetectionNumDialog()
             changeContent(DetectionNumFragment.instance)
             vd.wgpSelectable.setSelected(it.id)
         }
 
         vd.sivMachineTestMode.setOnClickListener {
             u("检测模式设置")
-//            showMachineTestModelDialog()
             changeContent(TestModeFragment.instance)
             vd.wgpSelectable.setSelected(it.id)
         }
@@ -292,96 +289,6 @@ class SettingsFragment :
         )
     }
 
-    /**
-     * 显示仪器检测模式对话框
-     */
-    private fun showMachineTestModelDialog() {
-        machineTestModelDialog.showPop(requireContext(), isCancelable = false) {
-            it.showDialog(
-                MachineTestModel.valueOf(LocalData.CurMachineTestModel),
-                LocalData.SampleExist,
-                LocalData.ScanCode,
-                { machineTestModel, sampleExist, scanCode, baseDialog ->
-                    if (appVm.testState.isTestRunning()) {
-                        toast("正在检测，请稍后")
-                        return@showDialog
-                    }
-
-                    LocalData.CurMachineTestModel = machineTestModel.name
-                    if (isAuto(machineTestModel)) {
-                        LocalData.SampleExist = sampleExist
-                        LocalData.ScanCode = scanCode
-                    }
-                    appVm.changeMachineTestModel(machineTestModel)
-                    i("machineTestModel=$machineTestModel sampleExist=$sampleExist scanCode=$scanCode")
-                    baseDialog?.dismiss()
-                },
-                {
-                    it.dismiss()
-                })
-        }
-
-    }
-
-    /**
-     * 显示编号设置
-     */
-    private fun showDetectionNumDialog() {
-        detectionNumDialog.showPop(requireContext(), isCancelable = false) {
-            detectionNumDialog.showDialog("请输入编号", "${LocalData.DetectionNum}", "确定", l@{
-                val content = it.etContent?.text.toString()
-                if (content.trim().isNullOrEmpty()) {
-                    toast("请输入数字")
-                    return@l
-                }
-                if (!content.isNum()) {
-                    toast("请输入数字")
-                    return@l
-                }
-                LocalData.DetectionNum = content
-                it.dismiss()
-            }, "取消", {
-                it.dismiss()
-            })
-        }
-    }
-
-
-    /**
-     * 显示参数设置
-     */
-    private fun showParamsSettingDialog() {
-        paramsDialog.showPop(requireContext(), isCancelable = false) {
-            paramsDialog.showDialog(
-                LocalData.TakeReagentR1,
-                LocalData.TakeReagentR2,
-                LocalData.SamplingVolume,
-                LocalData.SamplingProbeCleaningDuration,
-                LocalData.StirProbeCleaningDuration,
-                LocalData.StirDuration,
-                LocalData.Test1DelayTime,
-                LocalData.Test2DelayTime,
-                LocalData.Test3DelayTime,
-                LocalData.Test4DelayTime,
-                { takeR1: Int, takeR2: Int, samplingVolume: Int, samplingProbeCleaningTime: Int, stirProbeCleaningTime: Int, stirDuration: Int, test1DelayTime: Long, test2DelayTime: Long, test3DelayTime: Long, test4DelayTime: Long, baseDialog: BasePopupView ->
-                    LocalData.TakeReagentR1 = takeR1
-                    LocalData.TakeReagentR2 = takeR2
-                    LocalData.SamplingVolume = samplingVolume
-                    LocalData.SamplingProbeCleaningDuration = samplingProbeCleaningTime
-                    LocalData.StirProbeCleaningDuration = stirProbeCleaningTime
-                    LocalData.StirDuration = stirDuration
-                    LocalData.Test1DelayTime = test1DelayTime
-                    LocalData.Test2DelayTime = test2DelayTime
-                    LocalData.Test3DelayTime = test3DelayTime
-                    LocalData.Test4DelayTime = test4DelayTime
-                    baseDialog.dismiss()
-
-                },
-                {
-                    it.dismiss()
-                })
-        }
-    }
 
     val testHiltDialog by lazy {
         HiltDialog(requireContext())

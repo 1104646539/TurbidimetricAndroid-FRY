@@ -626,6 +626,11 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 vd.tvSettingsTestNum.visibility = (!isAuto()).isShow()
             }
         }
+        lifecycleScope.launch {
+            appVm.detectionNum.collectLatest {
+                vd.tvSettingsStartNum.text = it.toString()
+            }
+        }
     }
 
 

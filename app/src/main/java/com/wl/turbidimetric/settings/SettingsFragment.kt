@@ -3,7 +3,7 @@ package com.wl.turbidimetric.settings
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
-import android.view.View
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.lxj.xpopup.core.BasePopupView
 import com.wl.turbidimetric.R
@@ -22,6 +22,9 @@ import com.wl.turbidimetric.view.dialog.*
 import com.wl.weiqianwllib.OrderUtil
 import com.wl.turbidimetric.base.BaseFragment
 import com.wl.turbidimetric.base.BaseViewModel
+import com.wl.turbidimetric.settings.fragments.detectionnum.DetectionNumFragment
+import com.wl.turbidimetric.settings.fragments.params.ParamsFragment
+import com.wl.turbidimetric.settings.fragments.testmode.TestModeFragment
 import com.wl.wllib.LogToFile.i
 import com.wl.wllib.LogToFile.u
 import kotlinx.coroutines.Dispatchers
@@ -87,59 +90,71 @@ class SettingsFragment :
         lifecycleScope.launch {
             SystemGlobal.obDebugMode.collectLatest {
                 i("obDebugMode $it")
-                vd.llDebugMode.visibility = if (it) View.VISIBLE else View.GONE
+                it.isShow()?.let {
+                    vd.sivDebug.visibility = it
+                    vd.sivLauncher.visibility = it
+                    vd.sivNav.visibility = it
+                    vd.sivExportLog.visibility = it
+                    vd.sivDebugTitle.visibility = it
+                }
             }
         }
     }
 
     private fun listenerView() {
-        vd.tvOrderSettings.setOnClickListener {
+        vd.sivOrderSettings.setOnClickListener {
             u("其他设置")
             showDebugModeView()
         }
-        vd.tvParamsSetting.setOnClickListener {
+        vd.sivParamsSetting.setOnClickListener {
             u("参数设置")
-            showParamsSettingDialog()
-
+//            showParamsSettingDialog()
+            changeContent(ParamsFragment.instance)
+            vd.wgpSelectable.setSelected(it.id)
         }
-        vd.tvDetectionNumSetting.setOnClickListener {
+        vd.sivDetectionNumSetting.setOnClickListener {
             u("编号设置")
-            showDetectionNumDialog()
+//            showDetectionNumDialog()
+            changeContent(DetectionNumFragment.instance)
+            vd.wgpSelectable.setSelected(it.id)
         }
 
-        vd.tvMachineTestMode.setOnClickListener {
+        vd.sivMachineTestMode.setOnClickListener {
             u("检测模式设置")
-            showMachineTestModelDialog()
+//            showMachineTestModelDialog()
+            changeContent(TestModeFragment.instance)
+            vd.wgpSelectable.setSelected(it.id)
         }
 
-        vd.tvRepeatability.setOnClickListener {
+        vd.sivRepeatability.setOnClickListener {
             u("重复性测试")
             showRepeatability()
         }
-        vd.tvNav.setOnClickListener {
+        vd.sivNav.setOnClickListener {
             u("显示隐藏导航栏")
             showHideNav()
         }
-        vd.tvLauncher.setOnClickListener {
+        vd.sivLauncher.setOnClickListener {
             u("打开桌面")
             showLauncher()
             OrderUtil.showHideNav(requireActivity(), true)
         }
-        vd.tvUpload.setOnClickListener {
+        vd.sivUpload.setOnClickListener {
             u("上传设置")
             startUpload()
         }
-        vd.tvExportLog.setOnClickListener {
+        vd.sivExportLog.setOnClickListener {
             u("导出日志")
             exportLog()
         }
-        vd.tvDebug.setOnClickListener {
+        vd.sivDebug.setOnClickListener {
             u("调试")
             debug()
         }
-        vd.tvProjectList.setOnClickListener {
+        vd.sivProjectList.setOnClickListener {
             u("项目设置")
             projectList()
+//            vd.wgpSelectable.setSelected(it.id)
         }
         val versionAndroid = String(
             ((getPackageInfo(requireContext())?.versionName) ?: "").toByteArray(),
@@ -147,9 +162,31 @@ class SettingsFragment :
         )
 
         vd.tvSoftVersionAndroid.text =
-            "上位机版本:${versionAndroid} 发布版本:1"
+            "上位机版本:${versionAndroid} \n发布版本:1"
         vd.tvSoftVersionMcu.text = "MCU版本:${SystemGlobal.mcuVersion}"
 
+        vd.sivParamsSetting.performClick()
+    }
+
+    var curFragment: Fragment? = null
+    private fun changeContent(fragment: Fragment) {
+        if (curFragment != null && curFragment == fragment) {
+            return
+        }
+        val bt = childFragmentManager.beginTransaction()
+        if (curFragment != null) {
+            bt.hide(curFragment!!)
+            curFragment = null
+        }
+
+        if (childFragmentManager.findFragmentByTag(fragment::class.java.name) == null) {
+            bt.add(R.id.fl_content, fragment, fragment::class.java.name).show(fragment)
+        } else {
+            bt.show(fragment)
+        }
+        curFragment = fragment
+
+        bt.commit()
     }
 
     private fun projectList() {

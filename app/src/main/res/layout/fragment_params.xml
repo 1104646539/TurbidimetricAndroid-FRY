@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_dialog_hint"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_r1"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:hint="取R1试剂量"
+            android:textSize="28sp"
+            app:counterEnabled="true"
+            app:counterMaxLength="3"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/til_r2"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="spread_inside"
+            app:suffixText="uL">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tiet_r1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="numberSigned"
+                android:text="153"
+                android:textSize="26dp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_r2"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:hint="取R2试剂量"
+            android:textSize="18sp"
+            app:counterEnabled="true"
+            app:counterMaxLength="3"
+            app:layout_constraintLeft_toRightOf="@id/til_r1"
+            app:layout_constraintRight_toLeftOf="@id/til_sampling"
+            app:layout_constraintTop_toTopOf="@id/til_r1"
+            app:suffixText="uL">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tiet_r2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="numberSigned"
+                android:text="153"
+                android:textSize="26dp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_sampling"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:hint="取样量"
+            android:textSize="18sp"
+            app:counterEnabled="true"
+            app:counterMaxLength="3"
+            app:layout_constraintLeft_toRightOf="@id/til_r2"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="@id/til_r1"
+            app:suffixText="uL">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tiet_sampling"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="numberSigned"
+                android:text="153"
+                android:textSize="26dp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_sampling_probe_cleaning_time"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:hint="取样针清洗时长"
+            android:textSize="18sp"
+            app:counterEnabled="true"
+            app:counterMaxLength="4"
+            app:layout_constraintLeft_toLeftOf="@id/til_r1"
+            app:layout_constraintTop_toBottomOf="@id/til_r1"
+            app:suffixText="ms">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tiet_sampling_probe_cleaning_time"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="numberSigned"
+                android:text="153"
+                android:textSize="26dp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_stir_probe_cleaning_time"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:hint="搅拌针清洗时长"
+            android:textSize="18sp"
+            app:counterEnabled="true"
+            app:counterMaxLength="4"
+            app:layout_constraintLeft_toLeftOf="@id/til_r2"
+            app:layout_constraintTop_toTopOf="@id/til_sampling_probe_cleaning_time"
+            app:suffixText="ms">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tiet_stir_probe_cleaning_time"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="numberSigned"
+                android:text="153"
+                android:textSize="26dp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_stir_time"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:hint="搅拌时长"
+            android:textSize="18sp"
+            app:counterEnabled="true"
+            app:counterMaxLength="4"
+            app:layout_constraintLeft_toLeftOf="@id/til_sampling"
+            app:layout_constraintTop_toTopOf="@id/til_sampling_probe_cleaning_time"
+            app:suffixText="ms">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tiet_stir_time"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="numberSigned"
+                android:text="153"
+                android:textSize="26dp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_test1_delay_time"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:hint="第一次间隔时长"
+            android:textSize="18sp"
+            app:counterEnabled="true"
+            app:counterMaxLength="4"
+            app:layout_constraintLeft_toLeftOf="@id/til_sampling_probe_cleaning_time"
+            app:layout_constraintTop_toBottomOf="@id/til_sampling_probe_cleaning_time"
+            app:suffixText="s">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tiet_test1_delay_time"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="numberSigned"
+                android:text="153"
+                android:textSize="26dp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_test2_delay_time"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:hint="第二次间隔时长"
+            android:textSize="18sp"
+            app:counterEnabled="true"
+            app:counterMaxLength="3"
+            app:layout_constraintLeft_toLeftOf="@id/til_r2"
+            app:layout_constraintTop_toTopOf="@id/til_test1_delay_time"
+            app:suffixText="s">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tiet_test2_delay_time"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="numberSigned"
+                android:text="153"
+                android:textSize="26dp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_test3_delay_time"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:hint="第三次间隔时长"
+            android:textSize="18sp"
+            app:counterEnabled="true"
+            app:counterMaxLength="3"
+            app:layout_constraintLeft_toLeftOf="@id/til_sampling"
+            app:layout_constraintTop_toTopOf="@id/til_test1_delay_time"
+            app:suffixText="s">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tiet_test3_delay_time"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="numberSigned"
+                android:text="153"
+                android:textSize="26dp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_test4_delay_time"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:hint="第四次间隔时长"
+            android:textSize="18sp"
+            app:counterEnabled="true"
+            app:counterMaxLength="3"
+            app:layout_constraintLeft_toLeftOf="@id/til_test1_delay_time"
+            app:layout_constraintTop_toBottomOf="@id/til_test1_delay_time"
+            app:suffixText="s">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tiet_test4_delay_time"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="numberSigned"
+                android:text="153"
+                android:textSize="26dp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <Button
+            style="@style/BtnPositive"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:minWidth="300dp"
+            android:text="修改"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:id="@+id/btn_change"
+            app:layout_constraintTop_toBottomOf="@id/til_test4_delay_time" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

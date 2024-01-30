@@ -45,4 +45,6 @@
     <color name="shelf_sampling">#b0d7fa</color>
     <color name="shelf_sample_finish">#f5c145</color>
     <color name="text_details_state">#b0d7fa</color>
+    <color name="bg_item_settings">#80c5d5e0</color>
+    <color name="text_item_settings">#414775</color>
 </resources>

@@ -29,7 +29,7 @@ android {
 
     defaultConfig {
         applicationId "com.wl.turbidimetric"
-        minSdk 21
+        minSdk 24
         targetSdk 26
         versionCode 1
         versionName "1.0.0.0增加多项目拟合"

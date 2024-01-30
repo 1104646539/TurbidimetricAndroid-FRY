@@ -123,12 +123,13 @@ open class ConditionDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
         }
         cbToday?.setOnCheckedChangeListener { buttonView, isChecked ->
             today = isChecked
+            updateToday()
         }
 
         updateToday()
     }
 
-    val oneday = 1000L * 60 * 60 * 24
+    val oneday = 1000L * 60 * 60 * 24 - 1000
 
     /**
      * 更新到当天的时间检索

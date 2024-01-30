@@ -227,7 +227,7 @@
                 android:textSize="26dp" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             style="@style/BtnPositive"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

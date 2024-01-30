@@ -1,4 +1,4 @@
-package com.wl.turbidimetric.settings.fragments.detectionnum
+package com.wl.turbidimetric.settings.detectionnum
 
 import android.os.Bundle
 import androidx.fragment.app.viewModels

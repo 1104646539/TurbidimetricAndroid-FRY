@@ -1,4 +1,4 @@
-package com.wl.turbidimetric.settings.fragments.params
+package com.wl.turbidimetric.settings.params
 
 import androidx.lifecycle.viewModelScope
 import com.wl.turbidimetric.base.BaseViewModel

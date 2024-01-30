@@ -22,9 +22,9 @@ import com.wl.turbidimetric.view.dialog.*
 import com.wl.weiqianwllib.OrderUtil
 import com.wl.turbidimetric.base.BaseFragment
 import com.wl.turbidimetric.base.BaseViewModel
-import com.wl.turbidimetric.settings.fragments.detectionnum.DetectionNumFragment
-import com.wl.turbidimetric.settings.fragments.params.ParamsFragment
-import com.wl.turbidimetric.settings.fragments.testmode.TestModeFragment
+import com.wl.turbidimetric.settings.detectionnum.DetectionNumFragment
+import com.wl.turbidimetric.settings.params.ParamsFragment
+import com.wl.turbidimetric.settings.testmode.TestModeFragment
 import com.wl.wllib.LogToFile.i
 import com.wl.wllib.LogToFile.u
 import kotlinx.coroutines.Dispatchers

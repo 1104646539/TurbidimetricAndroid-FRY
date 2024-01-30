@@ -1,4 +1,4 @@
-package com.wl.turbidimetric.settings.fragments.testmode
+package com.wl.turbidimetric.settings.testmode
 
 import android.os.Bundle
 import androidx.fragment.app.viewModels

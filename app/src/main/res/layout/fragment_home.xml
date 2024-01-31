@@ -288,7 +288,7 @@
         <ImageView
             android:id="@+id/iv_temp"
             android:layout_width="wrap_content"
-            android:layout_height="71dp"
+            android:layout_height="wrap_content"
             android:src="@drawable/temp_1"
             app:layout_constraintLeft_toRightOf="@id/iv_cleanout_fluid"
             app:layout_constraintRight_toRightOf="parent"
@@ -342,13 +342,14 @@
             android:id="@+id/tv_details_state"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="未知"
+            android:text="未放入样本"
             android:textColor="@color/text_details_state"
             android:textSize="34sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@id/tv_details_state_hilt"
             app:layout_constraintLeft_toRightOf="@id/tv_details_state_hilt"
             app:layout_constraintTop_toTopOf="@id/tv_details_state_hilt" />
+
 
         <TextView
             android:id="@+id/tv_details_no_hilt"

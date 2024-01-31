@@ -41,8 +41,14 @@ object SystemGlobal {
             field = value
             _obDebugMode.value = value
         }
+
     private val _obDebugMode = MutableStateFlow(false)
     val obDebugMode = _obDebugMode.asStateFlow()
+
+    /**
+     * 是否是在升级中
+     */
+    var mcuUpdate = false
 
     /**
      * 上传配置

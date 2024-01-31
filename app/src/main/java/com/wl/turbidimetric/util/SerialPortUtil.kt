@@ -4,6 +4,7 @@ import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.SerialGlobal
 import com.wl.turbidimetric.global.SystemGlobal
+import com.wl.turbidimetric.mcuupdate.UpdateResult
 import com.wl.turbidimetric.model.*
 import com.wl.turbidimetric.test.TestSerialPort
 import com.wl.weiqianwllib.serialport.BaseSerialPort
@@ -65,6 +66,15 @@ object SerialPortUtil {
      */
     var allowRunning = true
 
+    /**
+     * 升级mcu的回调，开始
+     */
+    var mcuUpdateCallBack: McuUpdateCallBack? = null
+
+    /**
+     * 升级mcu的回调，升级结果
+     */
+    var onResult: ((UpdateResult) -> Unit)? = null
     init {
         open()
     }
@@ -73,7 +83,7 @@ object SerialPortUtil {
         if (SystemGlobal.isCodeDebug) {
             TestSerialPort.callback = this::dispatchData
         } else {
-            serialPort.openSerial(WQSerialGlobal.COM1, 9600, 8)
+            serialPort.openSerial(WQSerialGlobal.COM1, 115200, 8)
             openRead()
         }
         openWrite()
@@ -295,6 +305,11 @@ object SerialPortUtil {
                 }
             }
 
+            SerialGlobal.CMD_McuUpdate -> {
+                mcuUpdateCallBack?.readDataMcuUpdate(transitionMcuUpdateModel(ready))
+
+            }
+
             else -> {}
         }
     }
@@ -335,6 +350,10 @@ object SerialPortUtil {
                 while (true) {
                     Thread.sleep(50)
                     val take = sendQueue.take()
+                    if (SystemGlobal.mcuUpdate) {
+                        //升级中不发送任何命令
+                        continue
+                    }
 //                    println("take=$take")
                     if (take != null) {
                         if (isNeedRetry(take)) {
@@ -398,6 +417,10 @@ object SerialPortUtil {
                         data.addAll(re)
 //                        c("每次接收的re=${re.toHex()}")
                     }
+                    if (SystemGlobal.mcuUpdate) {
+                        parseMcuUpdate()
+                        continue
+                    }
                     if (data.size < hCount + allCount) {
                         continue
                     }
@@ -454,6 +477,23 @@ object SerialPortUtil {
         }
     }
 
+
+
+    /**
+     * mcu升级的解析
+     */
+    private fun parseMcuUpdate() {
+        if (data.isNotEmpty()) {
+            val str = String(data.toUByteArray().toByteArray())
+            if(str == "1"){
+                onResult?.invoke(UpdateResult.Success("升级成功"))
+            }else{
+                onResult?.invoke(UpdateResult.Success("升级失败 $str"))
+            }
+            data.clear()
+        }
+    }
+
     private fun writeAsync(data: UByteArray) {
 //        c("writeAsync ${data.toHex()}")
         originalCallback.forEach {
@@ -496,6 +536,10 @@ object SerialPortUtil {
                 sendMap[data[0]] = 1
             }
         }
+    }
+
+    fun updateWrite(data: UByteArray) {
+        write(data)
     }
 
     /**
@@ -888,6 +932,20 @@ object SerialPortUtil {
     }
 
     /**
+     * 升级mcu
+     */
+    fun mcuUpdate(fileSize: Long) {
+        writeAsync(
+            createCmd(
+                SerialGlobal.CMD_McuUpdate,
+                data2 = (fileSize shr 16).toUByte(),
+                data3 = (fileSize shr 8).toUByte(),
+                data4 = (fileSize ).toUByte(),
+            )
+        )
+    }
+
+    /**
      * 创建一个完整的命令
      */
     private fun createCmd(
@@ -903,6 +961,7 @@ object SerialPortUtil {
         t = t.plus(crc[1])
         return t
     }
+
 }
 
 interface Callback2 {
@@ -929,6 +988,10 @@ interface Callback2 {
     fun readDataTempModel(reply: ReplyModel<TempModel>)
     fun stateSuccess(cmd: Int, state: Int): Boolean
     fun readDataSqueezing(reply: ReplyModel<SqueezingModel>)
+}
+
+fun interface McuUpdateCallBack {
+    fun readDataMcuUpdate(reply: ReplyModel<McuUpdateModel>)
 }
 
 interface OriginalDataCall {

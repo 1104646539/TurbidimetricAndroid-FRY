@@ -316,3 +316,15 @@ fun transitionSqueezingModel(data: UByteArray): ReplyModel<SqueezingModel> {
         )
     )
 }
+/**
+ * 解析成 mcu升级
+ * @param data UByteArray
+ * @return ReplyModel<SqueezingModel>
+ */
+fun transitionMcuUpdateModel(data: UByteArray): ReplyModel<McuUpdateModel> {
+    return ReplyModel(
+        SerialGlobal.CMD_McuUpdate, convertReplyState(data[1].toInt()), McuUpdateModel(
+            data[3].toInt() == 1,
+        )
+    )
+}

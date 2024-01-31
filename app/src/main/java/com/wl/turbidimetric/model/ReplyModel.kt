@@ -235,4 +235,7 @@ data class TempModel(val reactionTemp: Int = 0, val r1Temp: Int = 0)
  */
 data class SqueezingModel(val v: Int = 0)
 
-
+/**
+ * 升级mcu
+ */
+data class McuUpdateModel(val ready: Boolean = false)

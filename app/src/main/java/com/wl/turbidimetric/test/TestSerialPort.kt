@@ -112,6 +112,9 @@ object TestSerialPort {
 //                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x0u))//取样成功
 //                reply = ubyteArrayOf(data[0], 0x04u, 0x0u, 0x0u, 0x0u, 0x0u)//取样失败
             }
+            SerialGlobal.CMD_McuUpdate -> {
+                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x1u))//是否准备好 1是 0否
+            }
 
             else -> {
                 reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x0u))

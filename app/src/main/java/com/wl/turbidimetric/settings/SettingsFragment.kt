@@ -22,6 +22,8 @@ import com.wl.turbidimetric.view.dialog.*
 import com.wl.weiqianwllib.OrderUtil
 import com.wl.turbidimetric.base.BaseFragment
 import com.wl.turbidimetric.base.BaseViewModel
+import com.wl.turbidimetric.mcuupdate.McuUpdateHelper
+import com.wl.turbidimetric.mcuupdate.UpdateResult
 import com.wl.turbidimetric.settings.detectionnum.DetectionNumFragment
 import com.wl.turbidimetric.settings.params.ParamsFragment
 import com.wl.turbidimetric.settings.testmode.TestModeFragment
@@ -51,6 +53,9 @@ class SettingsFragment :
     }
 
     override val vm: BaseViewModel by lazy { BaseViewModel() }
+    private val mcuUpdateHiltDialog by lazy {
+        HiltDialog(requireContext())
+    }
 
     private val machineTestModelDialog by lazy {
         MachineTestModelDialog(requireContext())
@@ -153,6 +158,10 @@ class SettingsFragment :
             projectList()
 //            vd.wgpSelectable.setSelected(it.id)
         }
+        vd.tvSoftVersionMcu.setOnClickListener {
+            u("MCU升级")
+            showHiltMcuUpdate()
+        }
         val versionAndroid = String(
             ((getPackageInfo(requireContext())?.versionName) ?: "").toByteArray(),
             charset("UTF-8")
@@ -163,6 +172,46 @@ class SettingsFragment :
         vd.tvSoftVersionMcu.text = "MCU版本:${SystemGlobal.mcuVersion}"
 
         vd.sivParamsSetting.performClick()
+    }
+
+    private fun showHiltMcuUpdate() {
+        mcuUpdateHiltDialog.showPop(requireContext(), isCancelable = false) {
+            it.showDialog(
+                "是否升级MCU，请确定已经插入含升级文件的U盘",
+                confirmText = "升级",
+                confirmClick = {
+                    mcuUpdate()
+                },
+                cancelText = "取消",
+                cancelClick = { it.dismiss() })
+        }
+    }
+
+    private fun mcuUpdate() {
+        mcuUpdateHiltDialog.showPop(requireContext(), isCancelable = false) {
+            it.showDialog("请等待……")
+        }
+        McuUpdateHelper.update(Dispatchers.IO, Dispatchers.Main, lifecycleScope) {
+            if (it is UpdateResult.Failed) {
+                mcuUpdateHiltDialog.showPop(requireContext(), isCancelable = false) { dialog ->
+                    dialog.showDialog(
+                        "升级失败,${it.msg}",
+                        confirmText = "确定",
+                        confirmClick = {
+                            it.dismiss()
+                        })
+                }
+            } else {
+                mcuUpdateHiltDialog.showPop(requireContext(), isCancelable = false) { dialog ->
+                    dialog.showDialog(
+                        "升级成功,请重启仪器生效",
+                        confirmText = "确定",
+                        confirmClick = {
+                            it.dismiss()
+                        })
+                }
+            }
+        }
     }
 
     var curFragment: Fragment? = null

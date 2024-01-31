@@ -113,6 +113,10 @@ object SerialGlobal {
      * 挤压
      */
     const val CMD_Squeezing:UByte = 0x17u
+    /**
+     * 升级mcu
+     */
+    const val CMD_McuUpdate:UByte = 0x18u
 
     /**
      * 响应

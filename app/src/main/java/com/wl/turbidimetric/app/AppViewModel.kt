@@ -4,9 +4,12 @@ import androidx.lifecycle.viewModelScope
 import com.wl.turbidimetric.base.BaseViewModel
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.datastore.LocalDataGlobal
+import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.MachineTestModel
 import com.wl.turbidimetric.model.TestState
 import com.wl.turbidimetric.upload.hl7.util.ConnectStatus
+import com.wl.turbidimetric.util.SerialPortIF
+import com.wl.turbidimetric.util.SerialPortImpl
 import com.wl.wllib.DateUtil
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -19,6 +22,8 @@ import kotlin.concurrent.timer
  * 全局唯一的ViewModel，用来保存全局通用的属性
  */
 class AppViewModel : BaseViewModel() {
+    val serialPort: SerialPortIF = SerialPortImpl(SystemGlobal.isCodeDebug)
+
     /**
      * 仪器状态
      */
@@ -58,10 +63,11 @@ class AppViewModel : BaseViewModel() {
     /**
      * 仪器检测模式
      */
-    private val _machineTestMode = MutableStateFlow(MachineTestModel.valueOf(LocalData.CurMachineTestModel))
+    private val _machineTestMode =
+        MutableStateFlow(MachineTestModel.valueOf(LocalData.CurMachineTestModel))
     val machineTestModel = _machineTestMode.asSharedFlow()
 
-    fun changeMachineTestModel(machineTestModel: MachineTestModel){
+    fun changeMachineTestModel(machineTestModel: MachineTestModel) {
         this._machineTestMode.value = machineTestModel
     }
 
@@ -71,9 +77,10 @@ class AppViewModel : BaseViewModel() {
     private val _detectionNum = MutableStateFlow(LocalData.DetectionNum.toLong())
     val detectionNum = _detectionNum.asSharedFlow()
 
-    fun changeDetectionNum(detectionNum:Long){
+    fun changeDetectionNum(detectionNum: Long) {
         this._detectionNum.value = detectionNum
     }
+
     /**
      * 更新当前时间
      */

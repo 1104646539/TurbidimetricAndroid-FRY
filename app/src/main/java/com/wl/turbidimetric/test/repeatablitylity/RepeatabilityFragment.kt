@@ -41,7 +41,7 @@ class RepeatabilityFragment :
     }
 
     override fun initViewModel() {
-        vd.model = vm
+//        vd.model = vm
     }
 
     override fun init(savedInstanceState: Bundle?) {
@@ -88,6 +88,12 @@ class RepeatabilityFragment :
             override fun onNothingSelected(parent: AdapterView<*>?) {
                 vm.selectProject = null
             }
+        }
+        vd.btnStart.setOnClickListener {
+            vm.clickStart()
+        }
+        vd.btnStartMoveData.setOnClickListener {
+            vm.clickMoveToRepository()
         }
     }
 

@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 
 class TestModeFragment :
     BaseFragment<TestModeViewModel, FragmentTestModeBinding>(R.layout.fragment_test_mode) {
-    override val vm: TestModeViewModel by viewModels()
+    override val vm: TestModeViewModel by viewModels{TestModeViewModelFactory()}
     private val hiltDialog by lazy { HiltDialog(requireContext()) }
     override fun initViewModel() {
 
@@ -87,7 +87,6 @@ class TestModeFragment :
 
     companion object {
         @JvmStatic
-//        fun newInstance() = ParamsFragment()
         val instance: TestModeFragment by lazy { TestModeFragment() }
     }
 }

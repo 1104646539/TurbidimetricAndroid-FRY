@@ -25,6 +25,7 @@ import com.wl.turbidimetric.upload.service.OnGetPatientCallback
 import com.wl.turbidimetric.view.dialog.*
 import com.wl.turbidimetric.base.BaseFragment
 import com.wl.turbidimetric.model.Item
+import com.wl.turbidimetric.model.MachineTestModel
 import com.wl.turbidimetric.model.SampleState
 import com.wl.turbidimetric.view.ShelfView
 import kotlinx.coroutines.launch
@@ -240,7 +241,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             if (vm.selectProject == null) {
                 showConfigDialog()
                 toast("请选择标曲")
-            } else if (!isAuto() && vm.needSamplingNum <= 0) {
+            } else if (!vm.isAuto() && vm.needSamplingNum <= 0) {
                 showConfigDialog()
                 toast("请输入检测数量")
             } else {
@@ -371,8 +372,9 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 projects,
                 vm.selectProject,
                 vm.cuvetteStartPos,
-                if (vm.detectionNumInput.isNullOrEmpty()) LocalData.DetectionNum else vm.detectionNumInput,
+                if (vm.detectionNumInput.isNullOrEmpty()) vm.getDetectionNum() else vm.detectionNumInput,
                 vm.needSamplingNum,
+                vm.isAuto(),
                 { projectModel, skipNum, detectionNum, sampleNum, baseDialog ->
                     if (projectModel == null) {
                         toast("请选择标曲")
@@ -623,12 +625,12 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 
         lifecycleScope.launch {
             appVm.machineTestModel.collectLatest {
-                vd.tvSettingsTestNum.visibility = (!isAuto()).isShow()
+                vd.tvSettingsTestNum.visibility = (!vm.isAuto()).isShow()
             }
         }
         lifecycleScope.launch {
             appVm.detectionNum.collectLatest {
-                vd.tvSettingsStartNum.text = it.toString()
+                vd.tvSettingsStartNum.text = "起始编号:   ${it.toString()}"
             }
         }
     }

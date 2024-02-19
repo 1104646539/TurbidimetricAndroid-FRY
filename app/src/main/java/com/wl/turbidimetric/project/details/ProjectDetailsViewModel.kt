@@ -3,7 +3,7 @@ package com.wl.turbidimetric.project.details
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.wl.turbidimetric.home.ProjectRepository
+import com.wl.turbidimetric.repository.ProjectRepository
 import com.wl.turbidimetric.model.ProjectModel
 import com.wl.turbidimetric.base.BaseViewModel
 import kotlinx.coroutines.flow.Flow

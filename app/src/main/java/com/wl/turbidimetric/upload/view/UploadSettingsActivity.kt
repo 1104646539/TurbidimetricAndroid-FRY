@@ -5,8 +5,9 @@ import androidx.activity.viewModels
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
 import com.wl.turbidimetric.R
+import com.wl.turbidimetric.base.BaseActivity
 import com.wl.turbidimetric.databinding.ActivityUploadSettingsBinding
-import com.wl.turbidimetric.datastore.LocalData
+import com.wl.turbidimetric.ex.selectionLast
 import com.wl.turbidimetric.ex.toast
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.CurveModel
@@ -25,16 +26,14 @@ import com.wl.turbidimetric.util.ActivityDataBindingDelegate
 import com.wl.turbidimetric.view.dialog.GetTestPatientInfoDialog
 import com.wl.turbidimetric.view.dialog.HiltDialog
 import com.wl.turbidimetric.view.dialog.PatientInfoDialog
+import com.wl.turbidimetric.view.dialog.isShow
 import com.wl.turbidimetric.view.dialog.showPop
 import com.wl.wllib.LogToFile.i
 import com.wl.wllib.isIP
-import com.wl.turbidimetric.base.BaseActivity
-import com.wl.turbidimetric.ex.selectionLast
-import com.wl.turbidimetric.view.dialog.isShow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import java.util.*
+import java.util.Date
 
 /**
  * 上传设置
@@ -235,7 +234,7 @@ class UploadSettingsActivity :
                 name = "张三",
                 gender = "男",
                 age = "30",
-                detectionNum = LocalData.getDetectionNumInc(),
+                detectionNum = vm.getDetectionNumInc(),
                 sampleBarcode = "ABCD",
                 testTime = Date().time,
                 deliveryTime = "20220202020202",

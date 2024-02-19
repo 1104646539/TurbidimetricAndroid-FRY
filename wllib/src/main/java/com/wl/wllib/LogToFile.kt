@@ -15,7 +15,7 @@ object LogToFile {
     private var file1: File? = null
     private var file2: File? = null
     private var curFile: File? = null
-    var MaxSize = 300 * 1024 * 1024
+    var MaxSize = 100 * 1024 * 1024
 
     val DateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss SSS")
     var fos: FileOutputStream? = null

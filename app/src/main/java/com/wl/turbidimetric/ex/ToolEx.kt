@@ -15,16 +15,10 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.github.mikephil.charting.data.Entry
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.app.App
-import com.wl.turbidimetric.app.AppViewModel
-import com.wl.turbidimetric.datastore.LocalData
-import com.wl.turbidimetric.global.SystemGlobal
-import com.wl.turbidimetric.model.MachineTestModel
 import com.wl.turbidimetric.model.CurveModel
+import com.wl.turbidimetric.model.MachineTestModel
 import com.wl.turbidimetric.model.ProjectModel
 import com.wl.turbidimetric.model.SampleType
-import com.wl.turbidimetric.model.TestState
-import com.wl.turbidimetric.util.CurveFitter
-import com.wl.turbidimetric.util.CurveFitterUtil
 import com.wl.turbidimetric.util.Fitter
 import com.wl.turbidimetric.util.FitterFactory
 import com.wl.turbidimetric.util.FitterType
@@ -251,7 +245,7 @@ fun calculateMean(numArray: DoubleArray): Double {
  * 是否是自动模式
  * @return Boolean
  */
-fun isAuto(machineTestModel: MachineTestModel = MachineTestModel.valueOf(LocalData.CurMachineTestModel)): Boolean {
+fun isAuto(machineTestModel: MachineTestModel ): Boolean {
     return machineTestModel == MachineTestModel.Auto
 }
 
@@ -259,7 +253,7 @@ fun isAuto(machineTestModel: MachineTestModel = MachineTestModel.valueOf(LocalDa
  * 是否是手动加样模式
  * @return Boolean
  */
-fun isManualSampling(machineTestModel: MachineTestModel = MachineTestModel.valueOf(LocalData.CurMachineTestModel)): Boolean {
+fun isManualSampling(machineTestModel: MachineTestModel ): Boolean {
     return machineTestModel == MachineTestModel.ManualSampling
 }
 
@@ -267,7 +261,7 @@ fun isManualSampling(machineTestModel: MachineTestModel = MachineTestModel.value
  * 是否是手动模式
  * @return Boolean
  */
-fun isManual(machineTestModel: MachineTestModel = MachineTestModel.valueOf(LocalData.CurMachineTestModel)): Boolean {
+fun isManual(machineTestModel: MachineTestModel ): Boolean {
     return machineTestModel == MachineTestModel.Manual
 }
 

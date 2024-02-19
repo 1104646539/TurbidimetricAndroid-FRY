@@ -1,13 +1,17 @@
 package com.wl.turbidimetric.settings.detectionnum
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.wl.turbidimetric.base.BaseViewModel
 import com.wl.turbidimetric.datastore.LocalData
+import com.wl.turbidimetric.repository.DefaultLocalDataDataSource
+import com.wl.turbidimetric.repository.if2.LocalDataSource
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
-class DetectionNumViewModel : BaseViewModel() {
+class DetectionNumViewModel(private val localDataDataSource: LocalDataSource) : BaseViewModel() {
     private val _detectionNumUiState = MutableSharedFlow<DetectionNumUiState>()
     val detectionNumUiState = _detectionNumUiState.asSharedFlow()
 
@@ -17,7 +21,7 @@ class DetectionNumViewModel : BaseViewModel() {
         viewModelScope.launch {
             _detectionNumUiState.emit(
                 DetectionNumUiState(
-                    LocalData.DetectionNum.toLongOrNull() ?: 0,
+                    localDataDataSource.getDetectionNum().toLongOrNull() ?: 0,
                 )
             )
         }
@@ -35,7 +39,7 @@ class DetectionNumViewModel : BaseViewModel() {
             }
             return
         }
-        LocalData.DetectionNum = detectionNum.toString()
+        localDataDataSource.setDetectionNum(detectionNum.toString())
 
         viewModelScope.launch {
             _hiltText.emit("修改成功")
@@ -50,6 +54,17 @@ class DetectionNumViewModel : BaseViewModel() {
         }
 
         return ""
+    }
+}
+
+class DetectionNumViewModelFactory(
+    private val localDataDataSource: LocalDataSource = DefaultLocalDataDataSource()
+) : ViewModelProvider.NewInstanceFactory() {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(DetectionNumViewModel::class.java)) {
+            return DetectionNumViewModel(localDataDataSource) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
 

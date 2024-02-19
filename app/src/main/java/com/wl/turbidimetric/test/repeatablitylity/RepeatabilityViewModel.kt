@@ -9,8 +9,8 @@ import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.global.SystemGlobal.testType
-import com.wl.turbidimetric.home.CurveRepository
-import com.wl.turbidimetric.home.TestResultRepository
+import com.wl.turbidimetric.repository.CurveRepository
+import com.wl.turbidimetric.repository.TestResultRepository
 import com.wl.turbidimetric.model.*
 import com.wl.turbidimetric.util.Callback2
 import com.wl.turbidimetric.util.SerialPortUtil

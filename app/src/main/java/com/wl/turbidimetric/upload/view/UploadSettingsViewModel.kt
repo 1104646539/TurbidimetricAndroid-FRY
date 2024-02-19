@@ -1,13 +1,27 @@
 package com.wl.turbidimetric.upload.view
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import com.wl.turbidimetric.app.App
+import com.wl.turbidimetric.app.AppViewModel
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.upload.model.ConnectConfig
 import com.wl.turbidimetric.upload.model.GetPatientType
 import com.wl.weiqianwllib.serialport.WQSerialGlobal
 import com.wl.turbidimetric.base.BaseViewModel
+import com.wl.turbidimetric.ex.getAppViewModel
+import com.wl.turbidimetric.home.HomeViewModel
+import com.wl.turbidimetric.repository.DefaultCurveDataSource
+import com.wl.turbidimetric.repository.DefaultLocalDataDataSource
+import com.wl.turbidimetric.repository.DefaultProjectDataSource
+import com.wl.turbidimetric.repository.DefaultTestResultDataSource
+import com.wl.turbidimetric.repository.if2.CurveSource
+import com.wl.turbidimetric.repository.if2.LocalDataSource
+import com.wl.turbidimetric.repository.if2.ProjectSource
+import com.wl.turbidimetric.repository.if2.TestResultSource
 import kotlinx.coroutines.flow.MutableStateFlow
 
-class UploadSettingsViewModel : BaseViewModel() {
+class UploadSettingsViewModel( private val localDataRepository: LocalDataSource ) : BaseViewModel() {
 
     var autUpload = MutableStateFlow(false)
 
@@ -53,5 +67,21 @@ class UploadSettingsViewModel : BaseViewModel() {
             getPatient = getPatient.value,
             twoWay = twoway.value
         )
+    }
+
+    fun getDetectionNumInc(): String {
+        return localDataRepository.getDetectionNumInc()
+    }
+}
+class UploadSettingsViewModelFactory(
+    private val localDataRepository: LocalDataSource = DefaultLocalDataDataSource()
+) : ViewModelProvider.NewInstanceFactory() {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(UploadSettingsViewModel::class.java)) {
+            return UploadSettingsViewModel(
+                localDataRepository
+            ) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

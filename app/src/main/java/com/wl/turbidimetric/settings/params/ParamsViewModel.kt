@@ -1,13 +1,20 @@
 package com.wl.turbidimetric.settings.params
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.wl.turbidimetric.base.BaseViewModel
 import com.wl.turbidimetric.datastore.LocalData
+import com.wl.turbidimetric.home.HomeViewModel
+import com.wl.turbidimetric.repository.DefaultLocalDataDataSource
+import com.wl.turbidimetric.repository.if2.LocalDataSource
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
-class ParamsViewModel : BaseViewModel() {
+class ParamsViewModel constructor(
+    private val localDataSource: LocalDataSource
+) : BaseViewModel() {
     private val _paramsUiState = MutableSharedFlow<ParamsUiState>()
     val paramsUiState = _paramsUiState.asSharedFlow()
 
@@ -17,16 +24,16 @@ class ParamsViewModel : BaseViewModel() {
         viewModelScope.launch {
             _paramsUiState.emit(
                 ParamsUiState(
-                    LocalData.TakeReagentR1,
-                    LocalData.TakeReagentR2,
-                    LocalData.SamplingVolume,
-                    LocalData.SamplingProbeCleaningDuration,
-                    LocalData.StirProbeCleaningDuration,
-                    LocalData.StirDuration,
-                    LocalData.Test1DelayTime,
-                    LocalData.Test2DelayTime,
-                    LocalData.Test3DelayTime,
-                    LocalData.Test4DelayTime,
+                    localDataSource.getTakeReagentR1(),
+                    localDataSource.getTakeReagentR2(),
+                    localDataSource.getSamplingVolume(),
+                    localDataSource.getSamplingProbeCleaningDuration(),
+                    localDataSource.getStirProbeCleaningDuration(),
+                    localDataSource.getStirDuration(),
+                    localDataSource.getTest1DelayTime(),
+                    localDataSource.getTest2DelayTime(),
+                    localDataSource.getTest3DelayTime(),
+                    localDataSource.getTest4DelayTime(),
                 )
             )
         }
@@ -56,22 +63,22 @@ class ParamsViewModel : BaseViewModel() {
             test3DelayTime,
             test4DelayTime
         )
-        if(verRet.isNotEmpty()){
+        if (verRet.isNotEmpty()) {
             viewModelScope.launch {
                 _hiltText.emit("$verRet")
             }
             return
         }
-        LocalData.TakeReagentR1 = r1Volume
-        LocalData.TakeReagentR2 = r2Volume
-        LocalData.SamplingVolume = samplingVolume
-        LocalData.SamplingProbeCleaningDuration = samplingProbeCleaningDuration
-        LocalData.StirProbeCleaningDuration = stirProbeCleaningDuration
-        LocalData.StirDuration = stirDuration
-        LocalData.Test1DelayTime = test1DelayTime
-        LocalData.Test2DelayTime = test2DelayTime
-        LocalData.Test3DelayTime = test3DelayTime
-        LocalData.Test4DelayTime = test4DelayTime
+        localDataSource.setTakeReagentR1(r1Volume)
+        localDataSource.setTakeReagentR2(r2Volume)
+        localDataSource.setSamplingVolume(samplingVolume)
+        localDataSource.setSamplingProbeCleaningDuration(samplingProbeCleaningDuration)
+        localDataSource.setStirProbeCleaningDuration(stirProbeCleaningDuration)
+        localDataSource.setStirDuration(stirDuration)
+        localDataSource.setTest1DelayTime(test1DelayTime)
+        localDataSource.setTest2DelayTime(test2DelayTime)
+        localDataSource.setTest3DelayTime(test3DelayTime)
+        localDataSource.setTest4DelayTime(test4DelayTime)
 
         viewModelScope.launch {
             _hiltText.emit("修改成功")
@@ -117,6 +124,19 @@ class ParamsViewModel : BaseViewModel() {
 
 
         return ""
+    }
+}
+
+class ParamsViewModelFactory(
+    private val localDataSource: LocalDataSource = DefaultLocalDataDataSource()
+) : ViewModelProvider.NewInstanceFactory() {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(ParamsViewModel::class.java)) {
+            return ParamsViewModel(
+                localDataSource
+            ) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
 

@@ -1,17 +1,24 @@
-package com.wl.turbidimetric.home
+package com.wl.turbidimetric.repository
 
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
-import com.wl.turbidimetric.app.App
+import androidx.paging.PagingData
+import com.wl.turbidimetric.dao.MainDao
 import com.wl.turbidimetric.model.ConditionModel
 import com.wl.turbidimetric.model.TestResultAndCurveModel
 import com.wl.turbidimetric.model.TestResultModel
+import com.wl.turbidimetric.repository.if2.TestResultSource
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 
-class TestResultRepository {
-    val dao = App.instance!!.mainDao
+class DefaultTestResultDataSource constructor(
+    private val dao: MainDao,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
+) : TestResultSource {
 
-    fun datas(condition: ConditionModel) =
-        Pager(
+    override fun listenerTestResult(condition: ConditionModel): Flow<PagingData<TestResultAndCurveModel>> {
+        return Pager(
             PagingConfig(pageSize = 50),
         ) {
             dao.listenerTestResultAndCurveModels(
@@ -25,13 +32,14 @@ class TestResultRepository {
                 condition.results.size
             )
         }.flow
+    }
 
 
-    suspend fun addTestResult(testResultModel: TestResultModel): Long {
+    override suspend fun addTestResult(testResultModel: TestResultModel): Long {
         return dao.insertTestResultModel(testResultModel)
     }
 
-    suspend fun countTestResultAndCurveModels(condition: ConditionModel): Long {
+    override suspend fun countTestResultAndCurveModels(condition: ConditionModel): Long {
         return dao.countTestResultAndCurveModels(
             condition.name,
             condition.qrcode,
@@ -44,28 +52,28 @@ class TestResultRepository {
         )
     }
 
-    suspend fun addTestResults(testResultModel: List<TestResultModel>) {
+    override suspend fun addTestResults(testResultModel: List<TestResultModel>) {
         dao.insertTestResultModels(*(testResultModel.toTypedArray()))
     }
 
-    suspend fun getTestResultAndCurveModelById(id: Long): TestResultAndCurveModel {
+    override suspend fun getTestResultAndCurveModelById(id: Long): TestResultAndCurveModel {
         return dao.getTestResultAndCurveModelById(id)
     }
 
-    suspend fun getTestResultModelById(id: Long): TestResultModel {
+    override suspend fun getTestResultModelById(id: Long): TestResultModel {
         return dao.getTestResultModelById(id)
     }
 
-    suspend fun updateTestResult(testResultModel: TestResultModel): Int {
+    override suspend fun updateTestResult(testResultModel: TestResultModel): Int {
         return dao.updateTestResultModel(testResultModel)
     }
 
 
-    suspend fun removeTestResult(testResults: List<TestResultModel>) {
+    override suspend fun removeTestResult(testResults: List<TestResultModel>) {
         dao.removeTestResultModel(*(testResults.toTypedArray()))
     }
 
-    suspend fun getAllTestResult(condition: ConditionModel): List<TestResultAndCurveModel> {
+    override suspend fun getAllTestResult(condition: ConditionModel): List<TestResultAndCurveModel> {
         return dao.getTestResultAndCurveModels(
             condition.name,
             condition.qrcode,

@@ -4,15 +4,19 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import com.lxj.xpopup.core.BasePopupView
 import com.wl.turbidimetric.R
+import com.wl.turbidimetric.base.BaseFragment
 import com.wl.turbidimetric.databinding.FragmentSettingsBinding
-import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.SystemGlobal
-import com.wl.turbidimetric.model.MachineTestModel
+import com.wl.turbidimetric.mcuupdate.McuUpdateHelper
+import com.wl.turbidimetric.mcuupdate.UpdateResult
 import com.wl.turbidimetric.project.list.ProjectListActivity
+import com.wl.turbidimetric.settings.detectionnum.DetectionNumFragment
+import com.wl.turbidimetric.settings.params.ParamsFragment
+import com.wl.turbidimetric.settings.testmode.TestModeFragment
 import com.wl.turbidimetric.test.TestActivity
 import com.wl.turbidimetric.test.debug.DebugActivity
 import com.wl.turbidimetric.upload.view.UploadSettingsActivity
@@ -20,21 +24,14 @@ import com.wl.turbidimetric.util.ExportLogHelper
 import com.wl.turbidimetric.view.*
 import com.wl.turbidimetric.view.dialog.*
 import com.wl.weiqianwllib.OrderUtil
-import com.wl.turbidimetric.base.BaseFragment
-import com.wl.turbidimetric.base.BaseViewModel
-import com.wl.turbidimetric.mcuupdate.McuUpdateHelper
-import com.wl.turbidimetric.mcuupdate.UpdateResult
-import com.wl.turbidimetric.settings.detectionnum.DetectionNumFragment
-import com.wl.turbidimetric.settings.params.ParamsFragment
-import com.wl.turbidimetric.settings.testmode.TestModeFragment
 import com.wl.wllib.LogToFile.i
 import com.wl.wllib.LogToFile.u
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-class SettingsFragment :
-    BaseFragment<BaseViewModel, FragmentSettingsBinding>(R.layout.fragment_settings) {
+class SettingsFragment constructor() :
+    BaseFragment<SettingsViewModel, FragmentSettingsBinding>(R.layout.fragment_settings) {
     private val TAG = "SettingsFragment"
     private var show = false
 
@@ -52,7 +49,7 @@ class SettingsFragment :
         fun newInstance() = SettingsFragment()
     }
 
-    override val vm: BaseViewModel by lazy { BaseViewModel() }
+    override val vm: SettingsViewModel by viewModels { SettingsViewModelFactory() }
     private val mcuUpdateHiltDialog by lazy {
         HiltDialog(requireContext())
     }
@@ -293,8 +290,8 @@ class SettingsFragment :
         clickOrder++
         handler.postDelayed(runnable_order, 5000)
         if (clickOrder >= clickOrderCount) {
-            LocalData.DebugMode = !LocalData.DebugMode
-            SystemGlobal.isDebugMode = LocalData.DebugMode
+            vm.setTestModel(!vm.getTestModel())
+            SystemGlobal.isDebugMode = vm.getTestModel()
             clickOrder = 0
         }
     }

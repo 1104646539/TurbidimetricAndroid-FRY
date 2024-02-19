@@ -5,13 +5,8 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.EditText
 import android.widget.Spinner
-import android.widget.Switch
 import com.lxj.xpopup.core.BasePopupView
 import com.wl.turbidimetric.R
-import com.wl.turbidimetric.datastore.LocalData
-import com.wl.turbidimetric.ex.isAuto
-import com.wl.turbidimetric.ex.isManual
-import com.wl.turbidimetric.ex.isManualSampling
 import com.wl.turbidimetric.ex.selectionLast
 import com.wl.turbidimetric.ex.toast
 import com.wl.turbidimetric.home.HomeProjectAdapter
@@ -35,6 +30,7 @@ class HomeConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_ho
     var projectAdapter: HomeProjectAdapter? = null
     val items: MutableList<CurveModel> = mutableListOf()
 
+    var isAutoMode: Boolean = true
     var configViewEnable: Boolean? = null
     var curveModel: CurveModel?? = null
     var skipNum: Int? = null
@@ -48,6 +44,7 @@ class HomeConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_ho
         skipNum: Int,
         detectionNum: String,
         sampleNum: Int,
+        isAutoMode:Boolean,
         onConfirm: ((CurveModel?, Int, String, Int, BasePopupView) -> Unit)? = null,
         onCancel: onClick,
     ) {
@@ -62,6 +59,7 @@ class HomeConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_ho
         this.detectionNum = detectionNum
         this.sampleNum = sampleNum
 
+        this.isAutoMode = isAutoMode
         items.clear()
         items.addAll(curveModels)
         projectAdapter?.notifyDataSetChanged()
@@ -95,7 +93,7 @@ class HomeConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_ho
             spnProject?.adapter = projectAdapter
         }
 
-        llSampleNum?.visibility = if (isAuto()) View.GONE else View.VISIBLE
+        llSampleNum?.visibility = if (isAutoMode) View.GONE else View.VISIBLE
 
         spnProject?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
@@ -119,7 +117,7 @@ class HomeConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_ho
         var sampleNum: Int = (etSampleNum?.text?.trim().toString()).toIntOrNull() ?: 0
         var skipNum: Int = (etSkipNum?.text?.trim().toString()).toIntOrNull() ?: 0
         var detectionNum: String = etDetectionNum?.text?.trim().toString()
-        if (!isAuto()) {
+        if (!isAutoMode) {
             if (sampleNum < 0 || sampleNum > 50) {
                 sampleNum = 0
                 toast("检测数量必须为1-50")
@@ -133,9 +131,9 @@ class HomeConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_ho
         }
 
 
-        if (detectionNum.isNullOrEmpty()) {
-            detectionNum = LocalData.DetectionNum
-        }
+//        if (detectionNum.isNullOrEmpty()) {
+//            detectionNum = LocalData.DetectionNum
+//        }
 
         onConfirm?.invoke(
             selectProject,

@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 
 class ParamsFragment :
     BaseFragment<ParamsViewModel, FragmentParamsBinding>(R.layout.fragment_params) {
-    override val vm: ParamsViewModel by viewModels()
+    override val vm: ParamsViewModel by viewModels { ParamsViewModelFactory() }
     private val hiltDialog by lazy { HiltDialog(requireContext()) }
     override fun initViewModel() {
 

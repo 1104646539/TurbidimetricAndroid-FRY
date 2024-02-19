@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.wl.turbidimetric.app.App
 import com.wl.turbidimetric.app.AppViewModel
 import com.wl.turbidimetric.base.BaseViewModel
 import com.wl.turbidimetric.datastore.LocalData
@@ -20,8 +21,8 @@ import com.wl.turbidimetric.global.EventGlobal
 import com.wl.turbidimetric.global.EventMsg
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.global.SystemGlobal.testType
-import com.wl.turbidimetric.home.CurveRepository
-import com.wl.turbidimetric.home.ProjectRepository
+import com.wl.turbidimetric.repository.CurveRepository
+import com.wl.turbidimetric.repository.ProjectRepository
 import com.wl.turbidimetric.model.CurveModel
 import com.wl.turbidimetric.model.CuvetteDoorModel
 import com.wl.turbidimetric.model.CuvetteState
@@ -54,6 +55,14 @@ import com.wl.turbidimetric.model.TestState
 import com.wl.turbidimetric.model.TestType
 import com.wl.turbidimetric.model.convertReplyState
 import com.wl.turbidimetric.print.PrintUtil
+import com.wl.turbidimetric.repository.DefaultCurveDataSource
+import com.wl.turbidimetric.repository.DefaultLocalDataDataSource
+import com.wl.turbidimetric.repository.DefaultProjectDataSource
+import com.wl.turbidimetric.repository.DefaultTestResultDataSource
+import com.wl.turbidimetric.repository.if2.CurveSource
+import com.wl.turbidimetric.repository.if2.LocalDataSource
+import com.wl.turbidimetric.repository.if2.ProjectSource
+import com.wl.turbidimetric.repository.if2.TestResultSource
 import com.wl.turbidimetric.util.Callback2
 import com.wl.turbidimetric.util.FitterType
 import com.wl.turbidimetric.util.SerialPortUtil
@@ -64,7 +73,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import java.math.BigDecimal
@@ -80,8 +88,9 @@ import kotlin.random.Random
  */
 class MatchingArgsViewModel(
     private val appViewModel: AppViewModel,
-    private val projectRepository: ProjectRepository,
-    private val curveRepository: CurveRepository
+    private val projectRepository: ProjectSource,
+    private val curveRepository: CurveSource,
+    private val localDataRepository:LocalDataSource
 ) : BaseViewModel(), Callback2 {
 
     init {
@@ -89,7 +98,7 @@ class MatchingArgsViewModel(
     }
 
     private fun listener() {
-        SerialPortUtil.callback.add(this)
+        appViewModel.serialPort.addCallback(this)
         viewModelScope.launch {
             projectRepository.getProjects().collectLatest {
                 projects.clear()
@@ -407,7 +416,7 @@ class MatchingArgsViewModel(
     //测试用 每个比色皿之间的检测间隔
     val testP: Long = 1000
 
-    val datas = curveRepository.allDatas
+    val datas = curveRepository.listenerCurve()
 
 
     /**
@@ -603,10 +612,10 @@ class MatchingArgsViewModel(
             testShelfInterval3 = testS
             testShelfInterval4 = testS
         } else {
-            testShelfInterval1 = LocalData.Test1DelayTime
-            testShelfInterval2 = LocalData.Test2DelayTime
-            testShelfInterval3 = LocalData.Test3DelayTime
-            testShelfInterval4 = LocalData.Test4DelayTime
+            testShelfInterval1 = localDataRepository.getTest1DelayTime()
+            testShelfInterval2 = localDataRepository.getTest2DelayTime()
+            testShelfInterval3 = localDataRepository.getTest3DelayTime()
+            testShelfInterval4 = localDataRepository.getTest4DelayTime()
         }
     }
 
@@ -759,7 +768,7 @@ class MatchingArgsViewModel(
      */
     private fun openSampleDoor() {
         i("发送 开样本仓门")
-        SerialPortUtil.openSampleDoor()
+        appViewModel.serialPort.openSampleDoor()
     }
 
     /**
@@ -767,7 +776,7 @@ class MatchingArgsViewModel(
      */
     private fun openCuvetteDoor() {
         i("发送 开比色皿仓门")
-        SerialPortUtil.openCuvetteDoor()
+        appViewModel.serialPort.openCuvetteDoor()
     }
 
     /**
@@ -775,7 +784,7 @@ class MatchingArgsViewModel(
      */
     private fun getSampleDoor() {
         i("发送 获取样本仓门状态")
-        SerialPortUtil.getSampleDoorState()
+        appViewModel.serialPort.getSampleDoorState()
     }
 
     private fun isMatchingFinish(): Boolean {
@@ -824,7 +833,7 @@ class MatchingArgsViewModel(
 
             TestState.MoveSample -> {//去取需要移动的已混匀的样本
                 sampleStep++
-                sampling(LocalData.SamplingVolume)
+                sampling(localDataRepository.getSamplingVolume())
             }
 
             else -> {
@@ -1661,7 +1670,7 @@ class MatchingArgsViewModel(
      */
     private fun getState() {
         i("发送 获取样本架，比色皿架状态，试剂，清洗液状态")
-        SerialPortUtil.getState()
+        appViewModel.serialPort.getState()
     }
 
 
@@ -1672,7 +1681,7 @@ class MatchingArgsViewModel(
     private fun moveSampleShelf(pos: Int) {
         i("发送 移动样本架 pos=$pos")
         sampleShelfMoveFinish = false
-        SerialPortUtil.moveSampleShelf(pos + 1)
+        appViewModel.serialPort.moveSampleShelf(pos + 1)
     }
 
     /**
@@ -1682,7 +1691,7 @@ class MatchingArgsViewModel(
     private fun moveCuvetteShelf(pos: Int) {
         i("发送 移动比色皿架 pos=$pos")
         cuvetteShelfMoveFinish = false
-        SerialPortUtil.moveCuvetteShelf(pos + 1)
+        appViewModel.serialPort.moveCuvetteShelf(pos + 1)
     }
 
     /**
@@ -1693,7 +1702,7 @@ class MatchingArgsViewModel(
         i("发送 移动样本 step=$step")
         sampleMoveFinish = false
         samplePos += step
-        SerialPortUtil.moveSample(step > 0, step.absoluteValue)
+        appViewModel.serialPort.moveSample(step > 0, step.absoluteValue)
     }
 
     /**
@@ -1703,7 +1712,7 @@ class MatchingArgsViewModel(
         i("发送 移动比色皿到 加样位 step=$step")
         cuvetteMoveFinish = false
         cuvettePos += step
-        SerialPortUtil.moveCuvetteDripSample(step > 0, step.absoluteValue)
+        appViewModel.serialPort.moveCuvetteDripSample(step > 0, step.absoluteValue)
     }
 
     /**
@@ -1713,7 +1722,7 @@ class MatchingArgsViewModel(
         i("发送 移动比色皿到 滴试剂位 step=$step")
         cuvetteMoveFinish = false
         cuvettePos += step
-        SerialPortUtil.moveCuvetteDripReagent(step > 0, step.absoluteValue)
+        appViewModel.serialPort.moveCuvetteDripReagent(step > 0, step.absoluteValue)
     }
 
     /**
@@ -1722,7 +1731,7 @@ class MatchingArgsViewModel(
     private fun moveCuvetteTest(step: Int = 1) {
         i("发送 移动比色皿到 检测位 testState=${appViewModel.testState} step=$step")
         cuvettePos += step
-        SerialPortUtil.moveCuvetteTest(step > 0, step.absoluteValue)
+        appViewModel.serialPort.moveCuvetteTest(step > 0, step.absoluteValue)
     }
 
     /**
@@ -1731,7 +1740,7 @@ class MatchingArgsViewModel(
     private fun sampling(volume: Int) {
         i("发送 取样 volume=$volume")
         samplingFinish = false
-        SerialPortUtil.sampling(volume, SampleType.CUVETTE)
+        appViewModel.serialPort.sampling(volume, SampleType.CUVETTE)
     }
 
     /**
@@ -1741,7 +1750,7 @@ class MatchingArgsViewModel(
         i("发送 取试剂")
         takeReagentFinish = false
         dripReagentFinish = false
-        SerialPortUtil.takeReagent()
+        appViewModel.serialPort.takeReagent(localDataRepository.getTakeReagentR1(),localDataRepository.getTakeReagentR2())
     }
 
     /**
@@ -1749,7 +1758,7 @@ class MatchingArgsViewModel(
      */
     private fun samplingProbeCleaning() {
         i("发送 取样针清洗")
-        SerialPortUtil.samplingProbeCleaning()
+        appViewModel.serialPort.samplingProbeCleaning(localDataRepository.getSamplingProbeCleaningDuration())
     }
 
     /**
@@ -1759,7 +1768,7 @@ class MatchingArgsViewModel(
         i("发送 搅拌 cuvettePos=$cuvettePos")
         stirFinish = false
         stirProbeCleaningFinish = false
-        SerialPortUtil.stir()
+        appViewModel.serialPort.stir(localDataRepository.getStirDuration())
     }
 
     /**
@@ -1768,7 +1777,7 @@ class MatchingArgsViewModel(
     private fun stirProbeCleaning() {
         i("发送 搅拌针清洗 cuvettePos=$cuvettePos")
         stirProbeCleaningFinish = false
-        SerialPortUtil.stirProbeCleaning()
+        appViewModel.serialPort.stirProbeCleaning(localDataRepository.getStirProbeCleaningDuration())
     }
 
     /**
@@ -1777,7 +1786,7 @@ class MatchingArgsViewModel(
     private fun dripSample(autoBlending: Boolean = false, inplace: Boolean = true, volume: Int) {
         i("发送 加样 volume=$volume")
         dripSamplingFinish = false
-        SerialPortUtil.dripSample(
+        appViewModel.serialPort.dripSample(
             autoBlending = autoBlending, inplace = inplace, volume = volume
         )
     }
@@ -1788,7 +1797,7 @@ class MatchingArgsViewModel(
     private fun dripReagent() {
         i("发送 加试剂 cuvettePos=$cuvettePos")
         dripReagentFinish = false
-        SerialPortUtil.dripReagent()
+        appViewModel.serialPort.dripReagent(localDataRepository.getTakeReagentR1(),localDataRepository.getTakeReagentR2())
     }
 
     /**
@@ -1797,7 +1806,7 @@ class MatchingArgsViewModel(
     private fun test() {
         i("发送 检测 cuvettePos=$cuvettePos")
         testFinish = false
-        SerialPortUtil.test()
+        appViewModel.serialPort.test()
     }
 
     /**
@@ -1952,12 +1961,13 @@ class MatchingArgsViewModel(
 
 class MatchingArgsViewModelFactory(
     private val appViewModel: AppViewModel = getAppViewModel(AppViewModel::class.java),
-    private val projectRepository: ProjectRepository = ProjectRepository(),
-    private val curveRepository: CurveRepository = CurveRepository()
+    private val projectRepository: ProjectSource = DefaultProjectDataSource(App.instance!!.mainDao),
+    private val curveRepository: CurveSource = DefaultCurveDataSource(App.instance!!.mainDao),
+    private val localDataRepository: LocalDataSource = DefaultLocalDataDataSource()
 ) : ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MatchingArgsViewModel::class.java)) {
-            return MatchingArgsViewModel(appViewModel, projectRepository, curveRepository) as T
+            return MatchingArgsViewModel(appViewModel, projectRepository, curveRepository,localDataRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

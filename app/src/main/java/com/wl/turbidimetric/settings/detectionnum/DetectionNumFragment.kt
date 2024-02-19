@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 
 class DetectionNumFragment :
     BaseFragment<DetectionNumViewModel, FragmentDetectionNumBinding>(R.layout.fragment_detection_num) {
-    override val vm: DetectionNumViewModel by viewModels()
+    override val vm: DetectionNumViewModel by viewModels { DetectionNumViewModelFactory() }
     private val hiltDialog by lazy { HiltDialog(requireContext()) }
     override fun initViewModel() {
 

@@ -1,27 +1,31 @@
 package com.wl.turbidimetric.home
 
 import androidx.lifecycle.*
-import ca.uhn.hl7v2.util.Home
-import ca.uhn.hl7v2.util.MessageIterator.Index
+import com.wl.turbidimetric.app.App
 import com.wl.turbidimetric.app.AppViewModel
 import com.wl.turbidimetric.base.BaseViewModel
-import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.EventGlobal
 import com.wl.turbidimetric.global.EventMsg
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.global.SystemGlobal.testType
 import com.wl.turbidimetric.model.*
+import com.wl.turbidimetric.repository.DefaultCurveDataSource
+import com.wl.turbidimetric.repository.DefaultLocalDataDataSource
+import com.wl.turbidimetric.repository.DefaultProjectDataSource
+import com.wl.turbidimetric.repository.DefaultTestResultDataSource
+import com.wl.turbidimetric.repository.if2.CurveSource
+import com.wl.turbidimetric.repository.if2.LocalDataSource
+import com.wl.turbidimetric.repository.if2.ProjectSource
+import com.wl.turbidimetric.repository.if2.TestResultSource
 import com.wl.turbidimetric.upload.hl7.HL7Helper
 import com.wl.turbidimetric.util.Callback2
 import com.wl.turbidimetric.util.OnScanResult
 import com.wl.turbidimetric.util.ScanCodeUtil
-import com.wl.turbidimetric.util.SerialPortUtil
 import com.wl.wllib.LogToFile.c
 import com.wl.wllib.LogToFile.i
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.selects.select
 import org.greenrobot.eventbus.EventBus
 import java.math.BigDecimal
 import java.util.*
@@ -30,9 +34,10 @@ import kotlin.math.absoluteValue
 
 class HomeViewModel(
     private val appViewModel: AppViewModel,
-    private val projectRepository: ProjectRepository,
-    private val curveRepository: CurveRepository,
-    private val testResultRepository: TestResultRepository
+    private val projectRepository: ProjectSource,
+    private val curveRepository: CurveSource,
+    private val testResultRepository: TestResultSource,
+    private val localDataRepository: LocalDataSource
 ) : BaseViewModel(), Callback2, OnScanResult {
 
     init {
@@ -52,11 +57,11 @@ class HomeViewModel(
     }
 
     fun goGetVersion() {
-        SerialPortUtil.getVersion()
+        appViewModel.serialPort.getVersion()
     }
 
     private fun listener() {
-        SerialPortUtil.callback.add(this)
+        appViewModel.serialPort.addCallback(this)
         ScanCodeUtil.onScanResult = this
 
         listenerTempState()
@@ -312,7 +317,7 @@ class HomeViewModel(
 
 
     val testMsg = MutableLiveData("")
-    val projectDatas = curveRepository.allDatas
+    val projectDatas = curveRepository.listenerCurve()
 
     /**
      * 选择的检测项目
@@ -480,7 +485,7 @@ class HomeViewModel(
         viewModelScope.launch {
             timer("", true, Date(), 30000) {
                 if (allowTemp) {
-                    SerialPortUtil.getTemp()
+                    appViewModel.serialPort.getTemp()
                 }
             }
         }
@@ -532,7 +537,7 @@ class HomeViewModel(
         sampleShelfPos = -1
         samplingNum = 0
         if (detectionNumInput.isNotEmpty()) {//如果更改了起始编号就使用输入的
-            LocalData.DetectionNum = detectionNumInput
+            localDataRepository.setDetectionNum(detectionNumInput)
             detectionNumInput = ""
         }
 
@@ -554,10 +559,10 @@ class HomeViewModel(
             testShelfInterval3 = testS
             testShelfInterval4 = testS
         } else {
-            testShelfInterval1 = LocalData.Test1DelayTime
-            testShelfInterval2 = LocalData.Test2DelayTime
-            testShelfInterval3 = LocalData.Test3DelayTime
-            testShelfInterval4 = LocalData.Test4DelayTime
+            testShelfInterval1 = localDataRepository.getTest1DelayTime()
+            testShelfInterval2 = localDataRepository.getTest2DelayTime()
+            testShelfInterval3 = localDataRepository.getTest3DelayTime()
+            testShelfInterval4 = localDataRepository.getTest4DelayTime()
         }
         resultTest1.clear()
         resultTest2.clear()
@@ -863,7 +868,7 @@ class HomeViewModel(
         if (samplePos < sampleMax) {
 //            if ((SystemGlobal.isCodeDebug && !sampleExists[samplePos]) || (isAuto() && LocalData.SampleExist && isNonexistent)) {
             //如果是自动模式并且已开启样本传感器,并且是未识别到样本，才是没有样本
-            if ((isAuto() && LocalData.SampleExist && isNonexistent)) {
+            if ((isAuto() && localDataRepository.getSampleExist() && isNonexistent)) {
                 //没有样本，移动到下一个位置
 //                i("没有样本,移动到下一个位置")
                 scanFinish = true
@@ -976,7 +981,7 @@ class HomeViewModel(
          * 1、测试用的
          * 2、自动模式并且开启了扫码并且样本类型为样本管
          */
-        if (!SystemGlobal.isCodeDebug && (isAuto() && LocalData.ScanCode && sampleType?.isSample() == true)) {
+        if (!SystemGlobal.isCodeDebug && (isAuto() && localDataRepository.getScanCode() && sampleType?.isSample() == true)) {
             viewModelScope.launch {
                 ScanCodeUtil.startScan()
             }
@@ -988,7 +993,7 @@ class HomeViewModel(
              * 3、是手动模式时
              * 4、是比色杯时
              */
-            if ((SystemGlobal.isCodeDebug && tempSampleState[samplePos] == 1) || (isAuto() && !LocalData.ScanCode) || (!isManual()) || sampleType?.isCuvette() == true) {
+            if ((SystemGlobal.isCodeDebug && tempSampleState[samplePos] == 1) || (isAuto() && !localDataRepository.getScanCode()) || (!isManual()) || sampleType?.isCuvette() == true) {
                 scanSuccess("")
             } else {
                 scanFailed()
@@ -1036,7 +1041,7 @@ class HomeViewModel(
         val resultModel = TestResultModel(
             sampleBarcode = str ?: "",
             createTime = Date().time,
-            detectionNum = LocalData.getDetectionNumInc(),
+            detectionNum = localDataRepository.getDetectionNumInc(),
             sampleType = sampleItem?.sampleType?.ordinal ?: SampleType.NONEXISTENT.ordinal,
             curveOwnerId = selectProject?.curveId ?: 0
         )
@@ -1054,7 +1059,7 @@ class HomeViewModel(
             mSamplesStates.get(sampleShelfPos)?.get(samplePos)?.sampleType ?: SampleType.CUVETTE
         c("发送 刺破 type=$type")
         piercedFinish = false
-        SerialPortUtil.pierced(type)
+        appViewModel.serialPort.pierced(type)
     }
 
 
@@ -2050,7 +2055,6 @@ class HomeViewModel(
     }
 
 
-
     /**
      * 获取检测结束的问题提示
      */
@@ -2111,7 +2115,7 @@ class HomeViewModel(
      */
     private fun openSampleDoor() {
         c("发送 开样本仓门")
-        SerialPortUtil.openSampleDoor()
+        appViewModel.serialPort.openSampleDoor()
     }
 
     /**
@@ -2119,7 +2123,7 @@ class HomeViewModel(
      */
     private fun openCuvetteDoor() {
         c("发送 开比色皿仓门")
-        SerialPortUtil.openCuvetteDoor()
+        appViewModel.serialPort.openCuvetteDoor()
     }
 
     /**
@@ -2528,7 +2532,7 @@ class HomeViewModel(
 
     private fun getState() {
         c("发送 获取状态")
-        SerialPortUtil.getState()
+        appViewModel.serialPort.getState()
     }
 
     /**
@@ -2536,7 +2540,7 @@ class HomeViewModel(
      */
     private fun getMachineState() {
         c("发送 自检")
-        SerialPortUtil.getMachineState()
+        appViewModel.serialPort.getMachineState()
     }
 
     /**
@@ -2546,7 +2550,7 @@ class HomeViewModel(
     private fun moveSampleShelf(pos: Int) {
         c("发送 移动样本架 pos=$pos ")
         sampleShelfMoveFinish = false
-        SerialPortUtil.moveSampleShelf(pos + 1)
+        appViewModel.serialPort.moveSampleShelf(pos + 1)
     }
 
     /**
@@ -2556,7 +2560,7 @@ class HomeViewModel(
     private fun moveCuvetteShelf(pos: Int) {
         c("发送 移动比色皿架 pos=$pos ")
         cuvetteShelfMoveFinish = false
-        SerialPortUtil.moveCuvetteShelf(pos + 1)
+        appViewModel.serialPort.moveCuvetteShelf(pos + 1)
     }
 
     /**
@@ -2567,7 +2571,7 @@ class HomeViewModel(
         c("发送 移动样本 step=$step samplePos=$samplePos")
         sampleMoveFinish = false
         samplePos += step
-        SerialPortUtil.moveSample(step > 0, step.absoluteValue)
+        appViewModel.serialPort.moveSample(step > 0, step.absoluteValue)
     }
 
     /**
@@ -2577,7 +2581,7 @@ class HomeViewModel(
         c("发送 移动比色皿到 加样位 step=$step cuvettePos=$cuvettePos")
         cuvetteMoveFinish = false
         cuvettePos += step
-        SerialPortUtil.moveCuvetteDripSample(step > 0, step.absoluteValue)
+        appViewModel.serialPort.moveCuvetteDripSample(step > 0, step.absoluteValue)
     }
 
     /**
@@ -2587,7 +2591,7 @@ class HomeViewModel(
         c("发送 移动比色皿到 加试剂位 step=$step")
         cuvetteMoveFinish = false
         cuvettePos += step
-        SerialPortUtil.moveCuvetteDripReagent(step > 0, step.absoluteValue)
+        appViewModel.serialPort.moveCuvetteDripReagent(step > 0, step.absoluteValue)
     }
 
 
@@ -2599,7 +2603,7 @@ class HomeViewModel(
         cuvettePos += step
         testFinish = false
         testing = true
-        SerialPortUtil.moveCuvetteTest(step > 0, step.absoluteValue)
+        appViewModel.serialPort.moveCuvetteTest(step > 0, step.absoluteValue)
     }
 
     /**
@@ -2611,7 +2615,7 @@ class HomeViewModel(
         c("发送 取样 type=$type")
         samplingFinish = false
         dripSampleFinish = false
-        SerialPortUtil.sampling(sampleType = type)
+        appViewModel.serialPort.sampling(localDataRepository.getSamplingVolume(), sampleType = type)
     }
 
     /**
@@ -2620,7 +2624,7 @@ class HomeViewModel(
      */
     private fun squeezing(enable: Boolean = true) {
         c("发送 挤压 enable=$enable")
-        SerialPortUtil.squeezing(enable)
+        appViewModel.serialPort.squeezing(enable)
     }
 
     /**
@@ -2631,7 +2635,10 @@ class HomeViewModel(
         if (allowTakeReagent) {
             takeReagentFinish = false
             dripReagentFinish = false
-            SerialPortUtil.takeReagent()
+            appViewModel.serialPort.takeReagent(
+                localDataRepository.getTakeReagentR1(),
+                localDataRepository.getTakeReagentR2()
+            )
         }
     }
 
@@ -2641,7 +2648,7 @@ class HomeViewModel(
     private fun samplingProbeCleaning() {
         c("发送 取样针清洗")
         samplingProbeCleaningFinish = false
-        SerialPortUtil.samplingProbeCleaning()
+        appViewModel.serialPort.samplingProbeCleaning(localDataRepository.getSamplingProbeCleaningDuration())
     }
 
     /**
@@ -2650,7 +2657,7 @@ class HomeViewModel(
     private fun stir() {
         c("发送 搅拌")
         stirFinish = false
-        SerialPortUtil.stir()
+        appViewModel.serialPort.stir(localDataRepository.getStirDuration())
     }
 
     /**
@@ -2659,7 +2666,7 @@ class HomeViewModel(
     private fun stirProbeCleaning() {
         c("发送 搅拌针清洗")
         stirProbeCleaningFinish = false
-        SerialPortUtil.stirProbeCleaning()
+        appViewModel.serialPort.stirProbeCleaning(localDataRepository.getStirProbeCleaningDuration())
     }
 
     /**
@@ -2668,7 +2675,7 @@ class HomeViewModel(
     private fun dripSample() {
         c("发送 加样")
         dripSampleFinish = false
-        SerialPortUtil.dripSample()
+        appViewModel.serialPort.dripSample(false, false, localDataRepository.getSamplingVolume())
     }
 
     /**
@@ -2677,7 +2684,10 @@ class HomeViewModel(
     private fun dripReagent() {
         c("发送 加试剂")
         dripReagentFinish = false
-        SerialPortUtil.dripReagent()
+        appViewModel.serialPort.dripReagent(
+            localDataRepository.getTakeReagentR1(),
+            localDataRepository.getTakeReagentR2()
+        )
     }
 
     /**
@@ -2686,7 +2696,7 @@ class HomeViewModel(
     private fun test() {
         c("发送 检测 $cuvettePos")
         testFinish = false
-        SerialPortUtil.test()
+        appViewModel.serialPort.test()
     }
 
     /**
@@ -2703,10 +2713,11 @@ class HomeViewModel(
         changeConfig(
             selectProject,
             cuvetteStartPos,
-            if (detectionNumInput.isEmpty()) LocalData.DetectionNum else detectionNumInput,
+            if (detectionNumInput.isEmpty()) localDataRepository.getDetectionNum() else detectionNumInput,
             samplingNum
         )
     }
+
     /**
      * 更改了配置
      * @param curveModel ProjectModel
@@ -2726,7 +2737,7 @@ class HomeViewModel(
         needSamplingNum = sampleNum
 
         selectProject?.let {
-            LocalData.SelectProjectID = it.curveId
+            localDataRepository.setSelectProjectID(it.curveId)
         }
         viewModelScope.launch {
             _configUiState.emit(
@@ -2753,7 +2764,7 @@ class HomeViewModel(
      * 恢复上次选择的项目
      */
     fun recoverSelectProject(projects: MutableList<CurveModel>) {
-        val selectId = LocalData.SelectProjectID
+        val selectId = localDataRepository.getSelectProjectID()
         val oldSelect = projects.filter { it.curveId == selectId }
         if (projects.isNotEmpty()) {
             if (oldSelect.isNotEmpty()) {//如果已经有选中的，就恢复
@@ -2777,7 +2788,7 @@ class HomeViewModel(
      */
     suspend fun selectLastProject() {
         var projects = getCurveModels()
-        LocalData.SelectProjectID = projects.first().curveId
+        localDataRepository.setSelectProjectID(projects.first().curveId)
         recoverSelectProject(projects.toMutableList())
     }
 
@@ -2796,6 +2807,22 @@ class HomeViewModel(
         }
     }
 
+    fun getDetectionNum(): String {
+        return localDataRepository.getDetectionNum()
+    }
+
+    fun isAuto(): Boolean {
+        return isAuto(MachineTestModel.valueOf(localDataRepository.getCurMachineTestModel()))
+    }
+
+    fun isManualSampling(): Boolean {
+        return isManualSampling(MachineTestModel.valueOf(localDataRepository.getCurMachineTestModel()))
+    }
+
+    fun isManual(): Boolean {
+        return isManual(MachineTestModel.valueOf(localDataRepository.getCurMachineTestModel()))
+    }
+
 //    data class CuvetteItem(
 //        var state: CuvetteState, var testResult: TestResultModel? = null, var sampleID: String? = ""
 //    )
@@ -2810,9 +2837,10 @@ class HomeViewModel(
 
 class HomeViewModelFactory(
     private val appViewModel: AppViewModel = getAppViewModel(AppViewModel::class.java),
-    private val projectRepository: ProjectRepository = ProjectRepository(),
-    private val curveRepository: CurveRepository = CurveRepository(),
-    private val testResultRepository: TestResultRepository = TestResultRepository()
+    private val projectRepository: ProjectSource = DefaultProjectDataSource(App.instance!!.mainDao),
+    private val curveRepository: CurveSource = DefaultCurveDataSource(App.instance!!.mainDao),
+    private val testResultRepository: TestResultSource = DefaultTestResultDataSource(App.instance!!.mainDao),
+    private val localDataRepository: LocalDataSource = DefaultLocalDataDataSource()
 ) : ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(HomeViewModel::class.java)) {
@@ -2820,7 +2848,8 @@ class HomeViewModelFactory(
                 appViewModel,
                 projectRepository,
                 curveRepository,
-                testResultRepository
+                testResultRepository,
+                localDataRepository
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")

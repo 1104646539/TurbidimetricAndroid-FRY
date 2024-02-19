@@ -12,13 +12,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.base.BaseFragment
 import com.wl.turbidimetric.databinding.FragmentDataManagerBinding
-import com.wl.turbidimetric.datastore.LocalData
-import com.wl.turbidimetric.ex.PD
 import com.wl.turbidimetric.ex.toast
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.ConditionModel
 import com.wl.turbidimetric.model.TestResultAndCurveModel
-import com.wl.turbidimetric.model.TestResultModel
 import com.wl.turbidimetric.print.PrintUtil
 import com.wl.turbidimetric.upload.hl7.HL7Helper
 import com.wl.turbidimetric.util.ExportExcelHelper
@@ -89,65 +86,65 @@ class DataManagerFragment :
     }
 
     fun test() {
-        lifecycleScope.launch {
-            val testdatas = createTestData()
-            vm.add(testdatas)
-        }
+//        lifecycleScope.launch {
+//            val testdatas = createTestData()
+//            vm.add(testdatas)
+//        }
     }
 
-    private fun createPrintData(): List<List<String>> {
-        return createTestData().map {
-            mutableListOf<String>().apply {
-                add("${it.concentration}")
-                add("${it.testResult}")
-                add("${it.name}")
-                add("${it.gender}")
-                add("${it.age}")
-                add("${it.detectionNum}")
-                add("${it.testOriginalValue1}")
-                add("${it.testOriginalValue2}")
-                add("${it.testOriginalValue3}")
-                add("${it.testOriginalValue4}")
-                add("${it.testValue1}")
-                add("${it.testValue2}")
-                add("${it.testValue3}")
-                add("${it.testValue4}")
-                add("${it.testTime}")
-                add("${it.absorbances}")
-            }
-        }
-    }
-
-    private fun createTestData(): List<TestResultModel> {
-        return mutableListOf<TestResultModel>().apply {
-            for (i in 0..100) {
-                val dr = TestResultModel(
-                    testResult = (i % 2 == 0).PD("阳性", "阴性"),
-                    concentration = 66 + i,
-                    absorbances = "121120".toBigDecimal(),
-                    name = (i % 2 == 0).PD("张三", "李四"),
-                    gender = (i % 2 == 0).PD("男", "女"),
-                    age = (i % 90).toString(),
-                    detectionNum = LocalData.getDetectionNumInc(),
-                    testOriginalValue1 = 52111,
-                    testOriginalValue2 = 52112,
-                    testOriginalValue3 = 52113,
-                    testOriginalValue4 = 52114,
-                    testValue1 = "52.31".toBigDecimal(),
-                    testValue2 = "52.32".toBigDecimal(),
-                    testValue3 = "52.33".toBigDecimal(),
-                    testValue4 = "52.34".toBigDecimal(),
-                    testTime = Date().time,
-                    deliveryTime = "",
-                    deliveryDepartment = "",
-                    deliveryDoctor = "",
-                    sampleBarcode = "ABCD$i",
-                    curveOwnerId = 0
-                )
-                add(dr)
-            }
-        }
-    }
+//    private fun createPrintData(): List<List<String>> {
+//        return createTestData().map {
+//            mutableListOf<String>().apply {
+//                add("${it.concentration}")
+//                add("${it.testResult}")
+//                add("${it.name}")
+//                add("${it.gender}")
+//                add("${it.age}")
+//                add("${it.detectionNum}")
+//                add("${it.testOriginalValue1}")
+//                add("${it.testOriginalValue2}")
+//                add("${it.testOriginalValue3}")
+//                add("${it.testOriginalValue4}")
+//                add("${it.testValue1}")
+//                add("${it.testValue2}")
+//                add("${it.testValue3}")
+//                add("${it.testValue4}")
+//                add("${it.testTime}")
+//                add("${it.absorbances}")
+//            }
+//        }
+//    }
+//
+//    private fun createTestData(): List<TestResultModel> {
+//        return mutableListOf<TestResultModel>().apply {
+//            for (i in 0..100) {
+//                val dr = TestResultModel(
+//                    testResult = (i % 2 == 0).PD("阳性", "阴性"),
+//                    concentration = 66 + i,
+//                    absorbances = "121120".toBigDecimal(),
+//                    name = (i % 2 == 0).PD("张三", "李四"),
+//                    gender = (i % 2 == 0).PD("男", "女"),
+//                    age = (i % 90).toString(),
+//                    detectionNum = LocalData.getDetectionNumInc(),
+//                    testOriginalValue1 = 52111,
+//                    testOriginalValue2 = 52112,
+//                    testOriginalValue3 = 52113,
+//                    testOriginalValue4 = 52114,
+//                    testValue1 = "52.31".toBigDecimal(),
+//                    testValue2 = "52.32".toBigDecimal(),
+//                    testValue3 = "52.33".toBigDecimal(),
+//                    testValue4 = "52.34".toBigDecimal(),
+//                    testTime = Date().time,
+//                    deliveryTime = "",
+//                    deliveryDepartment = "",
+//                    deliveryDoctor = "",
+//                    sampleBarcode = "ABCD$i",
+//                    curveOwnerId = 0
+//                )
+//                add(dr)
+//            }
+//        }
+//    }
 
 
     private fun listener() {

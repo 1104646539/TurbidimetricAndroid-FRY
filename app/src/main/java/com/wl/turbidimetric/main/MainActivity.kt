@@ -12,31 +12,25 @@ import android.os.Handler
 import android.os.Message
 import android.util.Log
 import androidx.activity.viewModels
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
 import com.wl.turbidimetric.R
-import com.wl.turbidimetric.app.AppViewModel
 import com.wl.turbidimetric.app.MachineState
 import com.wl.turbidimetric.base.BaseActivity
 import com.wl.turbidimetric.databinding.ActivityMainBinding
-import com.wl.turbidimetric.ex.getAppViewModel
 import com.wl.turbidimetric.global.EventGlobal
 import com.wl.turbidimetric.global.EventMsg
-import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.main.splash.SplashFragment
 import com.wl.turbidimetric.upload.hl7.HL7Helper
 import com.wl.turbidimetric.upload.hl7.util.ConnectResult
 import com.wl.turbidimetric.upload.hl7.util.ConnectStatus
 import com.wl.turbidimetric.upload.service.OnConnectListener
 import com.wl.turbidimetric.util.ActivityDataBindingDelegate
-import com.wl.turbidimetric.util.SerialPortUtil
 import com.wl.turbidimetric.view.dialog.HiltDialog
 import com.wl.turbidimetric.view.dialog.showPop
 import com.wl.weiqianwllib.OrderUtil
 import com.wl.weiqianwllib.upan.StorageState
 import com.wl.weiqianwllib.upan.StorageUtil
 import com.wl.weiqianwllib.upan.StorageUtil.OPEN_DOCUMENT_TREE_CODE
-import com.wl.wllib.DateUtil
 import com.wl.wllib.LogToFile.i
 import com.wl.wllib.ktxRunOnBgCache
 import kotlinx.coroutines.Dispatchers
@@ -45,13 +39,12 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.greenrobot.eventbus.EventBus
-import kotlin.concurrent.timer
 
 
 class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     val TAG = "MainActivity"
     override val vd: ActivityMainBinding by ActivityDataBindingDelegate(R.layout.activity_main)
-    override val vm: MainViewModel by viewModels()
+    override val vm: MainViewModel by viewModels {MainViewModelFactory()}
     var mPermissionIntent: PendingIntent? = null
 
     private val handler_init_qrcode = 1000
@@ -231,7 +224,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         }
         lifecycleScope.launch {
             delay(3000)
-            SerialPortUtil.shutdown()
+            vm.shutdown()
         }
     }
 
@@ -258,7 +251,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
             appVm.machineState.collectLatest {
                 vd.tnv.setStateMachineSrc(it.id)
                 if (it == MachineState.MachineRunningError) {
-                    SerialPortUtil.allowRunning = false
+                    vm.allowRunning()
                 }
             }
         }

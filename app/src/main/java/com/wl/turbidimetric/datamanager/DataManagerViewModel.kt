@@ -6,22 +6,27 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.wl.turbidimetric.app.App
 import com.wl.turbidimetric.app.AppViewModel
-import com.wl.turbidimetric.home.ProjectRepository
-import com.wl.turbidimetric.home.TestResultRepository
+import com.wl.turbidimetric.repository.ProjectRepository
+import com.wl.turbidimetric.repository.TestResultRepository
 import com.wl.turbidimetric.model.ConditionModel
 import com.wl.turbidimetric.model.TestResultAndCurveModel
 import com.wl.turbidimetric.model.TestResultModel
 import com.wl.turbidimetric.base.BaseViewModel
 import com.wl.turbidimetric.ex.getAppViewModel
+import com.wl.turbidimetric.repository.DefaultProjectDataSource
+import com.wl.turbidimetric.repository.DefaultTestResultDataSource
+import com.wl.turbidimetric.repository.if2.ProjectSource
+import com.wl.turbidimetric.repository.if2.TestResultSource
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 
 class DataManagerViewModel(
     private val appViewModel: AppViewModel,
-    private val projectRepository: ProjectRepository = ProjectRepository(),
-    private val testResultRepository: TestResultRepository = TestResultRepository()
+    private val projectRepository: ProjectSource,
+    private val testResultRepository: TestResultSource
 ) : BaseViewModel() {
     /**
      * 显示删除提示对话框
@@ -44,7 +49,7 @@ class DataManagerViewModel(
         viewModelScope.launch {
             _resultSize.value = testResultRepository.countTestResultAndCurveModels(condition)
         }
-        return testResultRepository.datas(condition).cachedIn(viewModelScope)
+        return testResultRepository.listenerTestResult(condition).cachedIn(viewModelScope)
     }
 
     suspend fun update(testResult: TestResultModel): Int {
@@ -88,8 +93,8 @@ class DataManagerViewModel(
 
 class DataManagerViewModelFactory(
     private val appViewModel: AppViewModel = getAppViewModel(AppViewModel::class.java),
-    private val projectRepository: ProjectRepository = ProjectRepository(),
-    private val testResultRepository: TestResultRepository = TestResultRepository()
+    private val projectRepository: ProjectSource = DefaultProjectDataSource(App.instance!!.mainDao),
+    private val testResultRepository: TestResultSource = DefaultTestResultDataSource(App.instance!!.mainDao)
 ) :
     ViewModelProvider.NewInstanceFactory() {
 

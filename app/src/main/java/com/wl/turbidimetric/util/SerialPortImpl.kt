@@ -138,8 +138,20 @@ class SerialPortImpl(private val isCodeDebug:Boolean) :SerialPortIF{
         callback.add(call)
     }
 
+    override fun removeCallback(call: Callback2) {
+        callback.remove(call)
+    }
 
-     fun callback(call: (Callback2) -> Unit) {
+    override fun addOriginalCallback(call: OriginalDataCall) {
+        originalCallback.add(call)
+    }
+
+    override fun removeOriginalCallback(call: OriginalDataCall) {
+        originalCallback.remove(call)
+    }
+
+
+    fun callback(call: (Callback2) -> Unit) {
         callback.forEach {
             call.invoke(it)
         }

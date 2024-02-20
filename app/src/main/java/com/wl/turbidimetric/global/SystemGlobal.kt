@@ -23,15 +23,12 @@ object SystemGlobal {
 //    private val _obTestState = MutableStateFlow(TestState.None)
 //    val obTestState = _obTestState.asStateFlow()
 
-    /**
-     * 检测类型
-     */
-    var testType = TestType.None
+
 
     /**
      * 是否是在只使用安卓板时调试用的
      */
-    var isCodeDebug = true
+    var isCodeDebug = false
 
     /**
      * 是否是调试模式

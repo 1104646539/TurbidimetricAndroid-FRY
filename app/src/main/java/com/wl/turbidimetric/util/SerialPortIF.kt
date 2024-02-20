@@ -16,6 +16,10 @@ interface SerialPortIF {
     fun setMcuUpdateCallBack(mcuUpdateCallBack: McuUpdateCallBack)
     fun setOnResult(onResult: ((UpdateResult) -> Unit)?)
     fun addCallback(call: Callback2)
+    fun removeCallback(call: Callback2)
+    fun addOriginalCallback(call: OriginalDataCall)
+    fun removeOriginalCallback(call: OriginalDataCall)
+
     fun updateWrite(data: UByteArray)
 
     fun allowRunning()

@@ -217,28 +217,41 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         }
         lifecycleScope.launch {
             appVm.obTestState.collectLatest {
-                if (it.isNotPrepare()) {
-                    vd.tvAnalyse.setText("重新自检")
-                    vd.tvAnalyse2.setText("(请重新自检)")
+                if (!appVm.testType.isTest() && it.isRunning()) {
                     vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg)
-                    vm.enableView(true)
-                } else if (it.isRunning()) {
-                    vd.tvAnalyse.setText("检测中")
-                    vd.tvAnalyse2.setText("(仓门已锁，请勿打开,请等待检测结束)")
-                    vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg)
+                    vd.tvAnalyse.setText("正在运行……")
                     vm.enableView(false)
                 } else {
-                    vd.tvAnalyse.setText("分析")
-                    vd.tvAnalyse2.setText("(点击分析)")
-                    vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg2)
-                    vm.enableView(true)
+                    if (it.machineStateIng()) {
+                        vd.tvAnalyse.setText("正在自检")
+                        vd.tvAnalyse2.setText("(正在自检，请稍后)")
+                        vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg)
+                        vm.enableView(true)
+                    } else if (it.isNotPrepare()) {
+                        vd.tvAnalyse.setText("重新自检")
+                        vd.tvAnalyse2.setText("(请重新自检)")
+                        vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg)
+                        vm.enableView(true)
+                    } else if (it.isRunning()) {
+                        vd.tvAnalyse.setText("检测中")
+                        vd.tvAnalyse2.setText("(仓门已锁，请勿打开,请等待检测结束)")
+                        vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg)
+                        vm.enableView(false)
+                    } else {
+                        vd.tvAnalyse.setText("分析")
+                        vd.tvAnalyse2.setText("(点击分析)")
+                        vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg2)
+                        vm.enableView(true)
+                    }
                 }
             }
         }
 
         vd.vTest.setOnClickListener {
             u("开始")
-            if (vm.selectProject == null) {
+            if (appVm.testState.isTestRunning()) {
+                toast("正在运行，请稍后")
+            } else if (vm.selectProject == null) {
                 showConfigDialog()
                 toast("请选择标曲")
             } else if (!vm.isAuto() && vm.needSamplingNum <= 0) {
@@ -263,7 +276,11 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 
         vd.vConfig.setOnClickListener {
             u("设置")
-            showConfigDialog()
+            if (appVm.testState.isTestRunning()) {
+                toast("正在运行，请稍后")
+            } else {
+                showConfigDialog()
+            }
         }
 //        vd.btnGetTestPatientInfo.setOnClickListener {
 //            u("获取待检信息")
@@ -424,6 +441,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
     var arrayCuvette = mutableListOf<ShelfView>()
     private fun listenerData() {
         arraySample.add(vd.svSample1)
+        arraySample.add(vd.svSample2)
         arraySample.add(vd.svSample3)
         arraySample.add(vd.svSample4)
         arrayCuvette.add(vd.svCuvette4)

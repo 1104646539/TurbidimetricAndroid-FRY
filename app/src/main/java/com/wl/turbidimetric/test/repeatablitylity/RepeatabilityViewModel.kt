@@ -4,27 +4,30 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.wl.turbidimetric.app.App
 import com.wl.turbidimetric.app.AppViewModel
+import com.wl.turbidimetric.base.BaseViewModel
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.SystemGlobal
-import com.wl.turbidimetric.global.SystemGlobal.testType
-import com.wl.turbidimetric.repository.CurveRepository
-import com.wl.turbidimetric.repository.TestResultRepository
 import com.wl.turbidimetric.model.*
+import com.wl.turbidimetric.repository.DefaultCurveDataSource
+import com.wl.turbidimetric.repository.DefaultLocalDataDataSource
+import com.wl.turbidimetric.repository.DefaultTestResultDataSource
+import com.wl.turbidimetric.repository.if2.CurveSource
+import com.wl.turbidimetric.repository.if2.LocalDataSource
+import com.wl.turbidimetric.repository.if2.TestResultSource
 import com.wl.turbidimetric.util.Callback2
-import com.wl.turbidimetric.util.SerialPortUtil
-import com.wl.turbidimetric.base.BaseViewModel
+import com.wl.wllib.LogToFile.i
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import java.text.NumberFormat
 import java.util.*
 import kotlin.math.absoluteValue
-import com.wl.wllib.LogToFile.i
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
 
 /**
  * 重复性测试
@@ -33,8 +36,9 @@ import kotlinx.coroutines.flow.asSharedFlow
  */
 class RepeatabilityViewModel(
     private val appViewModel: AppViewModel,
-    val curveRepository: CurveRepository,
-    val testResultRepository: TestResultRepository
+    val curveRepository: CurveSource,
+    val testResultRepository: TestResultSource,
+    val localDataRepository: LocalDataSource
 ) : BaseViewModel(),
     Callback2 {
 
@@ -43,13 +47,13 @@ class RepeatabilityViewModel(
     }
 
     fun listener() {
-        SerialPortUtil.callback.add(this)
-        i("SerialPortUtil.callback listener")
+        appViewModel.serialPort.addCallback(this)
+        i("appViewModel.serialPort.callback listener")
     }
 
     fun clearListener() {
-        SerialPortUtil.callback.remove(this)
-        i("SerialPortUtil.callback onCleared")
+        appViewModel.serialPort.removeCallback(this)
+        i("appViewModel.serialPort.callback onCleared")
     }
 
     /**
@@ -195,7 +199,7 @@ class RepeatabilityViewModel(
     val testMsg = MutableLiveData("")
     val toastMsg = MutableLiveData("")
 
-    val projectDatas = curveRepository.allDatas
+    val projectDatas = curveRepository.listenerCurve()
 
     var selectProject: CurveModel? = null
 
@@ -318,7 +322,7 @@ class RepeatabilityViewModel(
         }
         initState()
         appViewModel.testState = TestState.GetState
-        testType = TestType.Repeatability
+        appViewModel.testType = TestType.Repeatability
         getState()
     }
 
@@ -545,7 +549,7 @@ class RepeatabilityViewModel(
      */
     private fun openSampleDoor() {
         i("发送 开样本仓门")
-        SerialPortUtil.openSampleDoor()
+        appViewModel.serialPort.openSampleDoor()
     }
 
     /**
@@ -553,7 +557,7 @@ class RepeatabilityViewModel(
      */
     private fun openCuvetteDoor() {
         i("发送 开比色皿仓门")
-        SerialPortUtil.openCuvetteDoor()
+        appViewModel.serialPort.openCuvetteDoor()
     }
 
     /**
@@ -561,7 +565,7 @@ class RepeatabilityViewModel(
      */
     private fun getSampleDoor() {
         i("发送 获取样本仓门状态")
-        SerialPortUtil.getSampleDoorState()
+        appViewModel.serialPort.getSampleDoorState()
     }
 
     private fun isMatchingFinish(): Boolean {
@@ -1230,7 +1234,7 @@ class RepeatabilityViewModel(
      */
     private fun getState() {
         i("发送 获取样本架，比色皿架状态，试剂，清洗液状态")
-        SerialPortUtil.getState()
+        appViewModel.serialPort.getState()
     }
 
 
@@ -1241,7 +1245,7 @@ class RepeatabilityViewModel(
     private fun moveSampleShelf(pos: Int) {
         i("发送 移动样本架 pos=$pos")
         sampleShelfMoveFinish = false
-        SerialPortUtil.moveSampleShelf(pos + 1)
+        appViewModel.serialPort.moveSampleShelf(pos + 1)
     }
 
     /**
@@ -1251,7 +1255,7 @@ class RepeatabilityViewModel(
     private fun moveCuvetteShelf(pos: Int) {
         i("发送 移动比色皿架 pos=$pos")
         cuvetteShelfMoveFinish = false
-        SerialPortUtil.moveCuvetteShelf(pos + 1)
+        appViewModel.serialPort.moveCuvetteShelf(pos + 1)
     }
 
     /**
@@ -1262,7 +1266,7 @@ class RepeatabilityViewModel(
         i("发送 移动样本 step=$step")
         sampleMoveFinish = false
         samplePos += step
-        SerialPortUtil.moveSample(step > 0, step.absoluteValue)
+        appViewModel.serialPort.moveSample(step > 0, step.absoluteValue)
     }
 
     /**
@@ -1272,7 +1276,7 @@ class RepeatabilityViewModel(
         i("发送 移动比色皿到 加样位 step=$step")
         cuvetteMoveFinish = false
         cuvettePos += step
-        SerialPortUtil.moveCuvetteDripSample(step > 0, step.absoluteValue)
+        appViewModel.serialPort.moveCuvetteDripSample(step > 0, step.absoluteValue)
     }
 
     /**
@@ -1282,7 +1286,7 @@ class RepeatabilityViewModel(
         i("发送 移动比色皿到 滴试剂位 step=$step")
         cuvetteMoveFinish = false
         cuvettePos += step
-        SerialPortUtil.moveCuvetteDripReagent(step > 0, step.absoluteValue)
+        appViewModel.serialPort.moveCuvetteDripReagent(step > 0, step.absoluteValue)
     }
 
     /**
@@ -1291,7 +1295,7 @@ class RepeatabilityViewModel(
     private fun moveCuvetteTest(step: Int = 1) {
         i("发送 移动比色皿到 检测位 testState=${appViewModel.testState} step=$step")
         cuvettePos += step
-        SerialPortUtil.moveCuvetteTest(step > 0, step.absoluteValue)
+        appViewModel.serialPort.moveCuvetteTest(step > 0, step.absoluteValue)
     }
 
     /**
@@ -1300,7 +1304,7 @@ class RepeatabilityViewModel(
     private fun sampling(volume: Int) {
         i("发送 取样 volume=$volume")
         samplingFinish = false
-        SerialPortUtil.sampling(volume, SampleType.CUVETTE)
+        appViewModel.serialPort.sampling(volume, SampleType.CUVETTE)
     }
 
     /**
@@ -1310,7 +1314,7 @@ class RepeatabilityViewModel(
         i("发送 取试剂")
         takeReagentFinish = false
         dripReagentFinish = false
-        SerialPortUtil.takeReagent()
+        appViewModel.serialPort.takeReagent(localDataRepository.getTakeReagentR1(),localDataRepository.getTakeReagentR2())
     }
 
     /**
@@ -1318,7 +1322,7 @@ class RepeatabilityViewModel(
      */
     private fun samplingProbeCleaning() {
         i("发送 取样针清洗")
-        SerialPortUtil.samplingProbeCleaning()
+        appViewModel.serialPort.samplingProbeCleaning(localDataRepository.getSamplingProbeCleaningDuration())
     }
 
     /**
@@ -1328,7 +1332,7 @@ class RepeatabilityViewModel(
         i("发送 搅拌 cuvettePos=$cuvettePos")
         stirFinish = false
         stirProbeCleaningFinish = false
-        SerialPortUtil.stir()
+        appViewModel.serialPort.stir(localDataRepository.getStirDuration())
     }
 
     /**
@@ -1337,7 +1341,7 @@ class RepeatabilityViewModel(
     private fun stirProbeCleaning() {
         i("发送 搅拌针清洗 cuvettePos=$cuvettePos")
         stirProbeCleaningFinish = false
-        SerialPortUtil.stirProbeCleaning()
+        appViewModel.serialPort.stirProbeCleaning(localDataRepository.getStirProbeCleaningDuration())
     }
 
     /**
@@ -1346,7 +1350,7 @@ class RepeatabilityViewModel(
     private fun dripSample(autoBlending: Boolean = false, inplace: Boolean = true, volume: Int) {
         i("发送 加样 volume=$volume")
         dripSamplingFinish = false
-        SerialPortUtil.dripSample(
+        appViewModel.serialPort.dripSample(
             autoBlending = autoBlending,
             inplace = inplace,
             volume = volume
@@ -1359,7 +1363,7 @@ class RepeatabilityViewModel(
     private fun dripReagent() {
         i("发送 加试剂 cuvettePos=$cuvettePos")
         dripReagentFinish = false
-        SerialPortUtil.dripReagent()
+        appViewModel.serialPort.dripReagent(localDataRepository.getTakeReagentR1(),localDataRepository.getTakeReagentR2())
     }
 
     /**
@@ -1368,7 +1372,7 @@ class RepeatabilityViewModel(
     private fun test() {
         i("发送 检测 cuvettePos=$cuvettePos")
         testFinish = false
-        SerialPortUtil.test()
+        appViewModel.serialPort.test()
     }
 
     /**
@@ -1401,13 +1405,19 @@ class RepeatabilityViewModel(
 
 class RepeatabilityViewModelFactory(
     private val appViewModel: AppViewModel = getAppViewModel(AppViewModel::class.java),
-    private val curveRepository: CurveRepository = CurveRepository(),
-    private val testResultRepository: TestResultRepository = TestResultRepository()
+    private val curveRepository: CurveSource = DefaultCurveDataSource(App.instance!!.mainDao),
+    private val testResultRepository: TestResultSource = DefaultTestResultDataSource(App.instance!!.mainDao),
+    private val localDataRepository: LocalDataSource = DefaultLocalDataDataSource()
 ) :
     ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(RepeatabilityViewModel::class.java)) {
-            return RepeatabilityViewModel(appViewModel,curveRepository, testResultRepository) as T
+            return RepeatabilityViewModel(
+                appViewModel,
+                curveRepository,
+                testResultRepository,
+                localDataRepository
+            ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

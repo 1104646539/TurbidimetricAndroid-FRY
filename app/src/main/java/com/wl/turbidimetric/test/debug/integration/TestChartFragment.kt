@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 
 class TestChartFragment :
     BaseFragment<TestChartViewModel, FragmentTestChartBinding>(R.layout.fragment_test_chart) {
-    override val vm: TestChartViewModel by viewModels()
+    override val vm: TestChartViewModel by viewModels{TestChartViewModelFactory()}
     private val bgGray = getResource().getColor(R.color.bg_gray)
     private val textColor = getResource().getColor(R.color.textColor)
     private val lineColor = getResource().getColor(R.color.themePositiveColor)

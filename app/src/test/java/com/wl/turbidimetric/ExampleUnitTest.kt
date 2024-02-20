@@ -1,18 +1,5 @@
 package com.wl.turbidimetric
 
-import com.wl.turbidimetric.ex.*
-import com.wl.turbidimetric.global.SerialGlobal
-import com.wl.turbidimetric.model.*
-import com.wl.turbidimetric.util.CurveFitter
-import com.wl.turbidimetric.util.SerialPortUtil
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import org.junit.Test
-import java.util.*
-import kotlin.math.log10
-import kotlin.properties.ReadOnlyProperty
-import kotlin.reflect.KProperty
-
 
 /**
  * Example local unit test, which will execute on the development machine (host).

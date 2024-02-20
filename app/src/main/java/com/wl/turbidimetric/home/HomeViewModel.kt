@@ -8,7 +8,6 @@ import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.EventGlobal
 import com.wl.turbidimetric.global.EventMsg
 import com.wl.turbidimetric.global.SystemGlobal
-import com.wl.turbidimetric.global.SystemGlobal.testType
 import com.wl.turbidimetric.model.*
 import com.wl.turbidimetric.repository.DefaultCurveDataSource
 import com.wl.turbidimetric.repository.DefaultLocalDataDataSource
@@ -520,7 +519,7 @@ class HomeViewModel(
             goGetMachineState()
             return
         }
-        testType = TestType.Test
+        appViewModel.testType = TestType.Test
         clickStart = true
         initState()
         getState()
@@ -1975,7 +1974,7 @@ class HomeViewModel(
      * 接收到移动比色皿架
      */
     override fun readDataMoveCuvetteShelfModel(reply: ReplyModel<MoveCuvetteShelfModel>) {
-        if (appViewModel.testState == TestState.TestFinish && testType.isTest()) {
+        if (appViewModel.testState == TestState.TestFinish && appViewModel.testType.isTest()) {
             cuvetteShelfMoveFinish = true
             if (isTestFinish()) {
                 showFinishDialog()
@@ -2076,7 +2075,7 @@ class HomeViewModel(
     }
 
     private fun isTestFinish(): Boolean {
-        return appViewModel.testState == TestState.TestFinish && testType.isTest() && sampleShelfMoveFinish && cuvetteShelfMoveFinish
+        return appViewModel.testState == TestState.TestFinish && appViewModel.testType.isTest() && sampleShelfMoveFinish && cuvetteShelfMoveFinish
     }
 
 
@@ -2085,7 +2084,7 @@ class HomeViewModel(
      */
     override fun readDataMoveSampleShelfModel(reply: ReplyModel<MoveSampleShelfModel>) {
         c("接收到 移动样本架 reply=$reply sampleShelfPos=$sampleShelfPos $appViewModel.testState")
-        if (appViewModel.testState == TestState.TestFinish && testType.isTest()) {
+        if (appViewModel.testState == TestState.TestFinish && appViewModel.testType.isTest()) {
             sampleShelfMoveFinish = true
             if (isTestFinish()) {
                 showFinishDialog()
@@ -2184,7 +2183,7 @@ class HomeViewModel(
      */
     override fun readDataGetMachineStateModel(reply: ReplyModel<GetMachineStateModel>) {
         c("接收到 自检 reply=$reply")
-        if (testType.isDebug()) {
+        if (appViewModel.testType.isDebug()) {
             return
         }
         EventBus.getDefault().post(EventMsg<Any>(what = EventGlobal.WHAT_HIDE_SPLASH))
@@ -2703,7 +2702,7 @@ class HomeViewModel(
      * 是否正在检测
      */
     private fun runningTest(): Boolean {
-        return appViewModel.testState.isRunning() && testType.isTest()
+        return appViewModel.testState.isRunning() && appViewModel.testType.isTest()
     }
 
     /**

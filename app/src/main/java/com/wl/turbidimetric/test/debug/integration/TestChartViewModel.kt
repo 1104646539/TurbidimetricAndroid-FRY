@@ -1,8 +1,12 @@
 package com.wl.turbidimetric.test.debug.integration
 
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.wl.turbidimetric.global.SystemGlobal.testType
+import com.wl.turbidimetric.app.AppViewModel
+import com.wl.turbidimetric.base.BaseViewModel
+import com.wl.turbidimetric.ex.getAppViewModel
 import com.wl.turbidimetric.model.CuvetteDoorModel
 import com.wl.turbidimetric.model.DripReagentModel
 import com.wl.turbidimetric.model.DripSampleModel
@@ -29,16 +33,14 @@ import com.wl.turbidimetric.model.TempModel
 import com.wl.turbidimetric.model.TestModel
 import com.wl.turbidimetric.model.TestType
 import com.wl.turbidimetric.util.Callback2
-import com.wl.turbidimetric.util.SerialPortUtil
 import com.wl.wllib.LogToFile.i
-import com.wl.turbidimetric.base.BaseViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import java.util.Date
 import java.util.Timer
 import kotlin.concurrent.timer
 
-class TestChartViewModel : BaseViewModel(), Callback2 {
+class TestChartViewModel(private val appViewModel: AppViewModel) : BaseViewModel(), Callback2 {
     val testMsg = MutableStateFlow("")
     val resultMsg = MutableStateFlow("")
     var debugType = DebugType.IntervalTest
@@ -49,14 +51,14 @@ class TestChartViewModel : BaseViewModel(), Callback2 {
     }
 
     fun listener() {
-        SerialPortUtil.callback.add(this)
-        testType = TestType.Debug
-        i("SerialPortUtil.callback listener")
+        appViewModel.serialPort.addCallback(this)
+        appViewModel.testType = TestType.Debug
+        i("appViewModel.serialPort.callback listener")
     }
 
     fun clearListener() {
-        SerialPortUtil.callback.remove(this)
-        i("SerialPortUtil.callback onCleared")
+        appViewModel.serialPort.removeCallback(this)
+        i("appViewModel.serialPort.callback onCleared")
     }
 
     override fun readDataGetMachineStateModel(reply: ReplyModel<GetMachineStateModel>) {
@@ -187,7 +189,7 @@ class TestChartViewModel : BaseViewModel(), Callback2 {
      * 自检
      */
     fun getMachineState() {
-        SerialPortUtil.getMachineState()
+        appViewModel.serialPort.getMachineState()
     }
 
     /**
@@ -204,7 +206,7 @@ class TestChartViewModel : BaseViewModel(), Callback2 {
             changeHilt("移动位置错误,必须为1-4")
             return
         }
-        SerialPortUtil.moveSampleShelf(step)
+        appViewModel.serialPort.moveSampleShelf(step)
     }
 
     /**
@@ -221,7 +223,7 @@ class TestChartViewModel : BaseViewModel(), Callback2 {
             changeHilt("移动位置错误,必须为1-4")
             return
         }
-        SerialPortUtil.moveCuvetteShelf(step)
+        appViewModel.serialPort.moveCuvetteShelf(step)
     }
 
     /**
@@ -239,7 +241,7 @@ class TestChartViewModel : BaseViewModel(), Callback2 {
             changeHilt("移动位置错误,必须为1-10")
             return
         }
-        SerialPortUtil.moveSample(forward, step)
+        appViewModel.serialPort.moveSample(forward, step)
     }
 
     /**
@@ -257,7 +259,7 @@ class TestChartViewModel : BaseViewModel(), Callback2 {
             changeHilt("移动位置错误,必须为1-10")
             return
         }
-        SerialPortUtil.moveCuvetteDripSample(forward, step)
+        appViewModel.serialPort.moveCuvetteDripSample(forward, step)
     }
 
     /**
@@ -275,7 +277,7 @@ class TestChartViewModel : BaseViewModel(), Callback2 {
             changeHilt("移动位置错误,必须为1-10")
             return
         }
-        SerialPortUtil.moveCuvetteDripReagent(forward, step)
+        appViewModel.serialPort.moveCuvetteDripReagent(forward, step)
     }
 
     /**
@@ -293,7 +295,7 @@ class TestChartViewModel : BaseViewModel(), Callback2 {
             changeHilt("移动位置错误,必须为1-10")
             return
         }
-        SerialPortUtil.moveCuvetteTest(forward, step)
+        appViewModel.serialPort.moveCuvetteTest(forward, step)
     }
 
     /**
@@ -311,7 +313,7 @@ class TestChartViewModel : BaseViewModel(), Callback2 {
             changeHilt("取样量错误,必须为1-500")
             return
         }
-        SerialPortUtil.sampling(volume, sampleType)
+        appViewModel.serialPort.sampling(volume, sampleType)
     }
 
     /**
@@ -330,7 +332,7 @@ class TestChartViewModel : BaseViewModel(), Callback2 {
             changeHilt("加样量错误,必须为1-500")
             return
         }
-        SerialPortUtil.dripSample(blending, inplace, volume)
+        appViewModel.serialPort.dripSample(blending, inplace, volume)
     }
 
     /**
@@ -357,7 +359,7 @@ class TestChartViewModel : BaseViewModel(), Callback2 {
             changeHilt("R2取试剂量错误,必须为1-100")
             return
         }
-        SerialPortUtil.takeReagent(volumeR1, volumeR2)
+        appViewModel.serialPort.takeReagent(volumeR1, volumeR2)
     }
 
     /**
@@ -384,7 +386,7 @@ class TestChartViewModel : BaseViewModel(), Callback2 {
             changeHilt("R2加试剂量错误,必须为1-100")
             return
         }
-        SerialPortUtil.takeReagent(volumeR1, volumeR2)
+        appViewModel.serialPort.takeReagent(volumeR1, volumeR2)
     }
 
     /**
@@ -401,7 +403,7 @@ class TestChartViewModel : BaseViewModel(), Callback2 {
             changeHilt("搅拌时长错误,必须为1-10000")
             return
         }
-        SerialPortUtil.stir(volume)
+        appViewModel.serialPort.stir(volume)
     }
 
     /**
@@ -418,7 +420,7 @@ class TestChartViewModel : BaseViewModel(), Callback2 {
             changeHilt("清洗时长错误,必须为1-10000")
             return
         }
-        SerialPortUtil.samplingProbeCleaning(volume)
+        appViewModel.serialPort.samplingProbeCleaning(volume)
     }
 
 
@@ -436,35 +438,35 @@ class TestChartViewModel : BaseViewModel(), Callback2 {
             changeHilt("清洗时长错误,必须为1-10000")
             return
         }
-        SerialPortUtil.stirProbeCleaning(volume)
+        appViewModel.serialPort.stirProbeCleaning(volume)
     }
 
     /**
      * 刺破
      */
     fun pierced() {
-        SerialPortUtil.pierced(SampleType.SAMPLE)
+        appViewModel.serialPort.pierced(SampleType.SAMPLE)
     }
 
     /**
      * 挤压
      */
     fun squeezing() {
-        SerialPortUtil.squeezing(true)
+        appViewModel.serialPort.squeezing(true)
     }
 
     /**
      * 获取下位机版本号
      */
     fun getMcuVersion() {
-        SerialPortUtil.getVersion()
+        appViewModel.serialPort.getVersion()
     }
 
     /**
      * 获取温度
      */
     fun getTemp() {
-        SerialPortUtil.getTemp()
+        appViewModel.serialPort.getTemp()
     }
 
 
@@ -472,21 +474,21 @@ class TestChartViewModel : BaseViewModel(), Callback2 {
      * 检测
      */
     fun test() {
-        SerialPortUtil.test()
+        appViewModel.serialPort.test()
     }
 
     /**
      * 关机
      */
     fun shutdown() {
-        SerialPortUtil.shutdown()
+        appViewModel.serialPort.shutdown()
     }
 
     /**
      * 获取状态
      */
     fun getState() {
-        SerialPortUtil.getState()
+        appViewModel.serialPort.getState()
     }
 
 
@@ -496,5 +498,18 @@ class TestChartViewModel : BaseViewModel(), Callback2 {
 
     private fun changeResult(msg: String) {
         resultMsg.value = msg
+    }
+}
+
+class TestChartViewModelFactory(
+    private val appViewModel: AppViewModel = getAppViewModel(AppViewModel::class.java),
+) : ViewModelProvider.NewInstanceFactory() {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(TestChartViewModel::class.java)) {
+            return TestChartViewModel(
+                appViewModel
+            ) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

@@ -189,14 +189,20 @@ class MatchingArgsFragment :
 
         lifecycleScope.launch {
             appVm.obTestState.collectLatest {
-                if (it.isRunning()) {
+                if (!appVm.testType.isMatchingArgs() && it.isRunning()) {
                     vd.vMatching.setBackgroundResource(R.drawable.shape_analyse_test_bg)
-                    vd.tvMatching.setText("生成曲线中……")
+                    vd.tvMatching.setText("正在运行……")
                     vm.configEnable.postValue(false)
                 } else {
-                    vd.vMatching.setBackgroundResource(R.drawable.shape_analyse_test_bg2)
-                    vd.tvMatching.setText("开始拟合")
-                    vm.configEnable.postValue(true)
+                    if (it.isRunning()) {
+                        vd.vMatching.setBackgroundResource(R.drawable.shape_analyse_test_bg)
+                        vd.tvMatching.setText("生成曲线中……")
+                        vm.configEnable.postValue(false)
+                    } else {
+                        vd.vMatching.setBackgroundResource(R.drawable.shape_analyse_test_bg2)
+                        vd.tvMatching.setText("开始拟合")
+                        vm.configEnable.postValue(true)
+                    }
                 }
             }
         }
@@ -212,7 +218,11 @@ class MatchingArgsFragment :
         }
         vd.vConfig.setOnClickListener {
             u("拟合配置")
-            vm.showMatchingSettingsDialog()
+            if (appVm.testState.isTestRunning()) {
+                toast("正在运行，请稍后")
+            } else {
+                vm.showMatchingSettingsDialog()
+            }
         }
         vd.btnPrint.setOnClickListener {
             u("打印")

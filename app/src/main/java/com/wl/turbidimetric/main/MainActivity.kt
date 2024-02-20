@@ -148,6 +148,9 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         vm.curIndex.observe(this) {
             vd.vp.setCurrentItem(it, false)
         }
+        vd.tnv.setShutdownListener {
+            showShutdownDialog()
+        }
     }
 
     private fun initTime() {
@@ -157,12 +160,12 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     val splashFragment: SplashFragment = SplashFragment()
 
     private fun showSplash() {
-        supportFragmentManager.beginTransaction().add(R.id.cl_root, splashFragment, "splash")
+        supportFragmentManager.beginTransaction().add(R.id.cl_root, splashFragment, SplashFragment.TAG)
             .show(splashFragment).commitAllowingStateLoss()
     }
 
     private fun hideSplash() {
-        supportFragmentManager.findFragmentByTag("splash")?.let {
+        supportFragmentManager.findFragmentByTag(SplashFragment.TAG)?.let {
             supportFragmentManager.beginTransaction().hide(it).commitAllowingStateLoss()
         }
     }

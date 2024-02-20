@@ -54,7 +54,7 @@
         android:layout_marginRight="27dp"
         android:text="12:46"
         android:textColor="@color/white"
-        android:textSize="67sp"
+        android:textSize="40sp"
         android:textStyle="normal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toLeftOf="@id/v_shutdown"

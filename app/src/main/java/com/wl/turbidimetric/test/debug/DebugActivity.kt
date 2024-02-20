@@ -19,7 +19,7 @@ import org.greenrobot.eventbus.EventBus
 
 class DebugActivity : BaseActivity<DebugViewModel, ActivityDebugBinding>() {
     override val vd: ActivityDebugBinding by ActivityDataBindingDelegate(R.layout.activity_debug)
-    override val vm: DebugViewModel by viewModels()
+    override val vm: DebugViewModel by viewModels{DebugViewModelFactory()}
     override fun init() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = "测试页面"

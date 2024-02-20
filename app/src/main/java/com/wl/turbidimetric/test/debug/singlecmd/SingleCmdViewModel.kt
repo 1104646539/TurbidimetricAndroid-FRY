@@ -1,7 +1,11 @@
 package com.wl.turbidimetric.test.debug.singlecmd
 
 import androidx.lifecycle.MutableLiveData
-import com.wl.turbidimetric.global.SystemGlobal.testType
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import com.wl.turbidimetric.app.AppViewModel
+import com.wl.turbidimetric.base.BaseViewModel
+import com.wl.turbidimetric.ex.getAppViewModel
 import com.wl.turbidimetric.model.CuvetteDoorModel
 import com.wl.turbidimetric.model.DripReagentModel
 import com.wl.turbidimetric.model.DripSampleModel
@@ -28,24 +32,22 @@ import com.wl.turbidimetric.model.TempModel
 import com.wl.turbidimetric.model.TestModel
 import com.wl.turbidimetric.model.TestType
 import com.wl.turbidimetric.util.Callback2
-import com.wl.turbidimetric.util.SerialPortUtil
 import com.wl.wllib.LogToFile.i
-import com.wl.turbidimetric.base.BaseViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 
-class SingleCmdViewModel : BaseViewModel(), Callback2 {
+class SingleCmdViewModel(private val appViewModel: AppViewModel) : BaseViewModel(), Callback2 {
     val testMsg = MutableStateFlow("")
     val resultMsg = MutableStateFlow("")
     val enable = MutableLiveData(true)
     fun listener() {
-        SerialPortUtil.callback.add(this)
-        testType = TestType.Debug
-        i("SerialPortUtil.callback listener")
+        appViewModel.serialPort.addCallback(this)
+        appViewModel.testType = TestType.Debug
+        i("appViewModel.serialPort.callback listener")
     }
 
     fun clearListener() {
-        SerialPortUtil.callback.remove(this)
-        i("SerialPortUtil.callback onCleared")
+        appViewModel.serialPort.removeCallback(this)
+        i("appViewModel.serialPort.callback onCleared")
     }
 
     override fun readDataGetMachineStateModel(reply: ReplyModel<GetMachineStateModel>) {
@@ -57,8 +59,8 @@ class SingleCmdViewModel : BaseViewModel(), Callback2 {
     }
 
     override fun readDataGetStateModel(reply: ReplyModel<GetStateModel>) {
-        val sampleShelfStr =reply.data.sampleShelfs.joinTo(StringBuffer())
-        val cuvetteShelfStr =reply.data.cuvetteShelfs.joinTo(StringBuffer())
+        val sampleShelfStr = reply.data.sampleShelfs.joinTo(StringBuffer())
+        val cuvetteShelfStr = reply.data.cuvetteShelfs.joinTo(StringBuffer())
         var msg =
             "获取状态完成\n清洗液状态:${reply.data.cleanoutFluid.isExist()} R1状态:${reply.data.r1Reagent.isExist()} R2状态:${reply.data.r2Reagent.isExist()} ${reply.data.r2Volume}\n样本架状态:${sampleShelfStr} 比色皿架状态:${cuvetteShelfStr}"
         changeResult(msg)
@@ -164,13 +166,14 @@ class SingleCmdViewModel : BaseViewModel(), Callback2 {
         changeResult(msg)
     }
 
-//    override fun readDataStateFailed(cmd: UByte, state: UByte) {
+    //    override fun readDataStateFailed(cmd: UByte, state: UByte) {
 //        var msg = "错误信息\n cmd=$cmd state=$state"
 //        changeResult(msg)
 //    }
-override fun stateSuccess(cmd: Int, state: Int): Boolean {
-    return true
-}
+    override fun stateSuccess(cmd: Int, state: Int): Boolean {
+        return true
+    }
+
     override fun readDataSqueezing(reply: ReplyModel<SqueezingModel>) {
         var msg = "挤压完成"
         changeResult(msg)
@@ -181,7 +184,7 @@ override fun stateSuccess(cmd: Int, state: Int): Boolean {
      */
     fun getMachineState() {
         enable.postValue(false)
-        SerialPortUtil.getMachineState()
+        appViewModel.serialPort.getMachineState()
     }
 
     /**
@@ -199,7 +202,7 @@ override fun stateSuccess(cmd: Int, state: Int): Boolean {
             return
         }
         enable.postValue(false)
-        SerialPortUtil.moveSampleShelf(step)
+        appViewModel.serialPort.moveSampleShelf(step)
     }
 
     /**
@@ -217,7 +220,7 @@ override fun stateSuccess(cmd: Int, state: Int): Boolean {
             return
         }
         enable.postValue(false)
-        SerialPortUtil.moveCuvetteShelf(step)
+        appViewModel.serialPort.moveCuvetteShelf(step)
     }
 
     /**
@@ -236,7 +239,7 @@ override fun stateSuccess(cmd: Int, state: Int): Boolean {
             return
         }
         enable.postValue(false)
-        SerialPortUtil.moveSample(forward, step)
+        appViewModel.serialPort.moveSample(forward, step)
     }
 
     /**
@@ -255,7 +258,7 @@ override fun stateSuccess(cmd: Int, state: Int): Boolean {
             return
         }
         enable.postValue(false)
-        SerialPortUtil.moveCuvetteDripSample(forward, step)
+        appViewModel.serialPort.moveCuvetteDripSample(forward, step)
     }
 
     /**
@@ -274,7 +277,7 @@ override fun stateSuccess(cmd: Int, state: Int): Boolean {
             return
         }
         enable.postValue(false)
-        SerialPortUtil.moveCuvetteDripReagent(forward, step)
+        appViewModel.serialPort.moveCuvetteDripReagent(forward, step)
     }
 
     /**
@@ -293,7 +296,7 @@ override fun stateSuccess(cmd: Int, state: Int): Boolean {
             return
         }
         enable.postValue(false)
-        SerialPortUtil.moveCuvetteTest(forward, step)
+        appViewModel.serialPort.moveCuvetteTest(forward, step)
     }
 
     /**
@@ -312,7 +315,7 @@ override fun stateSuccess(cmd: Int, state: Int): Boolean {
             return
         }
         enable.postValue(false)
-        SerialPortUtil.sampling(volume, sampleType)
+        appViewModel.serialPort.sampling(volume, sampleType)
     }
 
     /**
@@ -332,7 +335,7 @@ override fun stateSuccess(cmd: Int, state: Int): Boolean {
             return
         }
         enable.postValue(false)
-        SerialPortUtil.dripSample(blending, inplace, volume)
+        appViewModel.serialPort.dripSample(blending, inplace, volume)
     }
 
     /**
@@ -360,7 +363,7 @@ override fun stateSuccess(cmd: Int, state: Int): Boolean {
             return
         }
         enable.postValue(false)
-        SerialPortUtil.takeReagent(volumeR1, volumeR2)
+        appViewModel.serialPort.takeReagent(volumeR1, volumeR2)
     }
 
     /**
@@ -388,7 +391,7 @@ override fun stateSuccess(cmd: Int, state: Int): Boolean {
             return
         }
         enable.postValue(false)
-        SerialPortUtil.takeReagent(volumeR1, volumeR2)
+        appViewModel.serialPort.takeReagent(volumeR1, volumeR2)
     }
 
     /**
@@ -406,7 +409,7 @@ override fun stateSuccess(cmd: Int, state: Int): Boolean {
             return
         }
         enable.postValue(false)
-        SerialPortUtil.stir(volume)
+        appViewModel.serialPort.stir(volume)
     }
 
     /**
@@ -424,7 +427,7 @@ override fun stateSuccess(cmd: Int, state: Int): Boolean {
             return
         }
         enable.postValue(false)
-        SerialPortUtil.samplingProbeCleaning(volume)
+        appViewModel.serialPort.samplingProbeCleaning(volume)
     }
 
 
@@ -443,7 +446,7 @@ override fun stateSuccess(cmd: Int, state: Int): Boolean {
             return
         }
         enable.postValue(false)
-        SerialPortUtil.stirProbeCleaning(volume)
+        appViewModel.serialPort.stirProbeCleaning(volume)
     }
 
     /**
@@ -451,7 +454,7 @@ override fun stateSuccess(cmd: Int, state: Int): Boolean {
      */
     fun pierced() {
         enable.postValue(false)
-        SerialPortUtil.pierced(SampleType.SAMPLE)
+        appViewModel.serialPort.pierced(SampleType.SAMPLE)
     }
 
     /**
@@ -459,7 +462,7 @@ override fun stateSuccess(cmd: Int, state: Int): Boolean {
      */
     fun squeezing() {
         enable.postValue(false)
-        SerialPortUtil.squeezing(true)
+        appViewModel.serialPort.squeezing(true)
     }
 
     /**
@@ -467,7 +470,7 @@ override fun stateSuccess(cmd: Int, state: Int): Boolean {
      */
     fun getMcuVersion() {
         enable.postValue(false)
-        SerialPortUtil.getVersion()
+        appViewModel.serialPort.getVersion()
     }
 
     /**
@@ -475,7 +478,7 @@ override fun stateSuccess(cmd: Int, state: Int): Boolean {
      */
     fun getTemp() {
         enable.postValue(false)
-        SerialPortUtil.getTemp()
+        appViewModel.serialPort.getTemp()
     }
 
 
@@ -484,7 +487,7 @@ override fun stateSuccess(cmd: Int, state: Int): Boolean {
      */
     fun test() {
         enable.postValue(false)
-        SerialPortUtil.test()
+        appViewModel.serialPort.test()
     }
 
     /**
@@ -492,7 +495,7 @@ override fun stateSuccess(cmd: Int, state: Int): Boolean {
      */
     fun shutdown() {
         enable.postValue(false)
-        SerialPortUtil.shutdown()
+        appViewModel.serialPort.shutdown()
     }
 
     /**
@@ -500,7 +503,7 @@ override fun stateSuccess(cmd: Int, state: Int): Boolean {
      */
     fun getState() {
         enable.postValue(false)
-        SerialPortUtil.getState()
+        appViewModel.serialPort.getState()
     }
 
 
@@ -511,5 +514,18 @@ override fun stateSuccess(cmd: Int, state: Int): Boolean {
     private fun changeResult(msg: String) {
         enable.postValue(true)
         resultMsg.value = msg
+    }
+}
+
+class SingleCmdViewModelFactory(
+    private val appViewModel: AppViewModel = getAppViewModel(AppViewModel::class.java),
+) : ViewModelProvider.NewInstanceFactory() {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(SingleCmdViewModel::class.java)) {
+            return SingleCmdViewModel(
+                appViewModel,
+            ) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

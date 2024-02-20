@@ -223,6 +223,14 @@ enum class TestState(val state: Int) {
     fun machineStateNormal(): Boolean {
         return this.isNotPrepare()
     }
+    /**
+     * 仪器是否可正常运行
+     *
+     * @return Boolean
+     */
+    fun machineStateIng(): Boolean {
+        return this.state == GetMachineState.state
+    }
 
     /**
      * 是否正在运行

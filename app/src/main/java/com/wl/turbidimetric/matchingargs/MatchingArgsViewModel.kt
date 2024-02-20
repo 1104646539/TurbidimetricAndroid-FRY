@@ -20,9 +20,6 @@ import com.wl.turbidimetric.ex.scale
 import com.wl.turbidimetric.global.EventGlobal
 import com.wl.turbidimetric.global.EventMsg
 import com.wl.turbidimetric.global.SystemGlobal
-import com.wl.turbidimetric.global.SystemGlobal.testType
-import com.wl.turbidimetric.repository.CurveRepository
-import com.wl.turbidimetric.repository.ProjectRepository
 import com.wl.turbidimetric.model.CurveModel
 import com.wl.turbidimetric.model.CuvetteDoorModel
 import com.wl.turbidimetric.model.CuvetteState
@@ -58,14 +55,11 @@ import com.wl.turbidimetric.print.PrintUtil
 import com.wl.turbidimetric.repository.DefaultCurveDataSource
 import com.wl.turbidimetric.repository.DefaultLocalDataDataSource
 import com.wl.turbidimetric.repository.DefaultProjectDataSource
-import com.wl.turbidimetric.repository.DefaultTestResultDataSource
 import com.wl.turbidimetric.repository.if2.CurveSource
 import com.wl.turbidimetric.repository.if2.LocalDataSource
 import com.wl.turbidimetric.repository.if2.ProjectSource
-import com.wl.turbidimetric.repository.if2.TestResultSource
 import com.wl.turbidimetric.util.Callback2
 import com.wl.turbidimetric.util.FitterType
-import com.wl.turbidimetric.util.SerialPortUtil
 import com.wl.wllib.LogToFile.i
 import com.wl.wllib.toTimeStr
 import kotlinx.coroutines.delay
@@ -90,7 +84,7 @@ class MatchingArgsViewModel(
     private val appViewModel: AppViewModel,
     private val projectRepository: ProjectSource,
     private val curveRepository: CurveSource,
-    private val localDataRepository:LocalDataSource
+    private val localDataRepository: LocalDataSource
 ) : BaseViewModel(), Callback2 {
 
     init {
@@ -582,7 +576,7 @@ class MatchingArgsViewModel(
     fun start() {
         initState()
         appViewModel.testState = TestState.GetState
-        testType = TestType.MatchingArgs
+        appViewModel.testType = TestType.MatchingArgs
         getState()
     }
 
@@ -729,7 +723,7 @@ class MatchingArgsViewModel(
      * @param reply ReplyModel<MoveCuvetteShelfModel>
      */
     override fun readDataMoveCuvetteShelfModel(reply: ReplyModel<MoveCuvetteShelfModel>) {
-        if (appViewModel.testState == TestState.TestFinish && testType.isMatchingArgs()) {
+        if (appViewModel.testState == TestState.TestFinish && appViewModel.testType.isMatchingArgs()) {
             cuvetteShelfMoveFinish = true
             if (isMatchingFinish()) {
                 showMatchingDialog()
@@ -954,7 +948,7 @@ class MatchingArgsViewModel(
      */
     override fun readDataMoveSampleShelfModel(reply: ReplyModel<MoveSampleShelfModel>) {
         i("接收到 移动样本架 reply=$reply testState=${appViewModel.testState}")
-        if (appViewModel.testState == TestState.TestFinish && testType.isMatchingArgs()) {
+        if (appViewModel.testState == TestState.TestFinish && appViewModel.testType.isMatchingArgs()) {
             sampleShelfMoveFinish = true
             if (isMatchingFinish()) {
                 showMatchingDialog()
@@ -1750,7 +1744,10 @@ class MatchingArgsViewModel(
         i("发送 取试剂")
         takeReagentFinish = false
         dripReagentFinish = false
-        appViewModel.serialPort.takeReagent(localDataRepository.getTakeReagentR1(),localDataRepository.getTakeReagentR2())
+        appViewModel.serialPort.takeReagent(
+            localDataRepository.getTakeReagentR1(),
+            localDataRepository.getTakeReagentR2()
+        )
     }
 
     /**
@@ -1797,7 +1794,10 @@ class MatchingArgsViewModel(
     private fun dripReagent() {
         i("发送 加试剂 cuvettePos=$cuvettePos")
         dripReagentFinish = false
-        appViewModel.serialPort.dripReagent(localDataRepository.getTakeReagentR1(),localDataRepository.getTakeReagentR2())
+        appViewModel.serialPort.dripReagent(
+            localDataRepository.getTakeReagentR1(),
+            localDataRepository.getTakeReagentR2()
+        )
     }
 
     /**
@@ -1833,7 +1833,7 @@ class MatchingArgsViewModel(
      * 是否正在拟合
      */
     fun runningMatching(): Boolean {
-        return appViewModel.testState.isRunning() && testType.isMatchingArgs()
+        return appViewModel.testState.isRunning() && appViewModel.testType.isMatchingArgs()
     }
 
     fun changeSelectProject(project: CurveModel) {
@@ -1967,7 +1967,12 @@ class MatchingArgsViewModelFactory(
 ) : ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MatchingArgsViewModel::class.java)) {
-            return MatchingArgsViewModel(appViewModel, projectRepository, curveRepository,localDataRepository) as T
+            return MatchingArgsViewModel(
+                appViewModel,
+                projectRepository,
+                curveRepository,
+                localDataRepository
+            ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

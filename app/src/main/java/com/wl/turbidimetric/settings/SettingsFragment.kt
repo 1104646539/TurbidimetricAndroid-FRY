@@ -34,6 +34,7 @@ class SettingsFragment constructor() :
     BaseFragment<SettingsViewModel, FragmentSettingsBinding>(R.layout.fragment_settings) {
     private val TAG = "SettingsFragment"
     private var show = false
+    private val mcuUpdateHelper by lazy { McuUpdateHelper(appVm) }
 
     /**
      * 点击显示调试模式的功能
@@ -188,7 +189,7 @@ class SettingsFragment constructor() :
         mcuUpdateHiltDialog.showPop(requireContext(), isCancelable = false) {
             it.showDialog("请等待……")
         }
-        McuUpdateHelper.update(Dispatchers.IO, Dispatchers.Main, lifecycleScope) {
+        mcuUpdateHelper.update(Dispatchers.IO, Dispatchers.Main, lifecycleScope) {
             if (it is UpdateResult.Failed) {
                 mcuUpdateHiltDialog.showPop(requireContext(), isCancelable = false) { dialog ->
                     dialog.showDialog(

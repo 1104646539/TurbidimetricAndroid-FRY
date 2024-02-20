@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 
 class SingleCmdFragment :
     BaseFragment<SingleCmdViewModel, FragmentSingleCmdBinding>(R.layout.fragment_single_cmd) {
-    override val vm: SingleCmdViewModel by viewModels()
+    override val vm: SingleCmdViewModel by viewModels { SingleCmdViewModelFactory() }
     override fun initViewModel() {
 
     }
@@ -24,7 +24,6 @@ class SingleCmdFragment :
     }
 
     private fun listenerView() {
-
         lifecycleScope.launch {
             vm.testMsg.collectLatest {
                 if (it.isNotEmpty()) {
@@ -37,8 +36,8 @@ class SingleCmdFragment :
                 vd.tvMsg.text = it
             }
         }
-        lifecycleScope.launch{
-            vm.enable.observe(this@SingleCmdFragment){
+        lifecycleScope.launch {
+            vm.enable.observe(this@SingleCmdFragment) {
                 vd.btnGetMachineState.isEnabled = it
                 vd.btnMoveSampleShelf.isEnabled = it
                 vd.btnMoveCuvetteShelf.isEnabled = it

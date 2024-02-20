@@ -18,5 +18,7 @@ class SplashFragment :
     override fun init(savedInstanceState: Bundle?) {
 
     }
-
+    companion object{
+        val TAG = "splash"
+    }
 }

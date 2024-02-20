@@ -1,8 +1,7 @@
 package com.wl.turbidimetric.mcuupdate
 
+import com.wl.turbidimetric.app.AppViewModel
 import com.wl.turbidimetric.global.SystemGlobal
-import com.wl.turbidimetric.util.McuUpdateCallBack
-import com.wl.turbidimetric.util.SerialPortUtil
 import com.wl.weiqianwllib.upan.StorageUtil
 import com.wl.wllib.LogToFile.i
 import kotlinx.coroutines.CoroutineDispatcher
@@ -24,8 +23,8 @@ import java.security.NoSuchAlgorithmException
  * 3、下位机验证升级文件传输完毕，验证成功后回复成功
  * 4、上位机提示升级完毕，重启仪器生效
  */
-object McuUpdateHelper {
-    const val updateFileName = "main.bin"
+class McuUpdateHelper(private val appViewModel: AppViewModel) {
+    val updateFileName = "bzapp.bin"
 
     private var mcuUpdate: Boolean = false
         set(value) {
@@ -60,28 +59,30 @@ object McuUpdateHelper {
                 return
             }
             val fileSize = curMcuFile.length()
-            SerialPortUtil.mcuUpdate(fileSize)
+            appViewModel.serialPort.mcuUpdate(fileSize)
             //step2 收到结果，发送文件和md5
-            SerialPortUtil.mcuUpdateCallBack = McuUpdateCallBack {
+            appViewModel.serialPort.setMcuUpdateCallBack {
                 coroutineScope.launch(taskDispatcher) {
                     delay(1000)
                     mcuUpdate = true
                     val tempBytes = ByteArray(256)
                     val input = curMcuFile.inputStream()
-                    var readLen :Int
+                    var readLen: Int
                     //发送文件
                     while (input.read(tempBytes).also { readLen = it } > 0) {
-                        SerialPortUtil.updateWrite(tempBytes.copyOf(readLen).toUByteArray())
-                        delay(20)
+                        appViewModel.serialPort.updateWrite(
+                            tempBytes.copyOf(readLen).toUByteArray()
+                        )
+                        delay(100)
                     }
                     delay(1000)
                     //发送md5
                     val md5 = getMD5(curMcuFile)
                     md5?.let {
-                        SerialPortUtil.updateWrite(it.toByteArray().toUByteArray())
+                        appViewModel.serialPort.updateWrite(it.toByteArray().toUByteArray())
                     }
                     //step3 收到发送文件和md5的结果
-                    SerialPortUtil.onResult = { ret ->
+                    appViewModel.serialPort.setOnResult { ret ->
                         coroutineScope.launch(resultDispatcher) {
                             //step4 提示升级完毕，重启仪器生效
                             onResult.invoke(ret)

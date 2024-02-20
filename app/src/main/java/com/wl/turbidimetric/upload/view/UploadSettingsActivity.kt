@@ -43,7 +43,7 @@ import java.util.Date
 class UploadSettingsActivity :
     BaseActivity<UploadSettingsViewModel, ActivityUploadSettingsBinding>() {
     override val vd: ActivityUploadSettingsBinding by ActivityDataBindingDelegate(R.layout.activity_upload_settings)
-    override val vm: UploadSettingsViewModel by viewModels()
+    override val vm: UploadSettingsViewModel by viewModels {UploadSettingsViewModelFactory()}
 
     /**
      * 获取待检信息

@@ -44,7 +44,7 @@ open class ConditionDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
     var results = getResource().getStringArray(R.array.results)
     var testTimeMin = ""
     var testTimeMax = ""
-    var today = true
+    var today = false
 
     /**
      * 时间选择器

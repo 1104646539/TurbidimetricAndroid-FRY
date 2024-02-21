@@ -161,7 +161,7 @@ class DataManagerFragment :
 
         vd.btnExportExcel.setOnClickListener {
             u("导出Excel")
-            exportExcelSelected()
+            exportExcelAll()
         }
 //        vd.btnExportExcelAll.setOnClickListener {
 //            u("导出Excel全部")
@@ -222,7 +222,12 @@ class DataManagerFragment :
         var verifyRet: String? = null
         //验证上传数据
         if (verifyUploadData(results).also { verifyRet = it } != null) {
-            toast("$verifyRet")
+//            toast("$verifyRet")
+            waitDialog.showPop(requireContext()) { dialog ->
+                dialog.showDialog("$verifyRet","确定",{
+                    it.dismiss()
+                })
+            }
             return
         }
 
@@ -325,7 +330,12 @@ class DataManagerFragment :
     private fun print() {
         val results = getSelectData()
         if (results.isNullOrEmpty()) {
-            toast("请选择数据")
+//            toast("请选择数据")
+            waitDialog.showPop(requireContext()) { dialog ->
+                dialog.showDialog("请选择数据","确定",{
+                    it.dismiss()
+                })
+            }
             return
         }
 
@@ -348,7 +358,7 @@ class DataManagerFragment :
      * @param items List<TestResultModel>?
      */
     private fun exportExcel(exportAll: Boolean) {
-        waitDialog.showPop(requireContext()) { dialog ->
+        waitDialog.showPop(requireContext(), isCancelable = false) { dialog ->
             //step1、 显示等待对话框
             dialog.showDialog("正在导出,请等待……", confirmText = "", confirmClick = {})
             lifecycleScope.launch(Dispatchers.IO) {

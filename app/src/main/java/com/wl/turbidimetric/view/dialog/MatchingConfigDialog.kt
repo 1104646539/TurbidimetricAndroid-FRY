@@ -124,7 +124,7 @@ class MatchingConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
         this.cons.clear()
         this.cons.addAll(targetCons)
 
-        this.confirmText = "确定"
+        this.confirmText = "下一步"
         this.confirmClick = {
             getCurInput()
             onConfirmClick.invoke(

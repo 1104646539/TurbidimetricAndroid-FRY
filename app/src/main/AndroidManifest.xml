@@ -48,6 +48,7 @@
             android:name=".main.MainActivity"
             android:configChanges="orientation|keyboardHidden|keyboard"
             android:exported="true"
+            android:theme="@style/AppTheme.StartingWindowTheme"
             android:windowSoftInputMode="adjustPan|stateAlwaysHidden|adjustNothing">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

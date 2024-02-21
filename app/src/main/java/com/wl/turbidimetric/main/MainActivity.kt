@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.hardware.usb.UsbDevice
 import android.hardware.usb.UsbManager
+import android.os.Bundle
 import android.os.Handler
 import android.os.Message
 import android.util.Log
@@ -49,7 +50,10 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
 
     private val handler_init_qrcode = 1000
     private val handler_init_upan = 1010
-
+    override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme(R.style.Theme_Mvvmdemo) //恢复原有的样式
+        super.onCreate(savedInstanceState)
+    }
     private val mHandler = object : Handler() {
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)

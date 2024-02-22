@@ -33,6 +33,7 @@ import com.wl.weiqianwllib.upan.StorageState
 import com.wl.weiqianwllib.upan.StorageUtil
 import com.wl.weiqianwllib.upan.StorageUtil.OPEN_DOCUMENT_TREE_CODE
 import com.wl.wllib.LogToFile.i
+import com.wl.wllib.LogToFile.e
 import com.wl.wllib.ktxRunOnBgCache
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -45,7 +46,7 @@ import org.greenrobot.eventbus.EventBus
 class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     val TAG = "MainActivity"
     override val vd: ActivityMainBinding by ActivityDataBindingDelegate(R.layout.activity_main)
-    override val vm: MainViewModel by viewModels {MainViewModelFactory()}
+    override val vm: MainViewModel by viewModels { MainViewModelFactory() }
     var mPermissionIntent: PendingIntent? = null
 
     private val handler_init_qrcode = 1000
@@ -54,6 +55,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         setTheme(R.style.Theme_Mvvmdemo) //恢复原有的样式
         super.onCreate(savedInstanceState)
     }
+
     private val mHandler = object : Handler() {
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
@@ -96,16 +98,20 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         //授权一次后重启开机不用再次授权
         if (resultCode != Activity.RESULT_OK) return
         val treeUri = data!!.data
-        grantUriPermission(
-            packageName,
-            treeUri,
-            Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-        )
-        contentResolver.takePersistableUriPermission(
-            treeUri!!,
-            Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-        )
-        Log.i(
+        try {
+            grantUriPermission(
+                packageName,
+                treeUri,
+                Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+            )
+            contentResolver.takePersistableUriPermission(
+                treeUri!!,
+                Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+            )
+        }catch (e:Exception){
+            e("异常${e.stackTraceToString()}")
+        }
+        i(
             TAG,
             "onActivityResult 第一次插入的U盘地址= ： $treeUri"
         )
@@ -144,7 +150,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
                 R.drawable.left_nav_settings_selected
             ),
             mutableListOf("样本分析", "数据管理", "曲线拟合", "参数设置"),
-            R.drawable.left_nav_item_bg,R.drawable.left_nav_item_bg2
+            R.drawable.left_nav_item_bg, R.drawable.left_nav_item_bg2
         )
         vd.lnv.onItemChangeListener = {
             vm.curIndex.value = it
@@ -164,7 +170,8 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     val splashFragment: SplashFragment = SplashFragment()
 
     private fun showSplash() {
-        supportFragmentManager.beginTransaction().add(R.id.cl_root, splashFragment, SplashFragment.TAG)
+        supportFragmentManager.beginTransaction()
+            .add(R.id.cl_root, splashFragment, SplashFragment.TAG)
             .show(splashFragment).commitAllowingStateLoss()
     }
 
@@ -320,7 +327,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         override fun onReceive(context: Context, intent: Intent) {
             val action = intent.action
             val path = intent.data!!.path
-            Log.d(TAG, "action=\$action path=$path")
+            Log.d(TAG, "action=$action path=$path")
             if (action == Intent.ACTION_MEDIA_REMOVED) {
                 Log.d(TAG, "u盘 已移除action=\$action")
                 changeStorageState(StorageState.NONE)

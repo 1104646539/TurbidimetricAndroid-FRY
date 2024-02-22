@@ -86,6 +86,7 @@ class McuUpdateHelper(private val appViewModel: AppViewModel) {
                         coroutineScope.launch(resultDispatcher) {
                             //step4 提示升级完毕，重启仪器生效
                             onResult.invoke(ret)
+                            mcuUpdate = false
                         }
                     }
                 }

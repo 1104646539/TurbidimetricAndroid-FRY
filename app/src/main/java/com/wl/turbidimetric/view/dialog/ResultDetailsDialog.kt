@@ -1,8 +1,11 @@
 package com.wl.turbidimetric.view.dialog
 
 import android.content.Context
+import android.widget.EditText
+import android.widget.Spinner
 import android.widget.TextView
 import com.wl.turbidimetric.R
+import com.wl.turbidimetric.matchingargs.MatchingConfigSampleAdapter
 import com.wl.turbidimetric.model.TestResultAndCurveModel
 import com.wl.turbidimetric.model.TestResultModel
 import com.wl.wllib.toTimeStr
@@ -22,26 +25,28 @@ import com.wl.wllib.toTimeStr
  */
 class ResultDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_result_details) {
     var tvID: TextView? = null
-    var tvDetectionNum: TextView? = null
+    var etDetectionNum: EditText? = null
     var tvTestTime: TextView? = null
-    var etName: TextView? = null
-    var etGender: TextView? = null
-    var etAbs: TextView? = null
-    var etCon: TextView? = null
-    var etResult: TextView? = null
-    var etSampleBarcode: TextView? = null
+    var etName: EditText? = null
+    var spnGender: Spinner? = null
+    var etAbs: EditText? = null
+    var etCon: EditText? = null
+    var etResult: EditText? = null
+    var etSampleBarcode: EditText? = null
 
 
     var result: TestResultAndCurveModel? = null
     open fun showDialog(
         result: TestResultAndCurveModel,
+        isDebug:Boolean,
         onConfirm: (result: TestResultAndCurveModel) -> Boolean,
     ) {
         this.confirmText = "确定"
         this.confirmClick = {
             result.result.name = etName?.text.toString()
-            result.result.gender = etGender?.text.toString()
-            result.result.absorbances = (etAbs?.text.toString().toDoubleOrNull() ?: 0.0).toBigDecimal()
+            result.result.gender = spnGender?.selectedItem as String
+            result.result.absorbances =
+                (etAbs?.text.toString().toDoubleOrNull() ?: 0.0).toBigDecimal()
             result.result.concentration = etCon?.text.toString().toIntOrNull() ?: 0
             result.result.testResult = etResult?.text.toString()
             result.result.sampleBarcode = etSampleBarcode?.text.toString()
@@ -54,36 +59,51 @@ class ResultDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog
 
         this.result = result
 
-        if(isCreated){
+        if (isCreated) {
             setContent()
         }
+        etDetectionNum?.isEnabled = isDebug
+        etAbs?.isEnabled = isDebug
+        etCon?.isEnabled = isDebug
+        etResult?.isEnabled = false
         super.show()
     }
 
+    val sexs = resources.getStringArray(R.array.sexs)
     override fun initDialogView() {
         tvID = findViewById(R.id.tv_id)
-        tvDetectionNum = findViewById(R.id.tv_detection_num)
+        etDetectionNum = findViewById(R.id.et_detectionNum)
         tvTestTime = findViewById(R.id.tv_test_time)
         etName = findViewById(R.id.et_name)
-        etGender = findViewById(R.id.et_gender)
+        spnGender = findViewById(R.id.spn_gender)
         etAbs = findViewById(R.id.et_abs)
         etCon = findViewById(R.id.et_con)
         etResult = findViewById(R.id.et_result)
         etSampleBarcode = findViewById(R.id.et_sample_barcode)
+
+
+        spnGender?.adapter = MatchingConfigSampleAdapter(rootView.context, sexs.toMutableList())
     }
 
     override fun setContent() {
         super.setContent()
         tvID?.text = result?.result?.resultId.toString()
-        tvDetectionNum?.text = result?.result?.detectionNum
+        etDetectionNum?.setText(result?.result?.detectionNum)
         tvTestTime?.text = result?.result?.testTime?.toTimeStr()
 
-        etName?.text = result?.result?.name
-        etGender?.text = result?.result?.gender
-        etAbs?.text = result?.result?.absorbances.toString()
-        etCon?.text = result?.result?.concentration.toString()
-        etResult?.text = result?.result?.testResult
-        etSampleBarcode?.text = result?.result?.sampleBarcode
+        etName?.setText(result?.result?.name)
+        etAbs?.setText(result?.result?.absorbances?.toInt().toString())
+        etCon?.setText(result?.result?.concentration.toString())
+        etResult?.setText(result?.result?.testResult)
+        etSampleBarcode?.setText(result?.result?.sampleBarcode)
+
+        sexs.indexOf(result?.result?.gender).let { index ->
+            if (index > -1 && index in sexs.indices) {
+                spnGender?.setSelection(index)
+            } else {
+                spnGender?.setSelection(0)//没有设置性别默认为- 未知
+            }
+        }
     }
 
     override fun getResId(): Int {

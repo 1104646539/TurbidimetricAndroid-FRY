@@ -20,6 +20,11 @@
         <item>阳性</item>
         <item>样本无效</item>
     </string-array>
+    <string-array name="sexs">
+        <item>-</item>
+        <item>男</item>
+        <item>女</item>
+    </string-array>
     <string-array name="getMachineStateErrors">
         <item>取样泵</item>
         <item>样本架X</item>

@@ -19,6 +19,7 @@ import com.wl.turbidimetric.repository.DefaultProjectDataSource
 import com.wl.turbidimetric.repository.DefaultTestResultDataSource
 import com.wl.turbidimetric.repository.if2.ProjectSource
 import com.wl.turbidimetric.repository.if2.TestResultSource
+import com.wl.turbidimetric.view.dialog.ResultDetailsDialog
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -28,10 +29,9 @@ class DataManagerViewModel(
     private val projectRepository: ProjectSource,
     private val testResultRepository: TestResultSource
 ) : BaseViewModel() {
-    /**
-     * 显示删除提示对话框
-     */
-    val showDeleteDialog = MutableLiveData(false)
+
+    private val _dialogUiState = MutableSharedFlow<DataManagerUiState>()
+    val dialogUiState = _dialogUiState.asSharedFlow()
 
     /**
      * 筛选条件
@@ -89,6 +89,14 @@ class DataManagerViewModel(
         _resultSize.value = testResultRepository.countTestResultAndCurveModels(conditionModel)
     }
 
+    /***
+     * 显示详情
+     */
+    suspend fun showDetails(id: Long) {
+        val result = getTestResultAndCurveModelById(id)
+        _dialogUiState.emit(DataManagerUiState.ResultDetailsDialog(result))
+    }
+
 }
 
 class DataManagerViewModelFactory(
@@ -101,7 +109,7 @@ class DataManagerViewModelFactory(
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
 
         if (modelClass.isAssignableFrom(DataManagerViewModel::class.java)) {
-            return DataManagerViewModel(appViewModel,projectRepository, testResultRepository) as T
+            return DataManagerViewModel(appViewModel, projectRepository, testResultRepository) as T
         }
 
         throw IllegalArgumentException("Unknown ViewModel class")

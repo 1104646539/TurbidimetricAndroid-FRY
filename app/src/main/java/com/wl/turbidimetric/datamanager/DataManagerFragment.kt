@@ -163,10 +163,6 @@ class DataManagerFragment :
             u("导出Excel")
             exportExcelAll()
         }
-//        vd.btnExportExcelAll.setOnClickListener {
-//            u("导出Excel全部")
-//            exportExcelAll()
-//        }
         vd.btnUpload.setOnClickListener {
             upload()
         }
@@ -180,17 +176,7 @@ class DataManagerFragment :
             u("详情$id")
             if (id > 0) {
                 lifecycleScope.launch {
-                    val result = vm.getTestResultAndCurveModelById(id)
-                    result?.let {
-                        resultDialog.showPop(requireContext(), isCancelable = false) {
-                            it.showDialog(result) {
-                                lifecycleScope.launch {
-                                    vm.update(it)
-                                }
-                                true
-                            }
-                        }
-                    }
+                    vm.showDetails(id)
                 }
             } else {
                 toast("ID错误")
@@ -203,6 +189,41 @@ class DataManagerFragment :
         }
         adapter.onSelectChange = { pos, selected ->
 
+        }
+        lifecycleScope.launch {
+            vm.dialogUiState.collectLatest { state ->
+                when (state) {
+                    DataManagerUiState.None -> {
+                    }
+
+                    is DataManagerUiState.ResultDetailsDialog -> {
+                        resultDialog.showPop(requireContext(), isCancelable = false) {
+                            it.showDialog(state.model, SystemGlobal.isDebugMode) { result ->
+                                lifecycleScope.launch {
+                                    val ret = vm.update(result)
+                                    toast("更新${if (ret > 0) "成功" else "失败"}")
+                                }
+                                true
+                            }
+                        }
+                    }
+                    is DataManagerUiState.DeleteDialog->{
+                        deleteDialog.showPop(requireContext(), isCancelable = false) {
+                            it.showDialog("确定要删除数据吗?", "确定", {
+                                val results = getSelectData()
+                                it.dismiss()
+                                if (!results.isNullOrEmpty()) {
+                                    lifecycleScope.launch {
+                                        vm.clickDeleteDialogConfirm(results.map { it.result })
+                                    }
+                                }
+                            }, "取消", {
+                                it.dismiss()
+                            }, showIcon = true, iconId = ICON_HINT)
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -224,7 +245,7 @@ class DataManagerFragment :
         if (verifyUploadData(results).also { verifyRet = it } != null) {
 //            toast("$verifyRet")
             waitDialog.showPop(requireContext()) { dialog ->
-                dialog.showDialog("$verifyRet","确定",{
+                dialog.showDialog("$verifyRet", "确定", {
                     it.dismiss()
                 })
             }
@@ -287,27 +308,6 @@ class DataManagerFragment :
     }
 
     private fun listenerData() {
-        vd.btnDelete.setOnClickListener {
-            vm.showDeleteDialog.postValue(true)
-        }
-
-        vm.showDeleteDialog.observe(this) {
-            if (it) {
-                deleteDialog.showPop(requireContext(), isCancelable = false) {
-                    it.showDialog("确定要删除数据吗?", "确定", {
-                        val results = getSelectData()
-                        it.dismiss()
-                        if (!results.isNullOrEmpty()) {
-                            lifecycleScope.launch {
-                                vm.clickDeleteDialogConfirm(results.map { it.result })
-                            }
-                        }
-                    }, "取消", {
-                        it.dismiss()
-                    }, showIcon = true, iconId = ICON_HINT)
-                }
-            }
-        }
 
         lifecycleScope.launch {
             adapter.loadStateFlow.collectLatest { loadState ->
@@ -332,7 +332,7 @@ class DataManagerFragment :
         if (results.isNullOrEmpty()) {
 //            toast("请选择数据")
             waitDialog.showPop(requireContext()) { dialog ->
-                dialog.showDialog("请选择数据","确定",{
+                dialog.showDialog("请选择数据", "确定", {
                     it.dismiss()
                 })
             }

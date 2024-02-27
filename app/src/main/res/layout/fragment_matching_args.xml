@@ -267,7 +267,7 @@
             android:id="@+id/iv_analyse"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="134dp"
+            android:layout_marginLeft="100dp"
             android:src="@drawable/analyse_test_btn"
             app:layout_constraintBottom_toBottomOf="@id/v_matching"
             app:layout_constraintLeft_toLeftOf="@id/v_matching"

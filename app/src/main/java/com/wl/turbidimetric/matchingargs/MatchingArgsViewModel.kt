@@ -1151,7 +1151,7 @@ class MatchingArgsViewModel(
 //        }
         //**修正end**
         var msg: StringBuilder = StringBuilder(
-            "拟合类型$selectFitterType \n 第一次原始:$resultOriginalTest1 \n" + "第一次:$resultTest1 \n" + "第二次原始:$resultOriginalTest2 \n" + "第二次:$resultTest2 \n" + "第三次原始:$resultOriginalTest3 \n" + "第三次:$resultTest3 \n" + "第四次原始:$resultOriginalTest4 \n" + "第四次:$resultTest4 \n" +
+            "拟合类型:${selectFitterType.showName} \n第一次原始:$resultOriginalTest1 \n" + "第一次:$resultTest1 \n" + "第二次原始:$resultOriginalTest2 \n" + "第二次:$resultTest2 \n" + "第三次原始:$resultOriginalTest3 \n" + "第三次:$resultTest3 \n" + "第四次原始:$resultOriginalTest4 \n" + "第四次:$resultTest4 \n" +
 //                    "吸光度:$result \n" +
 //                    "拟合度：${cf.fitGoodness} \n" +
 //                    "四参数：f0=${f0} f1=${f1} f2=${f2} f3=${f3} \n " +

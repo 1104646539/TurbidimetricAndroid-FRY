@@ -651,6 +651,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="134dp"
             android:src="@drawable/analyse_test_btn"
+            android:layout_marginTop="20dp"
             app:layout_constraintBottom_toBottomOf="@id/v_test"
             app:layout_constraintLeft_toLeftOf="@id/v_test"
             app:layout_constraintTop_toTopOf="@id/v_test" />
@@ -662,7 +663,7 @@
             android:layout_marginLeft="20dp"
             android:text="检测中……"
             android:textColor="@color/white"
-            android:textSize="58sp"
+            android:textSize="50sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@id/v_test"
             app:layout_constraintLeft_toRightOf="@id/iv_analyse"

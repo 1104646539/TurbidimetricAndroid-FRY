@@ -1,6 +1,7 @@
 package com.wl.turbidimetric.upload.model
 
 data class ConnectConfig(
+    var openUpload: Boolean = false,//是否开启上传
     var autoUpload: Boolean = true,//是否自动上传结果
     var ip: String = "",//网络连接的IP
     var port: Int = 22222,//网络连接的IP

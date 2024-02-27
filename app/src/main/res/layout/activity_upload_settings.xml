@@ -11,37 +11,10 @@
         android:orientation="vertical"
         tools:context=".upload.view.UploadSettingsActivity">
 
-        <RelativeLayout
+        <com.wl.turbidimetric.view.TopNavView2
+            android:id="@+id/nav"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="@color/themePositiveColor"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:id="@+id/ll_back"
-                android:paddingLeft="30dp"
-                android:paddingRight="30dp">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:src="@drawable/icon_back" />
-
-                <TextView
-                    style="@style/TextTitle"
-                    android:layout_width="200dp"
-                    android:layout_height="match_parent"
-                    android:gravity="left|center_vertical"
-                    android:paddingLeft="10dp"
-                    android:text="返回"
-                    android:textColor="@color/white" />
-            </LinearLayout>
-        </RelativeLayout>
+            android:layout_height="wrap_content" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -81,6 +54,35 @@
                                 android:text="连接设置"
                                 android:textColor="@color/themePositiveColor" />
 
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:paddingTop="10dp">
+
+                                <TextView
+                                    style="@style/TextHilt"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="left"
+                                    android:text="打开上传" />
+
+                                <LinearLayout
+                                    android:layout_width="150dp"
+                                    android:layout_height="match_parent"
+                                    android:layout_marginLeft="14dp"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
+
+                                    <Switch
+                                        android:id="@+id/sw_open_upload"
+                                        android:layout_width="150dp"
+                                        android:layout_height="match_parent"
+                                        android:switchMinWidth="56dp"
+                                        android:thumb="@drawable/selector_switch_thumb"
+                                        android:track="@drawable/selector_switch_track" />
+                                </LinearLayout>
+                            </LinearLayout>
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"

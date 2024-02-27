@@ -23,7 +23,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 
 class UploadSettingsViewModel( private val localDataRepository: LocalDataSource ) : BaseViewModel() {
 
-    var autUpload = MutableStateFlow(false)
+    var openUpload = MutableStateFlow(false)
+    var autoUpload = MutableStateFlow(false)
 
     var ip = MutableStateFlow("0.0.0.0")
     var port = MutableStateFlow("")
@@ -37,7 +38,8 @@ class UploadSettingsViewModel( private val localDataRepository: LocalDataSource 
     var getPatientType = MutableStateFlow(GetPatientType.BC)
     var getPatient = MutableStateFlow(false)
     override fun init() {
-        autUpload.value = SystemGlobal.uploadConfig.autoUpload
+        openUpload.value = SystemGlobal.uploadConfig.openUpload
+        autoUpload.value = SystemGlobal.uploadConfig.autoUpload
         ip.value = SystemGlobal.uploadConfig.ip
         port.value = SystemGlobal.uploadConfig.port.toString()
         timeout.value = SystemGlobal.uploadConfig.timeout.toString()
@@ -53,7 +55,8 @@ class UploadSettingsViewModel( private val localDataRepository: LocalDataSource 
 
     fun generateConfig(): ConnectConfig {
         return ConnectConfig(
-            autoUpload = autUpload.value,
+            openUpload = openUpload.value,
+            autoUpload = autoUpload.value,
             serialPortName = WQSerialGlobal.COM4,
             ip = ip.value,
             port = port.value.toInt(),

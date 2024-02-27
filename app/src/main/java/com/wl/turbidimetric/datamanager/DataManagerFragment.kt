@@ -251,7 +251,6 @@ class DataManagerFragment :
             }
             return
         }
-
         //批量上传
         waitDialog.showPop(requireContext(), isCancelable = false) { dialog ->
             dialog.showDialog("请等待……", confirmText = "", confirmClick = {})
@@ -270,7 +269,8 @@ class DataManagerFragment :
                     }
                 } else {
                     lifecycleScope.launch(Dispatchers.Main) {
-                        dialog.dismiss()
+//                        dialog.dismiss()
+                        dialog.showDialog("上传未连接" ,confirmText = "确定", confirmClick = {dialog -> dialog.dismiss() })
                     }
                     i("上传未连接")
                 }

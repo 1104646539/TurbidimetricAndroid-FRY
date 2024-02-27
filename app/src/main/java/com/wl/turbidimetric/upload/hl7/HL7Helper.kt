@@ -107,7 +107,10 @@ object HL7Helper : UploadService {
         testResults.clear()
     }
 
-    override fun uploadTestResult(testResult: TestResultAndCurveModel, onUploadCallback: OnUploadCallback) {
+    override fun uploadTestResult(
+        testResult: TestResultAndCurveModel,
+        onUploadCallback: OnUploadCallback
+    ) {
         uploadService.uploadTestResult(testResult, onUploadCallback)
     }
 
@@ -123,8 +126,9 @@ object HL7Helper : UploadService {
         config: ConnectConfig,
         onConnectListener: OnConnectListener?
     ) {
-        config.save()
-        SystemGlobal.uploadConfig = config
+//        config.save()
+//        SystemGlobal.uploadConfig = config
+        if (!config.openUpload) return
         uploadService.connect(config, object : OnConnectListener {
             override fun onConnectResult(connectResult: ConnectResult) {
                 onConnectListener?.onConnectResult(connectResult)

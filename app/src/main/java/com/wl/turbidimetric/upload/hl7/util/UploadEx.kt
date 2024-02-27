@@ -95,6 +95,7 @@ fun getLocalConfig(): ConnectConfig {
  */
 fun defaultConfig(): ConnectConfig {
     return ConnectConfig(
+        openUpload = false,
         autoUpload = false,
         "192.168.0.133",
         22222,

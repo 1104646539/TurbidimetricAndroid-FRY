@@ -23,4 +23,9 @@ object EventGlobal {
      * 自检结束
      */
     const val WHAT_HIDE_SPLASH = 130
+
+    /**
+     * 上传配置发生变化
+     */
+    const val WHAT_UPLOAD_CHANGE = 140
 }

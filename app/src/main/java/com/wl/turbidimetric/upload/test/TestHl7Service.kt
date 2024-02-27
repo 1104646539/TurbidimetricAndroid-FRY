@@ -24,6 +24,7 @@ class TestHl7Service : Service() {
             val testHl7Service =
                 TestHl7Thread(
                     ConnectConfig(
+                        openUpload = false,
                         autoUpload = false,
                         "192.168.0.1",
                         22222,

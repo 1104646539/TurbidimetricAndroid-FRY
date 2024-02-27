@@ -108,7 +108,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
                 treeUri!!,
                 Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
             )
-        }catch (e:Exception){
+        } catch (e: Exception) {
             e("异常${e.stackTraceToString()}")
         }
         i(
@@ -365,16 +365,20 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         lifecycleScope.launch(Dispatchers.IO) {
             delay(3000)
             withContext(Dispatchers.Main) {
-                HL7Helper.connect(object : OnConnectListener {
-                    override fun onConnectResult(connectResult: ConnectResult) {
-                        i("onConnectResult connectResult=$connectResult")
-                    }
+                if (HL7Helper.getConfig().openUpload) {
+                    HL7Helper.connect(object : OnConnectListener {
+                        override fun onConnectResult(connectResult: ConnectResult) {
+                            i("onConnectResult connectResult=$connectResult")
+                        }
 
-                    override fun onConnectStatusChange(connectStatus: ConnectStatus) {
-                        i("onConnectStatusChange connectStatus=$connectStatus")
-                        appVm.changeUploadState(connectStatus)
-                    }
-                })
+                        override fun onConnectStatusChange(connectStatus: ConnectStatus) {
+                            i("onConnectStatusChange connectStatus=$connectStatus")
+                            appVm.changeUploadState(connectStatus)
+                        }
+                    })
+                }else{
+                    appVm.changeUploadState(ConnectStatus.NONE)
+                }
             }
         }
     }
@@ -403,6 +407,8 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         super.onMessageEvent(event)
         if (event.what == EventGlobal.WHAT_HIDE_SPLASH) {
             hideSplash()
+        }else if (event.what == EventGlobal.WHAT_UPLOAD_CHANGE) {
+            initUploadClient()
         }
     }
 }

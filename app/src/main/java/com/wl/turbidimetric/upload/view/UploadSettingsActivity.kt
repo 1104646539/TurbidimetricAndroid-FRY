@@ -9,6 +9,8 @@ import com.wl.turbidimetric.base.BaseActivity
 import com.wl.turbidimetric.databinding.ActivityUploadSettingsBinding
 import com.wl.turbidimetric.ex.selectionLast
 import com.wl.turbidimetric.ex.toast
+import com.wl.turbidimetric.global.EventGlobal
+import com.wl.turbidimetric.global.EventMsg
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.CurveModel
 import com.wl.turbidimetric.model.TestResultAndCurveModel
@@ -16,6 +18,7 @@ import com.wl.turbidimetric.model.TestResultModel
 import com.wl.turbidimetric.upload.hl7.HL7Helper
 import com.wl.turbidimetric.upload.hl7.util.ConnectResult
 import com.wl.turbidimetric.upload.hl7.util.ConnectStatus
+import com.wl.turbidimetric.upload.hl7.util.save
 import com.wl.turbidimetric.upload.model.GetPatientCondition
 import com.wl.turbidimetric.upload.model.GetPatientType
 import com.wl.turbidimetric.upload.model.Patient
@@ -33,6 +36,7 @@ import com.wl.wllib.isIP
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import org.greenrobot.eventbus.EventBus
 import java.util.Date
 
 /**
@@ -43,7 +47,7 @@ import java.util.Date
 class UploadSettingsActivity :
     BaseActivity<UploadSettingsViewModel, ActivityUploadSettingsBinding>() {
     override val vd: ActivityUploadSettingsBinding by ActivityDataBindingDelegate(R.layout.activity_upload_settings)
-    override val vm: UploadSettingsViewModel by viewModels {UploadSettingsViewModelFactory()}
+    override val vm: UploadSettingsViewModel by viewModels { UploadSettingsViewModelFactory() }
 
     /**
      * 获取待检信息
@@ -76,9 +80,18 @@ class UploadSettingsActivity :
 
     private fun listenerView() {
         //监听view改变viewModel的值
-
+        vd.nav.setOnBack { finish() }
+        vd.nav.setTitle("上传参数设置")
+        vd.nav.setRight1("保存配置") {
+            saveConfig()
+        }
+        openUploadChange(vm.openUpload.value)
+        vd.swOpenUpload.setOnCheckedChangeListener { buttonView, isChecked ->
+            vm.openUpload.value = isChecked
+            openUploadChange(isChecked)
+        }
         vd.swAutoUpload.setOnCheckedChangeListener { buttonView, isChecked ->
-            vm.autUpload.value = isChecked
+            vm.autoUpload.value = isChecked
         }
         vd.swAutoReconnection.setOnCheckedChangeListener { buttonView, isChecked ->
             vm.isReconnection.value = isChecked
@@ -128,9 +141,6 @@ class UploadSettingsActivity :
         vd.btnSendResult.setOnClickListener {
             sendResult()
         }
-        vd.llBack.setOnClickListener {
-            finish()
-        }
         vd.btnGetTestPatientInfo.setOnClickListener {
             showGetTestPatientInfo()
         }
@@ -148,7 +158,45 @@ class UploadSettingsActivity :
 
     }
 
+    private fun saveConfig() {
+        vm.generateConfig().let {
+            config->
+            config.save()
+            SystemGlobal.uploadConfig = config
+            if(!config.openUpload){
+                HL7Helper.disconnect()
+            }
+            EventBus.getDefault().post(EventMsg<String>(EventGlobal.WHAT_UPLOAD_CHANGE))
+            toast("保存成功")
+            finish()
+        }
+    }
+
+    private fun openUploadChange(checked: Boolean) {
+        vd.swAutoUpload.isEnabled = checked
+        vd.swAutoReconnection.isEnabled = checked
+        vd.swTwoway.isEnabled = checked
+        vd.etRetryCount.isEnabled = checked
+        vd.etTimeoutTime.isEnabled = checked
+        vd.etSocketIp.isEnabled = checked
+        vd.etSocketPort.isEnabled = checked
+        vd.rbBc.isEnabled = checked
+        vd.rbSn.isEnabled = checked
+        vd.rbSerial.isEnabled = checked
+        vd.btnConnect.isEnabled = checked
+        vd.btnSendResult.isEnabled = checked
+        vd.btnGetTestPatientInfo.isEnabled = checked
+
+        if (!checked) {
+            HL7Helper.disconnect()
+        }
+    }
+
     private fun showGetTestPatientInfo() {
+        if(!HL7Helper.isConnected()){
+            toast("未连接")
+            return
+        }
         getTestPatientInfoDialog.showPop(
             this,
             width = 600,
@@ -225,6 +273,10 @@ class UploadSettingsActivity :
      * 上传结果
      */
     private fun sendResult() {
+        if(!HL7Helper.isConnected()){
+            toast("未连接")
+            return
+        }
         HL7Helper.uploadTestResult(
             TestResultAndCurveModel(result = TestResultModel(
                 resultId = 0L,
@@ -314,7 +366,12 @@ class UploadSettingsActivity :
     private fun listenerViewModel() {
         //监听viewModel的值改变view
         lifecycleScope.launch {
-            vm.autUpload.collectLatest {
+            vm.openUpload.collectLatest {
+                vd.swOpenUpload.isChecked = it
+            }
+        }
+        lifecycleScope.launch {
+            vm.autoUpload.collectLatest {
                 vd.swAutoUpload.isChecked = it
             }
         }

@@ -19,14 +19,14 @@ class TestActivity : BaseActivity<BaseViewModel, ActivityTestBinding>() {
 
 
     override fun init() {
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = "测试页面"
-        supportActionBar?.show()
+        supportActionBar?.hide()
+        vd.nav.setOnBack { finish() }
 
         val flag = intent.getStringExtra(TestActivity.flag)
         var fragment: Fragment? = null
         if (flag == flag_Repeatability) {
             fragment = RepeatabilityFragment.newInstance()
+            vd.nav.setTitle("重复性测试")
         }
 
 

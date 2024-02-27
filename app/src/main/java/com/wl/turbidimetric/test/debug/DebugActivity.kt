@@ -21,10 +21,9 @@ class DebugActivity : BaseActivity<DebugViewModel, ActivityDebugBinding>() {
     override val vd: ActivityDebugBinding by ActivityDataBindingDelegate(R.layout.activity_debug)
     override val vm: DebugViewModel by viewModels{DebugViewModelFactory()}
     override fun init() {
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = "测试页面"
-        supportActionBar?.show()
-
+        supportActionBar?.hide()
+        vd.nav.setOnBack{finish()}
+        vd.nav.setTitle("测试页面")
         listener()
         vd.vp.isUserInputEnabled = false
         vd.vp.offscreenPageLimit = ViewPager2.OFFSCREEN_PAGE_LIMIT_DEFAULT

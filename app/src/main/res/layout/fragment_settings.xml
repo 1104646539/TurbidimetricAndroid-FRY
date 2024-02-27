@@ -21,7 +21,7 @@
                 android:layout_height="0dp"
                 app:ids="siv_params_setting,siv_detection_num_setting,siv_machine_test_mode,siv_project_list" />
 
-            <com.wl.turbidimetric.view.dialog.SettingItemView
+            <com.wl.turbidimetric.view.SettingItemView
                 android:id="@+id/siv_order_settings"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
@@ -32,7 +32,7 @@
                 app:text="其他设置"
                 app:textColor="@color/white" />
 
-            <com.wl.turbidimetric.view.dialog.SettingItemView
+            <com.wl.turbidimetric.view.SettingItemView
                 android:id="@+id/siv_params_setting"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
@@ -42,7 +42,7 @@
                 app:text="参数设置"
                 app:textColor="@color/text_item_settings" />
 
-            <com.wl.turbidimetric.view.dialog.SettingItemView
+            <com.wl.turbidimetric.view.SettingItemView
                 android:id="@+id/siv_detection_num_setting"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
@@ -53,7 +53,7 @@
                 app:textColor="@color/text_item_settings" />
 
 
-            <com.wl.turbidimetric.view.dialog.SettingItemView
+            <com.wl.turbidimetric.view.SettingItemView
                 android:id="@+id/siv_machine_test_mode"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
@@ -63,7 +63,7 @@
                 app:text="检测模式设置"
                 app:textColor="@color/text_item_settings" />
 
-            <com.wl.turbidimetric.view.dialog.SettingItemView
+            <com.wl.turbidimetric.view.SettingItemView
                 android:id="@+id/siv_project_list"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
@@ -73,7 +73,7 @@
                 app:text="项目设置"
                 app:textColor="@color/text_item_settings" />
 
-            <com.wl.turbidimetric.view.dialog.SettingItemView
+            <com.wl.turbidimetric.view.SettingItemView
                 android:id="@+id/siv_debug_title"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
@@ -84,7 +84,7 @@
                 app:text="调试功能"
                 app:textColor="@color/white" />
 
-            <com.wl.turbidimetric.view.dialog.SettingItemView
+            <com.wl.turbidimetric.view.SettingItemView
                 android:id="@+id/siv_debug"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
@@ -94,7 +94,7 @@
                 app:text="调试"
                 app:textColor="@color/text_item_settings" />
 
-            <com.wl.turbidimetric.view.dialog.SettingItemView
+            <com.wl.turbidimetric.view.SettingItemView
                 android:id="@+id/siv_repeatability"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
@@ -105,7 +105,7 @@
                 app:textColor="@color/text_item_settings" />
 
 
-            <com.wl.turbidimetric.view.dialog.SettingItemView
+            <com.wl.turbidimetric.view.SettingItemView
                 android:id="@+id/siv_nav"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
@@ -115,7 +115,7 @@
                 app:text="隐藏和显示导航栏"
                 app:textColor="@color/text_item_settings" />
 
-            <com.wl.turbidimetric.view.dialog.SettingItemView
+            <com.wl.turbidimetric.view.SettingItemView
                 android:id="@+id/siv_launcher"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
@@ -125,7 +125,7 @@
                 app:text="打开桌面"
                 app:textColor="@color/text_item_settings" />
 
-            <com.wl.turbidimetric.view.dialog.SettingItemView
+            <com.wl.turbidimetric.view.SettingItemView
                 android:id="@+id/siv_export_log"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
@@ -135,7 +135,7 @@
                 app:text="导出日志"
                 app:textColor="@color/text_item_settings" />
 
-            <com.wl.turbidimetric.view.dialog.SettingItemView
+            <com.wl.turbidimetric.view.SettingItemView
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginTop="5dp"
@@ -145,7 +145,7 @@
                 app:text="上传设置"
                 app:textColor="@color/white" />
 
-            <com.wl.turbidimetric.view.dialog.SettingItemView
+            <com.wl.turbidimetric.view.SettingItemView
                 android:id="@+id/siv_upload"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
@@ -155,7 +155,7 @@
                 app:text="上传参数设置"
                 app:textColor="@color/text_item_settings" />
 
-            <com.wl.turbidimetric.view.dialog.SettingItemView
+            <com.wl.turbidimetric.view.SettingItemView
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginTop="5dp"

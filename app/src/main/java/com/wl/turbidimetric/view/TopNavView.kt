@@ -1,4 +1,4 @@
-package com.wl.turbidimetric.view.dialog
+package com.wl.turbidimetric.view
 
 import android.content.Context
 import android.util.AttributeSet

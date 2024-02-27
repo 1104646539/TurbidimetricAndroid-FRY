@@ -1,8 +1,10 @@
 package com.wl.turbidimetric.project.details
 
+import android.view.View.OnClickListener
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.wl.turbidimetric.R
+import com.wl.turbidimetric.base.BaseActivity
 import com.wl.turbidimetric.databinding.ActivityProjectDetailsBinding
 import com.wl.turbidimetric.ex.selectionLast
 import com.wl.turbidimetric.ex.toast
@@ -11,7 +13,6 @@ import com.wl.turbidimetric.project.list.ProjectListAdapter
 import com.wl.turbidimetric.util.ActivityDataBindingDelegate
 import com.wl.turbidimetric.view.dialog.HiltDialog
 import com.wl.turbidimetric.view.dialog.showPop
-import com.wl.turbidimetric.base.BaseActivity
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -32,6 +33,7 @@ class ProjectDetailsActivity :
     }
 
     private fun initData() {
+        vd.nav.setTitle("项目详情")
         id = intent.getLongExtra(ID, 0)
         if (id > 0) {
             lifecycleScope.launchWhenStarted {
@@ -44,9 +46,9 @@ class ProjectDetailsActivity :
                 }
 
             }
-            vd.tvSave.text = "保存"
+            vd.nav.setRight1("保存",onRight)
         } else {
-            vd.tvSave.text = "添加"
+            vd.nav.setRight1("添加",onRight)
         }
 
     }
@@ -99,34 +101,34 @@ class ProjectDetailsActivity :
             }
         }
     }
-
-    private fun listenerEvent() {
-        vd.tvSave.setOnClickListener {
-            if (id <= 0) {//新增
-                lifecycleScope.launch {
-                    vm.add(ProjectModel().apply {
+    private var onRight:OnClickListener = OnClickListener {
+        if (id <= 0) {//新增
+            lifecycleScope.launch {
+                vm.add(ProjectModel().apply {
+                    projectName = vd.etProjectName.text.toString()
+                    projectCode = vd.etProjectCode.text.toString()
+                    projectUnit = vd.etProjectUnit.text.toString()
+                    projectLjz = vd.etProjectLjz.text.toString().toIntOrNull() ?: 0
+                })
+            }
+        } else {//修改
+            lifecycleScope.launch {
+                vm.project.value?.let {
+                    vm.update(it.apply {
                         projectName = vd.etProjectName.text.toString()
                         projectCode = vd.etProjectCode.text.toString()
                         projectUnit = vd.etProjectUnit.text.toString()
                         projectLjz = vd.etProjectLjz.text.toString().toIntOrNull() ?: 0
                     })
                 }
-            } else {//修改
-                lifecycleScope.launch {
-                    vm.project.value?.let {
-                        vm.update(it.apply {
-                            projectName = vd.etProjectName.text.toString()
-                            projectCode = vd.etProjectCode.text.toString()
-                            projectUnit = vd.etProjectUnit.text.toString()
-                            projectLjz = vd.etProjectLjz.text.toString().toIntOrNull() ?: 0
-                        })
-                    }
 
-                }
             }
         }
+    }
+    private fun listenerEvent() {
 
-        vd.llBack.setOnClickListener {
+
+        vd.nav.setOnBack{
             finish()
         }
     }

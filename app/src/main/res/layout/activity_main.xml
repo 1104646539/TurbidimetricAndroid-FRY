@@ -12,7 +12,7 @@
         <!--        <include-->
         <!--            android:id="@+id/top_nav"-->
         <!--            layout="@layout/layout_main_top_nav" />-->
-        <com.wl.turbidimetric.view.dialog.TopNavView
+        <com.wl.turbidimetric.view.TopNavView
             android:id="@+id/tnv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />

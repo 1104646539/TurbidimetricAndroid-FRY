@@ -5,47 +5,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-        <RelativeLayout
+
+        <com.wl.turbidimetric.view.TopNavView2
+            android:id="@+id/nav"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="@color/themePositiveColor"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:layout_height="wrap_content" />
 
-            <LinearLayout
-                android:id="@+id/ll_back"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:paddingLeft="30dp"
-                android:paddingRight="30dp">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:src="@drawable/icon_back" />
-
-                <TextView
-                    style="@style/TextTitle"
-                    android:layout_width="200dp"
-                    android:layout_height="match_parent"
-                    android:gravity="left|center_vertical"
-                    android:paddingLeft="10dp"
-                    android:text="返回"
-                    android:textColor="@color/white" />
-            </LinearLayout>
-
-            <TextView
-                style="@style/TextTitle"
-                android:id="@+id/tv_save"
-                android:layout_width="200dp"
-                android:layout_height="match_parent"
-                android:layout_alignParentRight="true"
-                android:paddingLeft="10dp"
-                android:text="保存"
-                android:textColor="@color/white" />
-        </RelativeLayout>
 
         <LinearLayout
             android:layout_width="match_parent"

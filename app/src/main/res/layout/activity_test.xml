@@ -9,6 +9,11 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <com.wl.turbidimetric.view.TopNavView2
+            android:id="@+id/nav"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
         <LinearLayout
             android:id="@+id/ll_root"
             android:layout_width="match_parent"

@@ -83,6 +83,7 @@
                                         android:track="@drawable/selector_switch_track" />
                                 </LinearLayout>
                             </LinearLayout>
+
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -142,6 +143,7 @@
                                         android:track="@drawable/selector_switch_track" />
                                 </LinearLayout>
                             </LinearLayout>
+
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -173,10 +175,10 @@
                             </LinearLayout>
 
                             <LinearLayout
+                                android:id="@+id/ll_timeout"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:gravity="center_vertical"
-                                android:id="@+id/ll_timeout"
                                 android:orientation="horizontal"
                                 android:paddingTop="10dp">
 
@@ -236,19 +238,19 @@
 
                             <TextView
                                 style="@style/TextTitle"
-                                android:visibility="gone"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:gravity="left"
                                 android:text="双向通讯"
-                                android:textColor="@color/themePositiveColor" />
+                                android:textColor="@color/themePositiveColor"
+                                android:visibility="gone" />
 
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:visibility="gone"
                                 android:orientation="horizontal"
-                                android:paddingTop="10dp">
+                                android:paddingTop="10dp"
+                                android:visibility="gone">
 
                                 <TextView
                                     style="@style/TextHilt"
@@ -278,17 +280,17 @@
                                 android:id="@+id/ll_get_patient1"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:visibility="gone"
+                                android:gravity="center_vertical"
                                 android:orientation="horizontal"
-                                android:paddingTop="10dp">
+                                android:paddingTop="10dp"
+                                android:visibility="gone">
 
                                 <TextView
                                     style="@style/TextHilt"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:gravity="left"
-                                    android:text="获取方式" />
-
+                                    android:text="实时匹配信息" />
 
                                 <RadioGroup
                                     android:layout_width="match_parent"
@@ -307,7 +309,8 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:layout_marginLeft="20dp"
-                                        android:text="检测前获取" />
+                                        android:text="检测前获取"
+                                        android:visibility="gone" />
                                 </RadioGroup>
                             </LinearLayout>
 
@@ -315,14 +318,22 @@
                                 android:id="@+id/ll_real_time"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:visibility="gone"
+                                android:gravity="center_vertical"
                                 android:orientation="horizontal"
-                                android:paddingTop="10dp">
+                                android:paddingTop="10dp"
+                                android:visibility="visible">
+
+                                <TextView
+                                    style="@style/TextHilt"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="left"
+                                    android:text="匹配依据" />
 
                                 <RadioGroup
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginLeft="50dp"
+                                    android:layout_marginLeft="14dp"
                                     android:orientation="horizontal">
 
                                     <RadioButton
@@ -661,8 +672,8 @@
 
                 <LinearLayout
                     android:layout_width="1200dp"
-                    android:background="@color/divider"
                     android:layout_height="match_parent"
+                    android:background="@color/divider"
                     android:orientation="vertical">
 
                     <TextView
@@ -684,8 +695,8 @@
                             style="@style/TextHilt"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:paddingTop="10dp"
                             android:gravity="left"
+                            android:paddingTop="10dp"
                             android:paddingBottom="20dp"
                             android:textSize="20sp"></TextView>
                     </androidx.core.widget.NestedScrollView>

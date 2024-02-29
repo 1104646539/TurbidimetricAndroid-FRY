@@ -9,6 +9,8 @@ import com.wl.turbidimetric.model.MachineTestModel
 import com.wl.turbidimetric.repository.DefaultLocalDataDataSource
 import com.wl.turbidimetric.repository.if2.LocalDataSource
 import com.wl.turbidimetric.settings.params.ParamsViewModel
+import com.wl.turbidimetric.upload.hl7.HL7Helper
+import com.wl.turbidimetric.upload.model.GetPatientType
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
@@ -23,7 +25,7 @@ class TestModeViewModel(private val localDataSource: LocalDataSource) : BaseView
         viewModelScope.launch {
             _testModeUiState.emit(
                 TestModeUiState(
-                    MachineTestModel.valueOf(LocalData.CurMachineTestModel),
+                    MachineTestModel.valueOf(localDataSource.getCurMachineTestModel()),
                     localDataSource.getSampleExist(),
                     localDataSource.getScanCode()
                 )
@@ -36,6 +38,14 @@ class TestModeViewModel(private val localDataSource: LocalDataSource) : BaseView
         sampleExist: Boolean,
         scanCode: Boolean,
     ) {
+        verifyChange(machineTestModel, sampleExist, scanCode).let { ret ->
+            if (ret.isNotEmpty()) {
+                viewModelScope.launch {
+                    _hiltText.emit("修改失败,$ret")
+                }
+                return
+            }
+        }
         localDataSource.setCurMachineTestModel(machineTestModel.name)
         localDataSource.setSampleExist(sampleExist)
         localDataSource.setScanCode(scanCode)
@@ -44,6 +54,19 @@ class TestModeViewModel(private val localDataSource: LocalDataSource) : BaseView
         }
     }
 
+    private fun verifyChange(
+        machineTestModel: MachineTestModel,
+        sampleExist: Boolean,
+        scanCode: Boolean,
+    ): String {
+        if (machineTestModel != MachineTestModel.Auto || !scanCode) {
+            val config = HL7Helper.getConfig()
+            if (config.twoWay && config.getPatientType == GetPatientType.BC) {
+                return "当按条码匹配时，不允许更改检测模式或关闭扫码"
+            }
+        }
+        return ""
+    }
 }
 
 class TestModeViewModelFactory(

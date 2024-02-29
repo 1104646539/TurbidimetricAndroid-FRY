@@ -11,6 +11,7 @@ import com.wl.weiqianwllib.serialport.WQSerialGlobal
 import com.wl.turbidimetric.base.BaseViewModel
 import com.wl.turbidimetric.ex.getAppViewModel
 import com.wl.turbidimetric.home.HomeViewModel
+import com.wl.turbidimetric.model.MachineTestModel
 import com.wl.turbidimetric.repository.DefaultCurveDataSource
 import com.wl.turbidimetric.repository.DefaultLocalDataDataSource
 import com.wl.turbidimetric.repository.DefaultProjectDataSource
@@ -21,7 +22,7 @@ import com.wl.turbidimetric.repository.if2.ProjectSource
 import com.wl.turbidimetric.repository.if2.TestResultSource
 import kotlinx.coroutines.flow.MutableStateFlow
 
-class UploadSettingsViewModel( private val localDataRepository: LocalDataSource ) : BaseViewModel() {
+class UploadSettingsViewModel(private val localDataSource: LocalDataSource) : BaseViewModel() {
 
     var openUpload = MutableStateFlow(false)
     var autoUpload = MutableStateFlow(false)
@@ -53,6 +54,17 @@ class UploadSettingsViewModel( private val localDataRepository: LocalDataSource 
         getPatient.value = SystemGlobal.uploadConfig.getPatient
     }
 
+    fun verifySave(): String {
+        if (twoway.value) {
+            if (getPatientType.value == GetPatientType.BC
+                && (MachineTestModel.valueOf(localDataSource.getCurMachineTestModel()) != MachineTestModel.Auto || !localDataSource.getScanCode())
+            ) {
+                return "当按条码匹配时，请先更改检测模式为自动模式并开启扫码功能"
+            }
+        }
+        return ""
+    }
+
     fun generateConfig(): ConnectConfig {
         return ConnectConfig(
             openUpload = openUpload.value,
@@ -73,9 +85,10 @@ class UploadSettingsViewModel( private val localDataRepository: LocalDataSource 
     }
 
     fun getDetectionNumInc(): String {
-        return localDataRepository.getDetectionNumInc()
+        return localDataSource.getDetectionNumInc()
     }
 }
+
 class UploadSettingsViewModelFactory(
     private val localDataRepository: LocalDataSource = DefaultLocalDataDataSource()
 ) : ViewModelProvider.NewInstanceFactory() {

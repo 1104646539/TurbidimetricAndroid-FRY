@@ -103,7 +103,7 @@ class UploadSettingsActivity :
 //        vd.swGetPatient.setOnCheckedChangeListener { buttonView, isChecked ->
 //            vm.getPatient.value = isChecked
 //        }
-        //        vd.rbRealTime.setOnCheckedChangeListener { buttonView, isChecked ->
+//        vd.rbRealTime.setOnCheckedChangeListener { buttonView, isChecked ->
 //            vm.realTimeGetPatient.value = isChecked
 //        }
 
@@ -159,17 +159,25 @@ class UploadSettingsActivity :
     }
 
     private fun saveConfig() {
+        vm.verifySave().let { ret ->
+            if (ret.isNotEmpty()) {
+                toast("保存失败,$ret")
+                return
+            }
+        }
+
         save()
         toast("保存成功")
 //        finish()
     }
 
+
+
     private fun save() {
-        vm.generateConfig().let {
-                config->
+        vm.generateConfig().let { config ->
             config.save()
             SystemGlobal.uploadConfig = config
-            if(!config.openUpload){
+            if (!config.openUpload) {
                 HL7Helper.disconnect()
             }
             EventBus.getDefault().post(EventMsg<String>(EventGlobal.WHAT_UPLOAD_CHANGE))
@@ -197,7 +205,7 @@ class UploadSettingsActivity :
     }
 
     private fun showGetTestPatientInfo() {
-        if(!HL7Helper.isConnected()){
+        if (!HL7Helper.isConnected()) {
             toast("未连接")
             return
         }
@@ -277,7 +285,7 @@ class UploadSettingsActivity :
      * 上传结果
      */
     private fun sendResult() {
-        if(!HL7Helper.isConnected()){
+        if (!HL7Helper.isConnected()) {
             toast("未连接")
             return
         }
@@ -389,6 +397,8 @@ class UploadSettingsActivity :
             vm.twoway.collectLatest {
                 vd.llTimeout.visibility = it.isShow()
                 vd.swTwoway.isChecked = it
+
+                vd.llRealTime.visibility = it.isShow()
             }
         }
         lifecycleScope.launch {
@@ -436,10 +446,10 @@ class UploadSettingsActivity :
         }
         lifecycleScope.launch {
             vm.realTimeGetPatient.collectLatest {
-                vd.llRealTime.visibility =
-                    if (it && vm.getPatient.value) View.VISIBLE else View.GONE
-                vd.rbRealTime.isChecked = it
-                vd.rbBeforeTesting.isChecked = !it
+//                vd.llRealTime.visibility =
+//                    if (it && vm.getPatient.value) View.VISIBLE else View.GONE
+//                vd.rbRealTime.isChecked = it
+//                vd.rbBeforeTesting.isChecked = !it
             }
         }
         lifecycleScope.launch {
@@ -455,10 +465,10 @@ class UploadSettingsActivity :
         }
         lifecycleScope.launch {
             vm.getPatient.collectLatest {
-                vd.swGetPatient.isChecked = it
-                vd.llGetPatient1.visibility = if (it) View.VISIBLE else View.GONE
-                vd.llRealTime.visibility =
-                    if (it && vm.realTimeGetPatient.value) View.VISIBLE else View.GONE
+//                vd.swGetPatient.isChecked = it
+//                vd.llGetPatient1.visibility = if (it) View.VISIBLE else View.GONE
+//                vd.llRealTime.visibility =
+//                    if (it && vm.realTimeGetPatient.value) View.VISIBLE else View.GONE
             }
         }
 

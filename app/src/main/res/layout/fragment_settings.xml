@@ -62,15 +62,7 @@
                 app:selectable="true"
                 app:text="检测模式设置"
                 app:textColor="@color/text_item_settings" />
-            <com.wl.turbidimetric.view.SettingItemView
-                android:id="@+id/siv_machine_network"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginTop="5dp"
-                app:bg="@drawable/bg_item_settings"
-                app:selectable="true"
-                app:text="本机网络设置"
-                app:textColor="@color/text_item_settings" />
+
 
             <com.wl.turbidimetric.view.SettingItemView
                 android:id="@+id/siv_project_list"
@@ -155,13 +147,23 @@
                 app:textColor="@color/white" />
 
             <com.wl.turbidimetric.view.SettingItemView
+                android:id="@+id/siv_machine_network"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="5dp"
+                app:bg="@drawable/bg_item_settings"
+                app:selectable="true"
+                app:text="本机网络设置"
+                app:textColor="@color/text_item_settings" />
+
+            <com.wl.turbidimetric.view.SettingItemView
                 android:id="@+id/siv_upload"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginTop="5dp"
                 app:bg="@drawable/bg_item_settings"
                 app:selectable="false"
-                app:text="上传参数设置"
+                app:text="连接参数设置"
                 app:textColor="@color/text_item_settings" />
 
             <com.wl.turbidimetric.view.SettingItemView

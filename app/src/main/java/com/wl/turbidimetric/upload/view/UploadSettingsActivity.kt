@@ -159,16 +159,20 @@ class UploadSettingsActivity :
     }
 
     private fun saveConfig() {
+        save()
+        toast("保存成功")
+//        finish()
+    }
+
+    private fun save() {
         vm.generateConfig().let {
-            config->
+                config->
             config.save()
             SystemGlobal.uploadConfig = config
             if(!config.openUpload){
                 HL7Helper.disconnect()
             }
             EventBus.getDefault().post(EventMsg<String>(EventGlobal.WHAT_UPLOAD_CHANGE))
-            toast("保存成功")
-            finish()
         }
     }
 

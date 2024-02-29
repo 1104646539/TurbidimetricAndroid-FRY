@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <!--    <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"-->
+    <!--        xmlns:app="http://schemas.android.com/apk/res-auto"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="match_parent">-->
+    <data>
+
+        <variable
+            name="model"
+            type="com.wl.turbidimetric.settings.network.NetworkViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/tv_title_mode"
+            style="@style/TextTitle"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:gravity="left"
+            android:text="静态IP"
+            app:layout_constraintLeft_toLeftOf="@+id/til_ip"
+            app:layout_constraintTop_toTopOf="parent" />
+        <TextView
+            android:id="@+id/tv_mac"
+            style="@style/TextTitle"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:gravity="left"
+            app:layout_constraintLeft_toRightOf="@+id/til_ip"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_ip"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:hint="IP地址"
+            android:textSize="28sp"
+            app:counterMaxLength="20"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@+id/til_gateway"
+            app:layout_constraintTop_toBottomOf="@id/tv_title_mode"
+            app:placeholderText="192.168.1.123">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tiet_ip"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@={model.ip}"
+                android:textSize="26dp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_gateway"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:hint="网关"
+            android:textSize="28sp"
+            app:counterMaxLength="20"
+            app:layout_constraintLeft_toRightOf="@id/til_ip"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_title_mode"
+            app:placeholderText="192.168.1.1">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tiet_gateway"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@={model.gateway}"
+                android:textSize="26dp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_netmask"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:hint="掩码"
+            android:textSize="28sp"
+            app:counterMaxLength="20"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@+id/til_gateway"
+            app:layout_constraintTop_toBottomOf="@id/til_ip"
+            app:placeholderText="255.255.255.0">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tiet_netmask"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@={model.netmask}"
+                android:textSize="26dp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_dns1"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:hint="dns1"
+            android:textSize="28sp"
+            app:counterMaxLength="20"
+            app:layout_constraintLeft_toRightOf="@id/til_netmask"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/til_gateway"
+            app:placeholderText="8.8.8.8">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tiet_dns1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@={model.dns1}"
+                android:textSize="26dp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!--        <com.google.android.material.textfield.TextInputLayout-->
+        <!--            android:id="@+id/til_dns2"-->
+        <!--            android:layout_width="300dp"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_marginTop="20dp"-->
+        <!--            android:hint="dns2"-->
+        <!--            android:textSize="28sp"-->
+        <!--            app:counterMaxLength="20"-->
+        <!--            app:layout_constraintLeft_toLeftOf="@id/til_dns1"-->
+        <!--            app:layout_constraintTop_toBottomOf="@id/til_dns1"-->
+        <!--            app:placeholderText="8.8.4.4">-->
+
+        <!--            <com.google.android.material.textfield.TextInputEditText-->
+        <!--                android:id="@+id/tiet_dns2"-->
+        <!--                android:layout_width="match_parent"-->
+        <!--                android:layout_height="match_parent"-->
+        <!--                android:textSize="26dp" />-->
+        <!--        </com.google.android.material.textfield.TextInputLayout>-->
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_change"
+            style="@style/BtnPositive"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:minWidth="300dp"
+            android:text="修改"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/til_dns1" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_get_ip"
+            style="@style/BtnPositive"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:minWidth="300dp"
+            android:text="获取IP"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btn_change" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    <!--    </androidx.core.widget.NestedScrollView>-->
+</layout>

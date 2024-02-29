@@ -18,14 +18,11 @@ import com.wl.turbidimetric.ex.getEquation
 import com.wl.turbidimetric.ex.getFitGoodness
 import com.wl.turbidimetric.ex.getIndexOrNullDefault
 import com.wl.turbidimetric.ex.getResource
-import com.wl.turbidimetric.ex.scale
-import com.wl.turbidimetric.ex.toast
-import com.wl.turbidimetric.matchingargs.MatchingConfigSampleAdapter
+import com.wl.turbidimetric.matchingargs.SpnSampleAdapter
 import com.wl.turbidimetric.matchingargs.MatchingStateAdapter
 import com.wl.turbidimetric.model.CurveModel
 import com.wl.turbidimetric.util.FitterType
 import com.wl.wllib.LogToFile.i
-import java.math.RoundingMode
 
 /**
  * 显示拟合中的状态
@@ -63,7 +60,7 @@ class MatchingStateDialog(val ct: Context) :
     var gradsNum: Int = 5
     var targets: MutableList<Double> = mutableListOf()
     var means: MutableList<Double> = mutableListOf()
-    private var spnFitterTypeAdapter: MatchingConfigSampleAdapter? = null
+    private var spnFitterTypeAdapter: SpnSampleAdapter? = null
     private var stateAdapter: MatchingStateAdapter? = null
     private val bgGray = getResource().getColor(R.color.bg_gray)
     private val textColor = getResource().getColor(R.color.textColor)
@@ -102,7 +99,7 @@ class MatchingStateDialog(val ct: Context) :
         }
         fitterTypes.addAll(FitterType.values())
         fitterTypeNames.addAll(fitterTypes.map { it.showName })
-        spnFitterTypeAdapter = MatchingConfigSampleAdapter(rootView.context, fitterTypeNames)
+        spnFitterTypeAdapter = SpnSampleAdapter(rootView.context, fitterTypeNames)
         spnFitterType?.adapter = spnFitterTypeAdapter
 
         vHeader?.setBackgroundResource(R.drawable.bg_item)

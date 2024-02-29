@@ -369,6 +369,10 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
                     HL7Helper.connect(object : OnConnectListener {
                         override fun onConnectResult(connectResult: ConnectResult) {
                             i("onConnectResult connectResult=$connectResult")
+                            if(connectResult is ConnectResult.AlreadyConnected){
+                                appVm.changeUploadState(ConnectStatus.CONNECTED)
+                            }
+
                         }
 
                         override fun onConnectStatusChange(connectStatus: ConnectStatus) {

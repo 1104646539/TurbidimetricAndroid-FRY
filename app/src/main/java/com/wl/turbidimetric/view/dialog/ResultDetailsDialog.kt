@@ -5,9 +5,8 @@ import android.widget.EditText
 import android.widget.Spinner
 import android.widget.TextView
 import com.wl.turbidimetric.R
-import com.wl.turbidimetric.matchingargs.MatchingConfigSampleAdapter
+import com.wl.turbidimetric.matchingargs.SpnSampleAdapter
 import com.wl.turbidimetric.model.TestResultAndCurveModel
-import com.wl.turbidimetric.model.TestResultModel
 import com.wl.wllib.toTimeStr
 
 /**
@@ -82,7 +81,7 @@ class ResultDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog
         etSampleBarcode = findViewById(R.id.et_sample_barcode)
 
 
-        spnGender?.adapter = MatchingConfigSampleAdapter(rootView.context, sexs.toMutableList())
+        spnGender?.adapter = SpnSampleAdapter(rootView.context, sexs.toMutableList())
     }
 
     override fun setContent() {

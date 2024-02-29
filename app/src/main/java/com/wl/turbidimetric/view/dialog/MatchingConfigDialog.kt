@@ -6,22 +6,12 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.EditText
 import android.widget.RadioButton
-import android.widget.SimpleAdapter
 import android.widget.Spinner
 import android.widget.Switch
-import android.widget.TextView
-import androidx.core.view.isVisible
-import com.lxj.xpopup.core.BasePopupView
 import com.wl.turbidimetric.R
-import com.wl.turbidimetric.home.HomeViewModel
-import com.wl.turbidimetric.matchingargs.MatchingConfigSampleAdapter
-import com.wl.turbidimetric.model.CuvetteState
+import com.wl.turbidimetric.matchingargs.SpnSampleAdapter
 import com.wl.turbidimetric.model.ProjectModel
-import com.wl.turbidimetric.model.SampleState
-import com.wl.turbidimetric.model.SampleType
-import com.wl.turbidimetric.model.TestResultModel
 import com.wl.turbidimetric.util.FitterType
-import com.wl.wllib.LogToFile.i
 
 class MatchingConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_matching_config) {
     var projects = mutableListOf<ProjectModel>()
@@ -62,8 +52,8 @@ class MatchingConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
     var etTargetCon7: EditText? = null
     var etTargetCon8: EditText? = null
 
-    private var spnProjectAdapter: MatchingConfigSampleAdapter? = null
-    private var spnFitterTypeAdapter: MatchingConfigSampleAdapter? = null
+    private var spnProjectAdapter: SpnSampleAdapter? = null
+    private var spnFitterTypeAdapter: SpnSampleAdapter? = null
 
     //5个梯度可以自动稀释或人工稀释
     //6个梯度只能人工稀释
@@ -88,12 +78,12 @@ class MatchingConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
         etTargetCon7 = findViewById(R.id.et_target_con_7)
         etTargetCon8 = findViewById(R.id.et_target_con_8)
 
-        spnProjectAdapter = MatchingConfigSampleAdapter(rootView.context, projectNames)
+        spnProjectAdapter = SpnSampleAdapter(rootView.context, projectNames)
         spnProject?.adapter = spnProjectAdapter
 
         fitterTypes.addAll(FitterType.values())
         fitterTypeNames.addAll(fitterTypes.map { it.showName })
-        spnFitterTypeAdapter = MatchingConfigSampleAdapter(rootView.context, fitterTypeNames)
+        spnFitterTypeAdapter = SpnSampleAdapter(rootView.context, fitterTypeNames)
         spnFitterType?.adapter = spnFitterTypeAdapter
 
     }

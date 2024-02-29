@@ -25,6 +25,10 @@
         <item>男</item>
         <item>女</item>
     </string-array>
+    <string-array name="network_mode">
+<!--        <item>动态IP</item>-->
+        <item>静态IP</item>
+    </string-array>
     <string-array name="getMachineStateErrors">
         <item>取样泵</item>
         <item>样本架X</item>

@@ -6,11 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import com.wl.turbidimetric.R
-import com.wl.turbidimetric.ex.scaleStr
-import com.wl.turbidimetric.model.CurveModel
 
 
-class MatchingConfigSampleAdapter @JvmOverloads constructor(
+class SpnSampleAdapter @JvmOverloads constructor(
     private val context: Context,
     private val items: MutableList<String>?
 ) :

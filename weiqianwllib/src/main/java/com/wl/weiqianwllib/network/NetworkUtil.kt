@@ -17,7 +17,23 @@ object NetworkUtil {
     private const val IPV4_REGEX = "^(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})$"
 
     private val IPv4_PATTERN = Pattern.compile(IPV4_REGEX)
-
+    /**
+     * 判断是否是ip格式
+     *
+     * @param addr
+     * @return
+     */
+    fun isIP(addr: String): Boolean {
+        if (addr.length < 7 || addr.length > 15 || "" == addr) {
+            return false
+        }
+        /**              * 判断IP格式和范围               */
+        val rexp =
+            "([1-9]|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3}"
+        val pat = Pattern.compile(rexp)
+        val mat = pat.matcher(addr)
+        return mat.find()
+    }
     //设置以太网静态IP
     fun setStaticIp(
         context: Context,

@@ -19,7 +19,7 @@
                 android:id="@+id/wgp_selectable"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                app:ids="siv_params_setting,siv_detection_num_setting,siv_machine_test_mode,siv_project_list" />
+                app:ids="siv_params_setting,siv_detection_num_setting,siv_machine_test_mode,siv_project_list,siv_machine_network" />
 
             <com.wl.turbidimetric.view.SettingItemView
                 android:id="@+id/siv_order_settings"
@@ -61,6 +61,15 @@
                 app:bg="@drawable/bg_item_settings"
                 app:selectable="true"
                 app:text="检测模式设置"
+                app:textColor="@color/text_item_settings" />
+            <com.wl.turbidimetric.view.SettingItemView
+                android:id="@+id/siv_machine_network"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="5dp"
+                app:bg="@drawable/bg_item_settings"
+                app:selectable="true"
+                app:text="本机网络设置"
                 app:textColor="@color/text_item_settings" />
 
             <com.wl.turbidimetric.view.SettingItemView

@@ -216,15 +216,15 @@ class HL7UploadService : UploadService {
 //            Log.d(TAG, "getPatientInfo: msgStr=$msgStr")
             if (connectService.isConnected()) {
                 if (msgStr.isNullOrEmpty()) {
-                    onGetPatientCallback.onGetPatientFailed(1, "上传数据为空")
+                    onGetPatientCallback.onGetPatientFailed(1, "数据为空")
                 } else if(connectService.connectService!!.config!!.twoWay){//双向通讯
-                    Log.d(TAG, "上传:发送 $msgStr")
+                    Log.d(TAG, "获取信息:发送 $msgStr")
                     val response =
                         connectService.sendWaitResponseRetry(
                             msgStr,
                             msgId.toString()
                         ) { str ->
-                            Log.d(TAG, "上传:接收 $str")
+                            Log.d(TAG, "获取信息:接收 $str")
                             if (str?.contains("QCK^Q02") == true) {
                                 try {
                                     val m = parser?.parse(str)

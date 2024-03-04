@@ -31,7 +31,7 @@ class NetworkFragment :
     }
 
     private fun listenerData() {
-        vm.mac.observe(this){
+        vm.mac.observe(this) {
             vd.tvMac.text = "MAC：${it}"
         }
     }
@@ -74,13 +74,13 @@ class NetworkFragment :
 
 
     private fun initData() {
-        val ip = Settings.Global.getString(requireContext().contentResolver, "ethernet_static_ip")
+        val ip = Settings.Global.getString(requireContext().contentResolver, "ethernet_static_ip")?:""
         val mask =
-            Settings.Global.getString(requireContext().contentResolver, "ethernet_static_mask")
+            Settings.Global.getString(requireContext().contentResolver, "ethernet_static_mask")?:""
         val gateway =
-            Settings.Global.getString(requireContext().contentResolver, "ethernet_static_gateway")
+            Settings.Global.getString(requireContext().contentResolver, "ethernet_static_gateway")?:""
         val dns1 =
-            Settings.Global.getString(requireContext().contentResolver, "ethernet_static_dns1")
+            Settings.Global.getString(requireContext().contentResolver, "ethernet_static_dns1")?:""
         vm.changeConfig(ip, mask, gateway, dns1)
     }
 

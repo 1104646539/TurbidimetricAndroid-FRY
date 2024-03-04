@@ -18,6 +18,11 @@ import com.wl.turbidimetric.repository.if2.LocalDataSource
 import com.wl.turbidimetric.repository.if2.ProjectSource
 import com.wl.turbidimetric.repository.if2.TestResultSource
 import com.wl.turbidimetric.upload.hl7.HL7Helper
+import com.wl.turbidimetric.upload.model.ConnectConfig
+import com.wl.turbidimetric.upload.model.GetPatientCondition
+import com.wl.turbidimetric.upload.model.GetPatientType
+import com.wl.turbidimetric.upload.model.Patient
+import com.wl.turbidimetric.upload.service.OnGetPatientCallback
 import com.wl.turbidimetric.util.Callback2
 import com.wl.turbidimetric.util.OnScanResult
 import com.wl.turbidimetric.util.ScanCodeUtil
@@ -942,7 +947,7 @@ class HomeViewModel(
             mSamplesStates[sampleShelfPos]!![samplePos].sampleType = sampleType
         }
         _samplesStates.value = mSamplesStates.copyOf()
-        i("updateSampleState ShelfPos=$sampleShelfPos samplePos=$samplePos  sampleType=$sampleType samplesState=${mSamplesStates.print()}")
+        i("updateSampleState ShelfPos=$sampleShelfPos samplePos=$samplePos  state=$state sampleType=$sampleType samplesState=${mSamplesStates.print()}")
     }
 
     /**
@@ -1003,13 +1008,114 @@ class HomeViewModel(
     /**
      * 扫码成功
      */
-    override fun scanSuccess(str: String) {
-        i("扫码成功 str=$str")
-        updateSampleState(samplePos, SampleState.ScanSuccess, sampleType = sampleType)
-        scanFinish = true
-        pierced()
-        scanResults.add(str)
-        i("scanResults=$scanResults")
+    override fun scanSuccess(barcode: String) {
+        viewModelScope.launch {
+            i("扫码成功 barcode=$barcode")
+            insertResult(barcode, samplePos, sampleShelfPos, sampleType)
+            scanFinish = true
+            pierced()
+            scanResults.add(barcode)
+            i("scanResults=$scanResults")
+        }
+    }
+
+    private suspend fun insertResult(
+        barcode: String,
+        samplePos: Int,
+        sampleShelfPos: Int,
+        sampleType: SampleType?
+    ) {
+
+        //创建检测结果
+        val result = createResultModel(
+            barcode, mSamplesStates[sampleShelfPos]?.get(samplePos)
+        )
+        //更新当前样本管的信息
+        updateSampleState(
+            samplePos,
+            SampleState.ScanSuccess,
+            sampleType = sampleType,
+            testResult = result
+        )
+
+        //实时获取信息
+        realTimeGetInfo(result)
+
+    }
+
+    private fun realTimeGetInfo(result: TestResultModel) {
+        val config = HL7Helper.getConfig()
+        val isConnected = HL7Helper.isConnected()
+        if (isConnected && config.twoWay) {
+            HL7Helper.getPatientInfo(
+                generateCondition(config, result),
+                object : OnGetPatientCallback {
+                    override fun onGetPatientSuccess(patients: List<Patient>?) {
+                        i("realTimeGetInfo onGetPatientSuccess=${result.resultId} patients=${patients?.size}")
+                        if (patients?.isNotEmpty() == true) {
+                            updatePatientInfoToResult(patients.first(), resultId = result.resultId)
+                        }
+                    }
+
+                    override fun onGetPatientFailed(code: Int, msg: String) {
+                        i("realTimeGetInfo onGetPatientFailed code=${code} msg=$msg")
+                    }
+                })
+        } else {
+            i("realTimeGetInfo resultId=${result.resultId} twoWay=${config.twoWay} isConnected=$isConnected")
+        }
+    }
+
+    private fun generateCondition(
+        config: ConnectConfig,
+        result: TestResultModel
+    ): GetPatientCondition {
+        return GetPatientCondition(
+            if (config.getPatientType == GetPatientType.BC) {
+                result.sampleBarcode
+            } else {
+                result.detectionNum
+            }, if (config.getPatientType == GetPatientType.BC) {
+                ""
+            } else {
+                result.detectionNum
+            },
+            config.getPatientType
+        )
+    }
+
+
+    suspend fun getTestResultAndCurveModelById(id: Long): TestResultAndCurveModel {
+        return testResultRepository.getTestResultAndCurveModelById(id)
+    }
+
+    suspend fun update(model: TestResultAndCurveModel): Int {
+        return testResultRepository.updateTestResult(model.result)
+    }
+
+    private fun updatePatientInfoToResult(patient: Patient, resultId: Long) {
+        viewModelScope.launch {
+            val result = getTestResultAndCurveModelById(resultId)
+            result.result.name = patient.name
+            result.result.age = patient.age
+            result.result.deliveryDoctor = patient.deliveryDoctor
+            result.result.deliveryTime = patient.deliveryTime
+            result.result.deliveryDepartment = patient.deliveryDepartments
+            result.result.gender = patient.sex
+            update(result)
+            i("resultId=$resultId size=${resultModels.size}")
+            resultModels.forEach {
+                i("it=$it")
+            }
+            resultModels.indexOfFirst { it?.result?.resultId == resultId }.let { index ->
+                if (index in resultModels.indices) {
+                    resultModels[index] = result
+                } else {
+                    i("index越界$index size=${resultModels.size}")
+                }
+            }
+        }
+
     }
 
     /**
@@ -1046,7 +1152,9 @@ class HomeViewModel(
         )
         val id = testResultRepository.addTestResult(resultModel)
         resultModel.resultId = id
+        i("createResultModel add ${resultModels.size}")
         resultModels.add(TestResultAndCurveModel(resultModel, selectProject))
+        i("createResultModel add2 ${resultModels.size}")
         return resultModel
     }
 
@@ -1068,7 +1176,7 @@ class HomeViewModel(
     override fun readDataTestModel(reply: ReplyModel<TestModel>) {
         if (!runningTest()) return
         if (appViewModel.testState.isNotPrepare()) return
-        c("接收到 检测完成 reply=$reply cuvettePos=$cuvettePos appViewModel.testState=$appViewModel.testState")
+        c("接收到 检测完成 reply=$reply cuvettePos=$cuvettePos appViewModel.testState=${appViewModel.testState}")
 
         testFinish = true
 
@@ -1660,24 +1768,24 @@ class HomeViewModel(
 
         dripSampleFinish = true
         viewModelScope.launch {
-            val result = createResultModel(
-                scanResults[samplePos - 1], mSamplesStates[sampleShelfPos]?.get(samplePos - 1)
-            )
+//            val result = createResultModel(
+//                scanResults[samplePos - 1], mSamplesStates[sampleShelfPos]?.get(samplePos - 1)
+//            )
             if (reply.state == ReplyState.CUVETTE_NOT_EMPTY) {//比色皿非空，不加样了
                 allowDripSample = false
                 updateCuvetteState(
                     cuvettePos,
                     CuvetteState.CuvetteNotEmpty,
-                    result,
+                    null,
                     "${sampleShelfPos + 1}- $samplePos"
                 )
             } else {//正常加样，继续
                 updateCuvetteState(
-                    cuvettePos, CuvetteState.DripSample, result, "${sampleShelfPos + 1}- $samplePos"
+                    cuvettePos, CuvetteState.DripSample, null, "${sampleShelfPos + 1}- $samplePos"
                 )
             }
             updateSampleState(
-                samplePos - 1, null, null, result, "${cuvetteShelfPos + 1}- ${cuvettePos + 1}"
+                samplePos - 1, null, null, null, "${cuvetteShelfPos + 1}- ${cuvettePos + 1}"
             )
             samplingProbeCleaning()
 
@@ -1801,7 +1909,7 @@ class HomeViewModel(
      * 因为跨命令的移动比色皿后重置位置，所以移动前，先把当前位置置为-1，这样移动后记录的位置才是真实的
      */
     private fun stepDripReagent() {
-        i(" ———————— stepDripReagent appViewModel.testState=$appViewModel.testState ————————————————————————————————————————————————————————————————————————————————————————————————=")
+        i(" ———————— stepDripReagent appViewModel.testState=${appViewModel.testState} ————————————————————————————————————————————————————————————————————————————————————————————————=")
         appViewModel.testState = TestState.DripReagent
         cuvettePos = -1
         val step = getNextStepCuvetteStartPos()
@@ -2083,7 +2191,7 @@ class HomeViewModel(
      * 接收到移动样本架
      */
     override fun readDataMoveSampleShelfModel(reply: ReplyModel<MoveSampleShelfModel>) {
-        c("接收到 移动样本架 reply=$reply sampleShelfPos=$sampleShelfPos $appViewModel.testState")
+        c("接收到 移动样本架 reply=$reply sampleShelfPos=$sampleShelfPos ${appViewModel.testState}")
         if (appViewModel.testState == TestState.TestFinish && appViewModel.testType.isTest()) {
             sampleShelfMoveFinish = true
             if (isTestFinish()) {
@@ -2232,7 +2340,7 @@ class HomeViewModel(
         r2Reagent = reply.data.r2Reagent
         r2Volume = reply.data.r2Volume
         cleanoutFluid = reply.data.cleanoutFluid
-        c("接收到 获取状态 appViewModel.testState=$appViewModel.testState reply=$reply continueTestCuvetteState=$continueTestCuvetteState continueTestSampleState=$continueTestSampleState clickStart=$clickStart r1Reagent=$r1Reagent r2Reagent=$r2Reagent cleanoutFluid=$cleanoutFluid continueTestGetState=$continueTestGetState")
+        c("接收到 获取状态 appViewModel.testState=${appViewModel.testState} reply=$reply continueTestCuvetteState=$continueTestCuvetteState continueTestSampleState=$continueTestSampleState clickStart=$clickStart r1Reagent=$r1Reagent r2Reagent=$r2Reagent cleanoutFluid=$cleanoutFluid continueTestGetState=$continueTestGetState")
         if (appViewModel.testState == TestState.Normal) {
             i("自检完成")
             viewModelScope.launch {
@@ -2598,7 +2706,7 @@ class HomeViewModel(
      * 移动比色皿到 检测位
      */
     private fun moveCuvetteTest(step: Int = 1) {
-        c("发送 移动比色皿到 检测位 appViewModel.testState=$appViewModel.testState step=$step")
+        c("发送 移动比色皿到 检测位 appViewModel.testState=${appViewModel.testState} step=$step")
         cuvettePos += step
         testFinish = false
         testing = true

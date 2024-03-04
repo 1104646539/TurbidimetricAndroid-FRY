@@ -61,7 +61,7 @@ class TestModeViewModel(private val localDataSource: LocalDataSource) : BaseView
     ): String {
         if (machineTestModel != MachineTestModel.Auto || !scanCode) {
             val config = HL7Helper.getConfig()
-            if (config.twoWay && config.getPatientType == GetPatientType.BC) {
+            if (config.openUpload && config.twoWay && config.getPatientType == GetPatientType.BC) {
                 return "当按条码匹配时，不允许更改检测模式或关闭扫码"
             }
         }

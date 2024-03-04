@@ -1837,7 +1837,7 @@ class HomeViewModel(
 
     private fun nextStepDripReagent() {
 
-        i("piercedFinish=$piercedFinish scanFinish=$scanFinish samplingFinish=$samplingFinish dripSampleFinish=$dripSampleFinish cuvettePos=$cuvettePos samplePos=$samplePos")
+        i("piercedFinish=$piercedFinish scanFinish=$scanFinish samplingFinish=$samplingFinish dripSampleFinish=$dripSampleFinish cuvettePos=$cuvettePos samplePos=$samplePos sampleShelfPos=$sampleShelfPos")
         if (!allowDripSample) {
             i("这排最后一个比色皿，需要去下一个步骤，加试剂")
             val dripSampleCuvetteNum = getDripSampleCuvetteNum()
@@ -1860,6 +1860,7 @@ class HomeViewModel(
                 //这排最后一个比色皿，需要去下一个步骤，加试剂
                 i("这排最后一个比色皿，需要去下一个步骤，加试剂")
                 stepDripReagent()
+//            } else if ((isAuto() && lastSamplePos(samplePos)) || !isAuto() && (lastSamplePos(samplePos) || manualModelSamplingFinish())) {//这排最后一个样本
             } else if ((isAuto() && lastSamplePos(samplePos)) || !isAuto()) {//这排最后一个样本
                 if (isManual() && manualModelSamplingFinish()) {
                     i("手动模式，样本加样完成！")

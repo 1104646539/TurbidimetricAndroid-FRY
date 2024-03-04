@@ -59,11 +59,11 @@ object TestSerialPort {
             }
 
             SerialGlobal.CMD_Pierced -> {
-                delay(4000)//测试实时获取信息时需要
+//                delay(4000)//测试实时获取信息时需要
                 reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x00u, 0x0u))
             }
             SerialGlobal.CMD_Squeezing -> {
-                delay(4000)//测试实时获取信息时需要
+//                delay(4000)//测试实时获取信息时需要
                 reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x00u, 0x0u))
             }
 

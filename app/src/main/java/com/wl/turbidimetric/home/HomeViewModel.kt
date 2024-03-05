@@ -23,6 +23,7 @@ import com.wl.turbidimetric.upload.model.GetPatientCondition
 import com.wl.turbidimetric.upload.model.GetPatientType
 import com.wl.turbidimetric.upload.model.Patient
 import com.wl.turbidimetric.upload.service.OnGetPatientCallback
+import com.wl.turbidimetric.upload.service.OnUploadCallback
 import com.wl.turbidimetric.util.Callback2
 import com.wl.turbidimetric.util.OnScanResult
 import com.wl.turbidimetric.util.ScanCodeUtil
@@ -1374,12 +1375,18 @@ class HomeViewModel(
      */
     private fun singleTestResultFinish(testResultModel: TestResultAndCurveModel) {
         if (HL7Helper.getConfig().autoUpload && HL7Helper.isConnected()) {
-            HL7Helper.uploadSingleTestResult(testResultModel) { count, success, failed ->
-                i("singleTestResultFinish count=$count success=$success failed=$failed")
-            }
+            HL7Helper.uploadTestResult(
+                testResultModel,
+                object : OnUploadCallback {
+                    override fun onUploadSuccess(msg: String) {
+                        i("onUploadSuccess msg=$msg")
+                    }
+
+                    override fun onUploadFailed(code: Int, msg: String) {
+                        i("onUploadFailed code=$code msg=$msg")
+                    }
+                })
         }
-
-
     }
 
 

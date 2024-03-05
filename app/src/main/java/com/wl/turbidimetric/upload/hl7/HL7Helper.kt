@@ -3,13 +3,14 @@ package com.wl.turbidimetric.upload.hl7
 import android.os.Handler
 import android.os.Message
 import com.wl.turbidimetric.global.SystemGlobal
+import com.wl.turbidimetric.model.ConditionModel
 import com.wl.turbidimetric.model.TestResultAndCurveModel
-import com.wl.turbidimetric.model.TestResultModel
 import com.wl.turbidimetric.upload.hl7.service.HL7UploadService
 import com.wl.turbidimetric.upload.hl7.service.Hl7Log
 import com.wl.turbidimetric.upload.hl7.util.*
 import com.wl.turbidimetric.upload.model.ConnectConfig
 import com.wl.turbidimetric.upload.model.GetPatientCondition
+import com.wl.turbidimetric.upload.model.Patient
 import com.wl.turbidimetric.upload.service.OnConnectListener
 import com.wl.turbidimetric.upload.service.OnGetPatientCallback
 import com.wl.turbidimetric.upload.service.OnUploadCallback
@@ -25,109 +26,72 @@ object HL7Helper : UploadService {
             field = value
             uploadService.hl7Log = value
         }
-    val WHAT_NEXT = 1000
+
+    /**
+     * 上传
+     */
+    val WHAT_UPLOAD_NEXT = 1000
+
+    /**
+     * 获取患者信息
+     */
+    val WHAT_GET_INFO_NEXT = 1100
+    var uploadHelper: UploadHelper? = null
+    var getPatientInfoHelper: GetPatientInfoHelper? = null
     val handler = object : Handler() {
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
-            if (WHAT_NEXT == msg.what) {
-                removeMessages(WHAT_NEXT)
-                uploadNextTestResult(testResults[index])
+            if (WHAT_UPLOAD_NEXT == msg.what) {
+                removeMessages(WHAT_UPLOAD_NEXT)
+                uploadHelper?.curTestResult()?.let { cur ->
+                    uploadHelper?.uploadNextTestResult(cur, uploadHelper?.curCallback())
+                }
+            } else if (WHAT_GET_INFO_NEXT == msg.what) {
+                removeMessages(WHAT_GET_INFO_NEXT)
+                getPatientInfoHelper?.curCondition()?.let { cur ->
+                    getPatientInfoHelper!!.getPatientInfoNext(cur, getPatientInfoHelper!!.curCallback())
+                }
+
             }
         }
     }
 
     private fun createUploadService(): HL7UploadService {
-        return HL7UploadService()
-    }
-
-    private var index = 0
-    private var successCount = 0
-    private var failedCount = 0
-    private var lastIndex = 0
-    private var testResults = mutableListOf<TestResultAndCurveModel>()
-    private var onUploadTestResults: OnUploadTestResults? = null
-
-    fun uploadTestResult(
-        datas: List<TestResultAndCurveModel>,
-        callback: OnUploadTestResults
-    ) {
-        testResults.addAll(datas)
-        onUploadTestResults = callback
-        lastIndex = testResults.lastIndex
-        uploadNextTestResult(testResults.first())
-    }
-
-    fun uploadSingleTestResult(
-        testResult: TestResultAndCurveModel,
-        callback: OnUploadTestResults
-    ) {
-        onUploadTestResults = callback
-        testResults.add(testResult)
-        lastIndex = testResults.lastIndex
-        if (testResults.size == 1) {
-            handler.sendEmptyMessageDelayed(WHAT_NEXT, 1000)
+        return HL7UploadService().apply {
+            uploadHelper = UploadHelper(this)
+            getPatientInfoHelper = GetPatientInfoHelper(this)
         }
     }
 
-    private fun uploadNextTestResult(testResult: TestResultAndCurveModel) {
-        uploadTestResult(testResult, object : OnUploadCallback {
-            override fun onUploadSuccess(msg: String) {
-                LogToFile.i("onUploadSuccess msg=$msg index=$index")
-                index++
-                successCount++
-                if (index > lastIndex) {
-                    LogToFile.i("index=$index successCount=$successCount failedCount=$failedCount lastIndex=$lastIndex")
-                    onUploadTestResults?.invoke(testResults.size, successCount, failedCount)
-                    clearUploadInfo()
-                } else {
-                    handler.sendEmptyMessageDelayed(WHAT_NEXT, 1000)
-                }
-            }
-
-            override fun onUploadFailed(code: Int, msg: String) {
-                LogToFile.i("onUploadFailed msg=$msg index=$index")
-                index++
-                failedCount++
-                if (index > lastIndex) {
-                    LogToFile.i("index=$index successCount=$successCount failedCount=$failedCount lastIndex=$lastIndex")
-                    onUploadTestResults?.invoke(testResults.size, successCount, failedCount)
-                    clearUploadInfo()
-                } else {
-                    handler.sendEmptyMessageDelayed(WHAT_NEXT, 1000)
-                }
-            }
-        })
-    }
-
-    fun clearUploadInfo() {
-        index = 0
-        successCount = 0
-        failedCount = 0
-        lastIndex = -1
-        testResults.clear()
+    fun uploadTestResult(
+        datas: List<TestResultAndCurveModel>,
+        onUploadCallbacks: List<OnUploadCallback> = mutableListOf(),
+        callback: OnUploadTestResults
+    ) {
+        uploadHelper?.uploadTestResult(datas, onUploadCallbacks, callback)
     }
 
     override fun uploadTestResult(
-        testResult: TestResultAndCurveModel,
-        onUploadCallback: OnUploadCallback
+        testResult: TestResultAndCurveModel, onUploadCallback: OnUploadCallback
     ) {
-        uploadService.uploadTestResult(testResult, onUploadCallback)
+        uploadHelper?.uploadSingleTestResult(testResult, callback2 = onUploadCallback)
+    }
+
+    fun getPatientInfo(
+        conditions: List<GetPatientCondition>, onGetPatientCallbacks: List<OnGetPatientCallback>
+    ) {
+        getPatientInfoHelper?.getPatientInfo(conditions, onGetPatientCallbacks)
     }
 
     override fun getPatientInfo(
-        condition: GetPatientCondition,
-        onGetPatientCallback: OnGetPatientCallback
+        condition: GetPatientCondition, onGetPatientCallback: OnGetPatientCallback
     ) {
-        uploadService.getPatientInfo(condition, onGetPatientCallback)
+        getPatientInfoHelper?.getPatientInfoSingle(condition, onGetPatientCallback)
     }
 
-
     override fun connect(
-        config: ConnectConfig,
-        onConnectListener: OnConnectListener?
+        config: ConnectConfig, onConnectListener: OnConnectListener?
     ) {
-//        config.save()
-//        SystemGlobal.uploadConfig = config
         if (!config.openUpload) return
         uploadService.connect(config, object : OnConnectListener {
             override fun onConnectResult(connectResult: ConnectResult) {
@@ -160,4 +124,237 @@ object HL7Helper : UploadService {
     override fun isConnected(): Boolean {
         return uploadService.isConnected()
     }
+
+    class UploadHelper(
+        private val uploadService: HL7UploadService
+    ) :
+        UploadService {
+        private var index = 0
+        private var successCount = 0
+        private var failedCount = 0
+        private var lastIndex = 0
+        private var testResults = mutableListOf<TestResultAndCurveModel>()
+        private var callbacks = mutableListOf<OnUploadCallback?>()
+        private var onUploadTestResults: OnUploadTestResults? = null
+
+
+        fun uploadTestResult(
+            datas: List<TestResultAndCurveModel>,
+            onUploadCallbacks: List<OnUploadCallback> = mutableListOf(),
+            callback: OnUploadTestResults
+        ) {
+            testResults.addAll(datas)
+            callbacks.addAll(onUploadCallbacks)
+            onUploadTestResults = callback
+            lastIndex = testResults.lastIndex
+            uploadNextTestResult(testResults.first(), onUploadCallbacks.firstOrNull())
+        }
+
+        fun uploadSingleTestResult(
+            testResult: TestResultAndCurveModel,
+            callback: OnUploadTestResults? = null,
+            callback2: OnUploadCallback? = null
+        ) {
+            onUploadTestResults = callback
+            testResults.add(testResult)
+            callbacks.add(callback2)
+            lastIndex = testResults.lastIndex
+            if (testResults.size == 1) {
+                handler.sendEmptyMessageDelayed(WHAT_UPLOAD_NEXT, 1000)
+            }
+        }
+
+        fun uploadNextTestResult(
+            testResult: TestResultAndCurveModel,
+            onUploadCallback: OnUploadCallback?
+        ) {
+            uploadTestResult(testResult, object : OnUploadCallback {
+                override fun onUploadSuccess(msg: String) {
+                    LogToFile.i("onUploadSuccess msg=$msg index=$index")
+                    index++
+                    successCount++
+                    if (index > lastIndex) {
+                        LogToFile.i("index=$index successCount=$successCount failedCount=$failedCount lastIndex=$lastIndex")
+                        onUploadTestResults?.invoke(testResults.size, successCount, failedCount)
+                        clearUploadInfo()
+                    } else {
+                        handler.sendEmptyMessageDelayed(WHAT_UPLOAD_NEXT, 1000)
+                    }
+                    onUploadCallback?.onUploadSuccess(msg)
+                }
+
+                override fun onUploadFailed(code: Int, msg: String) {
+                    LogToFile.i("onUploadFailed msg=$msg index=$index")
+                    index++
+                    failedCount++
+                    if (index > lastIndex) {
+                        LogToFile.i("index=$index successCount=$successCount failedCount=$failedCount lastIndex=$lastIndex")
+                        onUploadTestResults?.invoke(testResults.size, successCount, failedCount)
+                        clearUploadInfo()
+                    } else {
+                        handler.sendEmptyMessageDelayed(WHAT_UPLOAD_NEXT, 1000)
+                    }
+                    onUploadCallback?.onUploadFailed(code, msg)
+                }
+            })
+        }
+
+        fun clearUploadInfo() {
+            index = 0
+            successCount = 0
+            failedCount = 0
+            lastIndex = -1
+            testResults.clear()
+            callbacks.clear()
+        }
+
+        override fun uploadTestResult(
+            testResult: TestResultAndCurveModel, onUploadCallback: OnUploadCallback
+        ) {
+            uploadService.uploadTestResult(testResult, onUploadCallback)
+        }
+
+        override fun getPatientInfo(
+            condition: GetPatientCondition, onGetPatientCallback: OnGetPatientCallback
+        ) {
+
+        }
+
+
+        override fun connect(
+            config: ConnectConfig, onConnectListener: OnConnectListener?
+        ) {
+
+        }
+
+        override fun disconnect() {
+            uploadService.disconnect()
+        }
+
+        override fun isConnected(): Boolean {
+            return uploadService.isConnected()
+        }
+
+        fun curTestResult(): TestResultAndCurveModel? {
+            if (index in testResults.indices)
+                return testResults[index]
+            else
+                return null
+        }
+
+        fun curCallback(): OnUploadCallback? {
+            if (index in callbacks.indices)
+                return callbacks[index]
+            else
+                return null
+        }
+    }
+
+    class GetPatientInfoHelper(
+        private val uploadService: HL7UploadService
+    ) :
+        UploadService {
+        private var index = 0
+        private var lastIndex = 0
+        private var conditions = mutableListOf<GetPatientCondition>()
+        private var callbacks = mutableListOf<OnGetPatientCallback?>()
+
+
+        fun clearUploadInfo() {
+            index = 0
+            conditions.clear()
+            callbacks.clear()
+            lastIndex = -1
+        }
+
+        override fun uploadTestResult(
+            testResult: TestResultAndCurveModel, onUploadCallback: OnUploadCallback
+        ) {
+
+        }
+
+        fun getPatientInfo(
+            conditions: List<GetPatientCondition>, onGetPatientCallbacks: List<OnGetPatientCallback>
+        ) {
+            this.conditions.addAll(conditions)
+            this.callbacks.addAll(onGetPatientCallbacks)
+            lastIndex = conditions.lastIndex
+
+            getPatientInfoNext(conditions.first(), onGetPatientCallbacks.first())
+        }
+
+        fun getPatientInfoSingle(
+            condition: GetPatientCondition, onGetPatientCallback: OnGetPatientCallback
+        ) {
+            this.conditions.add(condition)
+            this.callbacks.add(onGetPatientCallback)
+            lastIndex = conditions.lastIndex
+            if (conditions.size == 1) {
+                handler.sendEmptyMessageDelayed(WHAT_GET_INFO_NEXT, 1000)
+            }
+        }
+
+        override fun getPatientInfo(
+            condition: GetPatientCondition, onGetPatientCallback: OnGetPatientCallback
+        ) {
+            uploadService.getPatientInfo(condition,onGetPatientCallback)
+        }
+         fun getPatientInfoNext(
+            condition: GetPatientCondition, onGetPatientCallback: OnGetPatientCallback?
+        ) {
+            uploadService.getPatientInfo(condition, object : OnGetPatientCallback {
+                override fun onGetPatientSuccess(patients: List<Patient>?) {
+                    onGetPatientCallback?.onGetPatientSuccess(patients)
+                    index++
+                    if (index > lastIndex) {
+                        LogToFile.i("index=$index lastIndex=$lastIndex")
+                        clearUploadInfo()
+                    } else {
+                        handler.sendEmptyMessageDelayed(WHAT_GET_INFO_NEXT, 1000)
+                    }
+                }
+
+                override fun onGetPatientFailed(code: Int, msg: String) {
+                    onGetPatientCallback?.onGetPatientFailed(code, msg)
+                    index++
+                    if (index > lastIndex) {
+                        LogToFile.i("index=$index lastIndex=$lastIndex")
+                        clearUploadInfo()
+                    } else {
+                        handler.sendEmptyMessageDelayed(WHAT_GET_INFO_NEXT, 1000)
+                    }
+                }
+            })
+        }
+
+        override fun connect(
+            config: ConnectConfig, onConnectListener: OnConnectListener?
+        ) {
+
+        }
+
+        override fun disconnect() {
+            uploadService.disconnect()
+        }
+
+        override fun isConnected(): Boolean {
+            return uploadService.isConnected()
+        }
+
+        fun curCondition(): GetPatientCondition? {
+            if (index in conditions.indices)
+                return conditions[index]
+            else
+                return null
+        }
+
+        fun curCallback(): OnGetPatientCallback? {
+            if (index in callbacks.indices)
+                return callbacks[index]
+            else
+                return null
+        }
+    }
+
+
 }

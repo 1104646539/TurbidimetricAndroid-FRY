@@ -63,7 +63,7 @@ object TestSerialPort {
                 reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x00u, 0x0u))
             }
             SerialGlobal.CMD_Squeezing -> {
-//                delay(4000)//测试实时获取信息时需要
+                delay(200)//测试实时获取信息时需要
                 reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x00u, 0x0u))
             }
 
@@ -112,7 +112,7 @@ object TestSerialPort {
             }
 
             SerialGlobal.CMD_DripSample -> {
-                delay(1000)//测试实时获取信息时需要
+//                delay(1000)//测试实时获取信息时需要
 //                if (index == 3) {
 //                    reply = ubyteArrayOf(data[0], 0x05u, 0x0u, 0x0u, 0x0u, 0x0u)//加样失败
 //                }else{

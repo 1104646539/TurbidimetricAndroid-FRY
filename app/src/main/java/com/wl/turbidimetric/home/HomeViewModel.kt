@@ -947,7 +947,7 @@ class HomeViewModel(
             mSamplesStates[sampleShelfPos]!![samplePos].sampleType = sampleType
         }
         _samplesStates.value = mSamplesStates.copyOf()
-        i("updateSampleState ShelfPos=$sampleShelfPos samplePos=$samplePos  state=$state sampleType=$sampleType samplesState=${mSamplesStates.print()}")
+        i("updateSampleState2 ShelfPos=$sampleShelfPos samplePos=$samplePos  state=$state sampleType=$sampleType samplesState=${mSamplesStates.print()}")
     }
 
     /**
@@ -968,7 +968,7 @@ class HomeViewModel(
         testResult?.let { mCuvetteStates[cuvetteShelfPos]!![cuvettePos].testResult = testResult }
         samplePos?.let { mCuvetteStates[cuvetteShelfPos]!![cuvettePos].id = samplePos }
         _cuvetteStates.value = mCuvetteStates.copyOf()
-        i("updateCuvetteState ShelfPos=$cuvetteShelfPos cuvettePos=$cuvettePos cuvetteStates=${mCuvetteStates.print()}")
+        i("updateCuvetteState2 ShelfPos=$cuvetteShelfPos cuvettePos=$cuvettePos cuvetteStates=${mCuvetteStates.print()}")
     }
 
 
@@ -1043,6 +1043,9 @@ class HomeViewModel(
 
     }
 
+    /**
+     * 实时获取信息
+     */
     private fun realTimeGetInfo(result: TestResultModel) {
         val config = HL7Helper.getConfig()
         val isConnected = HL7Helper.isConnected()
@@ -1093,6 +1096,9 @@ class HomeViewModel(
         return testResultRepository.updateTestResult(model.result)
     }
 
+    /**
+     * 更新获取到的个人信息
+     */
     private fun updatePatientInfoToResult(patient: Patient, resultId: Long) {
         viewModelScope.launch {
             val result = getTestResultAndCurveModelById(resultId)
@@ -1102,6 +1108,7 @@ class HomeViewModel(
             result.result.deliveryTime = patient.deliveryTime
             result.result.deliveryDepartment = patient.deliveryDepartments
             result.result.gender = patient.sex
+            result.result.sampleBarcode = patient.bc
             update(result)
             i("resultId=$resultId size=${resultModels.size}")
             resultModels.forEach {
@@ -1152,9 +1159,8 @@ class HomeViewModel(
         )
         val id = testResultRepository.addTestResult(resultModel)
         resultModel.resultId = id
-        i("createResultModel add ${resultModels.size}")
         resultModels.add(TestResultAndCurveModel(resultModel, selectProject))
-        i("createResultModel add2 ${resultModels.size}")
+        i("createResultModel add ${resultModels.size}")
         return resultModel
     }
 
@@ -1861,7 +1867,10 @@ class HomeViewModel(
                 i("这排最后一个比色皿，需要去下一个步骤，加试剂")
                 stepDripReagent()
 //            } else if ((isAuto() && lastSamplePos(samplePos)) || !isAuto() && (lastSamplePos(samplePos) || manualModelSamplingFinish())) {//这排最后一个样本
-            } else if ((isAuto() && lastSamplePos(samplePos)) || !isAuto()) {//这排最后一个样本
+            } else if ((isAuto() && lastSamplePos(samplePos)) || (!isAuto() && (lastSamplePos(
+                    samplePos
+                ) || manualModelSamplingFinish()))
+            ) {//这排最后一个样本
                 if (isManual() && manualModelSamplingFinish()) {
                     i("手动模式，样本加样完成！")
                     stepDripReagent()
@@ -1943,7 +1952,6 @@ class HomeViewModel(
             updateSampleState(samplePos - 1, SampleState.SamplingFailed)
             samplingProbeCleaning()
             nextStepDripReagent()
-            return
         } else {//取样成功
             updateSampleState(samplePos - 1, SampleState.Sampling)
             goDripSample()
@@ -2246,7 +2254,7 @@ class HomeViewModel(
             moveSampleShelfNext()
         }
         //如果需要移动
-        if (cuvetteNeedMove(cuvettePos)) {
+        if (cuvetteNeedMove(cuvettePos) && cuvetteMoveFinish) {
             moveCuvetteDripSample()
         }
     }

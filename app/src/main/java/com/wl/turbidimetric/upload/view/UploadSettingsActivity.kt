@@ -38,6 +38,7 @@ import com.wl.wllib.LogToFile.i
 import com.wl.wllib.isIP
 import com.wl.wllib.longStrToLong
 import com.wl.wllib.toLong
+import com.wl.wllib.toTimeStr
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -217,7 +218,6 @@ class UploadSettingsActivity :
         }
         getTestPatientInfoDialog.showPop(
             this,
-            width = 600,
         ) { tpiDialog ->
             tpiDialog.show { condition1, condition2, type ->
                 tpiDialog.dismiss()
@@ -318,7 +318,7 @@ class UploadSettingsActivity :
                                         detectionNum = detectionNum,
                                         sampleBarcode = barcode,
                                         testTime = testTime.toLong(DateUtil.Time1Format),
-                                        deliveryTime = deliveryTime,
+                                        deliveryTime = deliveryTime.toLong(DateUtil.Time1Format).toTimeStr(DateUtil.Time5Format),
                                         deliveryDepartment = deliveryDepartment,
                                         deliveryDoctor = deliveryDoctor,
                                     ), curve = CurveModel().apply {

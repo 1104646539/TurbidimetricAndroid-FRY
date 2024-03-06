@@ -1,8 +1,10 @@
 package com.wl.turbidimetric.view.dialog
 
 import android.content.Context
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import com.lxj.xpopup.core.BasePopupView
@@ -13,31 +15,53 @@ class GetTestPatientInfoDialog(val ct: Context) :
     CustomBtn3Popup(ct, R.layout.dialog_get_test_patient_info) {
     var etCondition1: EditText? = null
     var etCondition2: EditText? = null
+    var tvCondition1: TextView? = null
+    var tvCondition2: TextView? = null
     var tb: TabLayout? = null
     var selectIndex = 0
     override fun initDialogView() {
         etCondition1 = findViewById(R.id.et_condition1)
         etCondition2 = findViewById(R.id.et_condition2)
+        tvCondition1 = findViewById(R.id.tv_condition1)
+        tvCondition2 = findViewById(R.id.tv_condition2)
         tb = findViewById(R.id.tb)
 
         tb?.apply {
             addTab(newTab().setText("编号"))
             addTab(newTab().setText("条码"))
-            addTab(newTab().setText("时间"))
+//            addTab(newTab().setText("时间"))
 
             addOnTabSelectedListener(object : OnTabSelectedListener {
                 override fun onTabSelected(tab: TabLayout.Tab?) {
                     selectIndex = tab?.position ?: 0
 
                     if (selectIndex == 0) {
+                        tvCondition1?.setText("编号起始")
+                        tvCondition2?.setText("编号结束")
+
                         etCondition1?.setText("1")
                         etCondition2?.setText("3")
+
+                        tvCondition2?.visibility = View.VISIBLE
+                        etCondition2?.visibility = View.VISIBLE
                     } else if (selectIndex == 1) {
+                        tvCondition1?.setText("条码")
+                        tvCondition2?.setText("")
+
                         etCondition1?.setText("ABCD")
                         etCondition2?.setText("")
+
+                        tvCondition2?.visibility = View.GONE
+                        etCondition2?.visibility = View.GONE
                     } else {
+                        tvCondition1?.setText("时间起始")
+                        tvCondition2?.setText("编号结束")
+
                         etCondition1?.setText("20220202020202")
                         etCondition2?.setText("20220203020202")
+
+                        tvCondition2?.visibility = View.VISIBLE
+                        etCondition2?.visibility = View.VISIBLE
                     }
                 }
 

@@ -7,4 +7,8 @@
         <!--也可以设置成一张图片 -->
         <item name="android:windowBackground">@drawable/start</item>
     </style>
+
+    <style name="TabLayoutTextStyle" parent="TextAppearance.Design.Tab">
+        <item name="android:textSize">24sp</item>
+    </style>
 </resources>

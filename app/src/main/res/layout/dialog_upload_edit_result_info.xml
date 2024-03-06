@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="40dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal">
+
+        <TextView
+            style="@style/TextHilt"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="left|center_vertical"
+            android:minWidth="100dp"
+            android:text="姓名:" />
+
+        <EditText
+            android:id="@+id/et_name"
+            style="@style/EtDefault"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_et_gray"
+            android:inputType="numberSigned"
+            android:minWidth="150dp" />
+
+        <TextView
+            style="@style/TextHilt"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="10dp"
+            android:gravity="left|center_vertical"
+            android:minWidth="100dp"
+            android:text="性别:" />
+
+        <Spinner
+            android:id="@+id/spn_sex"
+            android:layout_width="150dp"
+            android:layout_height="match_parent"
+            android:minWidth="150dp" />
+
+        <TextView
+            style="@style/TextHilt"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="10dp"
+            android:gravity="left|center_vertical"
+            android:minWidth="100dp"
+            android:text="年龄:" />
+
+        <EditText
+            android:id="@+id/et_age"
+            style="@style/EtDefault"
+            android:layout_width="200dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_et_gray"
+            android:inputType="numberSigned"
+            android:minWidth="150dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal">
+
+        <TextView
+            style="@style/TextHilt"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="left|center_vertical"
+            android:minWidth="100dp"
+            android:text="编号:" />
+
+        <EditText
+            android:id="@+id/et_sn"
+            style="@style/EtDefault"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_et_gray"
+            android:inputType="numberSigned"
+            android:minWidth="150dp" />
+
+        <TextView
+            style="@style/TextHilt"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="10dp"
+            android:gravity="left|center_vertical"
+            android:minWidth="100dp"
+            android:text="条码:" />
+
+        <EditText
+            android:id="@+id/et_bc"
+            style="@style/EtDefault"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_et_gray"
+            android:inputType="numberSigned"
+            android:minWidth="150dp" />
+
+
+        <TextView
+            style="@style/TextHilt"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="10dp"
+            android:gravity="left|center_vertical"
+            android:minWidth="100dp"
+            android:text="检测时间:" />
+
+        <TextView
+            android:id="@+id/tv_test_time"
+            style="@style/TextItem"
+            android:layout_width="200dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_et_gray"
+            android:inputType="numberSigned"
+            android:minWidth="150dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal">
+
+        <TextView
+            style="@style/TextHilt"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="left|center_vertical"
+            android:minWidth="100dp"
+            android:text="反应度:" />
+
+        <EditText
+            android:id="@+id/et_abs"
+            style="@style/EtDefault"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_et_gray"
+            android:inputType="numberSigned"
+            android:minWidth="150dp" />
+
+        <TextView
+            style="@style/TextHilt"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="10dp"
+            android:gravity="left|center_vertical"
+            android:minWidth="100dp"
+            android:text="浓度:" />
+
+        <EditText
+            android:id="@+id/et_con"
+            style="@style/EtDefault"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_et_gray"
+            android:inputType="numberSigned"
+            android:minWidth="150dp" />
+
+        <TextView
+            style="@style/TextHilt"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="10dp"
+            android:gravity="left|center_vertical"
+            android:minWidth="100dp"
+            android:text="检测项目:" />
+
+        <Spinner
+            android:id="@+id/spn_project"
+            android:layout_width="200dp"
+            android:layout_height="match_parent"
+            android:minWidth="200dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal">
+
+        <TextView
+            style="@style/TextHilt"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="left|center_vertical"
+            android:minWidth="100dp"
+            android:text="送检医生:" />
+
+        <EditText
+            android:id="@+id/et_delivery_doctor"
+            style="@style/EtDefault"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_et_gray"
+            android:inputType="numberSigned"
+            android:minWidth="150dp" />
+
+        <TextView
+            style="@style/TextHilt"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="10dp"
+            android:gravity="left|center_vertical"
+            android:minWidth="100dp"
+            android:text="送检科室:" />
+
+        <EditText
+            android:id="@+id/et_delivery_department"
+            style="@style/EtDefault"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_et_gray"
+            android:inputType="numberSigned"
+            android:minWidth="150dp" />
+
+        <TextView
+            style="@style/TextHilt"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="10dp"
+            android:gravity="left|center_vertical"
+            android:minWidth="100dp"
+            android:text="送检时间:" />
+
+        <TextView
+            android:id="@+id/tv_delivery_time"
+            style="@style/TextItem"
+            android:layout_width="200dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_et_gray"
+            android:inputType="numberSigned"
+            android:minWidth="150dp" />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal">
+
+        <TextView
+            style="@style/TextHilt"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="left|center_vertical"
+            android:minWidth="100dp"
+            android:text="结果:" />
+
+        <Spinner
+            android:id="@+id/spn_result"
+            android:layout_width="150dp"
+            android:layout_height="match_parent"
+            android:inputType="numberSigned"
+            android:minWidth="150dp" />
+
+
+    </LinearLayout>
+
+</LinearLayout>

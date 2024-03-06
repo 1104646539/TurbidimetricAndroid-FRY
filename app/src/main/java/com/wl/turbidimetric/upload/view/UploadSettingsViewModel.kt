@@ -12,6 +12,7 @@ import com.wl.turbidimetric.base.BaseViewModel
 import com.wl.turbidimetric.ex.getAppViewModel
 import com.wl.turbidimetric.home.HomeViewModel
 import com.wl.turbidimetric.model.MachineTestModel
+import com.wl.turbidimetric.model.ProjectModel
 import com.wl.turbidimetric.repository.DefaultCurveDataSource
 import com.wl.turbidimetric.repository.DefaultLocalDataDataSource
 import com.wl.turbidimetric.repository.DefaultProjectDataSource
@@ -21,8 +22,12 @@ import com.wl.turbidimetric.repository.if2.LocalDataSource
 import com.wl.turbidimetric.repository.if2.ProjectSource
 import com.wl.turbidimetric.repository.if2.TestResultSource
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 
-class UploadSettingsViewModel(private val localDataSource: LocalDataSource) : BaseViewModel() {
+class UploadSettingsViewModel(
+    private val projectSource: ProjectSource,
+    private val localDataSource: LocalDataSource
+) : BaseViewModel() {
 
     var openUpload = MutableStateFlow(false)
     var autoUpload = MutableStateFlow(false)
@@ -54,9 +59,13 @@ class UploadSettingsViewModel(private val localDataSource: LocalDataSource) : Ba
         getPatient.value = SystemGlobal.uploadConfig.getPatient
     }
 
+    suspend fun getProjects(): List<ProjectModel> {
+        return projectSource.getProjects().first()
+    }
+
     fun verifySave(): String {
         if (twoway.value) {
-            if ( getPatientType.value == GetPatientType.BC
+            if (getPatientType.value == GetPatientType.BC
                 && (MachineTestModel.valueOf(localDataSource.getCurMachineTestModel()) != MachineTestModel.Auto || !localDataSource.getScanCode())
             ) {
                 return "当按条码匹配时，请先更改检测模式为自动模式并开启扫码功能"
@@ -90,11 +99,13 @@ class UploadSettingsViewModel(private val localDataSource: LocalDataSource) : Ba
 }
 
 class UploadSettingsViewModelFactory(
+    private val projectSource: ProjectSource = DefaultProjectDataSource(App.instance!!.mainDao),
     private val localDataRepository: LocalDataSource = DefaultLocalDataDataSource()
 ) : ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(UploadSettingsViewModel::class.java)) {
             return UploadSettingsViewModel(
+                projectSource,
                 localDataRepository
             ) as T
         }

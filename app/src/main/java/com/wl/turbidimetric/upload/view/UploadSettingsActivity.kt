@@ -13,6 +13,7 @@ import com.wl.turbidimetric.global.EventGlobal
 import com.wl.turbidimetric.global.EventMsg
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.CurveModel
+import com.wl.turbidimetric.model.ProjectModel
 import com.wl.turbidimetric.model.TestResultAndCurveModel
 import com.wl.turbidimetric.model.TestResultModel
 import com.wl.turbidimetric.upload.hl7.HL7Helper
@@ -26,17 +27,23 @@ import com.wl.turbidimetric.upload.service.OnConnectListener
 import com.wl.turbidimetric.upload.service.OnGetPatientCallback
 import com.wl.turbidimetric.upload.service.OnUploadCallback
 import com.wl.turbidimetric.util.ActivityDataBindingDelegate
+import com.wl.turbidimetric.view.dialog.EditUploadResultInfoDialog
 import com.wl.turbidimetric.view.dialog.GetTestPatientInfoDialog
 import com.wl.turbidimetric.view.dialog.HiltDialog
 import com.wl.turbidimetric.view.dialog.PatientInfoDialog
 import com.wl.turbidimetric.view.dialog.isShow
 import com.wl.turbidimetric.view.dialog.showPop
+import com.wl.wllib.DateUtil
 import com.wl.wllib.LogToFile.i
 import com.wl.wllib.isIP
+import com.wl.wllib.longStrToLong
+import com.wl.wllib.toLong
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.greenrobot.eventbus.EventBus
+import java.math.BigDecimal
 import java.util.Date
 
 /**
@@ -58,7 +65,7 @@ class UploadSettingsActivity :
     private val waitDialog: HiltDialog by lazy {
         HiltDialog(this)
     }
-    private val dialog: HiltDialog by lazy {
+    private val hiltDialog: HiltDialog by lazy {
         HiltDialog(this)
     }
 
@@ -172,7 +179,6 @@ class UploadSettingsActivity :
     }
 
 
-
     private fun save() {
         vm.generateConfig().let { config ->
             config.save()
@@ -235,8 +241,11 @@ class UploadSettingsActivity :
                         lifecycleScope.launch(Dispatchers.Main) {
                             hilt.dismiss()
                             if (patients.isNullOrEmpty()) {
-                                dialog.showPop(this@UploadSettingsActivity, isCancelable = true) {
-                                    dialog.showDialog(
+                                hiltDialog.showPop(
+                                    this@UploadSettingsActivity,
+                                    isCancelable = true
+                                ) {
+                                    hiltDialog.showDialog(
                                         msg = "没有待检信息",
                                         confirmText = "我知道了",
                                         confirmClick = {
@@ -266,8 +275,8 @@ class UploadSettingsActivity :
                     override fun onGetPatientFailed(code: Int, msg: String) {
                         lifecycleScope.launch(Dispatchers.Main) {
                             hilt.dismiss()
-                            dialog.showPop(this@UploadSettingsActivity, isCancelable = false) {
-                                dialog.showDialog(
+                            hiltDialog.showPop(this@UploadSettingsActivity, isCancelable = false) {
+                                hiltDialog.showDialog(
                                     msg = "$code $msg",
                                     confirmText = "我知道了",
                                     confirmClick = {
@@ -281,6 +290,8 @@ class UploadSettingsActivity :
         }
     }
 
+    private val editUploadResultInfoDialog by lazy { EditUploadResultInfoDialog(this) }
+
     /**
      * 上传结果
      */
@@ -289,35 +300,101 @@ class UploadSettingsActivity :
             toast("未连接")
             return
         }
-        HL7Helper.uploadTestResult(
-            TestResultAndCurveModel(result = TestResultModel(
-                resultId = 0L,
-                testResult = "阴性",
-                concentration = 66,
-                absorbances = "121120".toBigDecimal(),
-                name = "张三",
-                gender = "男",
-                age = "30",
-                detectionNum = vm.getDetectionNumInc(),
-                sampleBarcode = "ABCD",
-                testTime = Date().time,
-                deliveryTime = "20220202020202",
-                deliveryDepartment = "体检科",
-                deliveryDoctor = "w医生",
-            ), curve = CurveModel().apply {
-                projectName = "便潜血"
-                projectLjz = 100
-                projectCode = "FOB"
-                projectUnit = "ul"
-            }), object : OnUploadCallback {
-                override fun onUploadSuccess(msg: String) {
-                    i("onUploadSuccess $msg")
-                }
+        lifecycleScope.launch {
+            vm.getProjects().let {
+                withContext(Dispatchers.Main) {
+                    editUploadResultInfoDialog.showPop(this@UploadSettingsActivity) { dialog ->
+                        dialog.showDialog(it,
+                            { name: String, age: String, detectionNum: String, barcode: String, abs: String, con: String, deliveryDoctor: String, deliveryDepartment: String, deliveryTime: String, testTime: String, project: ProjectModel, sex: String, result: String, BasePopupView ->
+                                HL7Helper.uploadTestResult(
+                                    TestResultAndCurveModel(result = TestResultModel(
+                                        resultId = 0L,
+                                        testResult = result,
+                                        concentration = con.toIntOrNull() ?: 0,
+                                        absorbances = abs.toBigDecimalOrNull() ?: BigDecimal(0),
+                                        name = name,
+                                        gender = sex,
+                                        age = age,
+                                        detectionNum = detectionNum,
+                                        sampleBarcode = barcode,
+                                        testTime = testTime.toLong(DateUtil.Time1Format),
+                                        deliveryTime = deliveryTime,
+                                        deliveryDepartment = deliveryDepartment,
+                                        deliveryDoctor = deliveryDoctor,
+                                    ), curve = CurveModel().apply {
+                                        projectName = project.projectName
+                                        projectLjz = project.projectLjz
+                                        projectCode = project.projectCode
+                                        projectUnit = project.projectUnit
+                                    }), object : OnUploadCallback {
+                                        override fun onUploadSuccess(msg: String) {
+                                            i("onUploadSuccess $msg")
+                                            lifecycleScope.launch(Dispatchers.Main) {
+                                                hiltDialog.showPop(this@UploadSettingsActivity) { hiltDialog ->
+                                                    hiltDialog.showDialog(
+                                                        "$msg",
+                                                        confirmText = "确定",
+                                                        confirmClick = {
+                                                            it.dismiss()
+                                                        })
+                                                }
+                                            }
+                                        }
 
-                override fun onUploadFailed(code: Int, msg: String) {
-                    i("onUploadFailed $code $msg")
+                                        override fun onUploadFailed(code: Int, msg: String) {
+                                            i("onUploadFailed $code $msg")
+                                            lifecycleScope.launch(Dispatchers.Main) {
+                                                hiltDialog.showPop(this@UploadSettingsActivity) { hiltDialog ->
+                                                    hiltDialog.showDialog(
+                                                        "$msg code=$code",
+                                                        confirmText = "确定",
+                                                        confirmClick = {
+                                                            it.dismiss()
+                                                        })
+                                                }
+                                            }
+                                        }
+                                    })
+                                return@showDialog
+                            }, {
+                                it.dismiss()
+                            }
+                        )
+                    }
+
                 }
-            })
+            }
+        }
+
+//        HL7Helper.uploadTestResult(
+//            TestResultAndCurveModel(result = TestResultModel(
+//                resultId = 0L,
+//                testResult = "阴性",
+//                concentration = 66,
+//                absorbances = "121120".toBigDecimal(),
+//                name = "张三",
+//                gender = "男",
+//                age = "30",
+//                detectionNum = vm.getDetectionNumInc(),
+//                sampleBarcode = "ABCD",
+//                testTime = Date().time,
+//                deliveryTime = "20220202020202",
+//                deliveryDepartment = "体检科",
+//                deliveryDoctor = "w医生",
+//            ), curve = CurveModel().apply {
+//                projectName = "便潜血"
+//                projectLjz = 100
+//                projectCode = "FOB"
+//                projectUnit = "ul"
+//            }), object : OnUploadCallback {
+//                override fun onUploadSuccess(msg: String) {
+//                    i("onUploadSuccess $msg")
+//                }
+//
+//                override fun onUploadFailed(code: Int, msg: String) {
+//                    i("onUploadFailed $code $msg")
+//                }
+//            })
     }
 
     private fun connect() {

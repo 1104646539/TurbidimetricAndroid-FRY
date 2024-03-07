@@ -13,6 +13,7 @@ import com.wl.turbidimetric.databinding.FragmentHomeBinding
 import com.wl.turbidimetric.ex.toast
 import com.wl.turbidimetric.global.EventGlobal
 import com.wl.turbidimetric.global.EventMsg
+import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.CurveModel
 import com.wl.turbidimetric.model.Item
 import com.wl.turbidimetric.model.SampleState
@@ -302,6 +303,11 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             EventGlobal.WHAT_PROJECT_ADD -> {
                 lifecycleScope.launch {
                     vm.selectLastProject()
+                }
+            }
+            EventGlobal.WHAT_DETECTION_NUM_CHANGE -> {
+                lifecycleScope.launch {
+                    vm.changeConfig(vm.selectProject,vm.cuvetteStartPos,vm.getDetectionNum(),vm.needSamplingNum)
                 }
             }
 

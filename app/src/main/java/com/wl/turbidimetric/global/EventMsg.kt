@@ -28,4 +28,8 @@ object EventGlobal {
      * 上传配置发生变化
      */
     const val WHAT_UPLOAD_CHANGE = 140
+    /**
+     * 编号发生变化
+     */
+    const val WHAT_DETECTION_NUM_CHANGE = 150
 }

@@ -1111,10 +1111,7 @@ class HomeViewModel(
             result.result.gender = patient.sex
             result.result.sampleBarcode = patient.bc
             update(result)
-            i("resultId=$resultId size=${resultModels.size}")
-            resultModels.forEach {
-                i("it=$it")
-            }
+
             resultModels.indexOfFirst { it?.result?.resultId == resultId }.let { index ->
                 if (index in resultModels.indices) {
                     resultModels[index] = result

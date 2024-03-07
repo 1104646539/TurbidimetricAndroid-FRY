@@ -3,6 +3,7 @@ package com.wl.turbidimetric.settings.detectionnum
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.wl.turbidimetric.app.AppViewModel
 import com.wl.turbidimetric.base.BaseViewModel
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.repository.DefaultLocalDataDataSource
@@ -31,7 +32,7 @@ class DetectionNumViewModel(private val localDataDataSource: LocalDataSource) : 
         detectionNum: Long,
     ) {
         val verRet = verify(
-            detectionNum,
+            detectionNum
         )
         if (verRet.isNotEmpty()) {
             viewModelScope.launch {
@@ -40,6 +41,13 @@ class DetectionNumViewModel(private val localDataDataSource: LocalDataSource) : 
             return
         }
         localDataDataSource.setDetectionNum(detectionNum.toString())
+        viewModelScope.launch {
+            _detectionNumUiState.emit(
+                DetectionNumUiState(
+                    localDataDataSource.getDetectionNum().toLongOrNull() ?: 0,
+                )
+            )
+        }
 
         viewModelScope.launch {
             _hiltText.emit("修改成功")

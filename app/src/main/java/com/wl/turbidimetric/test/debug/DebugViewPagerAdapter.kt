@@ -4,18 +4,26 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.wl.turbidimetric.test.debug.integration.TestChartFragment
+import com.wl.turbidimetric.test.debug.scanbarcode.ScanBarcodeFragment
+import com.wl.turbidimetric.test.debug.scanbarcode.ScanBarcodeViewModel
 import com.wl.turbidimetric.test.debug.singlecmd.SingleCmdFragment
 
 class DebugViewPagerAdapter(fragmentActivity: FragmentActivity) :
     FragmentStateAdapter(fragmentActivity) {
     override fun getItemCount(): Int {
-        return 2
+        return 3
     }
 
     override fun createFragment(position: Int): Fragment {
         return when (position) {
             0 -> {
                 SingleCmdFragment.newInstance()
+            }
+            1 -> {
+                TestChartFragment.newInstance()
+            }
+            2 -> {
+                ScanBarcodeFragment.newInstance()
             }
             else -> {
                 TestChartFragment.newInstance()

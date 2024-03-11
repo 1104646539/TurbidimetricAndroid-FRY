@@ -177,6 +177,46 @@ enum class CuvetteState : ItemState {
     },
 }
 
+/**
+ * 表示结果的状态
+ */
+enum class ResultState(val state: String) {
+    /**
+     * 无
+     */
+    None("-"),
+
+    /**
+     * 取样失败
+     */
+    SamplingFailed("取样失败"),
+
+    /**
+     * 取样成功
+     */
+    SamplingSuccess("取样成功"),
+
+    /**
+     * 取试剂完成
+     */
+    TakeReagentSuccess("取试剂完成"),
+
+    /**
+     * 取试剂失败
+     */
+    TakeReagentFailed("取试剂失败"),
+
+    /**
+     * 搅拌完成
+     */
+    Stir("等待检测"),
+
+    /**
+     * 检测完成
+     */
+    Test("检测完成"),
+}
+
 data class Item(
     var state: ItemState,
     var testResult: TestResultModel? = null,
@@ -223,6 +263,7 @@ enum class TestState(val state: Int) {
     fun machineStateNormal(): Boolean {
         return this.isNotPrepare()
     }
+
     /**
      * 仪器是否可正常运行
      *

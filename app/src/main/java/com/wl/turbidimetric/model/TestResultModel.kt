@@ -22,6 +22,11 @@ data class TestResultModel(
      * @see SampleType
      */
     var sampleType: Int = SampleType.NONEXISTENT.ordinal,
+    /**
+     * 结果的状态
+     * @see ResultState
+     */
+    var resultState: Int = ResultState.None.ordinal,
 
     /**
      * 编号
@@ -102,7 +107,7 @@ data class TestResultModel(
      */
     var curveOwnerId: Long = 0
 
-)  {
+) {
 
 
     @Suppress("UNCHECKED_CAST")
@@ -144,6 +149,7 @@ data class TestResultModel(
         if (createTime != other.createTime) return false
         if (testTime != other.testTime) return false
         if (sampleType != other.sampleType) return false
+        if (resultState != other.resultState) return false
         if (deliveryTime != other.deliveryTime) return false
         if (deliveryDepartment != other.deliveryDepartment) return false
         return deliveryDoctor == other.deliveryDoctor
@@ -172,6 +178,7 @@ data class TestResultModel(
         result = 31 * result + createTime.hashCode()
         result = 31 * result + testTime.hashCode()
         result = 31 * result + sampleType.hashCode()
+        result = 31 * result + resultState.hashCode()
         result = 31 * result + deliveryTime.hashCode()
         result = 31 * result + deliveryDepartment.hashCode()
         result = 31 * result + deliveryDoctor.hashCode()
@@ -179,7 +186,7 @@ data class TestResultModel(
     }
 
     override fun toString(): String {
-        return "TestResultModel(resultId=$resultId, isSelect=$isSelect, name='$name', sampleType='$sampleType',gender='$gender', age='$age', sampleBarcode='$sampleBarcode', detectionNum='$detectionNum', testState=$testState, testResult='$testResult', absorbances=$absorbances, concentration=$concentration, testValue1=$testValue1, testValue2=$testValue2, testValue3=$testValue3, testValue4=$testValue4, testOriginalValue1=$testOriginalValue1, testOriginalValue2=$testOriginalValue2, testOriginalValue3=$testOriginalValue3, testOriginalValue4=$testOriginalValue4, createTime='$createTime', testTime='$testTime',)"
+        return "TestResultModel(resultId=$resultId, isSelect=$isSelect, name='$name', sampleType='$sampleType', resultState='$resultState',gender='$gender', age='$age', sampleBarcode='$sampleBarcode', detectionNum='$detectionNum', testState=$testState, testResult='$testResult', absorbances=$absorbances, concentration=$concentration, testValue1=$testValue1, testValue2=$testValue2, testValue3=$testValue3, testValue4=$testValue4, testOriginalValue1=$testOriginalValue1, testOriginalValue2=$testOriginalValue2, testOriginalValue3=$testOriginalValue3, testOriginalValue4=$testOriginalValue4, createTime='$createTime', testTime='$testTime',)"
     }
 
 }

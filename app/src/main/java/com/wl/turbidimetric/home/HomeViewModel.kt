@@ -444,6 +444,11 @@ class HomeViewModel(
     var allowDripSample = true
 
     /**
+     * 里面保存着每个反应杯对应的结果下标。如果没有取样失败的，那和反应杯的下标一致，否则将不一样
+     */
+    val resultMapIDIndexs = mutableListOf<Int>()
+
+    /**
      * 测试用的 start
      */
     //检测的值
@@ -578,6 +583,7 @@ class HomeViewModel(
         resultOriginalTest3.clear()
         resultOriginalTest4.clear()
         cons.clear()
+        resultMapIDIndexs.clear()
     }
 
     /**
@@ -626,6 +632,7 @@ class HomeViewModel(
             allowTakeReagent = false
             dripReagentFinish = true
             updateCuvetteState(cuvettePos, CuvetteState.TakeReagentFailed)
+            updateResultState(resultMapIDIndexs[cuvettePos], ResultState.TakeReagentFailed)
             if (cuvetteMoveFinish) {//已经移动到位了，取试剂失败后不应该再取，只检测已经加完试剂的样本
                 val takeReagentCuvetteNum = getTakeReagentCuvetteNum()
                 if (takeReagentCuvetteNum == 0) {//第一个就失败，直接结束检测
@@ -635,6 +642,7 @@ class HomeViewModel(
                 }
             }
         } else {//取试剂成功,去加试剂
+            updateResultState(resultMapIDIndexs[cuvettePos], ResultState.TakeReagentSuccess)
             goDripReagent()
         }
     }
@@ -918,6 +926,25 @@ class HomeViewModel(
     private fun sampleNeedDripSampling(samplePos: Int): Boolean {
         if (samplePos < 0) return false
         return mSamplesStates[sampleShelfPos]!![samplePos].state == SampleState.Sampling
+    }
+
+    /**
+     * 更新结果状态
+     * @param pos Int
+     * @param resultState ResultState
+     */
+    private fun updateResultState(pos: Int, resultState: ResultState) {
+        i("updateResultState pos=$pos resultState=$resultState")
+        i("resultModels=$resultModels")
+        pos?.let {
+
+        }
+        viewModelScope.launch {
+            resultModels?.get(pos)?.result?.resultState = resultState.ordinal
+            resultModels?.get(pos)?.let {
+                update(it)
+            }
+        }
     }
 
     /**
@@ -1263,6 +1290,7 @@ class HomeViewModel(
         if (pos < 0 || pos >= resultModels.size) {
             return
         }
+        val resultIndex = resultMapIDIndexs[pos]
         when (state) {
             CuvetteState.Test1 -> {
                 if (SystemGlobal.isCodeDebug) {
@@ -1272,10 +1300,11 @@ class HomeViewModel(
                     resultOriginalTest1.add(value)
                     resultTest1.add(calcAbsorbance(value.toBigDecimal()))
                 }
-                resultModels[pos]?.result?.testValue1 = resultTest1[pos]
-                resultModels[pos]?.result?.testOriginalValue1 = resultOriginalTest1[pos]
+                resultModels[resultIndex]?.result?.testValue1 = resultTest1[pos]
+                resultModels[resultIndex]?.result?.testOriginalValue1 = resultOriginalTest1[pos]
 
-                mCuvetteStates[cuvetteShelfPos]?.get(pos)?.testResult = resultModels[pos]?.result
+                mCuvetteStates[cuvetteShelfPos]?.get(pos)?.testResult =
+                    resultModels[resultIndex]?.result
                 _cuvetteStates.value = mCuvetteStates
             }
 
@@ -1287,8 +1316,8 @@ class HomeViewModel(
                     resultOriginalTest2.add(value)
                     resultTest2.add(calcAbsorbance(value.toBigDecimal()))
                 }
-                resultModels[pos]?.result?.testValue2 = resultTest2[pos]
-                resultModels[pos]?.result?.testOriginalValue2 = resultOriginalTest2[pos]
+                resultModels[resultIndex]?.result?.testValue2 = resultTest2[pos]
+                resultModels[resultIndex]?.result?.testOriginalValue2 = resultOriginalTest2[pos]
             }
 
             CuvetteState.Test3 -> {
@@ -1299,8 +1328,8 @@ class HomeViewModel(
                     resultOriginalTest3.add(value)
                     resultTest3.add(calcAbsorbance(value.toBigDecimal()))
                 }
-                resultModels[pos]?.result?.testValue3 = resultTest3[pos]
-                resultModels[pos]?.result?.testOriginalValue3 = resultOriginalTest3[pos]
+                resultModels[resultIndex]?.result?.testValue3 = resultTest3[pos]
+                resultModels[resultIndex]?.result?.testOriginalValue3 = resultOriginalTest3[pos]
             }
 
             CuvetteState.Test4 -> {
@@ -1311,9 +1340,10 @@ class HomeViewModel(
                     resultOriginalTest4.add(value)
                     resultTest4.add(calcAbsorbance(value.toBigDecimal()))
                 }
-                resultModels[pos]?.result?.testValue4 = resultTest4[pos]
-                resultModels[pos]?.result?.testOriginalValue4 = resultOriginalTest4[pos]
-                resultModels[pos]?.result?.testTime = Date().time
+                resultModels[resultIndex]?.result?.testValue4 = resultTest4[pos]
+                resultModels[resultIndex]?.result?.testOriginalValue4 = resultOriginalTest4[pos]
+                resultModels[resultIndex]?.result?.testTime = Date().time
+                resultModels[resultIndex]?.result?.resultState = ResultState.Test.ordinal
                 //计算单个结果浓度
                 val abs = calcAbsorbanceDifference(resultTest1[pos], resultTest2[pos])
                 absorbances.add(abs)
@@ -1321,16 +1351,16 @@ class HomeViewModel(
                     var con = calcCon(abs, project)
                     con = if (con.toDouble() < 0.0) 0 else con
                     cons.add(con)
-                    resultModels[pos]?.result?.absorbances = abs
-                    resultModels[pos]?.result?.concentration = con
+                    resultModels[resultIndex]?.result?.absorbances = abs
+                    resultModels[resultIndex]?.result?.concentration = con
 
 
-                    resultModels[pos]?.result?.testResult = calcShowTestResult(
-                        con, resultModels[pos]?.curve?.projectLjz ?: 100
+                    resultModels[resultIndex]?.result?.testResult = calcShowTestResult(
+                        con, resultModels[resultIndex]?.curve?.projectLjz ?: 100
                     )
                 }
                 //单个检测完毕
-                resultModels[pos]?.let {
+                resultModels[resultIndex]?.let {
                     singleTestResultFinish(it)
                 }
 
@@ -1339,7 +1369,7 @@ class HomeViewModel(
             else -> {}
         }
 
-        resultModels[pos]?.result?.let {
+        resultModels[resultIndex]?.result?.let {
             viewModelScope.launch {
                 //因为结果内的姓名性别等信息可能在数据管理内修改过了，所以这里没有
                 testResultRepository.getTestResultModelById(it.resultId).apply {
@@ -1422,6 +1452,7 @@ class HomeViewModel(
         absorbances.clear()
         cuvetteStartPos = 0
         resultModels.clear()
+        resultMapIDIndexs.clear()
     }
 
 
@@ -1715,6 +1746,7 @@ class HomeViewModel(
         updateStirTime()
         stirFinish = true
         updateCuvetteState(cuvettePos - 2, CuvetteState.Stir)
+        updateResultState(resultMapIDIndexs[cuvettePos - 2], ResultState.Stir)
         stirProbeCleaning()
     }
 
@@ -1954,10 +1986,14 @@ class HomeViewModel(
         samplingNum++
         if (reply.state == ReplyState.SAMPLING_FAILED) {//取样失败
             updateSampleState(samplePos - 1, SampleState.SamplingFailed)
+            updateResultState(samplePos - 1, ResultState.SamplingFailed)
             samplingProbeCleaning()
             nextStepDripReagent()
+
         } else {//取样成功
             updateSampleState(samplePos - 1, SampleState.Sampling)
+            resultMapIDIndexs.add(samplePos - 1)
+            updateResultState(samplePos - 1, ResultState.SamplingSuccess)
             goDripSample()
         }
         selectFocChange(

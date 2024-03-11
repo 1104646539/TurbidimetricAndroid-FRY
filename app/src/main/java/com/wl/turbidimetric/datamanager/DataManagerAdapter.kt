@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.ItemDatamanagerResultBinding
+import com.wl.turbidimetric.model.ResultState
 import com.wl.turbidimetric.model.TestResultAndCurveModel
 import com.wl.turbidimetric.model.TestResultModel
 import com.wl.wllib.LogToFile.i
@@ -59,7 +60,7 @@ class DataManagerAdapter :
                 item?.result?.absorbances?.toInt().toString()
 //            binding.tvAbsorbances.text =
 //                item?.result?.absorbances?.setScale(5, RoundingMode.HALF_UP).toString()
-            binding.tvResult.text = item?.result?.testResult ?: "-"
+//            binding.tvResult.text = item?.result?.testResult ?: "-"
             binding.tvConcentration.text = item?.result?.concentration?.toString() ?: "-"
             binding.tvTestTime.text =
                 if (item?.result?.testTime == 0L) "-" else item?.result?.testTime?.toTimeStr()
@@ -85,10 +86,24 @@ class DataManagerAdapter :
             binding.tvTestOriginalValue3.text = item?.result?.testOriginalValue3?.toString() ?: "-"
             binding.tvTestOriginalValue4.text = item?.result?.testOriginalValue4?.toString() ?: "-"
 
+            updateResult(binding, item)
 
             binding.root.setOnLongClickListener {
                 onLongClick?.invoke(item?.result?.resultId ?: 0)
                 true
+            }
+        }
+
+        private fun updateResult(
+            binding: ItemDatamanagerResultBinding,
+            item: TestResultAndCurveModel?
+        ) {
+
+            if (item?.result?.resultState == ResultState.SamplingFailed.ordinal || item?.result?.resultState == ResultState.TakeReagentFailed.ordinal) {//取样失败提示
+                val ori: Int = item?.result?.resultState ?: 0
+                binding.tvResult.text = ResultState.values()[ori].state
+            } else {
+                binding.tvResult.text = item?.result?.testResult ?: "-"
             }
         }
     }

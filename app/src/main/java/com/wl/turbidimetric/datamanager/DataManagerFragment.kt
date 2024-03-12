@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.base.BaseFragment
 import com.wl.turbidimetric.databinding.FragmentDataManagerBinding
+import com.wl.turbidimetric.ex.calcShowTestResult
 import com.wl.turbidimetric.ex.toast
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.ConditionModel
@@ -200,6 +201,13 @@ class DataManagerFragment :
                         resultDialog.showPop(requireContext(), isCancelable = false) {
                             it.showDialog(state.model, SystemGlobal.isDebugMode) { result ->
                                 lifecycleScope.launch {
+                                    if (SystemGlobal.isDebugMode) {
+                                        val newResult = calcShowTestResult(
+                                            result.result.concentration,
+                                            result.curve?.projectLjz ?: 0
+                                        )
+                                        result.result.testResult = newResult
+                                    }
                                     val ret = vm.update(result)
                                     toast("更新${if (ret > 0) "成功" else "失败"}")
                                 }
@@ -207,7 +215,8 @@ class DataManagerFragment :
                             }
                         }
                     }
-                    is DataManagerUiState.DeleteDialog->{
+
+                    is DataManagerUiState.DeleteDialog -> {
                         deleteDialog.showPop(requireContext(), isCancelable = false) {
                             it.showDialog("确定要删除数据吗?", "确定", {
                                 val results = getSelectData()
@@ -270,7 +279,10 @@ class DataManagerFragment :
                 } else {
                     lifecycleScope.launch(Dispatchers.Main) {
 //                        dialog.dismiss()
-                        dialog.showDialog("上传未连接" ,confirmText = "确定", confirmClick = {dialog -> dialog.dismiss() })
+                        dialog.showDialog(
+                            "上传未连接",
+                            confirmText = "确定",
+                            confirmClick = { dialog -> dialog.dismiss() })
                     }
                     i("上传未连接")
                 }

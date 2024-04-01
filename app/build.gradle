@@ -7,24 +7,23 @@ plugins {
 }
 
 android {
-    signingConfigs {
-        debug {
-            storeFile file('E:\\platform.keystore')
-            storePassword '123456'
-            keyAlias 'platform'
-            keyPassword '123456'
-        }
-        release {
-//            manifestPlaceholders = [
-//                    APP_NAME: "@string/app_name",
-//            ]
-            storeFile file('E:\\platform.keystore')
-            storePassword '123456'
-            keyAlias 'platform'
-            keyPassword '123456'
-        }
-
-    }
+//    signingConfigs {
+//        debug {
+//            storeFile file('E:\\platform.keystore')
+//            storePassword '123456'
+//            keyAlias 'platform'
+//            keyPassword '123456'
+//        }
+//        release {
+////            manifestPlaceholders = [
+////                    APP_NAME: "@string/app_name",
+////            ]
+//            storeFile file('E:\\platform.keystore')
+//            storePassword '123456'
+//            keyAlias 'platform'
+//            keyPassword '123456'
+//        }
+//    }
     compileSdk 33
 
     defaultConfig {
@@ -32,7 +31,7 @@ android {
         minSdk 24
         targetSdk 26
         versionCode 1
-        versionName "1.0.0.0增加多项目拟合"
+        versionName "1.0.0.0-1增加无限检测模式"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 

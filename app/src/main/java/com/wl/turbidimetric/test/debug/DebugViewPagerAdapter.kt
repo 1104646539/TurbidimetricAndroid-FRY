@@ -3,6 +3,7 @@ package com.wl.turbidimetric.test.debug
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.wl.turbidimetric.test.debug.debugSettings.DebugSettingsFragment
 import com.wl.turbidimetric.test.debug.integration.TestChartFragment
 import com.wl.turbidimetric.test.debug.scanbarcode.ScanBarcodeFragment
 import com.wl.turbidimetric.test.debug.scanbarcode.ScanBarcodeViewModel
@@ -11,7 +12,7 @@ import com.wl.turbidimetric.test.debug.singlecmd.SingleCmdFragment
 class DebugViewPagerAdapter(fragmentActivity: FragmentActivity) :
     FragmentStateAdapter(fragmentActivity) {
     override fun getItemCount(): Int {
-        return 3
+        return 4
     }
 
     override fun createFragment(position: Int): Fragment {
@@ -24,6 +25,9 @@ class DebugViewPagerAdapter(fragmentActivity: FragmentActivity) :
             }
             2 -> {
                 ScanBarcodeFragment.newInstance()
+            }
+            3 -> {
+                DebugSettingsFragment.newInstance()
             }
             else -> {
                 TestChartFragment.newInstance()

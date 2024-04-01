@@ -50,6 +50,11 @@ class AppViewModel : BaseViewModel() {
     val nowTimeStr = _nowTimeStr.asSharedFlow()
 
     /**
+     * 无限检测
+     */
+    var looperTest = LocalData.LooperTest
+
+    /**
      * 检测类型
      */
     var testType = TestType.None

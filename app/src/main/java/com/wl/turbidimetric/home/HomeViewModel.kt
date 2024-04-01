@@ -506,6 +506,19 @@ class HomeViewModel(
      * 测试用的 end
      */
     fun clickStart() {
+        if (!appViewModel.looperTest && !clickVerify()) {
+            return
+        }
+        viewModelScope.launch(Dispatchers.Main) {
+            appViewModel.testType = TestType.Test
+            clickStart = true
+            initState()
+            getState()
+        }
+
+    }
+
+    private fun clickVerify(): Boolean {
         val errorMsg = if (appViewModel.testState.isRunning()) {
             "正在检测，请勿操作！"
         } else if (appViewModel.testState.isRunningError()) {
@@ -523,17 +536,14 @@ class HomeViewModel(
             viewModelScope.launch {
                 _dialogUiState.emit(HomeDialogUiState.Notify(errorMsg))
             }
-            return
+            return false
         }
         //需要重新自检
         if (appViewModel.testState.isNotPrepare()) {
             goGetMachineState()
-            return
+            return false
         }
-        appViewModel.testType = TestType.Test
-        clickStart = true
-        initState()
-        getState()
+        return true
     }
 
 
@@ -628,7 +638,7 @@ class HomeViewModel(
         if (appViewModel.testState.isNotPrepare()) return
         c("接收到 取试剂 reply=$reply cuvettePos=$cuvettePos")
         takeReagentFinish = true
-        if (reply.state == ReplyState.TAKE_REAGENT_FAILED) {//取试剂失败
+        if (reply.state == ReplyState.TAKE_REAGENT_FAILED && !appViewModel.looperTest) {//取试剂失败
             allowTakeReagent = false
             dripReagentFinish = true
             updateCuvetteState(cuvettePos, CuvetteState.TakeReagentFailed)
@@ -1468,25 +1478,27 @@ class HomeViewModel(
     private fun checkTestState(
         accord: () -> Unit, discrepancy: (String) -> Unit
     ) {
-        if (!r1Reagent) {
-            i("没有R1试剂")
-            discrepancy.invoke("R1试剂不足，请添加")
-            return
-        }
-        if (!r2Reagent) {
-            i("没有R2试剂")
-            discrepancy.invoke("R2试剂不足，请添加")
-            return
-        }
-        if (r2Volume == 0) {
-            i("没有R2试剂")
-            discrepancy.invoke("R2试剂不足，请添加")
-            return
-        }
-        if (!cleanoutFluid) {
-            i("没有清洗液")
-            discrepancy.invoke("清洗液不足，请添加")
-            return
+        if (!appViewModel.looperTest) {
+            if (!r1Reagent) {
+                i("没有R1试剂")
+                discrepancy.invoke("R1试剂不足，请添加")
+                return
+            }
+            if (!r2Reagent) {
+                i("没有R2试剂")
+                discrepancy.invoke("R2试剂不足，请添加")
+                return
+            }
+            if (r2Volume == 0) {
+                i("没有R2试剂")
+                discrepancy.invoke("R2试剂不足，请添加")
+                return
+            }
+            if (!cleanoutFluid) {
+                i("没有清洗液")
+                discrepancy.invoke("清洗液不足，请添加")
+                return
+            }
         }
         accord()
     }
@@ -1813,7 +1825,7 @@ class HomeViewModel(
 //            val result = createResultModel(
 //                scanResults[samplePos - 1], mSamplesStates[sampleShelfPos]?.get(samplePos - 1)
 //            )
-            if (reply.state == ReplyState.CUVETTE_NOT_EMPTY) {//比色皿非空，不加样了
+            if (reply.state == ReplyState.CUVETTE_NOT_EMPTY && !appViewModel.looperTest) {//比色皿非空，不加样了
                 allowDripSample = false
                 updateCuvetteState(
                     cuvettePos,
@@ -1984,7 +1996,7 @@ class HomeViewModel(
         c("接收到 取样 reply=$reply cuvettePos=$cuvettePos samplePos=$samplePos cuvetteShelfPos=$cuvetteShelfPos sampleShelfPos=$sampleShelfPos")
         samplingFinish = true
         samplingNum++
-        if (reply.state == ReplyState.SAMPLING_FAILED) {//取样失败
+        if (reply.state == ReplyState.SAMPLING_FAILED && !appViewModel.looperTest) {//取样失败
             updateSampleState(samplePos - 1, SampleState.SamplingFailed)
             updateResultState(samplePos - 1, ResultState.SamplingFailed)
             samplingProbeCleaning()
@@ -2134,8 +2146,12 @@ class HomeViewModel(
         if (appViewModel.testState == TestState.TestFinish && appViewModel.testType.isTest()) {
             cuvetteShelfMoveFinish = true
             if (isTestFinish()) {
-                showFinishDialog()
-                openAllDoor()
+                if (appViewModel.looperTest) {
+                    clickStart()
+                } else {
+                    showFinishDialog()
+                    openAllDoor()
+                }
             }
         }
         if (!runningTest()) return
@@ -2244,8 +2260,12 @@ class HomeViewModel(
         if (appViewModel.testState == TestState.TestFinish && appViewModel.testType.isTest()) {
             sampleShelfMoveFinish = true
             if (isTestFinish()) {
-                showFinishDialog()
-                openAllDoor()
+                if (appViewModel.looperTest) {
+                    clickStart()
+                } else {
+                    showFinishDialog()
+                    openAllDoor()
+                }
             }
         }
         if (!runningTest()) return

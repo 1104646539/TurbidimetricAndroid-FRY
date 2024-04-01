@@ -87,6 +87,11 @@ object LocalData {
      */
     var Test4DelayTime by LongDataStoreProperty(LocalDataGlobal.Default.test4DelayTime)
 
+    /**
+     * 循环测试
+     */
+    var LooperTest by BooleanDataStoreProperty(LocalDataGlobal.Default.looperTest)
+//    var LooperTest = true
 
     /**
      * 编号自增并保存

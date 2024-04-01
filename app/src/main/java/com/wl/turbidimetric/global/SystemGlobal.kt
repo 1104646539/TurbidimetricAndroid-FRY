@@ -28,7 +28,7 @@ object SystemGlobal {
     /**
      * 是否是在只使用安卓板时调试用的
      */
-    var isCodeDebug = true
+    var isCodeDebug = false
 
     /**
      * 是否是调试模式

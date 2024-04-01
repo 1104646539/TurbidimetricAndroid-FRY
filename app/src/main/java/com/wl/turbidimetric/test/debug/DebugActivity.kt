@@ -33,6 +33,7 @@ class DebugActivity : BaseActivity<DebugViewModel, ActivityDebugBinding>() {
         vd.tl.addTab(vd.tl.newTab().setText("单步调试"))
         vd.tl.addTab(vd.tl.newTab().setText("检测分析调试"))
         vd.tl.addTab(vd.tl.newTab().setText("扫码调试"))
+        vd.tl.addTab(vd.tl.newTab().setText("调试参数设置"))
 
         vd.tl.addOnTabSelectedListener(object : OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {

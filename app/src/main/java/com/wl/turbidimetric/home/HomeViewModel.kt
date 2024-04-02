@@ -73,9 +73,14 @@ class HomeViewModel(
     }
 
     /**
-     * 检测结果
+     * 检测结果 这排每个比色皿对应的
      */
     val resultModels = arrayListOf<TestResultAndCurveModel?>()
+
+    /**
+     * 检测结果 这排每个样本位对应的
+     */
+    val resultModelsForSample = arrayListOf<TestResultAndCurveModel?>()
 
     /**
      * 四次检测的吸光度值
@@ -443,10 +448,6 @@ class HomeViewModel(
      */
     var allowDripSample = true
 
-    /**
-     * 里面保存着每个反应杯对应的结果下标。如果没有取样失败的，那和反应杯的下标一致，否则将不一样
-     */
-    val resultMapIDIndexs = mutableListOf<Int>()
 
     /**
      * 测试用的 start
@@ -593,7 +594,8 @@ class HomeViewModel(
         resultOriginalTest3.clear()
         resultOriginalTest4.clear()
         cons.clear()
-        resultMapIDIndexs.clear()
+        resultModels.clear()
+        resultModelsForSample.clear()
     }
 
     /**
@@ -636,13 +638,16 @@ class HomeViewModel(
         r2Volume = reply.data.r2Volume
         if (!runningTest()) return
         if (appViewModel.testState.isNotPrepare()) return
-        c("接收到 取试剂 reply=$reply cuvettePos=$cuvettePos")
+        c("接收到 取试剂 reply=$reply cuvettePos=$cuvettePos ")
         takeReagentFinish = true
         if (reply.state == ReplyState.TAKE_REAGENT_FAILED && !appViewModel.looperTest) {//取试剂失败
             allowTakeReagent = false
             dripReagentFinish = true
             updateCuvetteState(cuvettePos, CuvetteState.TakeReagentFailed)
-            updateResultState(resultMapIDIndexs[cuvettePos], ResultState.TakeReagentFailed)
+            updateResultState(
+                cuvettePos,
+                ResultState.TakeReagentFailed
+            )
             if (cuvetteMoveFinish) {//已经移动到位了，取试剂失败后不应该再取，只检测已经加完试剂的样本
                 val takeReagentCuvetteNum = getTakeReagentCuvetteNum()
                 if (takeReagentCuvetteNum == 0) {//第一个就失败，直接结束检测
@@ -652,7 +657,10 @@ class HomeViewModel(
                 }
             }
         } else {//取试剂成功,去加试剂
-            updateResultState(resultMapIDIndexs[cuvettePos], ResultState.TakeReagentSuccess)
+            updateResultState(
+                cuvettePos,
+                ResultState.TakeReagentSuccess
+            )
             goDripReagent()
         }
     }
@@ -896,6 +904,7 @@ class HomeViewModel(
 //                i("没有样本,移动到下一个位置")
                 scanFinish = true
                 scanResults.add(null)
+                resultModelsForSample.add(null)
                 i("scanResults=$scanResults")
                 updateSampleState(samplePos, SampleState.NONEXISTENT)
                 nextStepDripReagent()
@@ -939,19 +948,37 @@ class HomeViewModel(
     }
 
     /**
-     * 更新结果状态
+     * 更新结果状态 在加样和加样之后的步骤中，需要更新的是每个比色皿对应的检测结果，也是最终的检测结果
      * @param pos Int
      * @param resultState ResultState
      */
     private fun updateResultState(pos: Int, resultState: ResultState) {
         i("updateResultState pos=$pos resultState=$resultState")
-        i("resultModels=$resultModels")
-        pos?.let {
+        i("resultModels=${resultModels.size} ")
 
-        }
         viewModelScope.launch {
+            if(pos==8){
+                i("resultModels=${resultModels.size}")
+            }
             resultModels?.get(pos)?.result?.resultState = resultState.ordinal
             resultModels?.get(pos)?.let {
+                update(it)
+            }
+        }
+    }
+
+    /**
+     * 更新结果状态  在加样之前的步骤中，需要更新的是每个样本对应的检测结果，是暂时的检测结果（会在加样时复制到最终的检测结果内）
+     * @param pos Int
+     * @param resultState ResultState
+     */
+    private fun updateResultStateForSample(pos: Int, resultState: ResultState) {
+        i("updateResultState pos=$pos resultState=$resultState")
+        i("resultModels=${resultModelsForSample.size}")
+
+        viewModelScope.launch {
+            resultModelsForSample?.get(pos)?.result?.resultState = resultState.ordinal
+            resultModelsForSample?.get(pos)?.let {
                 update(it)
             }
         }
@@ -1149,11 +1176,11 @@ class HomeViewModel(
             result.result.sampleBarcode = patient.bc
             update(result)
 
-            resultModels.indexOfFirst { it?.result?.resultId == resultId }.let { index ->
-                if (index in resultModels.indices) {
-                    resultModels[index] = result
+            resultModelsForSample.indexOfFirst { it?.result?.resultId == resultId }.let { index ->
+                if (index in resultModelsForSample.indices) {
+                    resultModelsForSample[index] = result
                 } else {
-                    i("index越界$index size=${resultModels.size}")
+                    i("index越界$index size=${resultModelsForSample.size}")
                 }
             }
         }
@@ -1176,6 +1203,7 @@ class HomeViewModel(
         }
         nextStepDripReagent()
         scanResults.add(null)
+        resultModelsForSample.add(null)
         i("scanResults=$scanResults")
     }
 
@@ -1194,8 +1222,8 @@ class HomeViewModel(
         )
         val id = testResultRepository.addTestResult(resultModel)
         resultModel.resultId = id
-        resultModels.add(TestResultAndCurveModel(resultModel, selectProject))
-        i("createResultModel add ${resultModels.size}")
+        resultModelsForSample.add(TestResultAndCurveModel(resultModel, selectProject))
+        i("createResultModel add ${resultModelsForSample.size}")
         return resultModel
     }
 
@@ -1300,7 +1328,7 @@ class HomeViewModel(
         if (pos < 0 || pos >= resultModels.size) {
             return
         }
-        val resultIndex = resultMapIDIndexs[pos]
+        val resultIndex = pos
         when (state) {
             CuvetteState.Test1 -> {
                 if (SystemGlobal.isCodeDebug) {
@@ -1462,7 +1490,6 @@ class HomeViewModel(
         absorbances.clear()
         cuvetteStartPos = 0
         resultModels.clear()
-        resultMapIDIndexs.clear()
     }
 
 
@@ -1758,7 +1785,7 @@ class HomeViewModel(
         updateStirTime()
         stirFinish = true
         updateCuvetteState(cuvettePos - 2, CuvetteState.Stir)
-        updateResultState(resultMapIDIndexs[cuvettePos - 2], ResultState.Stir)
+        updateResultState(cuvettePos - 2, ResultState.Stir)
         stirProbeCleaning()
     }
 
@@ -1838,12 +1865,26 @@ class HomeViewModel(
                     cuvettePos, CuvetteState.DripSample, null, "${sampleShelfPos + 1}- $samplePos"
                 )
             }
+            changeSampleResultToCuvette(samplePos - 1)
             updateSampleState(
                 samplePos - 1, null, null, null, "${cuvetteShelfPos + 1}- ${cuvettePos + 1}"
             )
             samplingProbeCleaning()
 
             nextStepDripReagent()
+        }
+    }
+
+    /**
+     * 在加样结束后，将样本对应的结果（可能有个人信息和该样本的状态）同时到比色皿对应的结果
+     * @param samplePos Int
+     * @param cuvettePos Int
+     */
+    private fun changeSampleResultToCuvette(samplePos: Int) {
+        i("changeSampleResultToCuvette samplePos=$samplePos")
+        resultModelsForSample?.get(samplePos)?.let {
+            sampleR->
+            resultModels.add(sampleR)
         }
     }
 
@@ -1998,14 +2039,13 @@ class HomeViewModel(
         samplingNum++
         if (reply.state == ReplyState.SAMPLING_FAILED && !appViewModel.looperTest) {//取样失败
             updateSampleState(samplePos - 1, SampleState.SamplingFailed)
-            updateResultState(samplePos - 1, ResultState.SamplingFailed)
+            updateResultStateForSample(samplePos - 1, ResultState.SamplingFailed)
             samplingProbeCleaning()
             nextStepDripReagent()
 
         } else {//取样成功
             updateSampleState(samplePos - 1, SampleState.Sampling)
-            resultMapIDIndexs.add(samplePos - 1)
-            updateResultState(samplePos - 1, ResultState.SamplingSuccess)
+            updateResultStateForSample(samplePos - 1, ResultState.SamplingSuccess)
             goDripSample()
         }
         selectFocChange(
@@ -2270,7 +2310,7 @@ class HomeViewModel(
         }
         if (!runningTest()) return
         if (appViewModel.testState.isNotPrepare()) return
-
+        resultModelsForSample.clear()
         sampleShelfMoveFinish = true
 
         if (appViewModel.testState != TestState.TestFinish) {

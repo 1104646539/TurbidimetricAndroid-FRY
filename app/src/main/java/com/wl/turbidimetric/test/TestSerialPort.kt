@@ -41,7 +41,16 @@ object TestSerialPort {
             }
 
             SerialGlobal.CMD_MoveSample -> {
-                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x2u))//0不存在 1样本管 2比色杯
+//                if (index in 0..1 || index in 6..9) {
+                    reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x2u))//0不存在 1样本管 2比色杯
+//                } else {
+//                    reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x0u))//0不存在 1样本管 2比色杯
+//                }
+//
+//                index++
+//                if (index == 10) {
+//                    index = 0
+//                }
             }
 
             SerialGlobal.CMD_MoveCuvetteShelf -> {
@@ -62,6 +71,7 @@ object TestSerialPort {
 //                delay(4000)//测试实时获取信息时需要
                 reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x00u, 0x0u))
             }
+
             SerialGlobal.CMD_Squeezing -> {
                 delay(200)//测试实时获取信息时需要
                 reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x00u, 0x0u))
@@ -101,13 +111,13 @@ object TestSerialPort {
             }
 
             SerialGlobal.CMD_Sampling -> {
-//                if (index == 2) {
-//                    reply = ubyteArrayOf(data[0], 0x04u, 0x0u, 0x0u, 0x0u, 0x0u)//取样失败
-//                } else {
-//                    reply = ubyteArrayOf(data[0], 0x00u, 0x0u, 0x0u, 0x0u, 0x0u)//取样成功
-//                }
-//                index++
-                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x0u))//取样成功
+                if (index == 2) {
+                    reply = ubyteArrayOf(data[0], 0x04u, 0x0u, 0x0u, 0x0u, 0x0u)//取样失败
+                } else {
+                    reply = ubyteArrayOf(data[0], 0x00u, 0x0u, 0x0u, 0x0u, 0x0u)//取样成功
+                }
+                index++
+//                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x0u))//取样成功
 //                reply = ubyteArrayOf(data[0], 0x04u, 0x0u, 0x0u, 0x0u, 0x0u)//取样失败
             }
 

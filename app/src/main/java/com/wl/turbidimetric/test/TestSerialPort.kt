@@ -41,7 +41,6 @@ object TestSerialPort {
             }
 
             SerialGlobal.CMD_MoveSample -> {
-                delay(700)
 //                if (index in 0..1 || index in 6..9) {
                     reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x2u))//0不存在 1样本管 2比色杯
 //                } else {

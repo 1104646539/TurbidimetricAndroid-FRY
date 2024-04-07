@@ -1,6 +1,5 @@
 package com.wl.turbidimetric.home
 
-import android.util.Log
 import androidx.lifecycle.*
 import com.wl.turbidimetric.app.App
 import com.wl.turbidimetric.app.AppViewModel
@@ -290,11 +289,6 @@ class HomeViewModel(
      */
     private var scanFinish = false
 
-    /**扫码是否成功
-     *
-     */
-    private var scanSuccess = false
-
     /**刺破是否完成
      *
      */
@@ -483,7 +477,7 @@ class HomeViewModel(
         intArrayOf(56000, 56000, 56000, 56000, 56000, 56000, 56000, 56000, 56000, 56000)
 
     //测试用，扫码是否成功
-    val tempSampleState = intArrayOf(1, 0, 1, 1, 0, 1, 1, 1, 1, 1)
+    val tempSampleState = intArrayOf(1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
 //  val tempSampleState = intArrayOf(1, 0, 1, 0, 1, 0, 0, 0, 0, 1)
 
     //测试用，样本是否存在
@@ -897,8 +891,7 @@ class HomeViewModel(
         sampleMoveFinish = true
         samplingFinish = false
         dripSampleFinish = false
-//        scanFinish = false
-//        scanSuccess = false
+        scanFinish = false
         sampleType = reply.data.type
         var isNonexistent = reply.data.type.isNonexistent()
         var isCuvette = reply.data.type.isCuvette()
@@ -914,14 +907,12 @@ class HomeViewModel(
                 resultModelsForSample.add(null)
                 i("scanResults=$scanResults")
                 updateSampleState(samplePos, SampleState.NONEXISTENT)
-                stopScan()
-                scanFinishAndMoveSampleFinish()
-//                nextStepDripReagent()
+                nextStepDripReagent()
             } else {
                 //有样本
                 i("有样本")
-                updateSampleState(samplePos, null, sampleType)
-                scanFinishAndMoveSampleFinish()
+                updateSampleState(samplePos, SampleState.Exist)
+                startScan(samplePos)
             }
         }
         //判断是否需要取样。取样位和扫码位差一个位置
@@ -966,7 +957,9 @@ class HomeViewModel(
         i("resultModels=${resultModels.size} ")
 
         viewModelScope.launch {
-
+            if(pos==8){
+                i("resultModels=${resultModels.size}")
+            }
             resultModels?.get(pos)?.result?.resultState = resultState.ordinal
             resultModels?.get(pos)?.let {
                 update(it)
@@ -1043,20 +1036,12 @@ class HomeViewModel(
         i("updateCuvetteState2 ShelfPos=$cuvetteShelfPos cuvettePos=$cuvettePos cuvetteStates=${mCuvetteStates.print()}")
     }
 
-    private fun stopScan() {
-        i("停止扫码 samplePos=$samplePos")
-        viewModelScope.launch {
-            ScanCodeUtil.stopScan(false)
-        }
-    }
 
     /**
      * 开始扫码
      */
     private fun startScan(samplePos: Int) {
-        i("开始扫码 samplePos=$samplePos")
         scanFinish = false
-        scanSuccess = false
         piercedFinish = false
 
 
@@ -1067,7 +1052,6 @@ class HomeViewModel(
          */
         if (!SystemGlobal.isCodeDebug && (isAuto() && localDataRepository.getScanCode() && sampleType?.isSample() == true)) {
             viewModelScope.launch {
-                delay(400)
                 ScanCodeUtil.startScan()
             }
         } else {
@@ -1078,11 +1062,7 @@ class HomeViewModel(
              * 3、是手动模式时
              * 4、是比色杯时
              */
-            if ((SystemGlobal.isCodeDebug && tempSampleState[samplePos] == 1)
-                || (!SystemGlobal.isCodeDebug &&
-                        ((isAuto() && !localDataRepository.getScanCode()) ||
-                                isManual() || sampleType?.isCuvette() == true))
-            ) {
+            if ((SystemGlobal.isCodeDebug && tempSampleState[samplePos] == 1) || (isAuto() && !localDataRepository.getScanCode()) || (!isManual()) || sampleType?.isCuvette() == true) {
                 scanSuccess("")
             } else {
                 scanFailed()
@@ -1098,28 +1078,9 @@ class HomeViewModel(
             i("扫码成功 barcode=$barcode")
             insertResult(barcode, samplePos, sampleShelfPos, sampleType)
             scanFinish = true
-            scanSuccess = true
+            pierced()
             scanResults.add(barcode)
-            scanFinishAndMoveSampleFinish()
             i("scanResults=$scanResults")
-        }
-    }
-
-    private fun scanFinishAndMoveSampleFinish() {
-        //扫码和移动样本都完成了
-        if (scanFinish && sampleMoveFinish) {
-            //扫码成功
-            if (scanSuccess) {
-                pierced()
-            } else {//扫码失败
-                //当不需要取样时，直接下一步
-                if (!sampleNeedSampling(samplePos - 1)) {
-                    samplingFinish = true
-                    dripSampleFinish = true
-                    i("不需要取样 下一步")
-                }
-                nextStepDripReagent()
-            }
         }
     }
 
@@ -1233,11 +1194,16 @@ class HomeViewModel(
         i("扫码失败")
         updateSampleState(samplePos, SampleState.ScanFailed, sampleType = sampleType)
         scanFinish = true
-        scanSuccess = false
         piercedFinish = true
+        //当不需要取样时，直接下一步
+        if (!sampleNeedSampling(samplePos - 1)) {
+            samplingFinish = true
+            dripSampleFinish = true
+            i("不需要取样 下一步")
+        }
+        nextStepDripReagent()
         scanResults.add(null)
         resultModelsForSample.add(null)
-        scanFinishAndMoveSampleFinish()
         i("scanResults=$scanResults")
     }
 
@@ -1632,7 +1598,6 @@ class HomeViewModel(
                 //还有比色皿。继续移动比色皿，检测
                 checkTestState(accord = {
                     moveSample()
-                    startScan(samplePos)
                     moveCuvetteShelfNext()
                 }, discrepancy = { str ->
                     continueTestGetState = true
@@ -1917,7 +1882,8 @@ class HomeViewModel(
      */
     private fun changeSampleResultToCuvette(samplePos: Int) {
         i("changeSampleResultToCuvette samplePos=$samplePos")
-        resultModelsForSample?.get(samplePos)?.let { sampleR ->
+        resultModelsForSample?.get(samplePos)?.let {
+            sampleR->
             resultModels.add(sampleR)
         }
     }
@@ -2352,7 +2318,6 @@ class HomeViewModel(
             scanResults.clear()
 //            samplesStates = initSampleStates()
             moveSample()
-            startScan(samplePos)
         }
     }
 
@@ -2384,9 +2349,6 @@ class HomeViewModel(
         if (samplePos < sampleMax) {
             //如果不是最后一个
             moveSample()
-            if (samplePos < sampleMax) {
-                startScan(samplePos)
-            }
         } else {
             //如果还没全部取完样就该换下一排样本去取样了
             moveSampleShelfNext()
@@ -2642,7 +2604,7 @@ class HomeViewModel(
         }
         mSamplesStates = arrays
         _samplesStates.value = mSamplesStates
-        i("getInitSampleShelfPos sampleShelfPos=$sampleShelfPos lastSampleShelfPos=$lastSampleShelfPos mSamplesStates=${mSamplesStates.print()}")
+        i("getInitSampleShelfPos sampleShelfPos=$sampleShelfPos lastSampleShelfPos=$lastSampleShelfPos")
     }
 
     /**

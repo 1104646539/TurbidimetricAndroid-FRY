@@ -6,14 +6,12 @@ import com.wl.wllib.toLongTimeStr
 import kotlinx.coroutines.*
 import java.util.*
 import com.wl.wllib.LogToFile.i
-
 /**
  * 扫描条形码类
  * 劳易测 CR100
  */
 object ScanCodeUtil {
     private val serialPort: BaseSerialPort = BaseSerialPort()
-
     /**
      * 开始扫码的命令
      */
@@ -48,11 +46,9 @@ object ScanCodeUtil {
      * 停止扫码的任务
      */
     private var canScanJob: Job? = null
-
     init {
         open()
     }
-
     /**
      * 扫码返回的内容是
      * 0x02,内容..., 0x0D, 0x0A
@@ -106,17 +102,14 @@ object ScanCodeUtil {
 
     /**
      * 结束扫码
-     * @param isCallback Boolean 是否调用回调，true表示要，false不需要
      */
-    suspend fun stopScan(isCallback: Boolean = false) {
+    private suspend fun stopScan() {
         i("结束扫码:${Date().toLongTimeStr()}")
         serialPort.write(stopScan)
         withContext(Dispatchers.Main) {
             if (isScan) {
                 isScan = false
-                if (isCallback) {
-                    onScanResult?.scanFailed()
-                }
+                onScanResult?.scanFailed()
             }
         }
     }

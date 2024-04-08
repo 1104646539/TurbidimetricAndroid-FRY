@@ -988,6 +988,7 @@ interface Callback2 {
     fun readDataTempModel(reply: ReplyModel<TempModel>)
     fun stateSuccess(cmd: Int, state: Int): Boolean
     fun readDataSqueezing(reply: ReplyModel<SqueezingModel>)
+    fun readDataMotor(reply: ReplyModel<MotorModel>)
 }
 
 fun interface McuUpdateCallBack {

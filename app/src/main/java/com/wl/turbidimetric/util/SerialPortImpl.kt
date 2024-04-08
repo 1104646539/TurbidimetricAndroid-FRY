@@ -336,6 +336,12 @@ class SerialPortImpl(private val isCodeDebug:Boolean) :SerialPortIF{
                 mMcuUpdateCallBack?.readDataMcuUpdate(transitionMcuUpdateModel(ready))
 
             }
+            SerialGlobal.CMD_Motor -> {
+                callback {
+                    it.readDataMotor(transitionMotorModel(ready))
+                }
+
+            }
 
             else -> {}
         }
@@ -972,6 +978,24 @@ class SerialPortImpl(private val isCodeDebug:Boolean) :SerialPortIF{
                 data2 = (fileSize shr 16).toUByte(),
                 data3 = (fileSize shr 8).toUByte(),
                 data4 = (fileSize ).toUByte(),
+            )
+        )
+    }
+
+    /**
+     * 控制电机
+     * @param motorNum Int
+     * @param direction Int
+     * @param params Int
+     */
+    override fun motor(motorNum: Int, direction: Int, params: Int) {
+        writeAsync(
+            createCmd(
+                SerialGlobal.CMD_Motor,
+                data1 = motorNum.toUByte(),
+                data2 = direction.toUByte(),
+                data3 = (params shr 8).toUByte(),
+                data4 = params.toUByte(),
             )
         )
     }

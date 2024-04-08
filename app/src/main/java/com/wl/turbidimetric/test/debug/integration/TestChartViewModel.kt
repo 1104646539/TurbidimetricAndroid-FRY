@@ -13,6 +13,7 @@ import com.wl.turbidimetric.model.DripSampleModel
 import com.wl.turbidimetric.model.GetMachineStateModel
 import com.wl.turbidimetric.model.GetStateModel
 import com.wl.turbidimetric.model.GetVersionModel
+import com.wl.turbidimetric.model.MotorModel
 import com.wl.turbidimetric.model.MoveCuvetteDripReagentModel
 import com.wl.turbidimetric.model.MoveCuvetteDripSampleModel
 import com.wl.turbidimetric.model.MoveCuvetteShelfModel
@@ -159,6 +160,10 @@ class TestChartViewModel(private val appViewModel: AppViewModel) : BaseViewModel
     }
 
     override fun readDataSqueezing(reply: ReplyModel<SqueezingModel>) {
+
+    }
+
+    override fun readDataMotor(reply: ReplyModel<MotorModel>) {
 
     }
 

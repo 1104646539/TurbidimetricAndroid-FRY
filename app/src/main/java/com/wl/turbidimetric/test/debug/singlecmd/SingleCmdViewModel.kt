@@ -12,6 +12,7 @@ import com.wl.turbidimetric.model.DripSampleModel
 import com.wl.turbidimetric.model.GetMachineStateModel
 import com.wl.turbidimetric.model.GetStateModel
 import com.wl.turbidimetric.model.GetVersionModel
+import com.wl.turbidimetric.model.MotorModel
 import com.wl.turbidimetric.model.MoveCuvetteDripReagentModel
 import com.wl.turbidimetric.model.MoveCuvetteDripSampleModel
 import com.wl.turbidimetric.model.MoveCuvetteShelfModel
@@ -177,6 +178,10 @@ class SingleCmdViewModel(private val appViewModel: AppViewModel) : BaseViewModel
     override fun readDataSqueezing(reply: ReplyModel<SqueezingModel>) {
         var msg = "挤压完成"
         changeResult(msg)
+    }
+
+    override fun readDataMotor(reply: ReplyModel<MotorModel>) {
+
     }
 
     /**

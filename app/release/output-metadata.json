@@ -11,8 +11,8 @@
       "type": "SINGLE",
       "filters": [],
       "versionCode": 1,
-      "versionName": "1.0.0.0-1增加无限检测模式",
-      "outputFile": "乳胶比浊1.0.0.0-1增加无限检测模式_2024-04-03_release.apk"
+      "versionName": "1.0.0.0-2修复自检完成后过快点击开始导致闪退的问题",
+      "outputFile": "乳胶比浊1.0.0.0-2修复自检完成后过快点击开始导致闪退的问题_2024-04-08_release.apk"
     }
   ]
 }

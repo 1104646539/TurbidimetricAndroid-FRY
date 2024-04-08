@@ -117,6 +117,10 @@ object SerialGlobal {
      * 升级mcu
      */
     const val CMD_McuUpdate:UByte = 0x18u
+    /**
+     * 控制电机
+     */
+    const val CMD_Motor:UByte = 0x19u
 
     /**
      * 响应

@@ -23,6 +23,7 @@ interface SerialPortIF {
     fun updateWrite(data: UByteArray)
 
     fun allowRunning()
+
     /**
      * 获取状态
      */
@@ -197,6 +198,12 @@ interface SerialPortIF {
      * 升级mcu
      */
     fun mcuUpdate(fileSize: Long)
+
+
+    /**
+     * 控制电机
+     */
+    fun motor(motorNum: Int, direction: Int, params: Int)
 
     /**
      * 创建一个完整的命令

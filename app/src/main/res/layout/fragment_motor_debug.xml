@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="vm"
+            type="com.wl.turbidimetric.test.debug.motorDebug.MotorDebugViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="20dp">
+
+        <TextView
+            android:id="@+id/tv_motor"
+            style="@style/TextTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="电机号"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Spinner
+            android:id="@+id/spn_motor"
+            android:layout_width="wrap_content"
+            android:minWidth="200dp"
+            android:textSize="30sp"
+            android:layout_height="wrap_content"
+            android:selectedItemPosition="@={vm.motorIndex}"
+            android:layout_marginLeft="30dp"
+            app:layout_constraintLeft_toRightOf="@id/tv_motor"
+            app:layout_constraintTop_toTopOf="@id/tv_motor" />
+
+        <TextView
+            android:id="@+id/tv_func"
+            style="@style/TextTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="电机功能"
+            app:layout_constraintLeft_toLeftOf="@id/tv_motor"
+            app:layout_constraintTop_toBottomOf="@id/tv_motor" />
+
+        <RadioGroup
+            android:id="@+id/rb_func"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="30dp"
+            android:checkedButton="@={vm.chekckID}"
+            android:orientation="horizontal"
+            app:layout_constraintLeft_toRightOf="@id/tv_func"
+            app:layout_constraintTop_toTopOf="@id/tv_func">
+
+            <RadioButton
+                android:id="@+id/cb_reset"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="100dp"
+                android:text="复位"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <RadioButton
+                android:id="@+id/cb_forward"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="100dp"
+                android:text="正向"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <RadioButton
+                android:id="@+id/cb_backward"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="100dp"
+                android:text="反向"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </RadioGroup>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_motor_params"
+            android:layout_width="400dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:hint="参数"
+            android:textSize="28sp"
+            app:layout_constraintLeft_toLeftOf="@id/tv_func"
+            app:layout_constraintTop_toBottomOf="@id/tv_func">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tiet_motor_params"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="numberSigned"
+                android:maxLength="4"
+                android:text="@={vm.params}"
+                android:textSize="26dp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="50dp"
+            android:minWidth="200dp"
+            android:text="执行"
+            android:onClick="@{()->vm.action()}"
+            android:enabled="@{vm.enable}"
+            android:textSize="30sp"
+            app:layout_constraintLeft_toRightOf="@id/til_motor_params"
+            app:layout_constraintTop_toTopOf="@id/til_motor_params" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

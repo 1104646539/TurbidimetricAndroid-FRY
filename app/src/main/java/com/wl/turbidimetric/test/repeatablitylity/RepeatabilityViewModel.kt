@@ -410,6 +410,10 @@ class RepeatabilityViewModel(
         i("接收到 挤压 reply=$reply")
     }
 
+    override fun readDataMotor(reply: ReplyModel<MotorModel>) {
+
+    }
+
     /**
      * 接收到获取状态
      * @param reply ReplyModel<GetStateModel>

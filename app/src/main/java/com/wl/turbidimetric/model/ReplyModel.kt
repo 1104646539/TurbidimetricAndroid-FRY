@@ -239,3 +239,8 @@ data class SqueezingModel(val v: Int = 0)
  * 升级mcu
  */
 data class McuUpdateModel(val ready: Boolean = false)
+
+/**
+ * 控制电机
+ */
+data class MotorModel(val resetState: Int = 0)

@@ -859,6 +859,10 @@ class HomeViewModel(
         }
     }
 
+    override fun readDataMotor(reply: ReplyModel<MotorModel>) {
+
+    }
+
     /**
      * 接收到 样本门状态
      * @param reply ReplyModel<SampleDoorModel>

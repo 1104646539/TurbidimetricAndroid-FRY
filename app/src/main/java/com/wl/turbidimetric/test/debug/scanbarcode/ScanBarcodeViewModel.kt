@@ -16,6 +16,7 @@ import com.wl.turbidimetric.model.GetMachineStateModel
 import com.wl.turbidimetric.model.GetStateModel
 import com.wl.turbidimetric.model.GetVersionModel
 import com.wl.turbidimetric.model.Item
+import com.wl.turbidimetric.model.MotorModel
 import com.wl.turbidimetric.model.MoveCuvetteDripReagentModel
 import com.wl.turbidimetric.model.MoveCuvetteDripSampleModel
 import com.wl.turbidimetric.model.MoveCuvetteShelfModel
@@ -318,6 +319,10 @@ class ScanBarcodeViewModel(private val appViewModel: AppViewModel) : BaseViewMod
     }
 
     override fun readDataSqueezing(reply: ReplyModel<SqueezingModel>) {
+
+    }
+
+    override fun readDataMotor(reply: ReplyModel<MotorModel>) {
 
     }
 

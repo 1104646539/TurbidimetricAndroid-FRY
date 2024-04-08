@@ -328,3 +328,15 @@ fun transitionMcuUpdateModel(data: UByteArray): ReplyModel<McuUpdateModel> {
         )
     )
 }
+/**
+ * 电机控制
+ * @param data UByteArray
+ * @return ReplyModel<SqueezingModel>
+ */
+fun transitionMotorModel(data: UByteArray): ReplyModel<MotorModel> {
+    return ReplyModel(
+        SerialGlobal.CMD_Motor, convertReplyState(data[1].toInt()), MotorModel(
+            data[3].toInt(),
+        )
+    )
+}

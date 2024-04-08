@@ -42,7 +42,7 @@ object TestSerialPort {
 
             SerialGlobal.CMD_MoveSample -> {
 //                if (index in 0..1 || index in 6..9) {
-                    reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x2u))//0不存在 1样本管 2比色杯
+                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x2u))//0不存在 1样本管 2比色杯
 //                } else {
 //                    reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x0u))//0不存在 1样本管 2比色杯
 //                }
@@ -135,6 +135,10 @@ object TestSerialPort {
 
             SerialGlobal.CMD_McuUpdate -> {
                 reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x1u))//是否准备好 1是 0否
+            }
+
+            SerialGlobal.CMD_Motor -> {
+                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, data[3]))//
             }
 
             else -> {

@@ -9,7 +9,7 @@ import com.wl.wllib.LogToFile.i
 
 class DebugSettingsFragment :
     BaseFragment<DebugSettingsViewModel, FragmentDebugSettingsBinding>(R.layout.fragment_debug_settings) {
-    override val vm: DebugSettingsViewModel by viewModels{DebugSettingsViewModelFactory()}
+    override val vm: DebugSettingsViewModel by viewModels{ DebugSettingsViewModelFactory() }
 
     override fun onResume() {
         super.onResume()

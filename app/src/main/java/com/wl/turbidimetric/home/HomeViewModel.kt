@@ -2403,7 +2403,7 @@ class HomeViewModel(
         if (appViewModel.testType.isDebug()) {
             return
         }
-        EventBus.getDefault().post(EventMsg<Any>(what = EventGlobal.WHAT_HIDE_SPLASH))
+
         errorInfo = reply.data.errorInfo
         appViewModel.testState = TestState.None
         if (errorInfo.isNullOrEmpty()) {
@@ -2411,9 +2411,10 @@ class HomeViewModel(
             //自检成功后获取一下r1,r2，清洗液状态
             getState()
         } else {
-            viewModelScope.launch {
-                _dialogUiState.emit(HomeDialogUiState.GetMachineDismiss)
-            }
+            EventBus.getDefault().post(EventMsg<Any>(what = EventGlobal.WHAT_HIDE_SPLASH))
+//            viewModelScope.launch {
+//                _dialogUiState.emit(HomeDialogUiState.GetMachineDismiss)
+//            }
             appViewModel.testState = TestState.NotGetMachineState
             val sb = StringBuffer()
             errorInfo?.let {
@@ -2451,10 +2452,11 @@ class HomeViewModel(
         cleanoutFluid = reply.data.cleanoutFluid
         c("接收到 获取状态 appViewModel.testState=${appViewModel.testState} reply=$reply continueTestCuvetteState=$continueTestCuvetteState continueTestSampleState=$continueTestSampleState clickStart=$clickStart r1Reagent=$r1Reagent r2Reagent=$r2Reagent cleanoutFluid=$cleanoutFluid continueTestGetState=$continueTestGetState")
         if (appViewModel.testState == TestState.Normal) {
+            EventBus.getDefault().post(EventMsg<Any>(what = EventGlobal.WHAT_HIDE_SPLASH))
             i("自检完成")
-            viewModelScope.launch {
-                _dialogUiState.emit(HomeDialogUiState.GetMachineDismiss)
-            }
+//            viewModelScope.launch {
+//                _dialogUiState.emit(HomeDialogUiState.GetMachineDismiss)
+//            }
         }
         if (!runningTest()) return
         if (appViewModel.testState.isNotPrepare()) return

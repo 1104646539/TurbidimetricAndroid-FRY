@@ -234,7 +234,7 @@
                         android:layout_height="wrap_content"
                         android:hint="移动距离1-10"
                         android:inputType="numberSigned"
-                        android:maxLength="1"
+                        android:maxLength="2"
                         android:minWidth="200dp"
                         android:text="1"
                         android:textSize="24sp" />
@@ -296,7 +296,7 @@
                         android:layout_height="wrap_content"
                         android:hint="移动距离1-10"
                         android:inputType="numberSigned"
-                        android:maxLength="1"
+                        android:maxLength="2"
                         android:minWidth="200dp"
                         android:text="1"
                         android:textSize="24sp" />
@@ -361,7 +361,7 @@
                         android:layout_height="wrap_content"
                         android:hint="移动距离1-10"
                         android:inputType="numberSigned"
-                        android:maxLength="1"
+                        android:maxLength="2"
                         android:minWidth="200dp"
                         android:text="1"
                         android:textSize="24sp" />
@@ -428,7 +428,7 @@
                         android:layout_height="wrap_content"
                         android:hint="移动距离1-10"
                         android:inputType="numberSigned"
-                        android:maxLength="1"
+                        android:maxLength="2"
                         android:minWidth="200dp"
                         android:text="1"
                         android:textSize="24sp" />

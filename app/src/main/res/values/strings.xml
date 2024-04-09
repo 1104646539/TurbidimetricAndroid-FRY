@@ -36,7 +36,7 @@
         <item>比色皿架X</item>
         <item>比色皿架Y</item>
         <item>试剂针X</item>
-        <item>试剂针Y</item>
+        <item>试剂针Z</item>
         <item>样本针X</item>
         <item>样本针Z</item>
         <item>试剂泵</item>
@@ -49,6 +49,7 @@
         <item>清洗液不足</item>
         <item>挤压错误</item>
     </string-array>
+    <!--暂时没用-->
     <string-array name="errorNum">
         <item>不能复位</item>
         <item>不能向前移动</item>

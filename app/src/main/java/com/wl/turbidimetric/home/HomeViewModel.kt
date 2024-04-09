@@ -961,7 +961,7 @@ class HomeViewModel(
         i("resultModels=${resultModels.size} ")
 
         viewModelScope.launch {
-            if(pos==8){
+            if (pos == 8) {
                 i("resultModels=${resultModels.size}")
             }
             resultModels?.get(pos)?.result?.resultState = resultState.ordinal
@@ -1886,8 +1886,7 @@ class HomeViewModel(
      */
     private fun changeSampleResultToCuvette(samplePos: Int) {
         i("changeSampleResultToCuvette samplePos=$samplePos")
-        resultModelsForSample?.get(samplePos)?.let {
-            sampleR->
+        resultModelsForSample?.get(samplePos)?.let { sampleR ->
             resultModels.add(sampleR)
         }
     }
@@ -2350,12 +2349,14 @@ class HomeViewModel(
      * 移动到下一个位置 样本和比色皿
      */
     private fun moveNextSampleAndCuvette() {
-        if (samplePos < sampleMax) {
-            //如果不是最后一个
-            moveSample()
-        } else {
-            //如果还没全部取完样就该换下一排样本去取样了
-            moveSampleShelfNext()
+        if (sampleMoveFinish) {
+            if (samplePos < sampleMax) {
+                //如果不是最后一个
+                moveSample()
+            } else {
+                //如果还没全部取完样就该换下一排样本去取样了
+                moveSampleShelfNext()
+            }
         }
         //如果需要移动
         if (cuvetteNeedMove(cuvettePos) && cuvetteMoveFinish) {

@@ -31,7 +31,7 @@ android {
         minSdk 24
         targetSdk 26
         versionCode 1
-        versionName "1.0.0.0-3修复首页样本架顺序显示错误的问题"
+        versionName "1.0.0.0-5修复动作报错时重复提示的问题"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 
@@ -48,7 +48,7 @@ android {
                 //只处理生产版本
                 if (buildType.name == 'release') {
                     def createTime = new Date().format("YYYY-MM-dd", TimeZone.getTimeZone("GMT+08:00"))
-                    outputFileName = "乳胶比浊" + defaultConfig.versionName + "_" + createTime + "_" + buildType.name + ".apk"
+                    outputFileName = "乳胶比浊" + defaultConfig.versionName + "_" + createTime  + ".apk"
                 }
             }
     }

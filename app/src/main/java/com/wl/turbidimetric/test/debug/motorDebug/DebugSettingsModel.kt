@@ -48,7 +48,7 @@ class MotorDebugViewModel(private val appViewModel: AppViewModel) : BaseViewMode
         "2（样本架X）",
         "3（样本架Y）",
         "4（比色皿架X）",
-        "5（比色皿Y）",
+        "5（比色皿架Y）",
         "6（试剂针X）",
         "7（试剂针Z）",
         "8（样本针X）",
@@ -66,7 +66,7 @@ class MotorDebugViewModel(private val appViewModel: AppViewModel) : BaseViewMode
 
         val motorNum = motorIndex.value?.plus(1) ?: 1
         val direction =
-            if (chekckID.value == R.id.cb_forward) 1 else if (chekckID.value == R.id.cb_backward) 2 else 0
+            if (chekckID.value == R.id.cb_forward) 2 else if (chekckID.value == R.id.cb_backward) 3 else 1
         val param = params.value?.toIntOrNull() ?: 0
         appViewModel.serialPort.motor(
             motorNum, direction, param

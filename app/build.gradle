@@ -31,7 +31,7 @@ android {
         minSdk 24
         targetSdk 26
         versionCode 1
-        versionName "1.0.0.0-2修复自检完成后过快点击开始导致闪退的问题"
+        versionName "1.0.0.0-3修复首页样本架顺序显示错误的问题"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 

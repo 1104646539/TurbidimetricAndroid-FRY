@@ -11,8 +11,8 @@
       "type": "SINGLE",
       "filters": [],
       "versionCode": 1,
-      "versionName": "1.0.0.0-2修复自检完成后过快点击开始导致闪退的问题",
-      "outputFile": "乳胶比浊1.0.0.0-2修复自检完成后过快点击开始导致闪退的问题_2024-04-08_release.apk"
+      "versionName": "1.0.0.0-3修复首页样本架顺序显示错误的问题",
+      "outputFile": "乳胶比浊1.0.0.0-3修复首页样本架顺序显示错误的问题_2024-04-09_release.apk"
     }
   ]
 }

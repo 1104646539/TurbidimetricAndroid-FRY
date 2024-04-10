@@ -31,7 +31,7 @@ android {
         minSdk 24
         targetSdk 26
         versionCode 1
-        versionName "1.0.0.0-5修复动作报错时重复提示的问题"
+        versionName "1.0.0.0-6修复调试功能加试剂不生效问题"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 

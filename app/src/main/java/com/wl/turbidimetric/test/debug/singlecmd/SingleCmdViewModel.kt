@@ -396,7 +396,7 @@ class SingleCmdViewModel(private val appViewModel: AppViewModel) : BaseViewModel
             return
         }
         enable.postValue(false)
-        appViewModel.serialPort.takeReagent(volumeR1, volumeR2)
+        appViewModel.serialPort.dripReagent(volumeR1, volumeR2)
     }
 
     /**

@@ -552,6 +552,10 @@ class HomeViewModel(
         hiltDetails()
         allowDripSample = true
         allowTakeReagent = true
+        cuvetteMoveFinish = false
+        sampleMoveFinish = false
+        sampleShelfMoveFinish = false
+        cuvetteShelfMoveFinish = false
         testMsg.value = ""
         appViewModel.testState = TestState.DripSample
         cuvetteShelfPos = -1
@@ -961,9 +965,6 @@ class HomeViewModel(
         i("resultModels=${resultModels.size} ")
 
         viewModelScope.launch {
-            if (pos == 8) {
-                i("resultModels=${resultModels.size}")
-            }
             resultModels?.get(pos)?.result?.resultState = resultState.ordinal
             resultModels?.get(pos)?.let {
                 update(it)

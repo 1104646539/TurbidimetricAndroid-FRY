@@ -2579,6 +2579,8 @@ class HomeViewModel(
      * 获取初始位置
      */
     private fun getInitialPos() {
+        sampleShelfPos = -1
+        cuvetteShelfPos = -1
         getInitCuvetteShelfPos()
         getInitSampleShelfPos()
     }

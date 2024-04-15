@@ -31,7 +31,7 @@ android {
         minSdk 24
         targetSdk 26
         versionCode 1
-        versionName "1.0.0.0-7修复无限检测时加样提前的问题"
+        versionName "1.0.0.0-8修复无限检测时比色皿不足后更换比色皿架位置导致的闪退的问题"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 

@@ -3,7 +3,6 @@ package com.wl.turbidimetric.app
 import androidx.lifecycle.viewModelScope
 import com.wl.turbidimetric.base.BaseViewModel
 import com.wl.turbidimetric.datastore.LocalData
-import com.wl.turbidimetric.datastore.LocalDataGlobal
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.MachineTestModel
 import com.wl.turbidimetric.model.TestState
@@ -23,7 +22,7 @@ import kotlin.concurrent.timer
  * 全局唯一的ViewModel，用来保存全局通用的属性
  */
 class AppViewModel : BaseViewModel() {
-    val serialPort: SerialPortIF = SerialPortImpl(SystemGlobal.isCodeDebug)
+    val serialPort: SerialPortIF = SerialPortImpl(SystemGlobal.isCodeDebug,this)
 
     /**
      * 仪器状态

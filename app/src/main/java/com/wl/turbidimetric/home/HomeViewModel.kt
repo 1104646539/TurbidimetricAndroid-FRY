@@ -495,7 +495,7 @@ class HomeViewModel(
     private fun listenerTempState() {
         viewModelScope.launch {
             timer("", true, Date(), 30000) {
-                if (allowTemp) {
+                if (allowTemp && !appViewModel.testState.isRunningError()) {
                     appViewModel.serialPort.getTemp()
                 }
             }
@@ -2418,9 +2418,6 @@ class HomeViewModel(
             getState()
         } else {
             EventBus.getDefault().post(EventMsg<Any>(what = EventGlobal.WHAT_HIDE_SPLASH))
-//            viewModelScope.launch {
-//                _dialogUiState.emit(HomeDialogUiState.GetMachineDismiss)
-//            }
             appViewModel.testState = TestState.NotGetMachineState
             val sb = StringBuffer()
             errorInfo?.let {
@@ -2460,9 +2457,6 @@ class HomeViewModel(
         if (appViewModel.testState == TestState.Normal) {
             EventBus.getDefault().post(EventMsg<Any>(what = EventGlobal.WHAT_HIDE_SPLASH))
             i("自检完成")
-//            viewModelScope.launch {
-//                _dialogUiState.emit(HomeDialogUiState.GetMachineDismiss)
-//            }
         }
         if (!runningTest()) return
         if (appViewModel.testState.isNotPrepare()) return

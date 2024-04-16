@@ -1,6 +1,6 @@
 package com.wl.turbidimetric.util
 
-import com.wl.turbidimetric.datastore.LocalData
+import com.wl.turbidimetric.app.AppViewModel
 import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.SerialGlobal
 import com.wl.turbidimetric.global.SystemGlobal
@@ -11,9 +11,7 @@ import com.wl.weiqianwllib.serialport.BaseSerialPort
 import com.wl.weiqianwllib.serialport.WQSerialGlobal
 import com.wl.wllib.CRC.CRC16
 import com.wl.wllib.CRC.VerifyCrc16
-import com.wl.wllib.LogToFile
 import com.wl.wllib.LogToFile.c
-import com.wl.wllib.LogToFile.e
 import com.wl.wllib.LogToFile.i
 import kotlinx.coroutines.*
 import java.util.*
@@ -24,7 +22,7 @@ import java.util.concurrent.LinkedBlockingQueue
 /**
  * 串口操作类
  */
-class SerialPortImpl(private val isCodeDebug:Boolean) :SerialPortIF{
+class SerialPortImpl(private val isCodeDebug: Boolean,private val appViewModel: AppViewModel) :SerialPortIF{
     private val serialPort: BaseSerialPort = BaseSerialPort()
 
     val callback: MutableList<Callback2> = mutableListOf()
@@ -423,7 +421,9 @@ class SerialPortImpl(private val isCodeDebug:Boolean) :SerialPortIF{
                     Thread.sleep(50)
                     val take = retryQueue.take()
 
-                    if (take != null) {
+                    if (take != null
+                        && !appViewModel.testState.isRunningError()
+                        ) {
                         c("重发了 $take")
                         writeAsync(take)
                     }
@@ -546,7 +546,7 @@ class SerialPortImpl(private val isCodeDebug:Boolean) :SerialPortIF{
      * 当仪器已经发生电机、传感器、非法参数等错误时，不允许再次发送命令，防止仪器损坏
      */
     private fun isAllowRunning(data: UByteArray): Boolean {
-        if (!allowRunning) {
+        if (!allowRunning ) {
             if (data[0] != SerialGlobal.CMD_GetSetTemp) {
                 return false
             }

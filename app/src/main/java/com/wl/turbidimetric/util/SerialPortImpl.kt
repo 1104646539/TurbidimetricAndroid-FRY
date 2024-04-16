@@ -468,7 +468,7 @@ class SerialPortImpl(private val isCodeDebug:Boolean) :SerialPortIF{
                                     if (hCount == count) {
                                         //找到了前缀
                                         val temp: UByteArray =
-                                            data.toUByteArray().copyOfRange(0, k + allCount + 1)
+                                            data.toUByteArray().copyOfRange(i, k + allCount + 1)
                                         val ready =
                                             temp.copyOfRange(temp.size - allCount, temp.size)
                                         if (temp.size < data.size) {
@@ -489,21 +489,21 @@ class SerialPortImpl(private val isCodeDebug:Boolean) :SerialPortIF{
                                         break@i
                                     }
                                 } else {
-                                    e("不对了")
+                                    i("不对了")
                                     continue@i
                                 }
                                 k++
                             }
                         } else {
                             if (!data.isNullOrEmpty()) {
-                                c(
+                                i(
                                     "data.size ${
                                         data.toUByteArray().toHex()
                                     }"
                                 )
                             }
 
-                            break@i
+//                            break@i
                         }
                     }
                 }

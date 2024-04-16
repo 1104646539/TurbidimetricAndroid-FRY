@@ -2,8 +2,12 @@ package com.wl.turbidimetric
 
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.ex.*
+import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.CurveModel
+import com.wl.wllib.CRC.CRC16
+import com.wl.wllib.LogToFile
 import com.wl.wllib.toLongTimeStr
+import kotlinx.coroutines.delay
 import org.junit.Assert
 import org.junit.Test
 import java.math.BigDecimal
@@ -34,6 +38,16 @@ class ToolExTest {
 //
 //        println(a == b)
 
+        val ret = CRC16(
+            ubyteArrayOf(0x15u, 0x00u, 0x01u, 0x5Eu, 0x01u, 0x62u)).toByteArray()
+                    Assert . assertTrue (ret
+                .contentEquals(
+                    ubyteArrayOf(
+                        0xE2u,
+                        0x89u
+                    ).toByteArray()
+                )
+        )
     }
 
     fun crc2(data: UByteArray): UByteArray {
@@ -310,5 +324,75 @@ class ToolExTest {
             println("target=$target")
         }
     }
+    private var data: MutableList<UByte> = mutableListOf<UByte>()
+    private val header = arrayOf<UByte>(0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u)
+    private val hCount = header.size
+    private  val allCount = 8
+    var byteArray = UByteArray(100)
+    @Test
+    fun serialPortOpenRead(){
+        val templl = mutableListOf<UByte>(0x00u,0x00u,0x00u,0x00u,0x00u,0x00u,0x15u,0x00u,0x01u,0x5Eu,0x01u,0x62u,0xE2u,0x89u,0x00u,0x00u,0x00u,0x00u,0x00u,0x00u,0x15u,0x00u,0x01u,0x5Eu,0x01u,0x62u,0xE2u,0x89u,0x00u,0x00u,0x00u,0x00u,0x00u,0x00u,0x15u,0x00u,0x01u,0x5Eu,0x01u,0x62u,0xE2u,0x89u,0x00u,0x00u,0x00u,0x00u,0x00u,0x00u,0x15u,0x00u,0x01u,0x5Eu,0x01u,0x62u,0xE2u,0x89u,0x00u,0x00u,0x00u,0x00u,0x00u,0x00u,0x15u,0x00u,0x01u,0x5Eu,0x01u,0x62u,0xE2u,0x89u,0x00u,0x00u,0x00u,0x00u,0x00u,0x00u,0x15u,0x00u,0x01u,0x5Eu,0x01u,0x62u,0xE2u,0x89u,0x00u,0x00u,0x00u,0x00u,0x00u,0x00u,0x15u,0x00u,0x01u,0x5Eu,0x01u,0x62u,0xE2u,0x89u,0x00u,0x00u,0x00u,0x00u,0x00u,0x00u,0x15u,0x00u,0x01u,0x5Eu,0x01u,0x62u,0xE2u,0x89u,0x00u,0x00u,0x00u,0x00u,0x00u,0x00u,0x15u,0x00u,0x01u,0x5Eu,0x01u,0x62u,0xE2u,0x89u,0x00u,0x00u,0x00u,0x00u,0x00u,0x00u,0x15u,0x00u,0x01u,0x5Eu,0x01u,0x62u,0xE2u,0x89u,0x00u,0x00u,0x00u,0x00u,0x00u,0x00u,0x15u,0x00u,0x01u,0x5Eu,0x01u,0x62u,0xE2u,0x89u,0x00u,0x00u,0x00u,0x00u,0x00u,0x00u,0x15u,0x00u,0x01u,0x5Eu,0x01u,0x62u,0xE2u,0x89u,0x00u,0x00u,0x00u,0x00u,0x00u,0x00u,0x15u,0x00u,0x01u,0x5Eu,0x01u,0x62u,0xE2u,0x89u)
+        while (true) {
 
+//            val count = serialPort.read(byteArray, byteArray.size)
+            byteArray = templl.subList(0,16).toUByteArray()
+            if (byteArray.size > 0) {
+                val re = byteArray.toUByteArray()
+                data.addAll(re)
+//                        c("每次接收的re=${re.toHex()}")
+            }
+
+            if (data.size < hCount + allCount) {
+                continue
+            }
+            i@ for (i in data.indices) {
+                if (data.size >= hCount + allCount && data[i] == header[0]) {
+                    var k = i
+                    var count = 0
+                    j@ for (element in header) {
+                        if (data[k] == element) {
+                            count++
+                            if (hCount == count) {
+                                //找到了前缀
+                                val temp: UByteArray =
+                                    data.toUByteArray().copyOfRange(i, k + allCount + 1)
+                                val ready =
+                                    temp.copyOfRange(temp.size - allCount, temp.size)
+                                if (temp.size < data.size) {
+                                    val remaining = data.toUByteArray()
+                                        .copyOfRange(k + allCount + 1, data.size)
+                                    data.clear()
+                                    data.addAll(remaining)
+                                } else {
+                                    data.clear()
+                                }
+
+                                        println(
+                                            "带前缀的 temp=${temp.toHex()} data=${
+                                                data.toUByteArray().toHex()
+                                            } ready=${ready.toHex()}"
+                                        )
+//                                parse(ready)
+                                break@i
+                            }
+                        } else {
+                            println("不对了")
+                            continue@i
+                        }
+                        k++
+                    }
+                } else {
+                    if (!data.isNullOrEmpty()) {
+                        println(
+                            "data.size ${
+                                data.toUByteArray().toHex()
+                            }"
+                        )
+                    }
+
+//                    break@i
+                }
+            }
+        }
+    }
 }

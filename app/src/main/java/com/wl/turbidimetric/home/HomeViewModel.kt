@@ -29,6 +29,7 @@ import com.wl.turbidimetric.util.OnScanResult
 import com.wl.turbidimetric.util.ScanCodeUtil
 import com.wl.wllib.LogToFile.c
 import com.wl.wllib.LogToFile.i
+import com.wl.wllib.toTimeStr
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.greenrobot.eventbus.EventBus
@@ -1326,7 +1327,7 @@ class HomeViewModel(
      */
     private fun updateTestResultModel(value: Int, index: Int, state: CuvetteState) {
         var pos = index
-        i("updateTestResultModel pos=$pos resultModels=$resultModels size=${resultModels.size}")
+        i("updateTestResultModel pos=$pos size=${resultModels.size}")
         if (cuvetteStartPos > 0 && isFirstCuvetteShelf()) {
             pos -= cuvetteStartPos
         }

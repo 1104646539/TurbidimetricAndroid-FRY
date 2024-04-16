@@ -180,6 +180,7 @@ class TestChartViewModel(private val appViewModel: AppViewModel) : BaseViewModel
         }
         debugType = DebugType.IntervalTest
         viewModelScope.launch {
+            stopIntervalTest()
             intervalTestTimer = timer("", true, Date(), intervalDuration.toLong()) {
                 test()
             }

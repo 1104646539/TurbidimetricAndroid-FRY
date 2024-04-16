@@ -30,6 +30,27 @@ object LogToFile {
         Error//异常报错
     }
 
+    var isAllowInput = true
+    var tsHashMap = hashMapOf<String, TSModel>()
+
+    @JvmStatic
+    fun stopInput() {
+        isAllowInput = false
+    }
+
+    @JvmStatic
+    fun startInput() {
+        isAllowInput = true
+        putMsgTs()
+    }
+
+    private fun putMsgTs() {
+        for ((k,v) in tsHashMap){
+            input(v.code,v.tag,v.msg)
+        }
+        tsHashMap.clear()
+    }
+
     @JvmStatic
     fun init() {
         file1 = File(fileName1)
@@ -68,7 +89,11 @@ object LogToFile {
     fun input(code: String, tag: String, msg: String) {
         format(code, tag, msg).let {
             Log.d(tag, "$code>>>[$msg]")
-            write("$it\n")
+            if (isAllowInput) {
+                write("$it\n")
+            }else{
+                tsHashMap.put(code,TSModel(code,tag,msg))
+            }
         }
     }
 
@@ -142,4 +167,5 @@ object LogToFile {
             return "${DateFormat.format(Date())}>${tag}/${code}>>>[${msg}]"
         }
     }
+    data class TSModel(val code:String,val tag:String,val msg:String)
 }

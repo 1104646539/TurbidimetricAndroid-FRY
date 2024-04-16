@@ -3,6 +3,7 @@ package com.wl.turbidimetric.settings
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -25,6 +26,7 @@ import com.wl.turbidimetric.util.ExportLogHelper
 import com.wl.turbidimetric.view.*
 import com.wl.turbidimetric.view.dialog.*
 import com.wl.weiqianwllib.OrderUtil
+import com.wl.wllib.LogToFile
 import com.wl.wllib.LogToFile.i
 import com.wl.wllib.LogToFile.u
 import kotlinx.coroutines.Dispatchers
@@ -261,7 +263,7 @@ class SettingsFragment constructor() :
         waitDialog.showPop(requireContext()) { dialog ->
             //step1、 显示等待对话框
             dialog.showDialog("正在导出,请等待……", confirmText = "", confirmClick = {})
-
+            LogToFile.stopInput()
             lifecycleScope.launch(Dispatchers.IO) {
                 //step2、 导出 等待结果
                 ExportLogHelper.export(requireContext(), { file1, file2 ->
@@ -270,12 +272,14 @@ class SettingsFragment constructor() :
                             d.dismiss()
                         })
                     }
+                    LogToFile.startInput()
                 }, { err ->
                     lifecycleScope.launch(Dispatchers.Main) {
                         dialog.showDialog("导出失败,$err", "确定", { d ->
                             d.dismiss()
                         })
                     }
+                    LogToFile.startInput()
                 })
 
             }

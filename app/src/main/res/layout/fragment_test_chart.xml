@@ -38,14 +38,7 @@
                 android:layout_marginLeft="10dp"
                 android:minWidth="150dp"
                 android:text="生成图像" />
-            <Button
-                android:id="@+id/btn_clear_chart"
-                style="@style/BtnPositive"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:minWidth="150dp"
-                android:text="清除图像" />
+
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="wrap_content"
@@ -64,6 +57,14 @@
                     android:textSize="24sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
+            <Button
+                android:id="@+id/btn_clear_chart"
+                style="@style/BtnPositive"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="200dp"
+                android:minWidth="150dp"
+                android:text="清除图像" />
         </LinearLayout>
 
         <com.github.mikephil.charting.charts.LineChart

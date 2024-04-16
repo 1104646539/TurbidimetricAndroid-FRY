@@ -22,7 +22,7 @@ import kotlin.concurrent.timer
  * 全局唯一的ViewModel，用来保存全局通用的属性
  */
 class AppViewModel : BaseViewModel() {
-    val serialPort: SerialPortIF = SerialPortImpl(SystemGlobal.isCodeDebug,this)
+    val serialPort: SerialPortIF = SerialPortImpl(SystemGlobal.isCodeDebug )
 
     /**
      * 仪器状态
@@ -57,6 +57,7 @@ class AppViewModel : BaseViewModel() {
      * 检测类型
      */
     var testType = TestType.None
+
     /**
      * 检测模式状态
      */
@@ -135,6 +136,7 @@ class AppViewModel : BaseViewModel() {
      * 更新上传状态
      */
     fun changeMachineState(state: TestState) {
+        serialPort?.testStateChange(state)
         val s = when (state) {
             TestState.NotGetMachineState -> MachineState.MachineError
             TestState.RunningError -> MachineState.MachineRunningError

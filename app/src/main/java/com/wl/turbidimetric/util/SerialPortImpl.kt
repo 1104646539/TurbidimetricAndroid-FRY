@@ -1,6 +1,5 @@
 package com.wl.turbidimetric.util
 
-import com.wl.turbidimetric.app.AppViewModel
 import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.SerialGlobal
 import com.wl.turbidimetric.global.SystemGlobal
@@ -22,7 +21,9 @@ import java.util.concurrent.LinkedBlockingQueue
 /**
  * 串口操作类
  */
-class SerialPortImpl(private val isCodeDebug: Boolean,private val appViewModel: AppViewModel) :SerialPortIF{
+class SerialPortImpl(
+    private val isCodeDebug: Boolean
+) : SerialPortIF {
     private val serialPort: BaseSerialPort = BaseSerialPort()
 
     val callback: MutableList<Callback2> = mutableListOf()
@@ -30,9 +31,10 @@ class SerialPortImpl(private val isCodeDebug: Boolean,private val appViewModel: 
     private var data: MutableList<UByte> = mutableListOf<UByte>()
     private val header = arrayOf<UByte>(0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u)
     private val hCount = header.size
-    private  val allCount = 8
+    private val allCount = 8
     var byteArray = ByteArray(100)
     private val responseCommand1: UByte = SerialGlobal.CMD_Response
+    var testState :TestState= TestState.None
 
     /**
      * 等待发送的命令队列
@@ -75,6 +77,7 @@ class SerialPortImpl(private val isCodeDebug: Boolean,private val appViewModel: 
      * 升级mcu的回调，升级结果
      */
     private var mOnResult: ((UpdateResult) -> Unit)? = null
+
     init {
         open()
     }
@@ -90,6 +93,9 @@ class SerialPortImpl(private val isCodeDebug: Boolean,private val appViewModel: 
         openRetry()
     }
 
+    override fun testStateChange(testState: TestState){
+        this.testState = testState
+    }
 
     private fun parse(ready: UByteArray) {
         c("parse ready=${ready.toHex()}")
@@ -334,6 +340,7 @@ class SerialPortImpl(private val isCodeDebug: Boolean,private val appViewModel: 
                 mMcuUpdateCallBack?.readDataMcuUpdate(transitionMcuUpdateModel(ready))
 
             }
+
             SerialGlobal.CMD_Motor -> {
                 callback {
                     it.readDataMotor(transitionMotorModel(ready))
@@ -422,8 +429,8 @@ class SerialPortImpl(private val isCodeDebug: Boolean,private val appViewModel: 
                     val take = retryQueue.take()
 
                     if (take != null
-                        && !appViewModel.testState.isRunningError()
-                        ) {
+                        && !testState.isRunningError()
+                    ) {
                         c("重发了 $take")
                         writeAsync(take)
                     }
@@ -512,16 +519,15 @@ class SerialPortImpl(private val isCodeDebug: Boolean,private val appViewModel: 
     }
 
 
-
     /**
      * mcu升级的解析
      */
     private fun parseMcuUpdate() {
         if (data.isNotEmpty()) {
             val str = String(data.toUByteArray().toByteArray())
-            if(str == "1"){
+            if (str == "1") {
                 mOnResult?.invoke(UpdateResult.Success("升级成功"))
-            }else{
+            } else {
                 mOnResult?.invoke(UpdateResult.Success("升级失败 $str"))
             }
             data.clear()
@@ -546,7 +552,7 @@ class SerialPortImpl(private val isCodeDebug: Boolean,private val appViewModel: 
      * 当仪器已经发生电机、传感器、非法参数等错误时，不允许再次发送命令，防止仪器损坏
      */
     private fun isAllowRunning(data: UByteArray): Boolean {
-        if (!allowRunning ) {
+        if (!allowRunning) {
             if (data[0] != SerialGlobal.CMD_GetSetTemp) {
                 return false
             }
@@ -572,7 +578,7 @@ class SerialPortImpl(private val isCodeDebug: Boolean,private val appViewModel: 
         }
     }
 
-   override fun updateWrite(data: UByteArray) {
+    override fun updateWrite(data: UByteArray) {
         write(data)
     }
 
@@ -623,7 +629,7 @@ class SerialPortImpl(private val isCodeDebug: Boolean,private val appViewModel: 
      * @param forward Boolean 是否向前
      * @param pos Int 移动多少个位置，相对的
      */
-    override fun moveSample(forward: Boolean , pos: Int) {
+    override fun moveSample(forward: Boolean, pos: Int) {
 //        c("发送 移动样本")
         writeAsync(
             createCmd(
@@ -640,7 +646,7 @@ class SerialPortImpl(private val isCodeDebug: Boolean,private val appViewModel: 
      * @param forward Boolean 是否向前
      * @param pos Int 移动多少个位置，相对的
      */
-    override fun moveCuvetteDripSample(forward: Boolean , pos: Int) {
+    override fun moveCuvetteDripSample(forward: Boolean, pos: Int) {
 //        c("发送 移动比色皿 加样位")
         writeAsync(
             createCmd(
@@ -658,7 +664,7 @@ class SerialPortImpl(private val isCodeDebug: Boolean,private val appViewModel: 
      * @param forward Boolean 是否向前
      * @param pos Int 移动多少个位置，相对的
      */
-    override fun moveCuvetteDripReagent(forward: Boolean , pos: Int) {
+    override fun moveCuvetteDripReagent(forward: Boolean, pos: Int) {
 //        c("发送 移动比色皿 搅拌位，加试剂位")
         writeAsync(
             createCmd(
@@ -676,7 +682,7 @@ class SerialPortImpl(private val isCodeDebug: Boolean,private val appViewModel: 
      * @param forward Boolean 是否向前
      * @param pos Int 移动多少个位置，相对的
      */
-    override fun moveCuvetteTest(forward: Boolean , pos: Int) {
+    override fun moveCuvetteTest(forward: Boolean, pos: Int) {
 //        c("发送 移动比色皿 检测位")
         writeAsync(
             createCmd(
@@ -692,7 +698,7 @@ class SerialPortImpl(private val isCodeDebug: Boolean,private val appViewModel: 
      * @param volume 取样量
      * @param squeezing 是否挤压
      */
-    override fun sampling(volume: Int , sampleType: SampleType) {
+    override fun sampling(volume: Int, sampleType: SampleType) {
 //        c("发送 取样")
         writeAsync(
             createCmd(
@@ -707,7 +713,7 @@ class SerialPortImpl(private val isCodeDebug: Boolean,private val appViewModel: 
     /**
      * 取样针清洗
      */
-    override fun samplingProbeCleaning(samplingProbeCleaningDuration: Int ) {
+    override fun samplingProbeCleaning(samplingProbeCleaningDuration: Int) {
 //        c("发送 取样针清洗")
         if (isCodeDebug) {
             GlobalScope.launch {
@@ -738,8 +744,8 @@ class SerialPortImpl(private val isCodeDebug: Boolean,private val appViewModel: 
      * @param volume Int 加样量
      */
     override fun dripSample(
-        autoBlending: Boolean ,
-        inplace: Boolean ,
+        autoBlending: Boolean,
+        inplace: Boolean,
         volume: Int
     ) {
 //        c("发送 加样")
@@ -758,7 +764,7 @@ class SerialPortImpl(private val isCodeDebug: Boolean,private val appViewModel: 
      * 加试剂
      */
     override fun dripReagent(
-        r1Volume: Int ,
+        r1Volume: Int,
         r2Volume: Int
     ) {
 //        c("发送 加试剂 ${LocalData.getTakeReagentR2()} ${LocalData.getTakeReagentR1()}")
@@ -777,7 +783,7 @@ class SerialPortImpl(private val isCodeDebug: Boolean,private val appViewModel: 
      * 取试剂
      */
     override fun takeReagent(
-        r1Volume: Int ,
+        r1Volume: Int,
         r2Volume: Int
     ) {
 //        c("发送 取试剂")
@@ -800,7 +806,7 @@ class SerialPortImpl(private val isCodeDebug: Boolean,private val appViewModel: 
     /**
      * 搅拌
      */
-    override fun stir(stirDuration: Int ) {
+    override fun stir(stirDuration: Int) {
 //        c("发送 搅拌")
         writeAsync(
             createCmd(
@@ -814,7 +820,7 @@ class SerialPortImpl(private val isCodeDebug: Boolean,private val appViewModel: 
     /**
      * 搅拌针清洗
      */
-    override fun stirProbeCleaning(stirProbeCleaningDuration: Int ) {
+    override fun stirProbeCleaning(stirProbeCleaningDuration: Int) {
 //        c("发送 搅拌针清洗")
         if (isCodeDebug) {
             GlobalScope.launch {
@@ -920,7 +926,7 @@ class SerialPortImpl(private val isCodeDebug: Boolean,private val appViewModel: 
      * 获取比色皿舱门状态|开比色皿舱门
      * @param open Boolean
      */
-    override fun setGetCuvetteDoor(open: Boolean ) {
+    override fun setGetCuvetteDoor(open: Boolean) {
         writeAsync(
             createCmd(
                 SerialGlobal.CMD_CuvetteDoor, data4 = if (open) 0x1u else 0x0u
@@ -931,7 +937,7 @@ class SerialPortImpl(private val isCodeDebug: Boolean,private val appViewModel: 
     /**
      * 设置温度
      */
-    override fun setTemp(reactionTemp: Int, r1Temp: Int ) {
+    override fun setTemp(reactionTemp: Int, r1Temp: Int) {
         writeAsync(
             createCmd(
                 SerialGlobal.CMD_GetSetTemp,
@@ -956,7 +962,7 @@ class SerialPortImpl(private val isCodeDebug: Boolean,private val appViewModel: 
      * 挤压
      * @param enable 是否挤压 比色杯不挤压
      */
-    override fun squeezing(enable: Boolean ) {
+    override fun squeezing(enable: Boolean) {
         writeAsync(
             createCmd(SerialGlobal.CMD_Squeezing, data4 = if (enable) 0x1u else 0x0u)
         )
@@ -978,7 +984,7 @@ class SerialPortImpl(private val isCodeDebug: Boolean,private val appViewModel: 
                 SerialGlobal.CMD_McuUpdate,
                 data2 = (fileSize shr 16).toUByte(),
                 data3 = (fileSize shr 8).toUByte(),
-                data4 = (fileSize ).toUByte(),
+                data4 = (fileSize).toUByte(),
             )
         )
     }

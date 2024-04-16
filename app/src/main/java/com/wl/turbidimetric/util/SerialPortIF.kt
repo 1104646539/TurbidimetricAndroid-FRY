@@ -25,6 +25,12 @@ interface SerialPortIF {
     fun allowRunning()
 
     /**
+     * 检测状态发生改变
+     * @param testState TestState
+     */
+    fun testStateChange(testState: TestState)
+
+    /**
      * 获取状态
      */
     fun getState()

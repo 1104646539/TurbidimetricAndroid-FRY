@@ -1563,12 +1563,11 @@ class HomeViewModel(
                     if (isManualSampling()) {
                         testFinishAction()
                     } else {
-                        //提示，比色皿不足了
-                        viewModelScope.launch {
-                            _dialogUiState.emit(
-                                HomeDialogUiState.CuvetteDeficiency
-                            )
-                        }
+
+                        //复位后提示，比色皿不足了
+                        continueTestCuvetteState = true
+                        cuvetteShelfPos = -1
+                        moveCuvetteShelf(cuvetteShelfPos)
                     }
                 } else {
                     checkTestState(accord = {
@@ -1593,12 +1592,10 @@ class HomeViewModel(
                 if (isManualSampling()) {
                     testFinishAction()
                 } else {
-                    //提示，比色皿不足了
-                    viewModelScope.launch {
-                        _dialogUiState.emit(
-                            HomeDialogUiState.CuvetteDeficiency
-                        )
-                    }
+                    //复位后提示，比色皿不足了
+                    continueTestCuvetteState = true
+                    cuvetteShelfPos = -1
+                    moveCuvetteShelf(cuvetteShelfPos)
                 }
             } else {
                 //还有比色皿。继续移动比色皿，检测
@@ -2204,6 +2201,11 @@ class HomeViewModel(
         c("接收到 移动比色皿架 reply=$reply cuvetteShelfPos=$cuvetteShelfPos cuvetteStartPos=$cuvetteStartPos")
         cuvetteShelfMoveFinish = true
 
+        //如果是比色皿不足复位的
+        if (continueTestCuvetteState) {
+            showCuvetteDeficiencyDialog()
+            return
+        }
 
         if (appViewModel.testState != TestState.TestFinish) {
             if (isManualSampling()) {//手动加样模式，不需要自动加样，直接设为已加样后加加试剂
@@ -2217,6 +2219,14 @@ class HomeViewModel(
                     moveCuvetteDripSample()
                 }
             }
+        }
+    }
+
+    private fun showCuvetteDeficiencyDialog() {
+        viewModelScope.launch {
+            _dialogUiState.emit(
+                HomeDialogUiState.CuvetteDeficiency
+            )
         }
     }
 
@@ -2723,7 +2733,7 @@ class HomeViewModel(
      */
     fun dialogTestFinishCuvetteDeficiencyCancel() {
         i("dialogTestFinishCuvetteDeficiencyCancel 点击结束检测")
-
+        continueTestCuvetteState = false
         testFinishAction()
     }
 

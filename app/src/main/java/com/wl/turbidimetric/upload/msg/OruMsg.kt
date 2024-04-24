@@ -50,17 +50,7 @@ object OruMsg {
     }
 
     fun createPID(t: TestResultAndCurveModel): String {
-        val sex = when (t.result.gender) {
-            "男" -> {
-                "M"
-            }
-            "女" -> {
-                "F"
-            }
-            else -> {
-                "O"
-            }
-        }
+        val sex = sexNormalToHl7(t.result.gender)
         val arr = createArray(
             31, hashMapOf(
                 0 to "PID", 5 to t.result.name, 7 to t.result.age, 8 to sex

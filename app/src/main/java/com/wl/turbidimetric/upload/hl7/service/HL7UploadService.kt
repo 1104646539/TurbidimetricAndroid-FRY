@@ -21,6 +21,7 @@ import com.wl.turbidimetric.upload.service.OnConnectListener
 import com.wl.turbidimetric.upload.service.OnGetPatientCallback
 import com.wl.turbidimetric.upload.service.OnUploadCallback
 import com.wl.turbidimetric.upload.service.UploadService
+import com.wl.wllib.LogToFile.i
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -73,6 +74,7 @@ class HL7UploadService : UploadService {
                     testResult,
                     msgId
                 )
+            i("uploadTestResult=$msgStr")
             try {
                 if (connectService.isConnected()) {
                     if (msgStr.isNullOrEmpty()) {

@@ -1128,6 +1128,7 @@ class HomeViewModel(
                         i("realTimeGetInfo onGetPatientSuccess=${result.resultId} patients=${patients?.size}")
                         if (patients?.isNotEmpty() == true) {
                             updatePatientInfoToResult(patients.first(), resultId = result.resultId)
+                            updatePatientInfoToSample(patients.first(), result.resultId)
                         }
                     }
 
@@ -1137,6 +1138,23 @@ class HomeViewModel(
                 })
         } else {
             i("realTimeGetInfo resultId=${result.resultId} twoWay=${config.twoWay} isConnected=$isConnected")
+        }
+    }
+
+    private fun updatePatientInfoToSample(patient: Patient, resultId: Long) {
+        mSamplesStates.forEachIndexed { i, items ->
+            items?.forEachIndexed { j, item ->
+                if(item.testResult?.resultId == resultId){
+                    mSamplesStates[i]?.get(j)?.testResult?.name = patient.name
+                    mSamplesStates[i]?.get(j)?.testResult?.age = patient.age
+                    mSamplesStates[i]?.get(j)?.testResult?.deliveryDoctor = patient.deliveryDoctor
+                    mSamplesStates[i]?.get(j)?.testResult?.deliveryTime = patient.deliveryTime
+                    mSamplesStates[i]?.get(j)?.testResult?.deliveryDepartment = patient.deliveryDepartments
+                    mSamplesStates[i]?.get(j)?.testResult?.gender = patient.sex
+                    mSamplesStates[i]?.get(j)?.testResult?.sampleBarcode = patient.bc
+                    _samplesStates.value = mSamplesStates.copyOf()
+                }
+            }
         }
     }
 
@@ -1189,6 +1207,7 @@ class HomeViewModel(
                     i("index越界$index size=${resultModelsForSample.size}")
                 }
             }
+
         }
 
     }
@@ -1402,6 +1421,15 @@ class HomeViewModel(
                     resultModels[resultIndex]?.result?.testResult = calcShowTestResult(
                         con, resultModels[resultIndex]?.curve?.projectLjz ?: 100
                     )
+                }
+                //更新检测结果到样本状态
+                mSamplesStates.forEachIndexed { i, items ->
+                    items?.forEachIndexed { j, item ->
+                        if(item.testResult?.resultId == _cuvetteStates.value[cuvetteShelfPos]?.get(cuvettePos)!!.testResult?.resultId){
+                            mSamplesStates[i]?.get(j)?.testResult?.testResult = resultModels[resultIndex]?.result?.testResult?:""
+                            _samplesStates.value = mSamplesStates.copyOf()
+                        }
+                    }
                 }
                 //单个检测完毕
                 resultModels[resultIndex]?.let {

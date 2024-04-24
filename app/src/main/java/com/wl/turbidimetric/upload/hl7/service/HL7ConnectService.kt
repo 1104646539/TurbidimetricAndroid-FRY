@@ -16,6 +16,7 @@ import com.wl.turbidimetric.upload.service.OnConnectListener
 import com.wl.turbidimetric.upload.hl7.util.ErrorEnum
 import com.wl.turbidimetric.upload.hl7.util.Status
 import com.wl.turbidimetric.upload.hl7.util.getMsgId
+import com.wl.turbidimetric.upload.hl7.util.sexHl7ToNormal
 import java.net.SocketException
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -186,7 +187,7 @@ class HL7ConnectService : ConnectService {
 
 
         return Patient(
-            name, age, sex, deliveryTime, deliveryDoctor, deliveryDepartments, bc, sn, tdh
+            name, age, sexHl7ToNormal(sex), deliveryTime, deliveryDoctor, deliveryDepartments, bc, sn, tdh
         )
     }
 

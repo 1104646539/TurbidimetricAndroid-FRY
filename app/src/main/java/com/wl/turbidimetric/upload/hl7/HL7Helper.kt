@@ -160,7 +160,7 @@ object HL7Helper : UploadService {
             callbacks.add(callback2)
             lastIndex = testResults.lastIndex
             if (testResults.size == 1) {
-                handler.sendEmptyMessageDelayed(WHAT_UPLOAD_NEXT, 1000)
+                handler.sendEmptyMessageDelayed(WHAT_UPLOAD_NEXT, 500)
             }
         }
 
@@ -178,7 +178,7 @@ object HL7Helper : UploadService {
                         onUploadTestResults?.invoke(testResults.size, successCount, failedCount)
                         clearUploadInfo()
                     } else {
-                        handler.sendEmptyMessageDelayed(WHAT_UPLOAD_NEXT, 1000)
+                        handler.sendEmptyMessageDelayed(WHAT_UPLOAD_NEXT, 500)
                     }
                     onUploadCallback?.onUploadSuccess(msg)
                 }
@@ -192,7 +192,7 @@ object HL7Helper : UploadService {
                         onUploadTestResults?.invoke(testResults.size, successCount, failedCount)
                         clearUploadInfo()
                     } else {
-                        handler.sendEmptyMessageDelayed(WHAT_UPLOAD_NEXT, 1000)
+                        handler.sendEmptyMessageDelayed(WHAT_UPLOAD_NEXT, 500)
                     }
                     onUploadCallback?.onUploadFailed(code, msg)
                 }
@@ -290,7 +290,7 @@ object HL7Helper : UploadService {
             this.callbacks.add(onGetPatientCallback)
             lastIndex = conditions.lastIndex
             if (conditions.size == 1) {
-                handler.sendEmptyMessageDelayed(WHAT_GET_INFO_NEXT, 1000)
+                handler.sendEmptyMessageDelayed(WHAT_GET_INFO_NEXT, 500)
             }
         }
 
@@ -310,7 +310,7 @@ object HL7Helper : UploadService {
                         LogToFile.i("index=$index lastIndex=$lastIndex")
                         clearUploadInfo()
                     } else {
-                        handler.sendEmptyMessageDelayed(WHAT_GET_INFO_NEXT, 1000)
+                        handler.sendEmptyMessageDelayed(WHAT_GET_INFO_NEXT, 500)
                     }
                 }
 
@@ -321,7 +321,7 @@ object HL7Helper : UploadService {
                         LogToFile.i("index=$index lastIndex=$lastIndex")
                         clearUploadInfo()
                     } else {
-                        handler.sendEmptyMessageDelayed(WHAT_GET_INFO_NEXT, 1000)
+                        handler.sendEmptyMessageDelayed(WHAT_GET_INFO_NEXT, 500)
                     }
                 }
             })

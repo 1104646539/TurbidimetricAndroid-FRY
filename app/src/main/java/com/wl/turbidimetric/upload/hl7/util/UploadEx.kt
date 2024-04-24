@@ -108,3 +108,43 @@ fun defaultConfig(): ConnectConfig {
         reconnectionTimeout = 20000
     )
 }
+
+/**
+ * 从hl7格式的性别转换成显示的
+ */
+fun sexHl7ToNormal(sex: String): String {
+    return when (sex) {
+        "M" -> {
+            "男"
+        }
+
+        "F" -> {
+            "女"
+        }
+
+        else -> {
+            "未知"
+        }
+
+    }
+}
+
+/**
+ * 从hl7格式的性别转换成显示的
+ */
+fun sexNormalToHl7(sex: String): String {
+    return when (sex) {
+        "男" -> {
+            "M"
+        }
+
+        "女" -> {
+            "F"
+        }
+
+        else -> {
+            "O"
+        }
+
+    }
+}

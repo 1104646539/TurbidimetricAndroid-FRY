@@ -36,8 +36,8 @@ object TestSerialPort {
 
             SerialGlobal.CMD_GetState -> {
 //                delay(40000)
-                reply = reply.plus(ubyteArrayOf(0x0u, 0x2u, 0x33u, 0xffu))// 0011 0011
-//                reply = reply.plus(ubyteArrayOf(0x0u, 0x2u, 0x13u, 0xffu))//0001 0001
+//                reply = reply.plus(ubyteArrayOf(0x0u, 0x2u, 0x33u, 0xffu))// 0011 0011
+                reply = reply.plus(ubyteArrayOf(0x0u, 0x2u, 0x13u, 0xffu))//0001 0001
             }
 
             SerialGlobal.CMD_MoveSample -> {
@@ -122,7 +122,7 @@ object TestSerialPort {
             }
 
             SerialGlobal.CMD_DripSample -> {
-//                delay(1000)//测试实时获取信息时需要
+                delay(4000)//测试实时获取信息时需要
 //                if (index == 3) {
 //                    reply = ubyteArrayOf(data[0], 0x05u, 0x0u, 0x0u, 0x0u, 0x0u)//加样失败
 //                }else{

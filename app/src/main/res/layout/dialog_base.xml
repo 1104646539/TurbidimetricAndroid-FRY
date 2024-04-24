@@ -13,6 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="60dp"
         android:background="@drawable/bg_dialog_hint"
+        android:maxHeight="300dp"
         android:gravity="center_horizontal"
         android:orientation="vertical">
 

@@ -56,7 +56,7 @@ abstract class CustomBtn3Popup(val ctx: Context, val viewId: Int) : CenterPopupV
         super.onCreate()
 
         LayoutInflater.from(context).inflate(viewId, null)?.let {
-            (findViewById<LinearLayout>(R.id.root)).addView(it, 1)
+               (findViewById<LinearLayout>(R.id.root)).addView(it, 1)
         }
         btnConfirm = findViewById(R.id.btn_confirm)
         btnConfirm2 = findViewById(R.id.btn_confirm2)

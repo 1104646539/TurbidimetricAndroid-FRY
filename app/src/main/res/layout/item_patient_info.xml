@@ -9,36 +9,42 @@
         <TextView
             android:id="@+id/tv_patient_name"
             style="@style/TextItem"
+            android:text="姓名"
             android:layout_width="100dp"
             android:layout_height="wrap_content" />
 
         <TextView
             android:id="@+id/tv_patient_age"
             style="@style/TextItem"
+            android:text="年龄"
             android:layout_width="100dp"
             android:layout_height="wrap_content" />
 
         <TextView
             android:id="@+id/tv_patient_sex"
             style="@style/TextItem"
+            android:text="性别"
             android:layout_width="100dp"
             android:layout_height="wrap_content" />
 
         <TextView
             android:id="@+id/tv_bc"
             style="@style/TextItem"
+            android:text="条码"
             android:layout_width="100dp"
             android:layout_height="wrap_content" />
 
         <TextView
             android:id="@+id/tv_sn"
             style="@style/TextItem"
+            android:text="编号"
             android:layout_width="100dp"
             android:layout_height="wrap_content" />
 
         <TextView
             android:id="@+id/tv_tdh"
             style="@style/TextItem"
+            android:text="通道号"
             android:layout_width="100dp"
             android:layout_height="wrap_content" />
 
@@ -47,17 +53,20 @@
         <TextView
             android:id="@+id/tv_delivery_doctor"
             style="@style/TextItem"
+            android:text="送检医生"
             android:layout_width="100dp"
             android:layout_height="wrap_content" />
 
         <TextView
             android:id="@+id/tv_delivery_departments"
             style="@style/TextItem"
+            android:text="送检科室"
             android:layout_width="100dp"
             android:layout_height="wrap_content" />
         <TextView
             android:id="@+id/tv_delivery_time"
             style="@style/TextItem"
+            android:text="送检时间"
             android:layout_width="100dp"
             android:layout_height="wrap_content" />
 

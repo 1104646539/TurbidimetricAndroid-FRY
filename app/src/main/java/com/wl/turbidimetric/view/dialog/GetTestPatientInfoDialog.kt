@@ -1,6 +1,7 @@
 package com.wl.turbidimetric.view.dialog
 
 import android.content.Context
+import android.text.InputType
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -44,6 +45,8 @@ class GetTestPatientInfoDialog(val ct: Context) :
 
                         tvCondition2?.visibility = View.VISIBLE
                         etCondition2?.visibility = View.VISIBLE
+                        etCondition1?.inputType = InputType.TYPE_CLASS_NUMBER
+                        etCondition2?.inputType = InputType.TYPE_CLASS_NUMBER
                     } else if (selectIndex == 1) {
                         tvCondition1?.setText("条码")
                         tvCondition2?.setText("")
@@ -53,6 +56,9 @@ class GetTestPatientInfoDialog(val ct: Context) :
 
                         tvCondition2?.visibility = View.GONE
                         etCondition2?.visibility = View.GONE
+
+                        etCondition1?.inputType = InputType.TYPE_CLASS_TEXT
+                        etCondition2?.inputType = InputType.TYPE_CLASS_TEXT
                     } else {
                         tvCondition1?.setText("时间起始")
                         tvCondition2?.setText("编号结束")
@@ -89,9 +95,11 @@ class GetTestPatientInfoDialog(val ct: Context) :
                 0 -> {
                     GetPatientType.SN
                 }
+
                 1 -> {
                     GetPatientType.BC
                 }
+
                 else -> {
                     GetPatientType.DT
                 }

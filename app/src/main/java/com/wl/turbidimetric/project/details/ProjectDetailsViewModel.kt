@@ -3,14 +3,16 @@ package com.wl.turbidimetric.project.details
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.wl.turbidimetric.repository.ProjectRepository
+import com.wl.turbidimetric.app.App
 import com.wl.turbidimetric.model.ProjectModel
 import com.wl.turbidimetric.base.BaseViewModel
+import com.wl.turbidimetric.repository.DefaultProjectDataSource
+import com.wl.turbidimetric.repository.if2.ProjectSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 
 
-class ProjectDetailsViewModel(private val projectRepository: ProjectRepository) :
+class ProjectDetailsViewModel(private val projectRepository: ProjectSource) :
     BaseViewModel() {
     val dialogState =
         MutableSharedFlow<ProjectDetailsDialogUiState>()//需要改，现在有问题重复修改信息成功后不弹出对话框，因为stateFlow不能重发一样的信息？代测
@@ -153,7 +155,7 @@ class ProjectDetailsViewModel(private val projectRepository: ProjectRepository) 
 }
 
 class ProjectDetailsViewModelFactory(
-    private val projectRepository: ProjectRepository = ProjectRepository(),
+    private val projectRepository: ProjectSource = DefaultProjectDataSource(App.instance!!.mainDao!!),
 ) :
     ViewModelProvider.NewInstanceFactory() {
 

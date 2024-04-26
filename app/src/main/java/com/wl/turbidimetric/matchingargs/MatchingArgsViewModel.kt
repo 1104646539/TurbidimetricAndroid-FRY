@@ -965,12 +965,7 @@ class MatchingArgsViewModel(
         sampleShelfMoveFinish = true
         if (appViewModel.testState != TestState.TestFinish) {
             //一开始就要移动到第二个位置去取第一个位置的稀释液
-            val step = if (!autoAttenuation) {//自动稀释就去第二个位置加
-                1
-            } else {
-                2
-            }
-            moveSample(step)
+            moveSample(2)
         }
     }
 

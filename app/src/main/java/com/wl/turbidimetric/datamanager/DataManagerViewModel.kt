@@ -1,6 +1,5 @@
 package com.wl.turbidimetric.datamanager
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -8,19 +7,21 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.wl.turbidimetric.app.App
 import com.wl.turbidimetric.app.AppViewModel
-import com.wl.turbidimetric.repository.ProjectRepository
-import com.wl.turbidimetric.repository.TestResultRepository
+import com.wl.turbidimetric.base.BaseViewModel
+import com.wl.turbidimetric.ex.getAppViewModel
 import com.wl.turbidimetric.model.ConditionModel
 import com.wl.turbidimetric.model.TestResultAndCurveModel
 import com.wl.turbidimetric.model.TestResultModel
-import com.wl.turbidimetric.base.BaseViewModel
-import com.wl.turbidimetric.ex.getAppViewModel
 import com.wl.turbidimetric.repository.DefaultProjectDataSource
 import com.wl.turbidimetric.repository.DefaultTestResultDataSource
 import com.wl.turbidimetric.repository.if2.ProjectSource
 import com.wl.turbidimetric.repository.if2.TestResultSource
-import com.wl.turbidimetric.view.dialog.ResultDetailsDialog
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 

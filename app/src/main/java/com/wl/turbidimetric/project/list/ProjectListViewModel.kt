@@ -2,12 +2,14 @@ package com.wl.turbidimetric.project.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.wl.turbidimetric.repository.ProjectRepository
+import com.wl.turbidimetric.app.App
 import com.wl.turbidimetric.model.ProjectModel
 import com.wl.turbidimetric.base.BaseViewModel
+import com.wl.turbidimetric.repository.DefaultProjectDataSource
+import com.wl.turbidimetric.repository.if2.ProjectSource
 import kotlinx.coroutines.flow.Flow
 
-class ProjectListViewModel(private val projectRepository: ProjectRepository) :
+class ProjectListViewModel(private val projectRepository: ProjectSource) :
     BaseViewModel() {
     fun getProjects(): Flow<List<ProjectModel>> {
         return projectRepository.getProjects()
@@ -15,7 +17,7 @@ class ProjectListViewModel(private val projectRepository: ProjectRepository) :
 }
 
 class ProjectListViewModelFactory(
-    private val projectRepository: ProjectRepository = ProjectRepository(),
+    private val projectRepository: ProjectSource = DefaultProjectDataSource(App.instance!!.mainDao!!),
 ) :
     ViewModelProvider.NewInstanceFactory() {
 

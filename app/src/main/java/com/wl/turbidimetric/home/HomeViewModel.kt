@@ -965,9 +965,10 @@ class HomeViewModel(
         i("updateResultState pos=$pos resultState=$resultState")
         i("resultModels=${resultModels.size} ")
 
-        viewModelScope.launch {
-            resultModels?.get(pos)?.result?.resultState = resultState.ordinal
-            resultModels?.get(pos)?.let {
+
+        resultModels?.get(pos)?.result?.resultState = resultState.ordinal
+        resultModels?.get(pos)?.let {
+            viewModelScope.launch {
                 update(it)
             }
         }
@@ -982,9 +983,9 @@ class HomeViewModel(
         i("updateResultState pos=$pos resultState=$resultState")
         i("resultModels=${resultModelsForSample.size}")
 
-        viewModelScope.launch {
-            resultModelsForSample?.get(pos)?.result?.resultState = resultState.ordinal
-            resultModelsForSample?.get(pos)?.let {
+        resultModelsForSample?.get(pos)?.result?.resultState = resultState.ordinal
+        resultModelsForSample?.get(pos)?.let {
+            viewModelScope.launch {
                 update(it)
             }
         }
@@ -1144,12 +1145,13 @@ class HomeViewModel(
     private fun updatePatientInfoToSample(patient: Patient, resultId: Long) {
         mSamplesStates.forEachIndexed { i, items ->
             items?.forEachIndexed { j, item ->
-                if(item.testResult?.resultId == resultId){
+                if (item.testResult?.resultId == resultId) {
                     mSamplesStates[i]?.get(j)?.testResult?.name = patient.name
                     mSamplesStates[i]?.get(j)?.testResult?.age = patient.age
                     mSamplesStates[i]?.get(j)?.testResult?.deliveryDoctor = patient.deliveryDoctor
                     mSamplesStates[i]?.get(j)?.testResult?.deliveryTime = patient.deliveryTime
-                    mSamplesStates[i]?.get(j)?.testResult?.deliveryDepartment = patient.deliveryDepartments
+                    mSamplesStates[i]?.get(j)?.testResult?.deliveryDepartment =
+                        patient.deliveryDepartments
                     mSamplesStates[i]?.get(j)?.testResult?.gender = patient.sex
                     mSamplesStates[i]?.get(j)?.testResult?.sampleBarcode = patient.bc
                     _samplesStates.value = mSamplesStates.copyOf()
@@ -1425,8 +1427,12 @@ class HomeViewModel(
                 //更新检测结果到样本状态
                 mSamplesStates.forEachIndexed { i, items ->
                     items?.forEachIndexed { j, item ->
-                        if(item.testResult?.resultId == _cuvetteStates.value[cuvetteShelfPos]?.get(cuvettePos)!!.testResult?.resultId){
-                            mSamplesStates[i]?.get(j)?.testResult?.testResult = resultModels[resultIndex]?.result?.testResult?:""
+                        if (item.testResult?.resultId == _cuvetteStates.value[cuvetteShelfPos]?.get(
+                                cuvettePos
+                            )!!.testResult?.resultId
+                        ) {
+                            mSamplesStates[i]?.get(j)?.testResult?.testResult =
+                                resultModels[resultIndex]?.result?.testResult ?: ""
                             _samplesStates.value = mSamplesStates.copyOf()
                         }
                     }

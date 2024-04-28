@@ -31,7 +31,7 @@ android {
         minSdk 24
         targetSdk 26
         versionCode 1
-        versionName "1.0.0.0-13修复拟合手动稀释位置错误的问题"
+        versionName "1.0.0.0-14修复取试剂失败可能的闪退问题"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 

@@ -29,7 +29,6 @@ import com.wl.turbidimetric.util.OnScanResult
 import com.wl.turbidimetric.util.ScanCodeUtil
 import com.wl.wllib.LogToFile.c
 import com.wl.wllib.LogToFile.i
-import com.wl.wllib.toTimeStr
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.greenrobot.eventbus.EventBus
@@ -54,10 +53,9 @@ class HomeViewModel(
      * 自检
      */
     fun goGetMachineState() {
-//        dialogGetMachine.postValue(true)
-        viewModelScope.launch(Dispatchers.IO) {
-            _dialogUiState.emit(HomeDialogUiState.GetMachineShow)
-        }
+//        viewModelScope.launch(Dispatchers.IO) {
+//            _dialogUiState.emit(HomeDialogUiState.GetMachineShow)
+//        }
         appViewModel.testState = TestState.GetMachineState
         getMachineState()
     }
@@ -623,10 +621,6 @@ class HomeViewModel(
     private fun initSampleStates(): Array<Array<Item>?> {
         val arrays = mutableListOf<Array<Item>?>()
         for (j in 0 until 4) {
-            val array = null
-//            for (i in 0 until 10) {
-//                array.add(SampleState.None)
-//            }
             arrays.add(null)
         }
 
@@ -902,8 +896,8 @@ class HomeViewModel(
         dripSampleFinish = false
         scanFinish = false
         sampleType = reply.data.type
-        var isNonexistent = reply.data.type.isNonexistent()
-        var isCuvette = reply.data.type.isCuvette()
+        val isNonexistent = reply.data.type.isNonexistent()
+        val isCuvette = reply.data.type.isCuvette()
         //最后一个位置不需要扫码，直接取样
         if (samplePos < sampleMax) {
 //            if ((SystemGlobal.isCodeDebug && !sampleExists[samplePos]) || (isAuto() && LocalData.SampleExist && isNonexistent)) {
@@ -1535,10 +1529,6 @@ class HomeViewModel(
 
     /**
      * 在开始检测下一排比色皿之前，检查试剂和清洗液的状态
-     * @param r2Volume Int
-     * @param r1Reagent Boolean
-     * @param r2Reagent Boolean
-     * @param cleanoutFluid Boolean
      * @param accord Function0<Unit> 符合后执行的命令
      * @param discrepancy Function1<String, Unit> 不符合后执行的命令
      */
@@ -1781,7 +1771,6 @@ class HomeViewModel(
 
     /**
      * 是否是最后一个需要**的比色皿
-     * @param cuvettePos Int
      * @param state CuvetteState
      * @return Boolean
      */
@@ -1915,7 +1904,6 @@ class HomeViewModel(
     /**
      * 在加样结束后，将样本对应的结果（可能有个人信息和该样本的状态）同时到比色皿对应的结果
      * @param samplePos Int
-     * @param cuvettePos Int
      */
     private fun changeSampleResultToCuvette(samplePos: Int) {
         i("changeSampleResultToCuvette samplePos=$samplePos")
@@ -2478,6 +2466,9 @@ class HomeViewModel(
                     HomeDialogUiState.GetMachineFailedShow(sb.toString())
                 )
             }
+            viewModelScope.launch(Dispatchers.IO) {
+                _dialogUiState.emit(HomeDialogUiState.GetMachineDismiss)
+            }
         }
     }
 
@@ -2501,6 +2492,9 @@ class HomeViewModel(
         c("接收到 获取状态 appViewModel.testState=${appViewModel.testState} reply=$reply continueTestCuvetteState=$continueTestCuvetteState continueTestSampleState=$continueTestSampleState clickStart=$clickStart r1Reagent=$r1Reagent r2Reagent=$r2Reagent cleanoutFluid=$cleanoutFluid continueTestGetState=$continueTestGetState")
         if (appViewModel.testState == TestState.Normal) {
             EventBus.getDefault().post(EventMsg<Any>(what = EventGlobal.WHAT_HIDE_SPLASH))
+            viewModelScope.launch(Dispatchers.IO) {
+                _dialogUiState.emit(HomeDialogUiState.GetMachineDismiss)
+            }
             i("自检完成")
         }
         if (!runningTest()) return
@@ -2736,6 +2730,9 @@ class HomeViewModel(
      */
     fun dialogGetMachineFailedConfirm() {
         i("dialogGetMachineFailedConfirm 点击重新自检")
+        viewModelScope.launch(Dispatchers.IO) {
+            _dialogUiState.emit(HomeDialogUiState.GetMachineShow)
+        }
         goGetMachineState()
     }
 

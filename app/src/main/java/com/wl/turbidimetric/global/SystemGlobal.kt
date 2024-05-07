@@ -1,11 +1,8 @@
 package com.wl.turbidimetric.global
 
-import androidx.lifecycle.MutableLiveData
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.ex.getResource
-import com.wl.turbidimetric.model.*
 import com.wl.turbidimetric.upload.hl7.util.ConnectStatus
-import com.wl.turbidimetric.upload.hl7.util.UploadGlobal
 import com.wl.turbidimetric.upload.hl7.util.defaultConfig
 import com.wl.turbidimetric.view.NavigationView
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,7 +19,6 @@ object SystemGlobal {
 //        }
 //    private val _obTestState = MutableStateFlow(TestState.None)
 //    val obTestState = _obTestState.asStateFlow()
-
 
 
     /**
@@ -56,7 +52,6 @@ object SystemGlobal {
             _obUploadConfig.value = value
         }
     private val _obUploadConfig = MutableStateFlow(uploadConfig)
-    val obUploadConfig = _obUploadConfig.asStateFlow()
 
     //显示的曲线数量
     val showCurveSize = 10;
@@ -76,6 +71,15 @@ object SystemGlobal {
      * 下位机版本
      */
     var mcuVersion = ""
+
+    /**
+     * 上位机软件版本名
+     */
+    var versionName = ""
+    /**
+     * 上位机软件版本号
+     */
+    var versionCode = 0
 
     /**
      * 首页的导航资源

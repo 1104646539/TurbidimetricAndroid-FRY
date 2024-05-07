@@ -3,7 +3,6 @@ package com.wl.turbidimetric.settings
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
-import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -58,13 +57,6 @@ class SettingsFragment constructor() :
         HiltDialog(requireContext())
     }
 
-    private val machineTestModelDialog by lazy {
-        MachineTestModelDialog(requireContext())
-    }
-
-    private val paramsDialog by lazy {
-        ParamsDialog(requireContext())
-    }
 
     /**
      * 等待任务对话框
@@ -168,13 +160,9 @@ class SettingsFragment constructor() :
             u("MCU升级")
             showHiltMcuUpdate()
         }
-        val versionAndroid = String(
-            ((getPackageInfo(requireContext())?.versionName) ?: "").toByteArray(),
-            charset("UTF-8")
-        )
 
         vd.tvSoftVersionAndroid.text =
-            "上位机版本:${versionAndroid} \n发布版本:1"
+            "上位机版本:${SystemGlobal.versionName} \n发布版本:1"
         vd.tvSoftVersionMcu.text = "MCU版本:${SystemGlobal.mcuVersion}"
 
         vd.sivParamsSetting.performClick()
@@ -347,12 +335,4 @@ class SettingsFragment constructor() :
     }
 
 
-    val testHiltDialog by lazy {
-        HiltDialog(requireContext())
-    }
-    val detectionNumDialog by lazy {
-        OneEditDialog(requireContext()).apply {
-            setEditType(OneEditDialog.EditType.NUM_POSITIVE)
-        }
-    }
 }

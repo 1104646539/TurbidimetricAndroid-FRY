@@ -12,6 +12,7 @@ import com.wl.turbidimetric.R
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.db.MainRoomDatabase
 import com.wl.turbidimetric.ex.copyForProject
+import com.wl.turbidimetric.ex.getPackageInfo
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.CurveModel
 import com.wl.turbidimetric.model.ProjectModel
@@ -51,8 +52,18 @@ class App : Application() {
 //
             //没有项目参数的时候，添加一个默认参数
             initDB()
-
+            //记录当前的版本
+            initVersion()
         }
+    }
+
+    private fun initVersion() {
+        SystemGlobal.versionName = String(
+            ((getPackageInfo(this)?.versionName) ?: "").toByteArray(), charset("UTF-8")
+        )
+        SystemGlobal.versionCode = getPackageInfo(this)?.versionCode ?: 0
+
+        LogToFile.i("versionName=${SystemGlobal.versionName} versionCode=${SystemGlobal.versionCode}")
     }
 
 
@@ -176,8 +187,7 @@ class App : Application() {
         private val viewModelStore = ViewModelStore()
         private val viewModelProvider: ViewModelProvider by lazy {
             ViewModelProvider(
-                this,
-                ViewModelProvider.AndroidViewModelFactory.getInstance(instance!!)
+                this, ViewModelProvider.AndroidViewModelFactory.getInstance(instance!!)
             )
         }
 

@@ -7,9 +7,11 @@ import android.view.Gravity
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
+import com.lxj.xpopup.core.BasePopupView
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.base.BaseFragment
 import com.wl.turbidimetric.databinding.FragmentHomeBinding
+import com.wl.turbidimetric.ex.throttle
 import com.wl.turbidimetric.ex.toast
 import com.wl.turbidimetric.global.EventGlobal
 import com.wl.turbidimetric.global.EventMsg
@@ -54,11 +56,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         R.drawable.state_reagent_r2_2,
         R.drawable.state_reagent_r2_3,
     )
-
-    /**
-     * 首页显示样本和比色皿详情的对话框
-     */
-    private val homeDetailsDialog: HomeDetailsDialog by lazy { HomeDetailsDialog(requireContext()) }
 
     /**
      * 显示调试时详情的对话框
@@ -252,7 +249,10 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 
         vd.vTest.setOnClickListener {
             u("开始")
-            if (appVm.testState.isTestRunning()) {
+            if (appVm.testState.isNotPrepare()) {
+                vm.dialogGetMachineFailedConfirm()
+                toast("自检中……")
+            } else if (appVm.testState.isTestRunning()) {
                 toast("正在运行，请稍后")
             } else if (vm.selectProject == null) {
                 showConfigDialog()
@@ -269,7 +269,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 it.showDialog(
                     vm.testMsg.value ?: "",
                     "确定",
-                    confirmClick = { it.dismiss() },
+                    confirmClick = { d: BasePopupView -> it.dismiss() }.throttle(),
                     scMaxHeight = 600,
                     textGravity = Gravity.LEFT
                 )
@@ -305,9 +305,15 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     vm.selectLastProject()
                 }
             }
+
             EventGlobal.WHAT_DETECTION_NUM_CHANGE -> {
                 lifecycleScope.launch {
-                    vm.changeConfig(vm.selectProject,vm.cuvetteStartPos,vm.getDetectionNum(),vm.needSamplingNum)
+                    vm.changeConfig(
+                        vm.selectProject,
+                        vm.cuvetteStartPos,
+                        vm.getDetectionNum(),
+                        vm.needSamplingNum
+                    )
                 }
             }
 
@@ -344,11 +350,11 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                                     dialog.showDialog(
                                         msg = "没有待检信息",
                                         confirmText = "我知道了",
-                                        confirmClick = {
+                                        confirmClick = { d: BasePopupView ->
                                             it.dismiss()
                                             u("没有待检信息，点击取消")
                                             vm.dialogGetStateNotExistConfirm()
-                                        },
+                                        }.throttle(),
                                     )
                                 }
                             } else {
@@ -374,11 +380,11 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                                 dialog.showDialog(
                                     msg = "$code $msg",
                                     confirmText = "我知道了",
-                                    confirmClick = {
+                                    confirmClick = { d: BasePopupView ->
                                         u("获取待检信息失败，我知道了")
                                         it.dismiss()
                                         vm.dialogGetStateNotExistConfirm()
-                                    },
+                                    }.throttle(),
                                 )
                             }
                         }
@@ -467,7 +473,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                             d.showDialog(
                                 it,
                                 "确定",
-                                confirmClick = { it.dismiss() },
+                                confirmClick = { baseDialog: BasePopupView -> baseDialog.dismiss() }.throttle(),
                                 showIcon = false,
                                 textGravity = Gravity.LEFT
                             )
@@ -484,31 +490,31 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                      * 自检中
                      */
                     is HomeDialogUiState.GetMachineShow -> {
-//                        dialogGetMachine.show()
+                        dialogGetMachine.show()
                     }
 
                     is HomeDialogUiState.GetMachineDismiss -> {
-//                        dialogGetMachine.dismiss()
+                        dialogGetMachine.dismiss()
                     }
                     /**
                      * 自检失败对话框
                      */
                     is HomeDialogUiState.GetMachineFailedShow -> {
                         lifecycleScope.launch {
-                            delay(300)
+                            delay(500)
                             dialog.showPop(requireContext(), isCancelable = false) {
                                 it.showDialog(
                                     msg = state.msg,
                                     confirmText = "重新自检",
-                                    confirmClick = { baseDialog ->
+                                    confirmClick = { baseDialog: BasePopupView ->
                                         baseDialog.dismiss()
                                         vm.dialogGetMachineFailedConfirm()
-                                    },
+                                    }.throttle(),
                                     cancelText = "我知道了",
-                                    cancelClick = { baseDialog ->
+                                    cancelClick = { baseDialog: BasePopupView ->
                                         baseDialog.dismiss()
                                         vm.dialogGetMachineFailedCancel()
-                                    },
+                                    }.throttle(),
                                     showIcon = true,
                                     iconId = ICON_HINT
                                 )
@@ -523,15 +529,15 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                             it.showDialog(
                                 msg = "比色皿检测结束，是否添加？",
                                 confirmText = "我已添加",
-                                confirmClick = {
+                                confirmClick = { baseDialog: BasePopupView ->
                                     it.dismiss()
                                     vm.dialogTestFinishCuvetteDeficiencyConfirm()
-                                },
+                                }.throttle(),
                                 cancelText = "结束检测",
-                                cancelClick = {
+                                cancelClick = { baseDialog: BasePopupView ->
                                     it.dismiss()
                                     vm.dialogTestFinishCuvetteDeficiencyCancel()
-                                },
+                                }.throttle(),
                                 showIcon = true,
                                 iconId = ICON_HINT
                             )
@@ -541,22 +547,27 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                      * 开始检测 比色皿,样本，试剂不足
                      */
                     is HomeDialogUiState.GetStateNotExist -> {
-                        dialog.showPop(requireContext(), isCancelable = false) {
-                            dialog.showDialog(
-                                msg = state.msg,
-                                confirmText = "我已添加",
-                                confirmClick = {
-                                    it.dismiss()
-                                    vm.dialogGetStateNotExistConfirm()
-                                },
-                                cancelText = "结束检测",
-                                cancelClick = {
-                                    it.dismiss()
-                                    vm.dialogGetStateNotExistCancel()
-                                },
-                                showIcon = true,
-                                iconId = ICON_HINT
-                            )
+                        lifecycleScope.launch {
+                            if (SystemGlobal.isCodeDebug) {
+                                delay(500)
+                            }
+                            dialog.showPop(requireContext(), isCancelable = false) {
+                                dialog.showDialog(
+                                    msg = state.msg,
+                                    confirmText = "我已添加",
+                                    confirmClick = { baseDialog: BasePopupView ->
+                                        it.dismiss()
+                                        vm.dialogGetStateNotExistConfirm()
+                                    }.throttle(),
+                                    cancelText = "结束检测",
+                                    cancelClick = { baseDialog: BasePopupView ->
+                                        it.dismiss()
+                                        vm.dialogGetStateNotExistCancel()
+                                    }.throttle(),
+                                    showIcon = true,
+                                    iconId = ICON_HINT
+                                )
+                            }
                         }
                     }
                     /**
@@ -567,9 +578,9 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                             it.showDialog(
                                 msg = if (state.msg.isEmpty()) "检测结束" else "检测结束,${state.msg}",
                                 confirmText = "确定",
-                                confirmClick = {
+                                confirmClick = { baseDialog: BasePopupView ->
                                     it.dismiss()
-                                },
+                                }.throttle(),
                                 showIcon = true,
                                 iconId = ICON_FINISH
                             )
@@ -583,9 +594,9 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                             it.showDialog(
                                 msg = state.msg,
                                 confirmText = "我知道了",
-                                confirmClick = { baseDialog ->
+                                confirmClick = { baseDialog: BasePopupView ->
                                     baseDialog.dismiss()
-                                },
+                                }.throttle(),
                                 showIcon = true,
                                 iconId = ICON_HINT
                             )
@@ -599,9 +610,9 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                             it.showDialog(
                                 msg = state.msg,
                                 confirmText = "我知道了",
-                                confirmClick = { baseDialog ->
+                                confirmClick = { baseDialog: BasePopupView ->
                                     baseDialog.dismiss()
-                                },
+                                }.throttle(),
                                 showIcon = true,
                                 iconId = ICON_HINT
                             )

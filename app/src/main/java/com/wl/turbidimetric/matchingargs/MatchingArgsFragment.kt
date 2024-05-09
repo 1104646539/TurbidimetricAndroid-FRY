@@ -111,9 +111,9 @@ class MatchingArgsFragment :
         set1.setDrawIcons(false)//不绘制值icon在点上
         set1.color = lineColor
         set1.label = ""
-        set1.enableDashedLine(6f, 6f, 0f)//线连成虚线
+        set1.enableDashedLine(10f, 0f, 0f)//线连成虚线
         set1.circleColors = listOf(lineColor)
-        set1.circleRadius = 4f //点的半径
+        set1.circleRadius = 1f //点的半径
         set1.setDrawCircleHole(false)
 
         //数据集,一个数据集一条线

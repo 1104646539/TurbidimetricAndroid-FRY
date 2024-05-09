@@ -14,7 +14,8 @@ interface Fitter {
     var fitGoodness: Double //拟合度
     var yss: DoubleArray //验算值
     fun calcParams(values: DoubleArray, guess: DoubleArray)
-    fun f(p: DoubleArray, x: Double): Double
+    fun ratCalcCon(p: DoubleArray, x: Double): Double
+    fun conCalcRat(p: DoubleArray, x: Double): Double
 }
 
 enum class FitterType(val showName: String) {
@@ -78,14 +79,18 @@ class ThreeFun : Fitter {
         yss = DoubleArray(guess.size)
         //step2、验算
         for (i in guess.indices) {
-            yss[i] = f(params, values[i])
+            yss[i] = ratCalcCon(params, values[i])
         }
 
         //step3、计算R方
         fitGoodness = calcRSquared2()
     }
 
-    override fun f(p: DoubleArray, x: Double): Double {
+    override fun ratCalcCon(p: DoubleArray, x: Double): Double {
+        return f2(p, x)
+    }
+
+    override fun conCalcRat(p: DoubleArray, x: Double): Double {
         return f2(p, x)
     }
 
@@ -125,11 +130,19 @@ class LinearFun : Fitter {
         //step2、验算
         yss = DoubleArray(guess.size)
         for (i in guess.indices) {
-            yss[i] = f(params, values[i])
+            yss[i] = ratCalcCon(params, values[i])
         }
 
         //step3、计算R方
         fitGoodness = simple.rSquare
+    }
+
+    override fun ratCalcCon(p: DoubleArray, x: Double): Double {
+        return f2(p, x)
+    }
+
+    override fun conCalcRat(p: DoubleArray, x: Double): Double {
+        return x - p[1] / p[0]
     }
 
     /**
@@ -143,9 +156,6 @@ class LinearFun : Fitter {
         return re as Double
     }
 
-    override fun f(p: DoubleArray, x: Double): Double {
-        return f2(p, x)
-    }
 
     companion object {
         @JvmStatic
@@ -172,7 +182,7 @@ class FourFun : Fitter {
         //step2、验算
         yss = DoubleArray(guess.size)
         for (i in guess.indices) {
-            yss[i] = f(params, values[i])
+            yss[i] = ratCalcCon(params, values[i])
         }
 
         //step3、计算R方
@@ -180,9 +190,15 @@ class FourFun : Fitter {
 
     }
 
-    override fun f(p: DoubleArray, x: Double): Double {
+    override fun ratCalcCon(p: DoubleArray, x: Double): Double {
         return f2(p, x)
     }
+
+    override fun conCalcRat(p: DoubleArray, x: Double): Double {
+        //y = (A - D) / [1 + (x/C)^B] + D
+        return ((p[0] - p[3]) / (1 + (x / p[2]).pow(p[1]))) + p[3]
+    }
+
 
     companion object {
         @JvmStatic

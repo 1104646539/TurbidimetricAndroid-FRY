@@ -22,6 +22,7 @@ import com.wl.turbidimetric.model.SampleType
 import com.wl.turbidimetric.util.Fitter
 import com.wl.turbidimetric.util.FitterFactory
 import com.wl.turbidimetric.util.FitterType
+import com.wl.turbidimetric.util.FourFun
 import com.wl.wllib.LogToFile.i
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -178,7 +179,7 @@ fun matchingArg(fitterType: FitterType, absorbances: List<Double>, targets: Doub
  */
 fun calcCon(absorbance: BigDecimal, project: CurveModel): Int {
     val fitter = FitterFactory.create(FitterType.toValue(project.fitterType))
-    var con = fitter.f(
+    var con = fitter.ratCalcCon(
         doubleArrayOf(project.f0, project.f1, project.f2, project.f3), absorbance.toDouble()
     )
 
@@ -249,7 +250,7 @@ fun calculateMean(numArray: DoubleArray): Double {
  * 是否是自动模式
  * @return Boolean
  */
-fun isAuto(machineTestModel: MachineTestModel ): Boolean {
+fun isAuto(machineTestModel: MachineTestModel): Boolean {
     return machineTestModel == MachineTestModel.Auto
 }
 
@@ -257,7 +258,7 @@ fun isAuto(machineTestModel: MachineTestModel ): Boolean {
  * 是否是手动加样模式
  * @return Boolean
  */
-fun isManualSampling(machineTestModel: MachineTestModel ): Boolean {
+fun isManualSampling(machineTestModel: MachineTestModel): Boolean {
     return machineTestModel == MachineTestModel.ManualSampling
 }
 
@@ -265,10 +266,9 @@ fun isManualSampling(machineTestModel: MachineTestModel ): Boolean {
  * 是否是手动模式
  * @return Boolean
  */
-fun isManual(machineTestModel: MachineTestModel ): Boolean {
+fun isManual(machineTestModel: MachineTestModel): Boolean {
     return machineTestModel == MachineTestModel.Manual
 }
-
 
 
 /**
@@ -455,27 +455,63 @@ fun getFitGoodness(fitterType: FitterType, fitGoodness: Double): String {
     }
 }
 
+///**
+// * 获取不同拟合类型的图表数据
+// */
+//fun getChartEntry(curve: CurveModel): List<Entry> {
+//    val values = mutableListOf<Entry>()
+//    curve.reactionValues.forEachIndexed { i, it ->
+//        if (i < curve.gradsNum) {
+//            val reaction = it.toFloat()
+//            val target = curve.targets[i].toFloat()
+//            //三种拟合方式的x,y轴不一样
+//            val x = if (FitterType.toValue(curve.fitterType) == FitterType.Three) {
+//                reaction
+//            } else {
+//                target
+//            }
+//            val y = if (FitterType.toValue(curve.fitterType) == FitterType.Three) {
+//                target
+//            } else {
+//                reaction
+//            }
+//            values.add(Entry(x, y))
+//        }
+//    }
+//    return values
+//}
 /**
  * 获取不同拟合类型的图表数据
+ * 根据曲线参数动态计算每个点【50个】计算的结果
+ * 反应值为y轴 浓度为x轴
+ * 三次多项式：
+ * 四参数：直接通过浓度计算反应值
+ * 线性：直接通过浓度计算反应值
  */
 fun getChartEntry(curve: CurveModel): List<Entry> {
     val values = mutableListOf<Entry>()
-    curve.reactionValues.forEachIndexed { i, it ->
-        if (i < curve.gradsNum) {
-            val reaction = it.toFloat()
-            val target = curve.targets[i].toFloat()
-            //三种拟合方式的x,y轴不一样
-            val x = if (FitterType.toValue(curve.fitterType) == FitterType.Three) {
-                reaction
-            } else {
-                target
+    val num = 50
+    var y = 0
+    var x = 0
+    var needContinue = true
+    repeat(num) {
+        if (!needContinue) return@repeat
+        if (FitterType.toValue(curve.fitterType) == FitterType.Three) {
+            y += 2000 / num
+            x = calcCon(y.toBigDecimal(), curve)
+            if (x > 1000) {
+                needContinue = false
             }
-            val y = if (FitterType.toValue(curve.fitterType) == FitterType.Three) {
-                target
-            } else {
-                reaction
-            }
-            values.add(Entry(x, y))
+        } else {
+            x += 1000 / num
+            val fitter = FitterFactory.create(FitterType.toValue(curve.fitterType))
+            y = fitter.conCalcRat(
+                doubleArrayOf(curve.f0, curve.f1, curve.f2, curve.f3),
+                x.toDouble()
+            ).toInt()
+        }
+        if (x >= 0 && y >= 0) {
+            values.add(Entry(x.toFloat(), y.toFloat()))
         }
     }
     return values
@@ -484,9 +520,10 @@ fun getChartEntry(curve: CurveModel): List<Entry> {
 /**
  * 获取全局唯一的ViewModel示例
  */
-fun <T : ViewModel> getAppViewModel(classVm: Class<T> ): T {
+fun <T : ViewModel> getAppViewModel(classVm: Class<T>): T {
     return App.AppViewModelStoreOwner.getAppViewModel(classVm)
 }
+
 /**
  * @param during 防抖时间间隔
  * @param combine 一个接口中的多个回调方法是否共用防抖时间

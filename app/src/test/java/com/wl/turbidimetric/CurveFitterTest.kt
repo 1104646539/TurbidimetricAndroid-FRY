@@ -7,10 +7,21 @@ import com.wl.turbidimetric.util.FitterType
 import com.wl.turbidimetric.util.FourFun
 import com.wl.turbidimetric.util.LinearFun
 import com.wl.turbidimetric.util.ThreeFun
+import org.junit.Before
 import org.junit.Test
+import kotlin.math.abs
 
 
 class CurveFitterTest {
+
+    lateinit var ratsFour: DoubleArray
+    lateinit var tarsFour: DoubleArray
+
+    @Before
+    fun create() {
+        ratsFour = doubleArrayOf(0.1, 15.9, 37.5, 178.8, 329.3, 437.7)
+        tarsFour = doubleArrayOf(0.0, 25.0, 50.0, 200.0, 500.0, 1000.0)
+    }
 
     /**
      * 三次多项式拟合测试
@@ -42,7 +53,7 @@ class CurveFitterTest {
         }
         println("\n验算")
         ps.forEach { v ->
-            val con = fitter.f(fitter.params, v)
+            val con = fitter.ratCalcCon(fitter.params, v)
             print("con=$con")
         }
         println()
@@ -218,10 +229,36 @@ class CurveFitterTest {
         }
 
         for (p in ps) {
-            val con = fitter.f(fitter.params, p)
+            val con = fitter.ratCalcCon(fitter.params, p)
             println("con=$con")
         }
         println("fitGoodness${fitter.fitGoodness}")
+    }
+
+    /**
+     * 四参数拟合测试
+     */
+    @Test
+    fun fourFunTest2() {
+        val fitter = FitterFactory.create(FitterType.Four)
+        fitter.calcParams(ratsFour, tarsFour)
+        println("参数")
+        fitter.params.forEach {
+            print("it=$it ")
+        }
+        val k = abs(fitter.params[0] - (-1.818473100987009)) < 0.0000001
+        assert(k)
+        println("\n验算")
+        ratsFour.forEach { v ->
+            val con = fitter.ratCalcCon(fitter.params, v)
+            print("con=$con ")
+        }
+        println()
+
+        tarsFour.forEach {
+            val rat = fitter.conCalcRat(fitter.params, it)
+            print("rat=$rat ")
+        }
     }
 
     /**
@@ -253,7 +290,7 @@ class CurveFitterTest {
         }
         println("\n验算")
         ps.forEach { v ->
-            val con = fitter.f(fitter.params, v)
+            val con = fitter.ratCalcCon(fitter.params, v)
             print("con=$con ")
         }
         println()
@@ -311,7 +348,7 @@ class CurveFitterTest {
         }
         println("\n验算")
         ps.forEach { v ->
-            val con = fitter.f(fitter.params, v)
+            val con = fitter.ratCalcCon(fitter.params, v)
             print("con=$con")
         }
         println()
@@ -333,6 +370,7 @@ class CurveFitterTest {
             println("con=$con")
         }
     }
+
     @Test
     fun testThreeFunCalc() {
         val f0 = 24.756992920270594
@@ -346,6 +384,7 @@ class CurveFitterTest {
             println("con=$con")
         }
     }
+
     @Test
     fun testLinearFunCalc() {
         val f0 = 1.614742835

@@ -128,7 +128,7 @@ data class TestResultModel(
         if (other !is TestResultModel) return false
 
         if (resultId != other.resultId) return false
-        if (isSelect != other.isSelect) return false
+//        if (isSelect != other.isSelect) return false
         if (name != other.name) return false
         if (gender != other.gender) return false
         if (age != other.age) return false

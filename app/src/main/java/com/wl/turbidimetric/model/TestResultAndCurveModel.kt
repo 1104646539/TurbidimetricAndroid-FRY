@@ -14,7 +14,7 @@ data class TestResultAndCurveModel(
         if (other == null) return false
         if (other !is TestResultAndCurveModel) return false
         if (other.result == null && result == null && other.curve == null && curve == null) return true
-        return other.result.equals(result) == true && other.curve?.equals(curve) == true
+        return other.result == result && other.curve?.equals(curve) == true
     }
 
     @Suppress("UNCHECKED_CAST")

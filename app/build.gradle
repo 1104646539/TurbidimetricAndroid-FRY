@@ -31,7 +31,7 @@ android {
         minSdk 24
         targetSdk 26
         versionCode 1
-        versionName "1.0.0.0-16修复自检失败后重新自检成功立刻开始检测的闪退问题"
+        versionName "1.0.0.0-17修复数据管理已选中的数据在数据更新时会丢失选中的问题"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 

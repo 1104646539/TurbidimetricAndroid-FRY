@@ -3,24 +3,16 @@ package com.wl.turbidimetric.upload.view
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.wl.turbidimetric.app.App
-import com.wl.turbidimetric.app.AppViewModel
+import com.wl.turbidimetric.base.BaseViewModel
+import com.wl.turbidimetric.db.ServiceLocator
 import com.wl.turbidimetric.global.SystemGlobal
+import com.wl.turbidimetric.model.MachineTestModel
+import com.wl.turbidimetric.model.ProjectModel
+import com.wl.turbidimetric.repository.if2.LocalDataSource
+import com.wl.turbidimetric.repository.if2.ProjectSource
 import com.wl.turbidimetric.upload.model.ConnectConfig
 import com.wl.turbidimetric.upload.model.GetPatientType
 import com.wl.weiqianwllib.serialport.WQSerialGlobal
-import com.wl.turbidimetric.base.BaseViewModel
-import com.wl.turbidimetric.ex.getAppViewModel
-import com.wl.turbidimetric.home.HomeViewModel
-import com.wl.turbidimetric.model.MachineTestModel
-import com.wl.turbidimetric.model.ProjectModel
-import com.wl.turbidimetric.repository.DefaultCurveDataSource
-import com.wl.turbidimetric.repository.DefaultLocalDataDataSource
-import com.wl.turbidimetric.repository.DefaultProjectDataSource
-import com.wl.turbidimetric.repository.DefaultTestResultDataSource
-import com.wl.turbidimetric.repository.if2.CurveSource
-import com.wl.turbidimetric.repository.if2.LocalDataSource
-import com.wl.turbidimetric.repository.if2.ProjectSource
-import com.wl.turbidimetric.repository.if2.TestResultSource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 
@@ -99,8 +91,8 @@ class UploadSettingsViewModel(
 }
 
 class UploadSettingsViewModelFactory(
-    private val projectSource: ProjectSource = DefaultProjectDataSource(App.instance!!.mainDao),
-    private val localDataRepository: LocalDataSource = DefaultLocalDataDataSource()
+    private val projectSource: ProjectSource = ServiceLocator.provideProjectSource(App.instance!!),
+    private val localDataRepository: LocalDataSource = ServiceLocator.provideLocalDataSource(App.instance!!)
 ) : ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(UploadSettingsViewModel::class.java)) {

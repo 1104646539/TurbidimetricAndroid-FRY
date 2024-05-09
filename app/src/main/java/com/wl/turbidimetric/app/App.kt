@@ -10,12 +10,13 @@ import androidx.lifecycle.ViewModelStoreOwner
 import com.lxj.xpopup.XPopup
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.datastore.LocalData
-import com.wl.turbidimetric.db.MainRoomDatabase
+import com.wl.turbidimetric.db.ServiceLocator
 import com.wl.turbidimetric.ex.copyForProject
 import com.wl.turbidimetric.ex.getPackageInfo
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.CurveModel
 import com.wl.turbidimetric.model.ProjectModel
+import com.wl.turbidimetric.repository.if2.ProjectSource
 import com.wl.turbidimetric.upload.hl7.util.getLocalConfig
 import com.wl.turbidimetric.util.CrashHandler
 import com.wl.turbidimetric.util.FitterType
@@ -31,8 +32,7 @@ import java.util.Date
 
 class App : Application() {
     private val activityList = mutableListOf<Activity>()
-    val database by lazy { MainRoomDatabase.getDatabase(this) }
-    val mainDao by lazy { database.mainDao() }
+    val mainDao by lazy { ServiceLocator.getDb(this).mainDao() }
     override fun attachBaseContext(base: Context?) {
         super.attachBaseContext(base)
     }
@@ -69,6 +69,7 @@ class App : Application() {
 
     private fun initDB() {
         GlobalScope.launch {
+           val projectSource =  ServiceLocator.provideProjectSource(this@App)
             val ps = mainDao.getProjectModels().first()
 
             if (ps.isEmpty()) {
@@ -84,17 +85,18 @@ class App : Application() {
                     projectUnit = "ug/mL"
                     projectLjz = 40
                 }
-                mainDao.insertProjectModel(project)
-                mainDao.insertProjectModel(project2)
+                projectSource.addProject(project)
+                projectSource.addProject(project2)
                 insertTestCurve(project)
             }
         }
     }
 
     private suspend fun insertTestCurve(project: ProjectModel) {
+        val curveSource =  ServiceLocator.provideCurveSource(this@App)
         repeat(1) {
             //三次方
-            mainDao.insertCurveModel(CurveModel().apply {
+            curveSource.addCurve(CurveModel().apply {
                 reagentNO = "${555 + it}"
                 f0 = 24.756992920270594
                 f1 = 0.8582045209676992
@@ -110,7 +112,7 @@ class App : Application() {
             }.copyForProject(project))
         }
         //线性
-        mainDao.insertCurveModel(CurveModel().apply {
+        curveSource.addCurve(CurveModel().apply {
             reagentNO = "${556}"
             f0 = 1.614742835
             f1 = -6.930948268
@@ -125,7 +127,7 @@ class App : Application() {
             createTime = Date().toTimeStr()
         }.copyForProject(project))
         //四参数
-        mainDao.insertCurveModel(CurveModel().apply {
+        curveSource.addCurve(CurveModel().apply {
             reagentNO = "${557}"
             f0 = -1.818473101
             f1 = 1.253206105

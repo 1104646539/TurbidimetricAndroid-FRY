@@ -3,12 +3,11 @@ package com.wl.turbidimetric.settings.testmode
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.wl.turbidimetric.app.App
 import com.wl.turbidimetric.base.BaseViewModel
-import com.wl.turbidimetric.datastore.LocalData
+import com.wl.turbidimetric.db.ServiceLocator
 import com.wl.turbidimetric.model.MachineTestModel
-import com.wl.turbidimetric.repository.DefaultLocalDataDataSource
 import com.wl.turbidimetric.repository.if2.LocalDataSource
-import com.wl.turbidimetric.settings.params.ParamsViewModel
 import com.wl.turbidimetric.upload.hl7.HL7Helper
 import com.wl.turbidimetric.upload.model.GetPatientType
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -70,7 +69,7 @@ class TestModeViewModel(private val localDataSource: LocalDataSource) : BaseView
 }
 
 class TestModeViewModelFactory(
-    private val localDataSource: LocalDataSource = DefaultLocalDataDataSource()
+    private val localDataSource: LocalDataSource = ServiceLocator.provideLocalDataSource(App.instance!!)
 ) : ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(TestModeViewModel::class.java)) {

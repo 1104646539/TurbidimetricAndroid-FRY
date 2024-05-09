@@ -8,6 +8,7 @@ import androidx.paging.cachedIn
 import com.wl.turbidimetric.app.App
 import com.wl.turbidimetric.app.AppViewModel
 import com.wl.turbidimetric.base.BaseViewModel
+import com.wl.turbidimetric.db.ServiceLocator
 import com.wl.turbidimetric.ex.getAppViewModel
 import com.wl.turbidimetric.model.ConditionModel
 import com.wl.turbidimetric.model.TestResultAndCurveModel
@@ -98,12 +99,18 @@ class DataManagerViewModel(
         _dialogUiState.emit(DataManagerUiState.ResultDetailsDialog(result))
     }
 
+    fun deleteResult() {
+        viewModelScope.launch {
+            _dialogUiState.emit(DataManagerUiState.DeleteDialog)
+        }
+    }
+
 }
 
 class DataManagerViewModelFactory(
     private val appViewModel: AppViewModel = getAppViewModel(AppViewModel::class.java),
-    private val projectRepository: ProjectSource = DefaultProjectDataSource(App.instance!!.mainDao),
-    private val testResultRepository: TestResultSource = DefaultTestResultDataSource(App.instance!!.mainDao)
+    private val projectRepository: ProjectSource = ServiceLocator.provideProjectSource(App.instance!!),
+    private val testResultRepository: TestResultSource = ServiceLocator.provideTestResultSource(App.instance!!)
 ) :
     ViewModelProvider.NewInstanceFactory() {
 

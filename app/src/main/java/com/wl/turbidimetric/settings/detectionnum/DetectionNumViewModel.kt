@@ -3,10 +3,9 @@ package com.wl.turbidimetric.settings.detectionnum
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.wl.turbidimetric.app.AppViewModel
+import com.wl.turbidimetric.app.App
 import com.wl.turbidimetric.base.BaseViewModel
-import com.wl.turbidimetric.datastore.LocalData
-import com.wl.turbidimetric.repository.DefaultLocalDataDataSource
+import com.wl.turbidimetric.db.ServiceLocator
 import com.wl.turbidimetric.repository.if2.LocalDataSource
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -66,7 +65,7 @@ class DetectionNumViewModel(private val localDataDataSource: LocalDataSource) : 
 }
 
 class DetectionNumViewModelFactory(
-    private val localDataDataSource: LocalDataSource = DefaultLocalDataDataSource()
+    private val localDataDataSource: LocalDataSource = ServiceLocator.provideLocalDataSource(App.instance!!)
 ) : ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(DetectionNumViewModel::class.java)) {

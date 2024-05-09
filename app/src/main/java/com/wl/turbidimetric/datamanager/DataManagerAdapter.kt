@@ -4,7 +4,6 @@ import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
-import androidx.databinding.library.baseAdapters.BR
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -12,11 +11,7 @@ import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.ItemDatamanagerResultBinding
 import com.wl.turbidimetric.model.ResultState
 import com.wl.turbidimetric.model.TestResultAndCurveModel
-import com.wl.turbidimetric.model.TestResultModel
-import com.wl.wllib.LogToFile.i
-import com.wl.wllib.toLongTimeStr
 import com.wl.wllib.toTimeStr
-import java.math.RoundingMode
 
 class DataManagerAdapter :
     PagingDataAdapter<TestResultAndCurveModel, DataManagerAdapter.DataManagerViewHolder>(

@@ -6,6 +6,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
+import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -75,6 +76,7 @@ class DataManagerFragment :
     private fun initView() {
         vd.rv.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+        vd.rv.itemAnimator = DefaultItemAnimator()
         val itemDividerMode = DividerItemDecoration(
             requireContext(), android.widget.LinearLayout.VERTICAL
         ).apply { setDrawable(resources.getDrawable(R.drawable.item_hori_divider)!!) }
@@ -188,6 +190,10 @@ class DataManagerFragment :
             u("打印")
             print()
         }
+        vd.btnDelete.setOnClickListener {
+            u("删除")
+            delete()
+        }
         adapter.onSelectChange = { pos, selected ->
 
         }
@@ -236,13 +242,10 @@ class DataManagerFragment :
         }
     }
 
-    private fun getBacklog2() {
-
+    private fun delete() {
+        vm.deleteResult()
     }
 
-    private fun getBacklog() {
-
-    }
 
     /**
      * 上传
@@ -454,7 +457,7 @@ class DataManagerFragment :
             vm.item(condition).collectLatest {
                 i("---监听到了变化---condition=$condition")
                 vm.conditionChange(condition)
-                adapter.submitData(it)
+                adapter.submitData(lifecycle,it)
                 //刷新后移动到顶部，只在没有移动的时候移动
                 withContext(Dispatchers.Main) {
                     if (vd.rv.scrollState == RecyclerView.SCROLL_STATE_IDLE)

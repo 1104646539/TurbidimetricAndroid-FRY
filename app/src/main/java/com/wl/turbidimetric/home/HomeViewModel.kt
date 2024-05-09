@@ -4,6 +4,7 @@ import androidx.lifecycle.*
 import com.wl.turbidimetric.app.App
 import com.wl.turbidimetric.app.AppViewModel
 import com.wl.turbidimetric.base.BaseViewModel
+import com.wl.turbidimetric.db.ServiceLocator
 import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.EventGlobal
 import com.wl.turbidimetric.global.EventMsg
@@ -3099,10 +3100,10 @@ class HomeViewModel(
 
 class HomeViewModelFactory(
     private val appViewModel: AppViewModel = getAppViewModel(AppViewModel::class.java),
-    private val projectRepository: ProjectSource = DefaultProjectDataSource(App.instance!!.mainDao),
-    private val curveRepository: CurveSource = DefaultCurveDataSource(App.instance!!.mainDao),
-    private val testResultRepository: TestResultSource = DefaultTestResultDataSource(App.instance!!.mainDao),
-    private val localDataRepository: LocalDataSource = DefaultLocalDataDataSource()
+    private val projectRepository: ProjectSource = ServiceLocator.provideProjectSource(App.instance!!),
+    private val curveRepository: CurveSource = ServiceLocator.provideCurveSource(App.instance!!),
+    private val testResultRepository: TestResultSource = ServiceLocator.provideTestResultSource(App.instance!!),
+    private val localDataRepository: LocalDataSource = ServiceLocator.provideLocalDataSource(App.instance!!)
 ) : ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(HomeViewModel::class.java)) {

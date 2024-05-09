@@ -2,15 +2,10 @@ package com.wl.turbidimetric.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
+import com.wl.turbidimetric.app.App
 import com.wl.turbidimetric.base.BaseViewModel
-import com.wl.turbidimetric.datastore.LocalData
-import com.wl.turbidimetric.home.HomeViewModel
-import com.wl.turbidimetric.repository.DefaultLocalDataDataSource
+import com.wl.turbidimetric.db.ServiceLocator
 import com.wl.turbidimetric.repository.if2.LocalDataSource
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.launch
 
 class SettingsViewModel constructor(
     private val localDataSource: LocalDataSource
@@ -29,7 +24,7 @@ class SettingsViewModel constructor(
 }
 
 class SettingsViewModelFactory(
-    private val localDataSource: LocalDataSource = DefaultLocalDataDataSource()
+    private val localDataSource: LocalDataSource = ServiceLocator.provideLocalDataSource(App.instance!!)
 ) : ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(SettingsViewModel::class.java)) {

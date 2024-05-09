@@ -1,18 +1,15 @@
 package com.wl.turbidimetric.db
 
-import android.content.Context
 import androidx.room.Database
-import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.wl.turbidimetric.dao.MainDao
 import com.wl.turbidimetric.db.converters.BigDecimalConverters
 import com.wl.turbidimetric.db.converters.DoubleArrayConverters
 import com.wl.turbidimetric.db.converters.IntArrayConverters
-import com.wl.turbidimetric.model.ProjectModel
 import com.wl.turbidimetric.model.CurveModel
+import com.wl.turbidimetric.model.ProjectModel
 import com.wl.turbidimetric.model.TestResultModel
-import java.io.File
 
 @Database(
     entities = [TestResultModel::class, ProjectModel::class, CurveModel::class],
@@ -26,24 +23,24 @@ abstract class MainRoomDatabase : RoomDatabase() {
     abstract fun mainDao(): MainDao
 
 
-    companion object {
-        @Volatile
-        private var INSTANCE: MainRoomDatabase? = null
-        fun getDatabase(context: Context): MainRoomDatabase {
-            return INSTANCE ?: synchronized(this) {
-                val instance = Room.databaseBuilder(
-                    context.applicationContext,
-                    MainRoomDatabase::class.java,
-                    "word_database"
-                )
-                    .allowMainThreadQueries()
-//                    .createFromFile(File("sdcard/bf/word_database"))
-//                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
-                    .build()
-                INSTANCE = instance
-                instance
-            }
-        }
+//    companion object {
+//        @Volatile
+//        private var INSTANCE: MainRoomDatabase? = null
+//        fun getDatabase(context: Context): MainRoomDatabase {
+//            return INSTANCE ?: synchronized(this) {
+//                val instance = Room.databaseBuilder(
+//                    context.applicationContext,
+//                    MainRoomDatabase::class.java,
+//                    "word_database"
+//                )
+//                    .allowMainThreadQueries()
+////                    .createFromFile(File("sdcard/bf/word_database"))
+////                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+//                    .build()
+//                INSTANCE = instance
+//                instance
+//            }
+//        }
 
 //        val MIGRATION_1_2 = object : Migration(1, 2) {
 //            override fun migrate(database: SupportSQLiteDatabase) {
@@ -55,6 +52,6 @@ abstract class MainRoomDatabase : RoomDatabase() {
 //                database.execSQL("ALTER TABLE TestResultModel ADD COLUMN testV varchar")
 //            }
 //        }
-    }
+//    }
 }
 

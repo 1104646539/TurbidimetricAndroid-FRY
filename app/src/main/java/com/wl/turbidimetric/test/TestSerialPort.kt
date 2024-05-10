@@ -126,7 +126,7 @@ object TestSerialPort {
             }
 
             SerialGlobal.CMD_DripSample -> {
-                delay(4000)//测试实时获取信息时需要
+//                delay(4000)//测试实时获取信息时需要
 //                if (index == 3) {
 //                    reply = ubyteArrayOf(data[0], 0x05u, 0x0u, 0x0u, 0x0u, 0x0u)//加样失败
 //                }else{

@@ -891,7 +891,7 @@ class HomeViewModel(
         if (!runningTest()) return
         if (appViewModel.testState.isNotPrepare()) return
         c("接收到 移动样本 reply=$reply cuvettePos=$cuvettePos lastCuvetteShelfPos=$lastCuvetteShelfPos cuvetteShelfPos=$cuvetteShelfPos samplePos=$samplePos samplingProbeCleaningFinish=$samplingProbeCleaningFinish")
-
+        samplingNum++
         sampleMoveFinish = true
         samplingFinish = false
         dripSampleFinish = false
@@ -913,10 +913,13 @@ class HomeViewModel(
                 updateSampleState(samplePos, SampleState.NONEXISTENT)
                 nextStepDripReagent()
             } else {
-                //有样本
-                i("有样本")
-                updateSampleState(samplePos, SampleState.Exist)
-                startScan(samplePos)
+                //如果是手动模式并且加样数量已经足够就不需要再去扫码。否则则去扫码
+                if (!(isManual() && manualModelSamplingFinish())) {
+                    //有样本
+                    i("有样本")
+                    updateSampleState(samplePos, SampleState.Exist)
+                    startScan(samplePos)
+                }
             }
         }
         //判断是否需要取样。取样位和扫码位差一个位置
@@ -2061,7 +2064,6 @@ class HomeViewModel(
         if (appViewModel.testState.isNotPrepare()) return
         c("接收到 取样 reply=$reply cuvettePos=$cuvettePos samplePos=$samplePos cuvetteShelfPos=$cuvetteShelfPos sampleShelfPos=$sampleShelfPos")
         samplingFinish = true
-        samplingNum++
         if (reply.state == ReplyState.SAMPLING_FAILED && !appViewModel.looperTest) {//取样失败
             updateSampleState(samplePos - 1, SampleState.SamplingFailed)
             updateResultStateForSample(samplePos - 1, ResultState.SamplingFailed)
@@ -2478,7 +2480,7 @@ class HomeViewModel(
      * @return Boolean
      */
     fun manualModelSamplingFinish(): Boolean {
-        return needSamplingNum <= samplingNum
+        return needSamplingNum < samplingNum
     }
 
 
@@ -2719,6 +2721,8 @@ class HomeViewModel(
         cuvetteStartPos = 0
         cuvettePos = -1
         samplePos = -1
+        samplingNum = 0
+        needSamplingNum = 0
         moveCuvetteShelf(cuvetteShelfPos)
         moveSampleShelf(sampleShelfPos)
     }

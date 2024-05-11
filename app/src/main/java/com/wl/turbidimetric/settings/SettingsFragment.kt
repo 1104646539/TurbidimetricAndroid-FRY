@@ -214,6 +214,12 @@ class SettingsFragment constructor() :
             return
         }
         val bt = childFragmentManager.beginTransaction()
+        bt.setCustomAnimations(
+            R.anim.card_flip_right_in,
+            R.anim.card_flip_left_out,
+            R.anim.card_flip_left_in,
+            R.anim.card_flip_right_out,
+        )
         if (curFragment != null) {
             bt.hide(curFragment!!)
             curFragment = null
@@ -226,11 +232,13 @@ class SettingsFragment constructor() :
         }
         curFragment = fragment
 
+        bt.addToBackStack(null)
         bt.commit()
     }
 
+
     private fun projectList() {
-        startActivity(Intent(requireContext(), ProjectListActivity::class.java))
+        requireActivity().transitionTo(Intent(requireActivity(), ProjectListActivity::class.java))
     }
 
     /**
@@ -241,7 +249,7 @@ class SettingsFragment constructor() :
             toast("正在检测，请稍后")
             return
         }
-        startActivity(Intent(requireContext(), DebugActivity::class.java))
+        requireActivity().transitionTo(Intent(requireContext(), DebugActivity::class.java))
     }
 
     /**
@@ -296,11 +304,11 @@ class SettingsFragment constructor() :
     }
 
     private fun startUpload() {
-        startActivity(Intent(requireContext(), UploadSettingsActivity::class.java))
+        requireActivity().transitionTo(Intent(requireContext(), UploadSettingsActivity::class.java))
     }
 
     private fun showLauncher() {
-        startActivity(getLauncher())
+        requireActivity().transitionTo(getLauncher())
     }
 
     /**
@@ -327,7 +335,7 @@ class SettingsFragment constructor() :
             toast("正在检测，请稍后")
             return
         }
-        startActivity(
+        requireActivity().transitionTo(
             Intent(requireContext(), TestActivity::class.java).putExtra(
                 TestActivity.flag, TestActivity.flag_Repeatability
             )

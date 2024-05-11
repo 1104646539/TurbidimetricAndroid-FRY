@@ -1,8 +1,12 @@
 package com.wl.turbidimetric.base
 
 import android.os.Bundle
+import android.transition.Slide
+import android.transition.Visibility
+import android.view.Gravity
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.ViewDataBinding
+import com.wl.turbidimetric.R
 import com.wl.turbidimetric.app.App
 import com.wl.turbidimetric.app.AppViewModel
 import com.wl.turbidimetric.ex.getAppViewModel
@@ -25,6 +29,16 @@ abstract class BaseActivity<VM : BaseViewModel, VD : ViewDataBinding> : AppCompa
         supportActionBar?.hide()
         EventBus.getDefault().register(this)
         init()
+        window.enterTransition = buildEnterTransition()
+    }
+
+    private fun buildEnterTransition(): Visibility? {
+        val enterTransition = Slide()
+        enterTransition.setDuration(
+            resources.getInteger(R.integer.fragment_transform_time).toLong()
+        )
+        enterTransition.slideEdge = Gravity.RIGHT
+        return enterTransition
     }
 
     override fun onDestroy() {

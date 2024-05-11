@@ -88,7 +88,7 @@ class UploadSettingsActivity :
 
     private fun listenerView() {
         //监听view改变viewModel的值
-        vd.nav.setOnBack { finish() }
+        vd.nav.setOnBack { finishAfterTransition() }
         vd.nav.setTitle("连接参数设置")
         vd.nav.setRight1("保存配置") {
             saveConfig()

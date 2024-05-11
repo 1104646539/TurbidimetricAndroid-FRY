@@ -10,6 +10,7 @@ import com.wl.turbidimetric.databinding.ActivityProjectListBinding
 import com.wl.turbidimetric.project.details.ProjectDetailsActivity
 import com.wl.turbidimetric.util.ActivityDataBindingDelegate
 import com.wl.turbidimetric.base.BaseActivity
+import com.wl.turbidimetric.ex.transitionTo
 import kotlinx.coroutines.flow.collectLatest
 
 /**
@@ -32,10 +33,10 @@ class ProjectListActivity : BaseActivity<ProjectListViewModel, ActivityProjectLi
         }
         vd.nav.setTitle("项目列表")
         vd.nav.setOnBack {
-            finish()
+            finishAfterTransition()
         }
         vd.nav.setRight1("添加项目") {
-            startActivity(Intent(this, ProjectDetailsActivity::class.java).apply {
+            transitionTo(Intent(this, ProjectDetailsActivity::class.java).apply {
                 putExtra(
                     ProjectDetailsActivity.ID,
                     0
@@ -52,7 +53,7 @@ class ProjectListActivity : BaseActivity<ProjectListViewModel, ActivityProjectLi
         vd.rv.adapter = adapter
 
         adapter.onItemClick = {
-            startActivity(Intent(this, ProjectDetailsActivity::class.java).apply {
+            transitionTo(Intent(this, ProjectDetailsActivity::class.java).apply {
                 putExtra(
                     ProjectDetailsActivity.ID,
                     it.projectId
@@ -63,7 +64,7 @@ class ProjectListActivity : BaseActivity<ProjectListViewModel, ActivityProjectLi
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
-            finish()
+            finishAfterTransition()
             return true
         }
         return super.onOptionsItemSelected(item)

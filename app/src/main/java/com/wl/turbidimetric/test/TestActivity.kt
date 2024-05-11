@@ -43,7 +43,7 @@ class TestActivity : BaseActivity<BaseViewModel, ActivityTestBinding>() {
                 toast("正在检测，请稍后……")
                 return false
             }
-            finish()
+            finishAfterTransition()
             return true
         }
         return super.onOptionsItemSelected(item)

@@ -6,7 +6,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.view.View
 import android.widget.EditText
+import androidx.core.app.ActivityOptionsCompat
+import androidx.core.util.Pair
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
@@ -554,4 +557,11 @@ private fun resolveDefaultReturnValue(method: Method): Any? {
         Void::class.java.simpleName.toLowerCase(Locale.US) -> null
         else -> throw IllegalArgumentException("无法正确对返回值不为空的回调进行节流")
     }
+}
+fun Activity.transitionTo( i: Intent?) {
+    val pairs: Array<Pair<View, String>> =
+        arrayOf()
+    val transitionActivityOptions =
+        ActivityOptionsCompat.makeSceneTransitionAnimation(this, *pairs)
+    this.startActivity(i, transitionActivityOptions.toBundle())
 }

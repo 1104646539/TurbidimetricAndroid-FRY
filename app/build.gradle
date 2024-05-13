@@ -31,7 +31,7 @@ android {
         minSdk 24
         targetSdk 26
         versionCode 1
-        versionName "1.0.0.0-20添加部分界面的动画效果"
+        versionName "1.0.0.0-21修复打开调试页面卡顿的问题"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 

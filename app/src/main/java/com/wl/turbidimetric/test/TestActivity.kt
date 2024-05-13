@@ -12,6 +12,8 @@ import com.wl.turbidimetric.ex.toast
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.TestState
 import com.wl.turbidimetric.test.repeatablitylity.RepeatabilityFragment
+import com.wl.wllib.LogToFile
+import com.wl.wllib.LogToFile.i
 
 class TestActivity : BaseActivity<BaseViewModel, ActivityTestBinding>() {
     override val vd: ActivityTestBinding by ActivityDataBindingDelegate(R.layout.activity_test)
@@ -20,7 +22,7 @@ class TestActivity : BaseActivity<BaseViewModel, ActivityTestBinding>() {
 
     override fun init() {
         supportActionBar?.hide()
-        vd.nav.setOnBack { finish() }
+        vd.nav.setOnBack { finishAfterTransition() }
 
         val flag = intent.getStringExtra(TestActivity.flag)
         var fragment: Fragment? = null
@@ -34,7 +36,6 @@ class TestActivity : BaseActivity<BaseViewModel, ActivityTestBinding>() {
             supportFragmentManager.beginTransaction()
                 .add(R.id.ll_root, it, flag_Repeatability).commitNowAllowingStateLoss()
         }
-
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

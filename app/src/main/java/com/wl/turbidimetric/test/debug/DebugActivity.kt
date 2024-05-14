@@ -24,7 +24,7 @@ class DebugActivity : BaseActivity<DebugViewModel, ActivityDebugBinding>() {
     override val vm: DebugViewModel by viewModels { DebugViewModelFactory() }
     override fun init() {
         supportActionBar?.hide()
-        vd.nav.setOnBack { finishAfterTransition() }
+
         vd.nav.setTitle("测试页面")
         listener()
 
@@ -33,6 +33,7 @@ class DebugActivity : BaseActivity<DebugViewModel, ActivityDebugBinding>() {
                 with(Dispatchers.IO) {
                     delay(1000)
                     with(Dispatchers.Main){
+                        vd.nav.setOnBack { finishAfterTransition() }
                         vd.vp.isUserInputEnabled = false
                         vd.vp.offscreenPageLimit = ViewPager2.OFFSCREEN_PAGE_LIMIT_DEFAULT
                         vd.vp.adapter = DebugViewPagerAdapter(this@DebugActivity)

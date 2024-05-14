@@ -38,11 +38,11 @@ class ProjectDetailsViewModel(private val projectRepository: ProjectSource) :
         return projectRepository.addProject(projectModel)
     }
 
-    suspend fun queryRepeatProjectModel(projectName: String, projectCode: String): ProjectModel {
+    suspend fun queryRepeatProjectModel(projectName: String, projectCode: String): ProjectModel? {
         return projectRepository.queryRepeatProjectModel(projectName, projectCode)
     }
 
-    suspend fun getProjectModelForId(id: Long): ProjectModel {
+    suspend fun getProjectModelForId(id: Long): ProjectModel? {
         return projectRepository.getProjectModelForId(id)
     }
 

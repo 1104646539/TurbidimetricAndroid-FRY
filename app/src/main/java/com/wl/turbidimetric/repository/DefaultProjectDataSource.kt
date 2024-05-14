@@ -58,7 +58,7 @@ class DefaultProjectDataSource constructor(
     /**
      * 获取项目 根据id
      */
-    override suspend fun getProjectModelForId(id: Long): ProjectModel {
+    override suspend fun getProjectModelForId(id: Long): ProjectModel? {
         return dao.getProjectModelForId(id)
     }
 

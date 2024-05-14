@@ -32,10 +32,10 @@ interface ProjectSource {
     /**
      * 查询是否有重复的项目
      */
-    suspend fun queryRepeatProjectModel(projectName: String, projectCode: String): ProjectModel
+    suspend fun queryRepeatProjectModel(projectName: String, projectCode: String): ProjectModel?
 
     /**
      * 获取项目 根据id
      */
-    suspend fun getProjectModelForId(id: Long): ProjectModel
+    suspend fun getProjectModelForId(id: Long): ProjectModel?
 }

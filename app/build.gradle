@@ -4,6 +4,7 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
     id("kotlin-parcelize")
+    id 'kotlin-android'
 }
 
 android {
@@ -29,9 +30,9 @@ android {
     defaultConfig {
         applicationId "com.wl.turbidimetric"
         minSdk 24
-        targetSdk 26
+        targetSdk 32
         versionCode 1
-        versionName "1.0.0.0-21修复打开调试页面卡顿的问题"
+        versionName "1.0.0.0-22修复关闭调试页面显示异常的问题"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 
@@ -101,9 +102,26 @@ dependencies {
     implementation files('libs\\hapi-base-2.2.jar')
     implementation files('libs\\hapi-structures-v231-2.2.jar')
     implementation files('libs\\commons-math3-3.6.1.jar')
-    //test
+    //test mock
     testImplementation 'org.mockito:mockito-core:4.4.0'
     androidTestImplementation "org.mockito:mockito-android:4.4.0"
+    //test junit
+    androidTestImplementation "androidx.test:runner:1.5.0"
+    androidTestImplementation "androidx.test:rules:1.5.0"
+    // test UI testing with UI Automator
+//    androidTestImplementation "androidx.test.uiautomator:uiautomator:2.1.0"
+    //test 协程
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4"
+    //test junit
+    androidTestImplementation 'androidx.test.ext:junit:1.1.4'
+    androidTestImplementation "androidx.test.ext:junit-ktx:1.1.4"
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
+    //test truth
+    androidTestImplementation "androidx.test.ext:truth:1.5.0"
+    //test orchestrator
+    androidTestUtil "androidx.test:orchestrator:1.4.2"
+
     //mockito
     testImplementation 'org.mockito:mockito-core:3.0.0'
     //powermock
@@ -127,9 +145,8 @@ dependencies {
     implementation project(path: ':wllib')
     implementation project(path: ':MPChartLib')
     implementation project(path: ':weiqianwllib')
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.4'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
+
+
 
     //navigation
     def nav_version = "2.5.3"
@@ -168,7 +185,7 @@ dependencies {
     //操作u盘
     implementation 'me.jahnen.libaums:core:0.9.1'
     //serial port usb转串
-    implementation 'com.github.mik3y:usb-serial-for-android:3.4.6'
+//    implementation 'com.github.mik3y:usb-serial-for-android:3.4.6'
     //eventbus
     implementation("org.greenrobot:eventbus:3.3.1")
     implementation 'com.github.felHR85:UsbSerial:6.1.0'

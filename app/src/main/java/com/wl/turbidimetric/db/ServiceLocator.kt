@@ -20,8 +20,8 @@ object ServiceLocator {
     var testResultSource: TestResultSource? = null
 
 
-     fun getDb(context: Context) :MainRoomDatabase{
-        return database ?: getDatabase(context).apply {
+     fun getDb(context: Context,isMemory: Boolean = false) :MainRoomDatabase{
+        return database ?: createDataBase(context,isMemory).apply {
             database = this
         }
     }
@@ -64,7 +64,7 @@ object ServiceLocator {
      * @param isMemory Boolean
      * @return MainRoomDatabase
      */
-    fun getDatabase(context: Context, isMemory: Boolean = false): MainRoomDatabase {
+    fun createDataBase(context: Context, isMemory: Boolean = false): MainRoomDatabase {
         return database ?: synchronized(this) {
             val instance = if (isMemory) {
                 Room.inMemoryDatabaseBuilder(

@@ -76,6 +76,30 @@ class DefaultLocalDataDataSource:LocalDataSource{
         return LocalData.getDetectionNumInc(getDetectionNum())
     }
 
+    override fun getAutoPrintReceipt(): Boolean {
+        return LocalData.AutoPrintReceipt
+    }
+
+    override fun getHospitalName(): String {
+        return LocalData.HospitalName
+    }
+
+    override fun getLooperTest(): Boolean {
+        return LocalData.LooperTest
+    }
+
+    override fun setLooperTest(looperTest: Boolean) {
+        LocalData.LooperTest = looperTest
+    }
+
+    override fun setHospitalName(name: String) {
+        LocalData.HospitalName = name
+    }
+
+    override fun setAutoPrintReceipt(auto: Boolean) {
+        LocalData.AutoPrintReceipt = auto
+    }
+
     override fun setDetectionNum(num: String) {
         LocalData.DetectionNum = num
     }

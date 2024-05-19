@@ -91,6 +91,15 @@ object LocalData {
      * 循环测试
      */
     var LooperTest by BooleanDataStoreProperty(LocalDataGlobal.Default.looperTest)
+    /**
+     * 报告医院名
+     */
+    var HospitalName by StringDataStoreProperty(LocalDataGlobal.Default.hospitalName)
+
+    /**
+     * 是否自动打印小票
+     */
+    var AutoPrintReceipt by BooleanDataStoreProperty(LocalDataGlobal.Default.autoPrintReceipt)
 //    var LooperTest = true
 
     /**

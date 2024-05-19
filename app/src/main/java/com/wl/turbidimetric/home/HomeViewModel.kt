@@ -1,19 +1,67 @@
 package com.wl.turbidimetric.home
 
-import androidx.lifecycle.*
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.wl.turbidimetric.app.App
 import com.wl.turbidimetric.app.AppViewModel
 import com.wl.turbidimetric.base.BaseViewModel
 import com.wl.turbidimetric.db.ServiceLocator
-import com.wl.turbidimetric.ex.*
+import com.wl.turbidimetric.ex.calcAbsorbance
+import com.wl.turbidimetric.ex.calcAbsorbanceDifference
+import com.wl.turbidimetric.ex.calcCon
+import com.wl.turbidimetric.ex.calcShowTestResult
+import com.wl.turbidimetric.ex.getAppViewModel
+import com.wl.turbidimetric.ex.isAuto
+import com.wl.turbidimetric.ex.isCuvette
+import com.wl.turbidimetric.ex.isManual
+import com.wl.turbidimetric.ex.isManualSampling
+import com.wl.turbidimetric.ex.isNonexistent
+import com.wl.turbidimetric.ex.isSample
+import com.wl.turbidimetric.ex.print
 import com.wl.turbidimetric.global.EventGlobal
 import com.wl.turbidimetric.global.EventMsg
 import com.wl.turbidimetric.global.SystemGlobal
-import com.wl.turbidimetric.model.*
-import com.wl.turbidimetric.repository.DefaultCurveDataSource
-import com.wl.turbidimetric.repository.DefaultLocalDataDataSource
-import com.wl.turbidimetric.repository.DefaultProjectDataSource
-import com.wl.turbidimetric.repository.DefaultTestResultDataSource
+import com.wl.turbidimetric.model.CurveModel
+import com.wl.turbidimetric.model.CuvetteDoorModel
+import com.wl.turbidimetric.model.CuvetteState
+import com.wl.turbidimetric.model.DripReagentModel
+import com.wl.turbidimetric.model.DripSampleModel
+import com.wl.turbidimetric.model.ErrorInfo
+import com.wl.turbidimetric.model.GetMachineStateModel
+import com.wl.turbidimetric.model.GetStateModel
+import com.wl.turbidimetric.model.GetVersionModel
+import com.wl.turbidimetric.model.Item
+import com.wl.turbidimetric.model.MachineTestModel
+import com.wl.turbidimetric.model.MotorModel
+import com.wl.turbidimetric.model.MoveCuvetteDripReagentModel
+import com.wl.turbidimetric.model.MoveCuvetteDripSampleModel
+import com.wl.turbidimetric.model.MoveCuvetteShelfModel
+import com.wl.turbidimetric.model.MoveCuvetteTestModel
+import com.wl.turbidimetric.model.MoveSampleModel
+import com.wl.turbidimetric.model.MoveSampleShelfModel
+import com.wl.turbidimetric.model.PiercedModel
+import com.wl.turbidimetric.model.ReplyModel
+import com.wl.turbidimetric.model.ReplyState
+import com.wl.turbidimetric.model.ResultState
+import com.wl.turbidimetric.model.SampleDoorModel
+import com.wl.turbidimetric.model.SampleState
+import com.wl.turbidimetric.model.SampleType
+import com.wl.turbidimetric.model.SamplingModel
+import com.wl.turbidimetric.model.SamplingProbeCleaningModel
+import com.wl.turbidimetric.model.SqueezingModel
+import com.wl.turbidimetric.model.StirModel
+import com.wl.turbidimetric.model.StirProbeCleaningModel
+import com.wl.turbidimetric.model.TakeReagentModel
+import com.wl.turbidimetric.model.TempModel
+import com.wl.turbidimetric.model.TestModel
+import com.wl.turbidimetric.model.TestResultAndCurveModel
+import com.wl.turbidimetric.model.TestResultModel
+import com.wl.turbidimetric.model.TestState
+import com.wl.turbidimetric.model.TestType
+import com.wl.turbidimetric.model.convertReplyState
+import com.wl.turbidimetric.print.PrintUtil
 import com.wl.turbidimetric.repository.if2.CurveSource
 import com.wl.turbidimetric.repository.if2.LocalDataSource
 import com.wl.turbidimetric.repository.if2.ProjectSource
@@ -30,11 +78,18 @@ import com.wl.turbidimetric.util.OnScanResult
 import com.wl.turbidimetric.util.ScanCodeUtil
 import com.wl.wllib.LogToFile.c
 import com.wl.wllib.LogToFile.i
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import java.math.BigDecimal
-import java.util.*
+import java.util.Date
 import kotlin.concurrent.timer
 import kotlin.math.absoluteValue
 
@@ -507,7 +562,7 @@ class HomeViewModel(
      * 测试用的 end
      */
     fun clickStart() {
-        if (!appViewModel.looperTest && !clickVerify()) {
+        if (!appViewModel.getLooperTest() && !clickVerify()) {
             return
         }
         viewModelScope.launch(Dispatchers.Main) {
@@ -640,7 +695,7 @@ class HomeViewModel(
         if (appViewModel.testState.isNotPrepare()) return
         c("接收到 取试剂 reply=$reply cuvettePos=$cuvettePos ")
         takeReagentFinish = true
-        if (reply.state == ReplyState.TAKE_REAGENT_FAILED && !appViewModel.looperTest) {//取试剂失败
+        if (reply.state == ReplyState.TAKE_REAGENT_FAILED && !appViewModel.getLooperTest()) {//取试剂失败
             allowTakeReagent = false
             dripReagentFinish = true
             updateCuvetteState(cuvettePos, CuvetteState.TakeReagentFailed)
@@ -1477,6 +1532,7 @@ class HomeViewModel(
      * @param testResultModel TestResultModel?
      */
     private fun singleTestResultFinish(testResultModel: TestResultAndCurveModel) {
+        //自动上传
         if (HL7Helper.getConfig().autoUpload && HL7Helper.isConnected()) {
             HL7Helper.uploadTestResult(
                 testResultModel,
@@ -1489,6 +1545,10 @@ class HomeViewModel(
                         i("onUploadFailed code=$code msg=$msg")
                     }
                 })
+        }
+        //自动打印小票
+        if (appViewModel.getAutoPrintReceipt()) {
+            PrintUtil.printTest(mutableListOf(testResultModel))
         }
     }
 
@@ -1539,7 +1599,7 @@ class HomeViewModel(
     private fun checkTestState(
         accord: () -> Unit, discrepancy: (String) -> Unit
     ) {
-        if (!appViewModel.looperTest) {
+        if (!appViewModel.getLooperTest()) {
             if (!r1Reagent) {
                 i("没有R1试剂")
                 discrepancy.invoke("R1试剂不足，请添加")
@@ -1882,7 +1942,7 @@ class HomeViewModel(
 //            val result = createResultModel(
 //                scanResults[samplePos - 1], mSamplesStates[sampleShelfPos]?.get(samplePos - 1)
 //            )
-            if (reply.state == ReplyState.CUVETTE_NOT_EMPTY && !appViewModel.looperTest) {//比色皿非空，不加样了
+            if (reply.state == ReplyState.CUVETTE_NOT_EMPTY && !appViewModel.getLooperTest()) {//比色皿非空，不加样了
                 allowDripSample = false
                 updateCuvetteState(
                     cuvettePos,
@@ -2064,7 +2124,7 @@ class HomeViewModel(
         if (appViewModel.testState.isNotPrepare()) return
         c("接收到 取样 reply=$reply cuvettePos=$cuvettePos samplePos=$samplePos cuvetteShelfPos=$cuvetteShelfPos sampleShelfPos=$sampleShelfPos")
         samplingFinish = true
-        if (reply.state == ReplyState.SAMPLING_FAILED && !appViewModel.looperTest) {//取样失败
+        if (reply.state == ReplyState.SAMPLING_FAILED && !appViewModel.getLooperTest()) {//取样失败
             updateSampleState(samplePos - 1, SampleState.SamplingFailed)
             updateResultStateForSample(samplePos - 1, ResultState.SamplingFailed)
             samplingProbeCleaning()
@@ -2213,7 +2273,7 @@ class HomeViewModel(
         if (appViewModel.testState == TestState.TestFinish && appViewModel.testType.isTest()) {
             cuvetteShelfMoveFinish = true
             if (isTestFinish()) {
-                if (appViewModel.looperTest) {
+                if (appViewModel.getLooperTest()) {
                     clickStart()
                 } else {
                     showFinishDialog()
@@ -2340,7 +2400,7 @@ class HomeViewModel(
         if (appViewModel.testState == TestState.TestFinish && appViewModel.testType.isTest()) {
             sampleShelfMoveFinish = true
             if (isTestFinish()) {
-                if (appViewModel.looperTest) {
+                if (appViewModel.getLooperTest()) {
                     clickStart()
                 } else {
                     showFinishDialog()

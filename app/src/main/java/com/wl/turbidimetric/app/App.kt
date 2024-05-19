@@ -16,10 +16,12 @@ import com.wl.turbidimetric.ex.getPackageInfo
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.CurveModel
 import com.wl.turbidimetric.model.ProjectModel
-import com.wl.turbidimetric.repository.if2.ProjectSource
+import com.wl.turbidimetric.repository.if2.LocalDataSource
 import com.wl.turbidimetric.upload.hl7.util.getLocalConfig
 import com.wl.turbidimetric.util.CrashHandler
+import com.wl.turbidimetric.util.ExportReportHelper
 import com.wl.turbidimetric.util.FitterType
+import com.wl.turbidimetric.util.PdfCreateUtil
 import com.wl.wllib.LogToFile
 import com.wl.wllib.ToastUtil
 import com.wl.wllib.ktxRunOnBgCache
@@ -27,6 +29,7 @@ import com.wl.wllib.toTimeStr
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.io.File
 import java.util.Date
 
 
@@ -54,6 +57,8 @@ class App : Application() {
             initDB()
             //记录当前的版本
             initVersion()
+            //删除检测报告的缓存
+            PdfCreateUtil.deleteCacheFolder(File(ExportReportHelper.defaultReportSavePath))
         }
     }
 
@@ -189,7 +194,7 @@ class App : Application() {
         private val viewModelStore = ViewModelStore()
         private val viewModelProvider: ViewModelProvider by lazy {
             ViewModelProvider(
-                this, ViewModelProvider.AndroidViewModelFactory.getInstance(instance!!)
+                this, AppViewModelFactory()
             )
         }
 
@@ -199,6 +204,17 @@ class App : Application() {
 
         fun <T : ViewModel> getAppViewModel(classVm: Class<T>): T {
             return viewModelProvider[classVm]
+        }
+    }
+
+    class AppViewModelFactory(
+        private val localDataDataSource: LocalDataSource = ServiceLocator.provideLocalDataSource(App.instance!!)
+    ) : ViewModelProvider.NewInstanceFactory() {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(AppViewModel::class.java)) {
+                return AppViewModel(localDataDataSource) as T
+            }
+            throw IllegalArgumentException("Unknown ViewModel class")
         }
     }
 }

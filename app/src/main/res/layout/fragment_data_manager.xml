@@ -119,6 +119,18 @@
             app:layout_constraintTop_toBottomOf="@id/gl_bottom" />
 
         <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_export_pdf"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="20dp"
+            style="@style/BtnDataManager"
+            android:minWidth="150dp"
+            android:text="导出报告"
+            app:layout_constraintBottom_toBottomOf="@id/v_bottom_bg"
+            app:layout_constraintRight_toLeftOf="@id/btn_delete"
+            app:layout_constraintTop_toTopOf="@id/v_bottom_bg" />
+
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_delete"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -14,8 +14,7 @@ class DebugSettingsViewModel(private val appViewModel: AppViewModel) : BaseViewM
     val looperTest = MutableLiveData(LocalData.LooperTest)
 
     fun changeLooperTest(looperTest: Boolean) {
-        LocalData.LooperTest = looperTest
-        appViewModel.looperTest = looperTest
+        appViewModel.setLooperTest(looperTest)
     }
 
 

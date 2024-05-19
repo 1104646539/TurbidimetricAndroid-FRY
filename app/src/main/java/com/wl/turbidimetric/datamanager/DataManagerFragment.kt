@@ -21,6 +21,7 @@ import com.wl.turbidimetric.model.TestResultAndCurveModel
 import com.wl.turbidimetric.print.PrintUtil
 import com.wl.turbidimetric.upload.hl7.HL7Helper
 import com.wl.turbidimetric.util.ExportExcelHelper
+import com.wl.turbidimetric.util.ExportReportHelper
 import com.wl.turbidimetric.view.dialog.*
 import com.wl.wllib.LogToFile.i
 import com.wl.wllib.LogToFile.u
@@ -194,6 +195,10 @@ class DataManagerFragment :
             u("删除")
             delete()
         }
+        vd.btnExportPdf.setOnClickListener {
+            u("导出报告")
+            exportReport()
+        }
         adapter.onSelectChange = { pos, selected ->
 
         }
@@ -239,6 +244,31 @@ class DataManagerFragment :
                     }
                 }
             }
+        }
+    }
+
+    private fun exportReport() {
+        val data = getSelectData()
+        waitDialog.showPop(requireContext(), isCancelable = false) { dialog ->
+            dialog.showDialog("正在导出数据，请等待……")
+
+            ExportReportHelper.exportReport(
+                requireContext(),
+                data,
+                "XX人民医院",
+                lifecycleScope,
+                { count, successCount, failedCount ->
+                    i("导出报告完成，本次导出总数${count}条,成功${successCount}条,失败${failedCount}条")
+                    dialog.showDialog("导出报告完成，本次导出总数${count}条,成功${successCount}条,失败${failedCount}条", "确定", {
+                        it.dismiss()
+                    })
+                }, { err ->
+                    i("导出报告失败 $err")
+                    dialog.showDialog("导出报告失败,$err", "确定", {
+                        it.dismiss()
+                    })
+                }
+            )
         }
     }
 
@@ -457,7 +487,7 @@ class DataManagerFragment :
             vm.item(condition).collectLatest {
                 i("---监听到了变化---condition=$condition")
                 vm.conditionChange(condition)
-                adapter.submitData(lifecycle,it)
+                adapter.submitData(lifecycle, it)
                 //刷新后移动到顶部，只在没有移动的时候移动
                 withContext(Dispatchers.Main) {
                     if (vd.rv.scrollState == RecyclerView.SCROLL_STATE_IDLE)

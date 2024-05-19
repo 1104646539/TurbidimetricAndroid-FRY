@@ -17,6 +17,7 @@ import com.wl.turbidimetric.project.list.ProjectListActivity
 import com.wl.turbidimetric.settings.detectionnum.DetectionNumFragment
 import com.wl.turbidimetric.settings.network.NetworkFragment
 import com.wl.turbidimetric.settings.params.ParamsFragment
+import com.wl.turbidimetric.settings.report.ReportFragment
 import com.wl.turbidimetric.settings.testmode.TestModeFragment
 import com.wl.turbidimetric.test.TestActivity
 import com.wl.turbidimetric.test.debug.DebugActivity
@@ -123,6 +124,11 @@ class SettingsFragment constructor() :
         vd.sivMachineNetwork.setOnClickListener {
             u("本机网络设置")
             changeContent(NetworkFragment.instance)
+            vd.wgpSelectable.setSelected(it.id)
+        }
+        vd.sivReportSettings.setOnClickListener {
+            u("报告设置")
+            changeContent(ReportFragment.instance)
             vd.wgpSelectable.setSelected(it.id)
         }
 

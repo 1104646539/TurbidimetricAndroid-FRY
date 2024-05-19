@@ -81,7 +81,46 @@
 
         </RelativeLayout>
     </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:orientation="horizontal">
 
+        <TextView
+            style="@style/TextTitle"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:text="年龄：" />
+
+        <EditText
+            android:id="@+id/et_age"
+            style="@style/EtDefault"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_et_gray"
+            android:inputType="numberSigned"
+            android:minWidth="200dp" />
+
+        <TextView
+            style="@style/TextTitle"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:inputType="numberDecimal"
+            android:text="项目名：" />
+
+        <TextView
+            android:id="@+id/tv_project_name"
+            style="@style/TextHilt"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:textSize="28sp"
+            android:background="@drawable/bg_et_gray"
+            android:minWidth="200dp" />
+
+    </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

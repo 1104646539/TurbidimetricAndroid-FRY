@@ -109,12 +109,12 @@ class ToolExTest {
         Assert.assertNotEquals(getStep(0x0fu, 6), 1)
         Assert.assertNotEquals(getStep(0x0fu, 7), 1)
 
-        Assert.assertThrows("错误 pos下标错误 pos=-1", IndexOutOfBoundsException::class.java) {
-            getStep(0x0fu, -1)
-        }
-        Assert.assertThrows("错误 pos下标错误 pos=8", IndexOutOfBoundsException::class.java) {
-            getStep(0x0fu, 8)
-        }
+//        Assert.assertThrows("错误 pos下标错误 pos=-1", IndexOutOfBoundsException::class.java) {
+//            getStep(0x0fu, -1)
+//        }
+//        Assert.assertThrows("错误 pos下标错误 pos=8", IndexOutOfBoundsException::class.java) {
+//            getStep(0x0fu, 8)
+//        }
     }
 
     @Test

@@ -32,12 +32,14 @@ class ResultDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog
     var etCon: EditText? = null
     var etResult: EditText? = null
     var etSampleBarcode: EditText? = null
+    var tvProjectName: TextView? = null
+    var etAge: EditText? = null
 
 
     var result: TestResultAndCurveModel? = null
     open fun showDialog(
         result: TestResultAndCurveModel,
-        isDebug:Boolean,
+        isDebug: Boolean,
         onConfirm: (result: TestResultAndCurveModel) -> Boolean,
     ) {
         this.confirmText = "确定"
@@ -49,6 +51,7 @@ class ResultDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog
             result.result.concentration = etCon?.text.toString().toIntOrNull() ?: 0
             result.result.testResult = etResult?.text.toString()
             result.result.sampleBarcode = etSampleBarcode?.text.toString()
+            result.result.age = etAge?.text.toString()
             dismiss().takeIf {
                 onConfirm.invoke(result)
             }
@@ -79,6 +82,8 @@ class ResultDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog
         etCon = findViewById(R.id.et_con)
         etResult = findViewById(R.id.et_result)
         etSampleBarcode = findViewById(R.id.et_sample_barcode)
+        tvProjectName = findViewById(R.id.tv_project_name)
+        etAge = findViewById(R.id.et_age)
 
 
         spnGender?.adapter = SpnSampleAdapter(rootView.context, sexs.toMutableList())
@@ -95,6 +100,8 @@ class ResultDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog
         etCon?.setText(result?.result?.concentration.toString())
         etResult?.setText(result?.result?.testResult)
         etSampleBarcode?.setText(result?.result?.sampleBarcode)
+        etAge?.setText(result?.result?.age)
+        tvProjectName?.setText(result?.curve?.projectName)
 
         sexs.indexOf(result?.result?.gender).let { index ->
             if (index > -1 && index in sexs.indices) {

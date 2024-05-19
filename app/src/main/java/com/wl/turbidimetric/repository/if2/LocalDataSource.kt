@@ -1,7 +1,5 @@
 package com.wl.turbidimetric.repository.if2
 
-import com.wl.turbidimetric.datastore.LocalData
-
 interface LocalDataSource {
     fun getDetectionNum(): String
     fun getTakeReagentR1(): Int
@@ -21,7 +19,13 @@ interface LocalDataSource {
     fun getTest3DelayTime(): Long
     fun getTest4DelayTime(): Long
     fun getDetectionNumInc(num: String = getDetectionNum()): String
+    fun getAutoPrintReceipt(): Boolean
+    fun getHospitalName(): String
+    fun getLooperTest(): Boolean
 
+    fun setLooperTest(looperTest:Boolean)
+    fun setHospitalName(name: String)
+    fun setAutoPrintReceipt(auto: Boolean)
     fun setDetectionNum(num: String)
     fun setTakeReagentR1(value: Int)
     fun setTakeReagentR2(value: Int)

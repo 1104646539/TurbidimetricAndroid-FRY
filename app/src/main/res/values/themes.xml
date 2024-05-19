@@ -29,13 +29,18 @@
     </style>
 
     <style name="TextHilt">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textColor">@color/textColor</item>
+        <item name="android:gravity">center</item>
+    </style>
+    <style name="TextNormal">
         <item name="android:textSize">22sp</item>
         <item name="android:textColor">@color/textColor</item>
         <item name="android:gravity">center</item>
     </style>
 
     <style name="TextTitle" parent="TextHilt">
-        <item name="android:textSize">24sp</item>
+        <item name="android:textSize">28sp</item>
         <item name="android:textStyle">normal</item>
         <item name="android:textColor">@color/textColor</item>
     </style>

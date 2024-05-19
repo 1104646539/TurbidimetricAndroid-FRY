@@ -2,11 +2,11 @@ package com.wl.turbidimetric.app
 
 import androidx.lifecycle.viewModelScope
 import com.wl.turbidimetric.base.BaseViewModel
-import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.MachineTestModel
 import com.wl.turbidimetric.model.TestState
 import com.wl.turbidimetric.model.TestType
+import com.wl.turbidimetric.repository.if2.LocalDataSource
 import com.wl.turbidimetric.upload.hl7.util.ConnectStatus
 import com.wl.turbidimetric.util.SerialPortIF
 import com.wl.turbidimetric.util.SerialPortImpl
@@ -21,8 +21,8 @@ import kotlin.concurrent.timer
 /**
  * 全局唯一的ViewModel，用来保存全局通用的属性
  */
-class AppViewModel : BaseViewModel() {
-    val serialPort: SerialPortIF = SerialPortImpl(SystemGlobal.isCodeDebug )
+class AppViewModel(val localDataSource: LocalDataSource) : BaseViewModel() {
+    val serialPort: SerialPortIF = SerialPortImpl(SystemGlobal.isCodeDebug)
 
     /**
      * 仪器状态
@@ -48,10 +48,6 @@ class AppViewModel : BaseViewModel() {
     private val _nowTimeStr = MutableStateFlow("00:00")
     val nowTimeStr = _nowTimeStr.asSharedFlow()
 
-    /**
-     * 无限检测
-     */
-    var looperTest = LocalData.LooperTest
 
     /**
      * 检测类型
@@ -74,23 +70,35 @@ class AppViewModel : BaseViewModel() {
      * 仪器检测模式
      */
     private val _machineTestMode =
-        MutableStateFlow(MachineTestModel.valueOf(LocalData.CurMachineTestModel))
+        MutableStateFlow(MachineTestModel.valueOf(localDataSource.getCurMachineTestModel()))
     val machineTestModel = _machineTestMode.asSharedFlow()
+
+    /**
+     * 检测编号
+     */
+    private val _detectionNum = MutableStateFlow(localDataSource.getDetectionNum().toLong())
+    val detectionNum = _detectionNum.asSharedFlow()
+
 
     fun changeMachineTestModel(machineTestModel: MachineTestModel) {
         this._machineTestMode.value = machineTestModel
     }
 
-    /**
-     * 检测编号
-     */
-    private val _detectionNum = MutableStateFlow(LocalData.DetectionNum.toLong())
-    val detectionNum = _detectionNum.asSharedFlow()
+    fun setLooperTest(looperTest: Boolean) {
+        localDataSource.setLooperTest(looperTest)
+    }
+
+    fun getLooperTest(): Boolean {
+        return localDataSource.getLooperTest()
+    }
 
     fun changeDetectionNum(detectionNum: Long) {
         this._detectionNum.value = detectionNum
     }
 
+    fun getAutoPrintReceipt():Boolean{
+        return localDataSource.getAutoPrintReceipt()
+    }
     /**
      * 更新当前时间
      */

@@ -22,6 +22,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 import java.text.NumberFormat
 import java.util.*
@@ -352,7 +353,7 @@ class RepeatabilityViewModel(
                     )
                 )
             }
-            with(Dispatchers.Main) {
+            withContext(Dispatchers.Main) {
                 toast("转移完成，请勿多次点击")
             }
         }

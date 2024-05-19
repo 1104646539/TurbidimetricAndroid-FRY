@@ -17,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.greenrobot.eventbus.EventBus
 
 class DebugActivity : BaseActivity<DebugViewModel, ActivityDebugBinding>() {
@@ -30,9 +31,9 @@ class DebugActivity : BaseActivity<DebugViewModel, ActivityDebugBinding>() {
 
         vd.tl.post {
             lifecycleScope.launch {
-                with(Dispatchers.IO) {
+                withContext(Dispatchers.IO) {
                     delay(1000)
-                    with(Dispatchers.Main){
+                    withContext(Dispatchers.Main){
                         vd.nav.setOnBack { finishAfterTransition() }
                         vd.vp.isUserInputEnabled = false
                         vd.vp.offscreenPageLimit = ViewPager2.OFFSCREEN_PAGE_LIMIT_DEFAULT

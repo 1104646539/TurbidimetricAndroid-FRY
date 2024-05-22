@@ -700,8 +700,7 @@ class HomeViewModel(
             dripReagentFinish = true
             updateCuvetteState(cuvettePos, CuvetteState.TakeReagentFailed)
             updateResultState(
-                cuvettePos,
-                ResultState.TakeReagentFailed
+                cuvettePos, ResultState.TakeReagentFailed
             )
             if (cuvetteMoveFinish) {//已经移动到位了，取试剂失败后不应该再取，只检测已经加完试剂的样本
                 val takeReagentCuvetteNum = getTakeReagentCuvetteNum()
@@ -713,8 +712,7 @@ class HomeViewModel(
             }
         } else {//取试剂成功,去加试剂
             updateResultState(
-                cuvettePos,
-                ResultState.TakeReagentSuccess
+                cuvettePos, ResultState.TakeReagentSuccess
             )
             goDripReagent()
         }
@@ -1145,10 +1143,7 @@ class HomeViewModel(
     }
 
     private suspend fun insertResult(
-        barcode: String,
-        samplePos: Int,
-        sampleShelfPos: Int,
-        sampleType: SampleType?
+        barcode: String, samplePos: Int, sampleShelfPos: Int, sampleType: SampleType?
     ) {
 
         //创建检测结果
@@ -1157,10 +1152,7 @@ class HomeViewModel(
         )
         //更新当前样本管的信息
         updateSampleState(
-            samplePos,
-            SampleState.ScanSuccess,
-            sampleType = sampleType,
-            testResult = result
+            samplePos, SampleState.ScanSuccess, sampleType = sampleType, testResult = result
         )
 
         //实时获取信息
@@ -1175,8 +1167,7 @@ class HomeViewModel(
         val config = HL7Helper.getConfig()
         val isConnected = HL7Helper.isConnected()
         if (isConnected && config.twoWay) {
-            HL7Helper.getPatientInfo(
-                generateCondition(config, result),
+            HL7Helper.getPatientInfo(generateCondition(config, result),
                 object : OnGetPatientCallback {
                     override fun onGetPatientSuccess(patients: List<Patient>?) {
                         i("realTimeGetInfo onGetPatientSuccess=${result.resultId} patients=${patients?.size}")
@@ -1214,8 +1205,7 @@ class HomeViewModel(
     }
 
     private fun generateCondition(
-        config: ConnectConfig,
-        result: TestResultModel
+        config: ConnectConfig, result: TestResultModel
     ): GetPatientCondition {
         return GetPatientCondition(
             if (config.getPatientType == GetPatientType.BC) {
@@ -1226,8 +1216,7 @@ class HomeViewModel(
                 ""
             } else {
                 result.detectionNum
-            },
-            config.getPatientType
+            }, config.getPatientType
         )
     }
 
@@ -1348,7 +1337,8 @@ class HomeViewModel(
                 updateCuvetteState(cuvettePos, CuvetteState.Test2)
                 updateTestResultModel(value, cuvettePos, CuvetteState.Test2)
                 selectFocChange(
-                    cuvetteShelfPos, cuvettePos,
+                    cuvetteShelfPos,
+                    cuvettePos,
                     _cuvetteStates.value[cuvetteShelfPos]?.get(cuvettePos)!!
                 )
                 if (lastNeed(cuvettePos, CuvetteState.Test1)) {
@@ -1364,7 +1354,8 @@ class HomeViewModel(
                 updateCuvetteState(cuvettePos, CuvetteState.Test3)
                 updateTestResultModel(value, cuvettePos, CuvetteState.Test3)
                 selectFocChange(
-                    cuvetteShelfPos, cuvettePos,
+                    cuvetteShelfPos,
+                    cuvettePos,
                     _cuvetteStates.value[cuvetteShelfPos]?.get(cuvettePos)!!
                 )
                 if (lastNeed(cuvettePos, CuvetteState.Test2)) {
@@ -1380,7 +1371,8 @@ class HomeViewModel(
                 updateCuvetteState(cuvettePos, CuvetteState.Test4)
                 updateTestResultModel(value, cuvettePos, CuvetteState.Test4)
                 selectFocChange(
-                    cuvetteShelfPos, cuvettePos,
+                    cuvetteShelfPos,
+                    cuvettePos,
                     _cuvetteStates.value[cuvetteShelfPos]?.get(cuvettePos)!!
                 )
                 if (lastNeed(cuvettePos, CuvetteState.Test3)) {
@@ -1534,17 +1526,15 @@ class HomeViewModel(
     private fun singleTestResultFinish(testResultModel: TestResultAndCurveModel) {
         //自动上传
         if (HL7Helper.getConfig().autoUpload && HL7Helper.isConnected()) {
-            HL7Helper.uploadTestResult(
-                testResultModel,
-                object : OnUploadCallback {
-                    override fun onUploadSuccess(msg: String) {
-                        i("onUploadSuccess msg=$msg")
-                    }
+            HL7Helper.uploadTestResult(testResultModel, object : OnUploadCallback {
+                override fun onUploadSuccess(msg: String) {
+                    i("onUploadSuccess msg=$msg")
+                }
 
-                    override fun onUploadFailed(code: Int, msg: String) {
-                        i("onUploadFailed code=$code msg=$msg")
-                    }
-                })
+                override fun onUploadFailed(code: Int, msg: String) {
+                    i("onUploadFailed code=$code msg=$msg")
+                }
+            })
         }
         //自动打印小票
         if (appViewModel.getAutoPrintReceipt()) {
@@ -1899,7 +1889,8 @@ class HomeViewModel(
         updateCuvetteState(cuvettePos, CuvetteState.DripReagent)
         nextDripReagent()
         selectFocChange(
-            cuvetteShelfPos, cuvettePos - 1,
+            cuvetteShelfPos,
+            cuvettePos - 1,
             _cuvetteStates.value[cuvetteShelfPos]?.get(cuvettePos - 1)!!
         )
     }
@@ -2127,18 +2118,24 @@ class HomeViewModel(
         if (reply.state == ReplyState.SAMPLING_FAILED && !appViewModel.getLooperTest()) {//取样失败
             updateSampleState(samplePos - 1, SampleState.SamplingFailed)
             updateResultStateForSample(samplePos - 1, ResultState.SamplingFailed)
+            selectFocChange(
+                sampleShelfPos,
+                samplePos - 1,
+                _samplesStates.value[sampleShelfPos]?.get(samplePos - 1)!!
+            )
             samplingProbeCleaning()
             nextStepDripReagent()
 
         } else {//取样成功
             updateSampleState(samplePos - 1, SampleState.Sampling)
             updateResultStateForSample(samplePos - 1, ResultState.SamplingSuccess)
+            selectFocChange(
+                sampleShelfPos,
+                samplePos - 1,
+                _samplesStates.value[sampleShelfPos]?.get(samplePos - 1)!!
+            )
             goDripSample()
         }
-        selectFocChange(
-            sampleShelfPos, samplePos - 1,
-            _samplesStates.value[sampleShelfPos]?.get(samplePos - 1)!!
-        )
     }
 
 
@@ -2963,8 +2960,7 @@ class HomeViewModel(
             takeReagentFinish = false
             dripReagentFinish = false
             appViewModel.serialPort.takeReagent(
-                localDataRepository.getTakeReagentR1(),
-                localDataRepository.getTakeReagentR2()
+                localDataRepository.getTakeReagentR1(), localDataRepository.getTakeReagentR2()
             )
         }
     }
@@ -3012,8 +3008,7 @@ class HomeViewModel(
         c("发送 加试剂")
         dripReagentFinish = false
         appViewModel.serialPort.dripReagent(
-            localDataRepository.getTakeReagentR1(),
-            localDataRepository.getTakeReagentR2()
+            localDataRepository.getTakeReagentR1(), localDataRepository.getTakeReagentR2()
         )
     }
 
@@ -3069,10 +3064,7 @@ class HomeViewModel(
         viewModelScope.launch {
             _configUiState.emit(
                 HomeConfigUiState(
-                    selectProject,
-                    detectionNumInput,
-                    cuvetteStartPos,
-                    needSamplingNum
+                    selectProject, detectionNumInput, cuvetteStartPos, needSamplingNum
                 )
             )
         }

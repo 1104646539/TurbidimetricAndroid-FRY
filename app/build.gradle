@@ -32,7 +32,7 @@ android {
         minSdk 24
         targetSdk 32
         versionCode 1
-        versionName "1.0.0.0-23修复最后一个样本取样失败后闪退的问题"
+        versionName "1.0.0.0-24添加U盘状态更改时的气泡提示"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 

@@ -54,6 +54,16 @@ class TopNavView @JvmOverloads constructor(
         ivStateStorage?.setImageResource(id)
     }
 
+    fun getStateMachine(): View? {
+        return ivStateMachine
+    }
+    fun getStateUpload(): View? {
+        return ivStateUpload
+    }
+    fun getStateStorage(): View? {
+        return ivStateStorage
+    }
+
     private fun initView() {
         root?.apply {
             ivLogo = findViewById(R.id.iv_logo)
@@ -65,5 +75,22 @@ class TopNavView @JvmOverloads constructor(
         }
     }
 
+    fun setMachineClick(onClick: (View) -> Unit) {
+        ivStateMachine?.setOnClickListener {
+            onClick.invoke(it)
+        }
+    }
+
+    fun setUploadClick(onClick: (View) -> Unit) {
+        ivStateUpload?.setOnClickListener {
+            onClick.invoke(it)
+        }
+    }
+
+    fun setStorageClick(onClick: (View) -> Unit) {
+        ivStateStorage?.setOnClickListener {
+            onClick.invoke(it)
+        }
+    }
 
 }

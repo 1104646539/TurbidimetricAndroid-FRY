@@ -12,8 +12,10 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Message
 import android.util.Log
+import android.view.View
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
+import com.lxj.xpopup.XPopup
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.app.MachineState
 import com.wl.turbidimetric.base.BaseActivity
@@ -26,18 +28,20 @@ import com.wl.turbidimetric.upload.hl7.util.ConnectResult
 import com.wl.turbidimetric.upload.hl7.util.ConnectStatus
 import com.wl.turbidimetric.upload.service.OnConnectListener
 import com.wl.turbidimetric.util.ActivityDataBindingDelegate
+import com.wl.turbidimetric.view.CustomBubbleAttachPopup
 import com.wl.turbidimetric.view.dialog.HiltDialog
 import com.wl.turbidimetric.view.dialog.showPop
 import com.wl.weiqianwllib.OrderUtil
 import com.wl.weiqianwllib.upan.StorageState
 import com.wl.weiqianwllib.upan.StorageUtil
 import com.wl.weiqianwllib.upan.StorageUtil.OPEN_DOCUMENT_TREE_CODE
-import com.wl.wllib.LogToFile.i
 import com.wl.wllib.LogToFile.e
+import com.wl.wllib.LogToFile.i
 import com.wl.wllib.ktxRunOnBgCache
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.greenrobot.eventbus.EventBus
@@ -163,6 +167,32 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         }
     }
 
+    /**
+     * 显示一个气泡popup在view的下方，该view只显示文字提示
+     * @param attachView View?
+     * @param content String
+     * @param hiltDuration Long
+     */
+    private fun showPopupView(attachView: View?, content: String, hiltDuration: Long = 3000) {
+        if (attachView == null) return
+        val contentView = CustomBubbleAttachPopup(this, content)
+        val popup = XPopup.Builder(this)
+            .hasShadowBg(true)
+            .isTouchThrough(true)
+            .isDestroyOnDismiss(true) //对于只使用一次的弹窗，推荐设置这个
+            .atView(attachView)
+            .isCenterHorizontal(true)
+            .hasShadowBg(false) // 去掉半透明背景
+            .asCustom(contentView)
+            .show()
+
+        mHandler.postDelayed({
+            if (popup != null && popup.isShow) {
+                popup.dismiss()
+            }
+        }, hiltDuration)
+    }
+
     private fun initTime() {
         appVm.listenerTime()
     }
@@ -277,9 +307,27 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         lifecycleScope.launch {
             appVm.storageState.collectLatest {
                 vd.tnv.setStateStorageSrc(it.id)
+                if (it != com.wl.turbidimetric.app.StorageState.None) {
+                    showPopupView(vd.tnv.getStateStorage(), it.str)
+                }
             }
         }
 
+        vd.tnv.getStateUpload()?.setOnClickListener {
+            lifecycleScope.launch {
+                showPopupView(vd.tnv.getStateUpload(), appVm.uploadState.first().str)
+            }
+        }
+        vd.tnv.getStateMachine()?.setOnClickListener {
+            lifecycleScope.launch {
+                showPopupView(vd.tnv.getStateMachine(), appVm.machineState.first().str)
+            }
+        }
+        vd.tnv.getStateStorage()?.setOnClickListener {
+            lifecycleScope.launch {
+                showPopupView(vd.tnv.getStateStorage(), appVm.storageState.first().str)
+            }
+        }
     }
 
     /**
@@ -290,7 +338,12 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         if (mPermissionIntent == null) {
 //            //其他设备权限的广播
             mPermissionIntent =
-                PendingIntent.getBroadcast(this, 3210, Intent(StorageUtil.ACTION_USB_PERMISSION), 0)
+                PendingIntent.getBroadcast(
+                    this,
+                    3210,
+                    Intent(StorageUtil.ACTION_USB_PERMISSION),
+                    0
+                )
             val filter = IntentFilter(StorageUtil.ACTION_USB_PERMISSION)
             filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED)
             filter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED)
@@ -369,7 +422,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
                     HL7Helper.connect(object : OnConnectListener {
                         override fun onConnectResult(connectResult: ConnectResult) {
                             i("onConnectResult connectResult=$connectResult")
-                            if(connectResult is ConnectResult.AlreadyConnected){
+                            if (connectResult is ConnectResult.AlreadyConnected) {
                                 appVm.changeUploadState(ConnectStatus.CONNECTED)
                             }
 
@@ -380,7 +433,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
                             appVm.changeUploadState(connectStatus)
                         }
                     })
-                }else{
+                } else {
                     appVm.changeUploadState(ConnectStatus.NONE)
                 }
             }
@@ -401,7 +454,10 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
             } else if (action == UsbManager.ACTION_USB_DEVICE_ATTACHED) {
                 Log.d(TAG, "设备 已插入action=$action")
                 val device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE) as UsbDevice?
-                Log.d(TAG, "设备 已插入device=${device} ${device?.productId} ${device?.vendorId}")
+                Log.d(
+                    TAG,
+                    "设备 已插入device=${device} ${device?.productId} ${device?.vendorId}"
+                )
                 changeStorageState(StorageState.INSERTED)
             }
         }
@@ -411,7 +467,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         super.onMessageEvent(event)
         if (event.what == EventGlobal.WHAT_HIDE_SPLASH) {
             hideSplash()
-        }else if (event.what == EventGlobal.WHAT_UPLOAD_CHANGE) {
+        } else if (event.what == EventGlobal.WHAT_UPLOAD_CHANGE) {
             initUploadClient()
         }
     }

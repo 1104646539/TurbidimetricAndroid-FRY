@@ -88,6 +88,14 @@ class DefaultLocalDataDataSource:LocalDataSource{
         return LocalData.LooperTest
     }
 
+    override fun getAutoPrintReport(): Boolean {
+        return LocalData.AutoPrintReport
+    }
+
+    override fun getReportFileNameBarcode(): Boolean {
+        return LocalData.ReportFileNameBarcode
+    }
+
     override fun setLooperTest(looperTest: Boolean) {
         LocalData.LooperTest = looperTest
     }
@@ -170,6 +178,14 @@ class DefaultLocalDataDataSource:LocalDataSource{
 
     override fun setDetectionNumInc(num: String) {
         LocalData.DetectionNum = num
+    }
+
+    override fun setAutoPrintReport(value: Boolean) {
+        LocalData.AutoPrintReport = value
+    }
+
+    override fun setReportFileNameBarcode(value: Boolean) {
+        LocalData.ReportFileNameBarcode = value
     }
 
 }

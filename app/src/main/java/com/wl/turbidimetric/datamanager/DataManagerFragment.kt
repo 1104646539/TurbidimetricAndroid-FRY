@@ -1,7 +1,13 @@
 package com.wl.turbidimetric.datamanager
 
+import android.animation.Animator
+import android.animation.ValueAnimator
+import android.graphics.Path
+import android.graphics.PathMeasure
 import android.os.Bundle
 import android.util.Log
+import android.widget.ImageView
+import android.widget.RelativeLayout
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -11,17 +17,21 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.wl.turbidimetric.R
+import com.wl.turbidimetric.app.PrinterState
 import com.wl.turbidimetric.base.BaseFragment
 import com.wl.turbidimetric.databinding.FragmentDataManagerBinding
 import com.wl.turbidimetric.ex.calcShowTestResult
 import com.wl.turbidimetric.ex.toast
 import com.wl.turbidimetric.global.SystemGlobal
+import com.wl.turbidimetric.main.MainActivity
 import com.wl.turbidimetric.model.ConditionModel
 import com.wl.turbidimetric.model.TestResultAndCurveModel
 import com.wl.turbidimetric.print.PrintUtil
 import com.wl.turbidimetric.upload.hl7.HL7Helper
 import com.wl.turbidimetric.util.ExportExcelHelper
 import com.wl.turbidimetric.util.ExportReportHelper
+import com.wl.turbidimetric.util.PrintHelper
+import com.wl.turbidimetric.util.PrintSDKHelper
 import com.wl.turbidimetric.view.dialog.*
 import com.wl.wllib.LogToFile.i
 import com.wl.wllib.LogToFile.u
@@ -199,6 +209,10 @@ class DataManagerFragment :
             u("导出报告")
             exportReport()
         }
+        vd.btnPrintPdf.setOnClickListener {
+            u("打印报告")
+            printReport()
+        }
         adapter.onSelectChange = { pos, selected ->
 
         }
@@ -247,6 +261,133 @@ class DataManagerFragment :
         }
     }
 
+    private val mCurrentPosition = FloatArray(2)
+
+    private fun addCart() {
+        val targetView = (requireActivity() as MainActivity).getTopPrint() ?: return
+        //   一、创造出执行动画的主题---imageview
+        //代码new一个imageview，图片资源是上面的imageview的图片
+        // (这个图片就是执行动画的图片，从开始位置出发，经过一个抛物线（贝塞尔曲线），移动到购物车里)
+        val goods = ImageView(requireContext())
+        goods.setImageResource(R.drawable.icon_report)
+        val params = RelativeLayout.LayoutParams(60, 60)
+        vd.clRoot.addView(goods, params)
+
+//    二、计算动画开始/结束点的坐标的准备工作
+        //得到父布局的起始点坐标（用于辅助计算动画开始/结束时的点的坐标）
+        val parentLocation = IntArray(2)
+        vd.clRoot.getLocationInWindow(parentLocation)
+
+        //得到商品图片的坐标（用于计算动画开始的坐标）
+        val startLoc = IntArray(2)
+        vd.btnPrintPdf.getLocationInWindow(startLoc)
+
+        //得到购物车图片的坐标(用于计算动画结束后的坐标)
+        val endLoc = IntArray(2)
+        targetView.getLocationInWindow(endLoc)
+
+
+//    三、正式开始计算动画开始/结束的坐标
+        //开始掉落的商品的起始点：商品起始点-父布局起始点+该商品图片的一半
+        val startX = (startLoc[0] - parentLocation[0] + vd.btnPrintPdf.width / 2).toFloat()
+        val startY = (startLoc[1] - parentLocation[1] + vd.btnPrintPdf.height / 2).toFloat()
+
+        //商品掉落后的终点坐标：购物车起始点-父布局起始点+购物车图片的1/5
+        val toX: Float = (endLoc[0] - parentLocation[0] + targetView.width / 5).toFloat()
+        val toY = (endLoc[1] - parentLocation[1]).toFloat()
+
+//    四、计算中间动画的插值坐标（贝塞尔曲线）（其实就是用贝塞尔曲线来完成起终点的过程）
+        //开始绘制贝塞尔曲线
+        val path = Path()
+        //移动到起始点（贝塞尔曲线的起点）
+        path.moveTo(startX, startY)
+        //使用二次萨贝尔曲线：注意第一个起始坐标越大，贝塞尔曲线的横向距离就会越大，一般按照下面的式子取即可
+        path.quadTo((startX + toX) / 2, startY, toX, toY)
+        //mPathMeasure用来计算贝塞尔曲线的曲线长度和贝塞尔曲线中间插值的坐标，
+        // 如果是true，path会形成一个闭环
+        val mPathMeasure = PathMeasure(path, false)
+
+        //★★★属性动画实现（从0到贝塞尔曲线的长度之间进行插值计算，获取中间过程的距离值）
+        val valueAnimator = ValueAnimator.ofFloat(0f, mPathMeasure.getLength())
+        valueAnimator.setDuration(600)
+        // 插值器
+        valueAnimator.interpolator = android.view.animation.AccelerateInterpolator()
+        valueAnimator.addUpdateListener { animation -> // 当插值计算进行时，获取中间的每个值，
+            // 这里这个值是中间过程中的曲线长度（下面根据这个值来得出中间点的坐标值）
+            val value = animation.animatedValue as Float
+            // ★★★★★获取当前点坐标封装到mCurrentPosition
+            // boolean getPosTan(float distance, float[] pos, float[] tan) ：
+            // 传入一个距离distance(0<=distance<=getLength())，然后会计算当前距
+            // 离的坐标点和切线，pos会自动填充上坐标，这个方法很重要。
+            mPathMeasure.getPosTan(value, mCurrentPosition, null) //mCurrentPosition此时就是中间距离点的坐标值
+            // 移动的商品图片（动画图片）的坐标设置为该中间点的坐标
+            goods.translationX = mCurrentPosition[0]
+            goods.translationY = mCurrentPosition[1]
+        }
+        //   五、 开始执行动画
+        valueAnimator.start()
+
+//   六、动画结束后的处理
+        valueAnimator.addListener(object : Animator.AnimatorListener {
+            override fun onAnimationStart(animation: Animator) {}
+
+            //当动画结束后：
+            override fun onAnimationEnd(animation: Animator) {
+                // 购物车的数量加1
+//                i++
+//                count.setText(java.lang.String.valueOf(i))
+                // 把移动的图片imageview从父布局里移除
+                vd.clRoot.removeView(goods)
+            }
+
+            override fun onAnimationCancel(animation: Animator) {}
+            override fun onAnimationRepeat(animation: Animator) {}
+        })
+    }
+
+    private fun printReport() {
+        val data = getSelectData()
+        if (data.isNullOrEmpty()) {
+            waitDialog.showPop(requireContext(), isCancelable = false) { dialog ->
+                dialog.showDialog("未选择数据", "确定", { dialog -> dialog.dismiss() })
+            }
+            return
+        }
+        waitDialog.showPop(requireContext(), isCancelable = true) { dialog ->
+            if (PrintSDKHelper.printerState == PrinterState.Success) {
+                ((requireActivity()) as MainActivity).addPrintWorkAnim(vd.btnPrintPdf) {
+                    PrintHelper.addPrintWork(data, "xxx医院", false)
+                }
+            } else if (PrintSDKHelper.printerState == PrinterState.None || PrintSDKHelper.printerState == PrinterState.InitSdkFailed) {
+                dialog.showDialog("打印未初始化")
+            } else if (PrintSDKHelper.printerState == PrinterState.NotInstallApk) {
+                dialog.showDialog("打印程序未安装")
+            } else if (PrintSDKHelper.printerState == PrinterState.NotPrinter) {
+                dialog.showDialog("未设置打印机，请先设置打印机", "选择打印机", {
+                    PrintSDKHelper.showSetupPrinterUi()
+                    it.dismiss()
+                }, "取消", { it.dismiss() })
+            }
+        }
+
+
+//        waitDialog.showPop(requireContext(), isCancelable = true) { dialog ->
+//            if (PrintSDKHelper.printerState == PrinterState.Success) {
+//                PrintHelper.addPrintWork(data, "xxx医院", false)
+//                dialog.showDialog("已加入打印队列，请等待打印")
+//            } else if (PrintSDKHelper.printerState == PrinterState.None || PrintSDKHelper.printerState == PrinterState.InitSdkFailed) {
+//                dialog.showDialog("打印未初始化")
+//            } else if (PrintSDKHelper.printerState == PrinterState.NotInstallApk) {
+//                dialog.showDialog("打印程序未安装")
+//            } else if (PrintSDKHelper.printerState == PrinterState.NotPrinter) {
+//                dialog.showDialog("未设置打印机，请先设置打印机", "选择打印机", {
+//                    PrintSDKHelper.showSetupPrinterUi()
+//                    it.dismiss()
+//                }, "取消", { it.dismiss() })
+//            }
+//        }
+    }
+
     private fun exportReport() {
         val data = getSelectData()
         waitDialog.showPop(requireContext(), isCancelable = false) { dialog ->
@@ -257,11 +398,15 @@ class DataManagerFragment :
                 data,
                 "XX人民医院",
                 lifecycleScope,
+                false,
                 { count, successCount, failedCount ->
                     i("导出报告完成，本次导出总数${count}条,成功${successCount}条,失败${failedCount}条")
-                    dialog.showDialog("导出报告完成，本次导出总数${count}条,成功${successCount}条,失败${failedCount}条", "确定", {
-                        it.dismiss()
-                    })
+                    dialog.showDialog(
+                        "导出报告完成，本次导出总数${count}条,成功${successCount}条,失败${failedCount}条",
+                        "确定",
+                        {
+                            it.dismiss()
+                        })
                 }, { err ->
                     i("导出报告失败 $err")
                     dialog.showDialog("导出报告失败,$err", "确定", {

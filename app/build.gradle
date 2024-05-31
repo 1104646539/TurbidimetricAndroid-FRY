@@ -32,7 +32,7 @@ android {
         minSdk 24
         targetSdk 32
         versionCode 1
-        versionName "1.0.0.0-24添加U盘状态更改时的气泡提示"
+        versionName "1.0.0.0-25添加打印机打印功能"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 
@@ -103,6 +103,7 @@ dependencies {
     implementation files('libs\\hapi-structures-v231-2.2.jar')
     implementation files('libs\\commons-math3-3.6.1.jar')
     implementation files('libs\\jxl-2.6.12.jar')
+//    implementation 'androidx.core:core-animation:1.0.0'
 //    implementation files('libs\\iText-5.0.5.jar')
     //test mock
     testImplementation 'org.mockito:mockito-core:4.4.0'
@@ -223,4 +224,8 @@ dependencies {
     //itext7 生成pdf
     implementation "com.itextpdf:itext-core:8.0.2"
     implementation "com.itextpdf:bouncy-castle-adapter:8.0.2"
+
+    //printhand
+    implementation 'com.dynamixsoftware.intentapi:intentAPI:12'
+    implementation 'com.dynamixsoftware.printingsdk:printingSDK:12'
 }

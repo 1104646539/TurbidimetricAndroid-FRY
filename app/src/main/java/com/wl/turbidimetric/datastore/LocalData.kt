@@ -100,7 +100,18 @@ object LocalData {
      * 是否自动打印小票
      */
     var AutoPrintReceipt by BooleanDataStoreProperty(LocalDataGlobal.Default.autoPrintReceipt)
-//    var LooperTest = true
+    /**
+     * 是否自动打印A4报告
+     */
+    var AutoPrintReport by BooleanDataStoreProperty(LocalDataGlobal.Default.autoPrintReport)
+
+    /**
+     * 生成报告文件的规则
+     * true 条码
+     * false 编号
+     */
+    var ReportFileNameBarcode by BooleanDataStoreProperty(LocalDataGlobal.Default.reportFileNameBarcode)
+
 
     /**
      * 编号自增并保存

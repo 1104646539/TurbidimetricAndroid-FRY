@@ -20,8 +20,10 @@ class TopNavView @JvmOverloads constructor(
     private var ivStateMachine: ImageView? = null
     private var ivStateUpload: ImageView? = null
     private var ivStateStorage: ImageView? = null
+    private var ivStatePrinter: ImageView? = null
     private var llShutdown: View? = null
     private var tvTime: TextView? = null
+    private var tvPrintNum: TextView? = null
 
     init {
         root = LayoutInflater.from(context).inflate(R.layout.layout_main_top_nav, this, true)
@@ -54,12 +56,34 @@ class TopNavView @JvmOverloads constructor(
         ivStateStorage?.setImageResource(id)
     }
 
+    fun setStatePrinterSrc(@DrawableRes id: Int) {
+        ivStatePrinter?.setImageResource(id)
+    }
+
+    fun setPrintNum(text: Int) {
+        if (text <= 0) {
+//            tvPrintNum?.visibility = View.GONE
+            tvPrintNum?.setText("")
+        } else {
+            tvPrintNum?.setText("$text")
+        }
+    }
+
+    fun setPrintNumVisibility(visibility: Int) {
+        tvPrintNum?.visibility = visibility
+    }
+
+    fun getStatePrinter(): View? {
+        return ivStatePrinter
+    }
     fun getStateMachine(): View? {
         return ivStateMachine
     }
+
     fun getStateUpload(): View? {
         return ivStateUpload
     }
+
     fun getStateStorage(): View? {
         return ivStateStorage
     }
@@ -70,8 +94,10 @@ class TopNavView @JvmOverloads constructor(
             ivStateMachine = findViewById(R.id.iv_state_machine)
             ivStateUpload = findViewById(R.id.iv_state_upload)
             ivStateStorage = findViewById(R.id.iv_state_storage)
+            ivStatePrinter = findViewById(R.id.iv_state_printer)
             llShutdown = findViewById(R.id.ll_shutdown)
             tvTime = findViewById(R.id.tv_time)
+            tvPrintNum = findViewById(R.id.tv_print_num)
         }
     }
 

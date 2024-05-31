@@ -3,6 +3,7 @@ package com.wl.turbidimetric.settings
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -26,6 +27,8 @@ import com.wl.turbidimetric.util.ExportLogHelper
 import com.wl.turbidimetric.view.*
 import com.wl.turbidimetric.view.dialog.*
 import com.wl.weiqianwllib.OrderUtil
+import com.wl.weiqianwllib.upan.StorageState
+import com.wl.weiqianwllib.upan.StorageUtil
 import com.wl.wllib.LogToFile
 import com.wl.wllib.LogToFile.i
 import com.wl.wllib.LogToFile.u
@@ -348,5 +351,11 @@ class SettingsFragment constructor() :
         )
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        for (f in childFragmentManager.fragments) {
+            f.onActivityResult(requestCode, resultCode, data)
+        }
+    }
 
 }

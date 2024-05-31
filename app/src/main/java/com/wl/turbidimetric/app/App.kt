@@ -22,6 +22,7 @@ import com.wl.turbidimetric.util.CrashHandler
 import com.wl.turbidimetric.util.ExportReportHelper
 import com.wl.turbidimetric.util.FitterType
 import com.wl.turbidimetric.util.PdfCreateUtil
+import com.wl.turbidimetric.util.PrintHelper
 import com.wl.wllib.LogToFile
 import com.wl.wllib.ToastUtil
 import com.wl.wllib.ktxRunOnBgCache
@@ -47,6 +48,7 @@ class App : Application() {
         Thread.setDefaultUncaughtExceptionHandler(CrashHandler())
         initData()
         ktxRunOnBgCache {
+            PrintHelper.context = this@App
 //            DBManager.init(this)
             initDataStore()
             LogToFile.init()

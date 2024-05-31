@@ -17,6 +17,8 @@ import java.io.File
 object ExportReportHelper {
     const val defaultReportSavePath = "sdcard/检测报告"
     const val defaultStorageCatalogue = "免疫比浊检测报告"
+    val root = File(defaultReportSavePath)
+
     @JvmStatic
     fun getSaveFileName(model: TestResultAndCurveModel, barcode: Boolean): String {
         var fileName = ""
@@ -35,10 +37,20 @@ object ExportReportHelper {
         datas: List<TestResultAndCurveModel>,
         hospitalName: String,
         scope: CoroutineScope,
+        barcode: Boolean,
         onSuccess: (count: Int, successCount: Int, failedCount: Int) -> Unit,
         onFailed: (err: String) -> Unit,
     ) {
-        createReport(context,datas,hospitalName,scope,onSuccess,onFailed,true)
+        createReport(
+            context,
+            datas,
+            hospitalName,
+            scope,
+            barcode,
+            onSuccess,
+            onFailed,
+            true
+        )
     }
 
     @JvmStatic
@@ -47,6 +59,7 @@ object ExportReportHelper {
         datas: List<TestResultAndCurveModel>,
         hospitalName: String,
         scope: CoroutineScope,
+        barcode: Boolean,
         onSuccess: (count: Int, successCount: Int, failedCount: Int) -> Unit,
         onFailed: (err: String) -> Unit,
         export: Boolean
@@ -66,7 +79,7 @@ object ExportReportHelper {
         var successCount = 0
         var failedCount = 0
 
-        val root = File(defaultReportSavePath)
+
         if (!root.exists()) {
             root.mkdirs()
         }
@@ -74,23 +87,16 @@ object ExportReportHelper {
         scope.launch {
             withContext(Dispatchers.IO) {
                 datas.forEach {
-                    var fileName = getSaveFileName(it, false)
-//                    LogToFile.i("fileName=$fileName")
-
-                    val localFile = File(root, "$fileName")
-                    if (localFile.isFile && localFile.exists()) {
-                        localFile.delete()
-                    }
-//                    LogToFile.i("fileName=$fileName localFile=${localFile.path}")
-                    val ret = PdfCreateUtil.create(it, localFile, hospitalName)
+                    val ret = create(it, hospitalName, barcode)
                     if (ret.isNullOrEmpty()) {
                         failedCount++
                     } else {
                         if (export) {
+                            val localFile = File(ret)
                             StorageUtil.copyStorageToUpan(
                                 context,
                                 localFile,
-                                "$defaultStorageCatalogue/$fileName",
+                                "$defaultStorageCatalogue/${localFile.name}",
                                 {
                                     LogToFile.i("");
                                     successCount++
@@ -112,5 +118,14 @@ object ExportReportHelper {
 
     }
 
+    @JvmStatic
+    fun create(result: TestResultAndCurveModel, hospitalName: String, barcode: Boolean): String? {
+        var fileName = getSaveFileName(result, barcode)
+        val localFile = File(root, "$fileName")
+        if (localFile.isFile && localFile.exists()) {
+            localFile.delete()
+        }
+        return PdfCreateUtil.create(result, localFile, hospitalName)
+    }
 
 }

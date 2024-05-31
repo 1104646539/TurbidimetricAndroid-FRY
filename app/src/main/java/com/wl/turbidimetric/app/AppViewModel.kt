@@ -43,6 +43,18 @@ class AppViewModel(val localDataSource: LocalDataSource) : BaseViewModel() {
     val storageState = _storageState.asSharedFlow()
 
     /**
+     * 打印机状态
+     */
+    private val _printerState = MutableStateFlow(PrinterState.None)
+    val printerState = _printerState.asSharedFlow()
+
+    /**
+     * 打印数量
+     */
+    private val _printNum = MutableStateFlow(0)
+    val printNum = _printNum.asSharedFlow()
+
+    /**
      * 当前时间
      */
     private val _nowTimeStr = MutableStateFlow("00:00")
@@ -96,9 +108,22 @@ class AppViewModel(val localDataSource: LocalDataSource) : BaseViewModel() {
         this._detectionNum.value = detectionNum
     }
 
-    fun getAutoPrintReceipt():Boolean{
+    fun getAutoPrintReceipt(): Boolean {
         return localDataSource.getAutoPrintReceipt()
     }
+
+    fun getHospitalName(): String {
+        return localDataSource.getHospitalName()
+    }
+
+    fun getReportFileNameBarcode(): Boolean {
+        return localDataSource.getReportFileNameBarcode()
+    }
+
+    fun getAutoPrintReport(): Boolean {
+        return localDataSource.getAutoPrintReport()
+    }
+
     /**
      * 更新当前时间
      */
@@ -137,6 +162,24 @@ class AppViewModel(val localDataSource: LocalDataSource) : BaseViewModel() {
         }
         viewModelScope.launch {
             _uploadState.emit(s)
+        }
+    }
+
+    /**
+     * 更新打印机状态
+     */
+    fun changePrinterState(state: PrinterState) {
+        viewModelScope.launch {
+            _printerState.emit(state)
+        }
+    }
+
+    /**
+     * 更新打印机状态
+     */
+    fun changePrintNum(num: Int) {
+        viewModelScope.launch {
+            _printNum.emit(num)
         }
     }
 

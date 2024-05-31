@@ -39,3 +39,15 @@ enum class StorageState(val id: Int, val str: String) {
         return this == Exist
     }
 }
+
+/**
+ * 打印机状态
+ */
+enum class PrinterState(val id: Int, val str: String) {
+    None(R.drawable.state_printer_none, "打印机未使用"),
+    NotInstallApk(R.drawable.state_printer_err, "打印程序未安装"),
+    InitSdkFailed(R.drawable.state_printer_err, "打印驱动初始化失败"),
+    Success(R.drawable.state_printer_normal, "打印机正在使用"),
+    NotPrinter(R.drawable.state_printer_err, "未选择打印机");
+
+}

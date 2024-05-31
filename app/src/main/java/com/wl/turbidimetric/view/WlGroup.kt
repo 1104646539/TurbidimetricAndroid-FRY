@@ -44,7 +44,7 @@ class WlGroup @JvmOverloads constructor(
                     )
                     val view = mRootView!!.findViewById<View>(rscId)
                     hashMap[rscId] = view
-                    Log.d("TAG", "initIds: rscId=$rscId view=$view")
+//                    Log.d("TAG", "initIds: rscId=$rscId view=$view")
                 }
             }
         }

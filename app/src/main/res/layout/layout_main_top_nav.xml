@@ -16,6 +16,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+
     <ImageView
         android:id="@+id/iv_state_machine"
         android:layout_width="wrap_content"
@@ -40,11 +41,34 @@
         android:id="@+id/iv_state_storage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginRight="43dp"
+        android:layout_marginRight="16dp"
         android:src="@drawable/state_storage_none"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/iv_state_printer"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/iv_state_printer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="43dp"
+        android:src="@drawable/state_printer_none"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toLeftOf="@id/tv_time"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_print_num"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="-30dp"
+        android:text="0"
+        android:textColor="@color/themePositiveColor"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        app:layout_constraintLeft_toLeftOf="@id/iv_state_printer"
+        app:layout_constraintTop_toBottomOf="@id/iv_state_printer" />
 
     <TextView
         android:id="@+id/tv_time"

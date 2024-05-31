@@ -75,6 +75,8 @@ import com.wl.turbidimetric.upload.service.OnGetPatientCallback
 import com.wl.turbidimetric.upload.service.OnUploadCallback
 import com.wl.turbidimetric.util.Callback2
 import com.wl.turbidimetric.util.OnScanResult
+import com.wl.turbidimetric.util.PrintHelper
+import com.wl.turbidimetric.util.PrintSDKHelper
 import com.wl.turbidimetric.util.ScanCodeUtil
 import com.wl.wllib.LogToFile.c
 import com.wl.wllib.LogToFile.i
@@ -1539,6 +1541,14 @@ class HomeViewModel(
         //自动打印小票
         if (appViewModel.getAutoPrintReceipt()) {
             PrintUtil.printTest(mutableListOf(testResultModel))
+        }
+        //自动打印A4报告
+        if (appViewModel.getAutoPrintReport() && PrintSDKHelper.isPreparePrint()) {
+            PrintHelper.addPrintWork(
+                testResultModel,
+                appViewModel.getHospitalName(),
+                appViewModel.getReportFileNameBarcode()
+            )
         }
     }
 

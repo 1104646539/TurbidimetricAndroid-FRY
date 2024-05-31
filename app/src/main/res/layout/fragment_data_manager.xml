@@ -8,6 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/white"
+        android:id="@+id/cl_root"
         android:orientation="vertical">
 
         <ImageView
@@ -119,11 +120,23 @@
             app:layout_constraintTop_toBottomOf="@id/gl_bottom" />
 
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_export_pdf"
+            android:id="@+id/btn_print_pdf"
+            style="@style/BtnDataManager"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="20dp"
+            android:minWidth="150dp"
+            android:text="打印报告"
+            app:layout_constraintBottom_toBottomOf="@id/v_bottom_bg"
+            app:layout_constraintRight_toLeftOf="@id/btn_export_pdf"
+            app:layout_constraintTop_toTopOf="@id/v_bottom_bg" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_export_pdf"
             style="@style/BtnDataManager"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="20dp"
             android:minWidth="150dp"
             android:text="导出报告"
             app:layout_constraintBottom_toBottomOf="@id/v_bottom_bg"
@@ -132,10 +145,10 @@
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_delete"
+            style="@style/BtnDataManager"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="20dp"
-            style="@style/BtnDataManager"
             android:minWidth="150dp"
             android:text="删除"
             app:layout_constraintBottom_toBottomOf="@id/v_bottom_bg"

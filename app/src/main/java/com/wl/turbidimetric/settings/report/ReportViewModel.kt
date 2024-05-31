@@ -3,10 +3,12 @@ package com.wl.turbidimetric.settings.report
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.dynamixsoftware.printingsdk.Printer
 import com.wl.turbidimetric.app.App
 import com.wl.turbidimetric.base.BaseViewModel
 import com.wl.turbidimetric.db.ServiceLocator
 import com.wl.turbidimetric.repository.if2.LocalDataSource
+import com.wl.turbidimetric.util.PrintSDKHelper
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
@@ -22,7 +24,10 @@ class ReportViewModel(private val localDataDataSource: LocalDataSource) : BaseVi
             _reportViewModelState.emit(
                 ReportViewModelState(
                     localDataDataSource.getHospitalName(),
-                    localDataDataSource.getAutoPrintReceipt()
+                    localDataDataSource.getAutoPrintReceipt(),
+                    localDataDataSource.getAutoPrintReport(),
+                    localDataDataSource.getReportFileNameBarcode(),
+                    PrintSDKHelper.getCurPrinter()
                 )
             )
 
@@ -32,9 +37,13 @@ class ReportViewModel(private val localDataDataSource: LocalDataSource) : BaseVi
     fun change(
         hospitalName: String,
         autoPrintReceipt: Boolean,
+        autoPrintReport: Boolean,
+        reportFileNameBarcode: Boolean,
     ) {
         localDataDataSource.setHospitalName(hospitalName)
         localDataDataSource.setAutoPrintReceipt(autoPrintReceipt)
+        localDataDataSource.setAutoPrintReport(autoPrintReport)
+        localDataDataSource.setReportFileNameBarcode(reportFileNameBarcode)
         viewModelScope.launch {
             _hiltText.emit("修改成功")
         }
@@ -56,4 +65,7 @@ class ReportViewModelFactory(
 data class ReportViewModelState(
     val hospitalName: String,
     val autoPrintReceipt: Boolean,
+    val autoPrintReport: Boolean,
+    val reportFileNameBarcode: Boolean,
+    val curPrinter: Printer?,
 )

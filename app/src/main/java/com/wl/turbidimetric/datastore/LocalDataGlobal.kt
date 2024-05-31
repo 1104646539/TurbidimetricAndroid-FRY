@@ -47,6 +47,8 @@ object LocalDataGlobal {
         val looperTest = false
         val hospitalName = ""
         val autoPrintReceipt = false
+        val autoPrintReport = false
+        val reportFileNameBarcode = false
     }
 
 

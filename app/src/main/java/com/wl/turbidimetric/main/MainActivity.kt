@@ -8,6 +8,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.Color
 import android.graphics.Path
 import android.graphics.PathMeasure
 import android.hardware.usb.UsbDevice
@@ -17,10 +18,14 @@ import android.os.Handler
 import android.os.Message
 import android.util.Log
 import android.view.View
+import android.view.animation.LinearInterpolator
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
+import android.widget.RelativeLayout.LayoutParams
 import androidx.activity.viewModels
+import androidx.core.animation.addListener
+import androidx.core.graphics.alpha
 import androidx.lifecycle.lifecycleScope
 import com.lxj.xpopup.XPopup
 import com.wl.turbidimetric.R
@@ -242,32 +247,6 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         }
     }
 
-//    /**
-//     * 初始化导航栏
-//     */
-//    private fun initNav() {
-//        i("initNav")
-//        vd.vp.adapter = MainViewPagerAdapter(this)
-//        vd.vp.isUserInputEnabled = false
-//        vd.vp.offscreenPageLimit = 6
-//        vd.rnv.setResIds(
-//            R.drawable.icon_shutdown,
-//            vm.navItems,
-//            R.drawable.icon_logo
-//        )
-//        vd.rnv.setNavigationSelectedIndexChangeListener { it ->
-//            vm.curIndex.value = it
-//            i("nav it=$it")
-//        }
-//        vd.tnv.setShutdownListener {
-//            showShutdownDialog()
-//        }
-//        vm.curIndex.observe(this) {
-//            vd.vp.setCurrentItem(it, false)
-//        }
-//    }
-
-
     /**
      * 关机提示
      */
@@ -277,7 +256,10 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
                 it.showDialog(
                     "确定要关机吗？请确定仪器检测结束。",
                     "关机",
-                    { shutdown() },
+                    {
+                        it.dismiss()
+                        showShutdownView { shutdown() }
+                    },
                     "取消",
                     { it.dismiss() })
             }
@@ -289,18 +271,34 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         }
     }
 
+    /**
+     * 显示关机动画
+     */
+    private fun showShutdownView(onAnimFinish: () -> Unit) {
+        val view = View(this)
+        view.setBackgroundColor(Color.BLACK)
+        val lp = LayoutParams(vd.rlRoot.width, vd.rlRoot.height)
+        view.alpha = 0f
+        vd.rlRoot.addView(view, lp)
+        val fromW = 0f
+        val targetW = 1f
+        val animW = ValueAnimator.ofFloat(fromW, targetW)
+        animW.setDuration(2000)
+        animW.addUpdateListener {
+            val v = (it.animatedValue as Float)
+            view.alpha = v
+        }
+        animW.interpolator = LinearInterpolator()
+        animW.addListener(onEnd = { onAnimFinish.invoke() })
+        animW.start()
+    }
+
     val shutdownDialog by lazy {
         HiltDialog(this)
     }
 
     fun shutdown() {
-        shutdownDialog.showPop(this, isCancelable = false) {
-            it.showDialog("即将关机，请等待……", "我知道了", { it.dismiss() })
-        }
-        lifecycleScope.launch {
-            delay(3000)
-            vm.shutdown()
-        }
+        vm.shutdown()
     }
 
     private fun test() {
@@ -386,6 +384,9 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
 
     private val mCurrentPosition = FloatArray(2)
 
+    /**
+     * 添加到打印队列的动画
+     */
     fun addPrintWorkAnim(formView: View, onAnimFinish: () -> Unit) {
         val targetView = getTopPrint() ?: return
         //   一、创造出执行动画的主题---imageview
@@ -545,13 +546,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         StorageUtil.state = state!!
         i("U盘状态=${StorageUtil.state.stateName}")
 
-//        if (state != StorageState.NONE) {
-//            vd.rnv.setUpanResId(if (state.isExist()) R.drawable.upan_enable_true else R.drawable.upan_enable_false)
-//        } else {
-//            vd.rnv.setUpanResId(0)
-//        }
         appVm.changeStorageState(state)
-//        vd.tvState!!.text = "U盘状态:" + StorageUtil.state.stateName
     }
 
     private fun initUploadClient() {

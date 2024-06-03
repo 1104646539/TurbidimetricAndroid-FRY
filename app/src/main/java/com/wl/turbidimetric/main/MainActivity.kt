@@ -1,6 +1,7 @@
 package com.wl.turbidimetric.main
 
 import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
 import android.app.Activity
 import android.app.PendingIntent
@@ -18,6 +19,8 @@ import android.os.Handler
 import android.os.Message
 import android.util.Log
 import android.view.View
+import android.view.ViewAnimationUtils
+import android.view.animation.DecelerateInterpolator
 import android.view.animation.LinearInterpolator
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -160,6 +163,31 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         initUploadClient()
         initPrintSDK()
         OrderUtil.showHideNav(this, false)
+        vd.ivStart.post {
+            showAnimStart()
+        }
+    }
+
+    private fun showAnimStart() {
+        val anim = ViewAnimationUtils.createCircularReveal(
+            vd.ivStart,
+            100,
+            50,
+            (vd.rlRoot.width * 1.2).toFloat(),
+            0.0.toFloat()
+        )
+        vd.ivStart.visibility = View.VISIBLE
+        anim.duration = 1000
+        anim.interpolator = LinearInterpolator()
+        //监听动画结束，进行回调
+        anim.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator) {
+                super.onAnimationEnd(animation)
+                vd.ivStart.visibility = View.GONE
+            }
+        })
+
+        anim.start()
     }
 
     private fun initPrintSDK() {

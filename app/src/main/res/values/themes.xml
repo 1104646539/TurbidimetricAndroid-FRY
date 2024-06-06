@@ -65,7 +65,7 @@
     </style>
 
     <style name="BtnNegative" parent="BtnDefault">
-        <item name="android:background">@drawable/rip_negative</item>
+        <item name="android:background">@drawable/select_rip_negative</item>
     </style>
 
     <style name="BtnDataManager" parent="BtnDefault">
@@ -74,11 +74,11 @@
     </style>
 
     <style name="BtnPositive" parent="BtnDefault">
-        <item name="android:background">@drawable/rip_positive</item>
+        <item name="android:background">@drawable/select_rip_positive</item>
     </style>
 
     <style name="BtnPositive2" parent="BtnDefault">
-        <item name="android:background">@drawable/rip_positive2</item>
+        <item name="android:background">@drawable/select_rip_positive2</item>
     </style>
 
     <style name="EtDefault">

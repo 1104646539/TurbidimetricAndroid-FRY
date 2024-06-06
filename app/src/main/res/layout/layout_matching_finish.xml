@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:minWidth="700dp"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tv_reagent_no"
+        style="@style/TextTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="试剂序号" />
+
+    <TextView
+        android:id="@+id/tv_project_name"
+        style="@style/TextTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="项目名" />
+
+    <TextView
+        android:id="@+id/tv_fitter_type"
+        style="@style/TextTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="拟合类型" />
+
+    <TextView
+        android:id="@+id/tv_target"
+        style="@style/TextTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="目标值"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/tv_abs"
+        style="@style/TextTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="吸光度"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/tv_ys"
+        style="@style/TextTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="验算"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/tv_quality"
+        style="@style/TextTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:gravity="left|center_vertical"
+        android:text="质控" />
+
+    <TextView
+        android:id="@+id/tv_params"
+        style="@style/TextTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:gravity="left|center_vertical"
+        android:text="参数1" />
+
+    <TextView
+        android:id="@+id/tv_fitGoodness"
+        style="@style/TextTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="拟合度" />
+
+    <TextView
+        android:id="@+id/tv_time"
+        style="@style/TextTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="拟合时间" />
+
+</LinearLayout>

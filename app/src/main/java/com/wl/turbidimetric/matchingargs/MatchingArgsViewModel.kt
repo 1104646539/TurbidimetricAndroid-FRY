@@ -54,9 +54,6 @@ import com.wl.turbidimetric.model.TestState
 import com.wl.turbidimetric.model.TestType
 import com.wl.turbidimetric.model.convertReplyState
 import com.wl.turbidimetric.print.PrintUtil
-import com.wl.turbidimetric.repository.DefaultCurveDataSource
-import com.wl.turbidimetric.repository.DefaultLocalDataDataSource
-import com.wl.turbidimetric.repository.DefaultProjectDataSource
 import com.wl.turbidimetric.repository.if2.CurveSource
 import com.wl.turbidimetric.repository.if2.LocalDataSource
 import com.wl.turbidimetric.repository.if2.ProjectSource
@@ -532,7 +529,8 @@ class MatchingArgsViewModel(
                     targetCons,
                     means,
                     selectFitterType,
-                    curProject
+                    curProject,
+                    quality
                 )
             )
         }
@@ -738,6 +736,7 @@ class MatchingArgsViewModel(
         }
         if (!runningMatching()) return
         if (appViewModel.testState.isNotPrepare()) return
+        cuvetteShelfMoveFinish = true
         i("接收到 移动比色皿架 reply=$reply")
         cuvettePos = 0
         when (appViewModel.testState) {
@@ -875,7 +874,7 @@ class MatchingArgsViewModel(
      * 去比色皿加样
      */
     private fun goDripSample() {
-        if (cuvetteMoveFinish && samplingFinish) {
+        if (cuvetteShelfMoveFinish && cuvetteMoveFinish && samplingFinish) {
             dripSample(autoBlending = false, inplace = false, LocalData.SamplingVolume)
         }
     }
@@ -1553,12 +1552,21 @@ class MatchingArgsViewModel(
             }
             return
         }
-        abss.clear()
-        means.clear()
+//        abss.clear()
+//        means.clear()
 
         viewModelScope.launch {
             _dialogUiState.emit(
-                MatchingArgsDialogUiState.MatchingFinishMsg(testMsg.value ?: "")
+                MatchingArgsDialogUiState.MatchingFinishMsg(
+                    reagentNOStr,
+                    gradsNum,
+                    abss,
+                    targetCons,
+                    means,
+                    selectFitterType,
+                    curProject,
+                    quality
+                )
             )
         }
         appViewModel.testState = TestState.Normal
@@ -1638,6 +1646,13 @@ class MatchingArgsViewModel(
             selectFitterType,
             targetCons
         )
+        initQualityData()
+    }
+
+    private fun initQualityData() {
+        abss.clear()
+        means.clear()
+        curProject = null
     }
 
     /**
@@ -1658,6 +1673,7 @@ class MatchingArgsViewModel(
             selectFitterType,
             targetCons
         )
+        initQualityData()
     }
 
     /**

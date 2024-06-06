@@ -9,6 +9,7 @@ import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
+import com.lxj.xpopup.XPopup
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.FragmentMatchingArgsBinding
 import com.wl.turbidimetric.ex.*
@@ -23,14 +24,9 @@ import com.wl.turbidimetric.view.dialog.showPop
 import com.wl.wllib.LogToFile.i
 import com.wl.turbidimetric.base.BaseFragment
 import com.wl.turbidimetric.global.SystemGlobal
-import com.wl.turbidimetric.view.dialog.ICON_HINT
-import com.wl.turbidimetric.view.dialog.MatchingStateDialog
 import com.wl.wllib.LogToFile.u
-import com.wl.wllib.toLongTimeStr
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import java.util.Date
 
 /**
  * 拟合参数
@@ -76,19 +72,6 @@ class MatchingArgsFragment :
         HiltDialog(requireContext())
     }
 
-    /**
-     * 拟合设置对话框
-     */
-    private val matchingConfigDialog: MatchingConfigDialog by lazy {
-        MatchingConfigDialog(requireContext())
-    }
-
-    /**
-     * 拟合中状态对话框
-     */
-    private val matchingStateDialog: MatchingStateDialog by lazy {
-        MatchingStateDialog(requireContext())
-    }
 
     override fun init(savedInstanceState: Bundle?) {
         initView()
@@ -218,27 +201,26 @@ class MatchingArgsFragment :
         }
         vd.vConfig.setOnClickListener {
             u("拟合配置")
-            if (appVm.testState.isTestRunning()) {
-                toast("正在运行，请稍后")
-            } else {
-                vm.showMatchingSettingsDialog()
-            }
+            startMatching()
+//            if (appVm.testState.isTestRunning()) {
+//                toast("正在运行，请稍后")
+//            } else {
+//                vm.showMatchingSettingsDialog()
+//            }
         }
         vd.btnPrint.setOnClickListener {
             u("打印")
             vm.print()
         }
-
-//        vd.btnDebugDialog.setOnClickListener {
-//            u("调试框")
-//            debugShowDetailsDialog.showPop(requireContext(), width = 1500) {
-//                it.showDialog(
-//                    vm.testMsg.value ?: "",
-//                    "确定",
-//                    confirmClick = { it.dismiss() }, textGravity = Gravity.LEFT
-//                )
-//            }
-//        }
+        lifecycleScope.launch {
+            appVm.obTestState.collectLatest {
+                if (it.isRunning() && matchingConfigDialog.isShow) {
+                    matchingConfigDialog.testingUI()
+                } else {
+                    matchingConfigDialog.noTestUI()
+                }
+            }
+        }
     }
 
 
@@ -320,32 +302,16 @@ class MatchingArgsFragment :
                     }
 
                     is MatchingArgsDialogUiState.MatchingFinishMsg -> {//检测结束，提示是否保存
-//                        vm.saveProject()
-                        val msg = state.msg.plus("\n确定保存该条标曲记录？\n\n")
-
-                        finishCoverDialog.showPop(
-                            requireContext(),
-                            width = 1500,
-                            isCancelable = false
-                        ) { dialog ->
-                            dialog.showDialog(
-                                msg = msg,
-                                confirmText = "保存", confirmClick = {
-                                    vm.saveProject()
-                                    dialog.dismiss()
-                                    if (matchingStateDialog.isShow) {
-                                        matchingStateDialog.dismiss()
-                                    }
-                                }, cancelText = "取消", cancelClick = {
-                                    vm.notSaveProject()
-                                    dialog.dismiss()
-                                    if (matchingStateDialog.isShow) {
-                                        matchingStateDialog.dismiss()
-                                    }
-                                }, textGravity = Gravity.LEFT
-                            )
-                        }
-
+                        showMatchingFinishDialog(
+                            state.reagnetNo,
+                            state.gradsNum,
+                            state.abss,
+                            state.targets,
+                            state.means,
+                            state.selectFitterType,
+                            state.curProject,
+                            state.isQuality
+                        )
                     }
 
                     is MatchingArgsDialogUiState.Accident -> {//意外的检测结束等
@@ -361,8 +327,8 @@ class MatchingArgsFragment :
                     }
 
                     is MatchingArgsDialogUiState.CloseMatchingStateDialog -> {//关闭拟合中的对话框
-                        if (matchingStateDialog.isShow) {
-                            matchingStateDialog.dismiss()
+                        if (matchingConfigDialog.isShow) {
+                            matchingConfigDialog.dismiss()
                         }
                     }
 
@@ -384,9 +350,10 @@ class MatchingArgsFragment :
                             state.gradsNum,
                             state.abss,
                             state.targets,
+                            state.quality,
                             state.means,
                             state.selectFitterType,
-                            state.curProject
+                            state.curProject,
                         )
                     }
 
@@ -451,6 +418,16 @@ class MatchingArgsFragment :
         }
     }
 
+    val matchingConfigDialog: MatchingConfigDialog by lazy {
+        return@lazy XPopup.Builder(requireActivity())
+            .dismissOnTouchOutside(false)
+            .dismissOnBackPressed(false)
+            .autoOpenSoftInput(false)
+            .autoFocusEditText(false)
+            .isDestroyOnDismiss(false)
+            .asCustom(MatchingConfigDialog(requireContext())) as MatchingConfigDialog
+    }
+
     /**
      * 显示拟合设置对话框
      */
@@ -464,36 +441,29 @@ class MatchingArgsFragment :
         selectFitterType: FitterType = FitterType.Three,
         targetCons: List<Double> = mutableListOf(),
     ) {
-        matchingConfigDialog.showPop(
-            requireContext(),
-            width = 900,
-            isCancelable = false
-        ) { dialog ->
-            dialog.showDialog(
-                reagentNo,
-                quality,
-                projects,
-                autoAttenuation,
-                gradsNum,
-                selectProject,
-                selectFitterType,
-                targetCons,
-                { reagentNo: String,
-                  quality: Boolean, matchingNum: Int, autoAttenuation: Boolean, selectProject: ProjectModel?, selectFitterType: FitterType, cons: List<Double> ->
-                    vm.matchingConfigFinish(
-                        reagentNo,
-                        quality,
-                        matchingNum,
-                        autoAttenuation,
-                        selectProject,
-                        selectFitterType,
-                        cons
-                    )
-                    dialog.dismiss()
-                }
-            ) {
-                it.dismiss()
-            }
+        matchingConfigDialog.showDialogStep1(
+            reagentNo,
+            quality,
+            projects,
+            autoAttenuation,
+            gradsNum,
+            selectProject,
+            selectFitterType,
+            targetCons,
+            { reagentNo: String,
+              quality: Boolean, matchingNum: Int, autoAttenuation: Boolean, selectProject: ProjectModel?, selectFitterType: FitterType, cons: List<Double> ->
+                vm.matchingConfigFinish(
+                    reagentNo,
+                    quality,
+                    matchingNum,
+                    autoAttenuation,
+                    selectProject,
+                    selectFitterType,
+                    cons
+                )
+            },
+        ) {
+            it.dismiss()
         }
     }
 
@@ -504,43 +474,67 @@ class MatchingArgsFragment :
         gradsNum: Int,
         abss: MutableList<MutableList<Double>>,
         targets: List<Double>,
+        quality: Boolean,
         means: List<Double>,
         selectFitterType: FitterType,
         curProject: CurveModel?
     ) {
-        matchingStateDialog.showPop(
-            requireContext(),
-            width = 1500,
-            isCancelable = false
-        ) { dialog ->
-            dialog.showDialog(
-                gradsNum,
-                abss,
-                targets,
-                means,
-                selectFitterType,
-                curProject,
-                {//开始
-                    vm.clickStart()
-                }, {//拟合结束
-                    vm.showSaveMatchingDialog()
-                },
-                {
-                    vm.changeFitterType(it)
-                },
-                SystemGlobal.isDebugMode,
-                {
-                    u("调试框")
-                    debugShowDetailsDialog.showPop(requireContext(), width = 1500) {
-                        it.showDialog(
-                            vm.testMsg.value ?: "",
-                            "确定",
-                            confirmClick = { it.dismiss() }, textGravity = Gravity.LEFT
-                        )
-                    }
+        matchingConfigDialog.showDialogStep2(
+            gradsNum, abss, targets, means, selectFitterType, curProject, quality, {//开始
+                vm.clickStart()
+//                vm.showMatchingSettingsDialog()
+            }, {//拟合结束
+                vm.showSaveMatchingDialog()
+            },
+            {
+                vm.changeFitterType(it)
+            },
+            SystemGlobal.isDebugMode,
+            {
+                u("调试框")
+                debugShowDetailsDialog.showPop(requireContext(), width = 1500) {
+                    it.showDialog(
+                        vm.testMsg.value ?: "",
+                        "确定",
+                        confirmClick = { it.dismiss() }, textGravity = Gravity.LEFT
+                    )
                 }
-            )
-        }
+            }
+        )
+    }
+
+    /**
+     * 显示拟合结果对话框
+     */
+    private fun showMatchingFinishDialog(
+        reagnetNo: String,
+        gradsNum: Int,
+        abss: MutableList<MutableList<Double>>,
+        targets: List<Double>,
+        means: List<Double>,
+        selectFitterType: FitterType,
+        curProject: CurveModel?,
+        isQuality: Boolean,
+    ) {
+        matchingConfigDialog.showDialogStep3(
+            reagnetNo,
+            gradsNum,
+            abss,
+            targets,
+            means,
+            selectFitterType,
+            curProject,
+            isQuality,
+            {
+                vm.showMatchingStateDialog()
+            }, {
+                vm.saveProject()
+                it.dismiss()
+            },
+            {
+                vm.notSaveProject()
+                it.dismiss()
+            })
     }
 
 

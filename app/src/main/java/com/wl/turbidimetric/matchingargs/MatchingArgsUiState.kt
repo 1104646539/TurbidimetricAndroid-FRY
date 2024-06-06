@@ -18,7 +18,16 @@ sealed class MatchingArgsDialogUiState {
     /**
      * 拟合质控结束提示
      */
-    class MatchingFinishMsg(val msg: String) : MatchingArgsDialogUiState()
+    class MatchingFinishMsg(
+        val reagnetNo: String,
+        val gradsNum: Int,
+        val abss: MutableList<MutableList<Double>>,
+        val targets: List<Double>,
+        val means: List<Double>,
+        val selectFitterType: FitterType,
+        val curProject: CurveModel?,
+        val isQuality: Boolean,
+    ) : MatchingArgsDialogUiState()
 
     /**
      * 意外错误等
@@ -53,7 +62,8 @@ sealed class MatchingArgsDialogUiState {
         val targets: List<Double>,
         val means: List<Double>,
         val selectFitterType: FitterType,
-        val curProject: CurveModel?
+        val curProject: CurveModel?,
+        val quality: Boolean
     ) : MatchingArgsDialogUiState()
 
     /**

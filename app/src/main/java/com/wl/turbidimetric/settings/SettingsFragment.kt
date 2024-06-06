@@ -96,11 +96,13 @@ class SettingsFragment constructor() :
                     vd.sivDebug.visibility = it
                     vd.sivLauncher.visibility = it
                     vd.sivNav.visibility = it
+                    vd.sivRepeatability.visibility = it
                     vd.sivExportLog.visibility = it
                     vd.sivDebugTitle.visibility = it
                 }
             }
         }
+
     }
 
     private fun listenerView() {

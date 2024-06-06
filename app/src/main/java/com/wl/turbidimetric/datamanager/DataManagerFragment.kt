@@ -515,6 +515,11 @@ class DataManagerFragment :
                 queryData(it)
             }
         }
+        lifecycleScope.launch {
+            SystemGlobal.obDebugMode.collectLatest {
+                vd.btnDelete.visibility = it.isShow()
+            }
+        }
     }
 
     private fun print() {

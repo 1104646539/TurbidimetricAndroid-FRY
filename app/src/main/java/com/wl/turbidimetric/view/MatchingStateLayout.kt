@@ -1,9 +1,11 @@
-package com.wl.turbidimetric.view.dialog
+package com.wl.turbidimetric.view
 
 import android.content.Context
+import android.util.AttributeSet
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.AdapterView
-import android.widget.AdapterView.OnItemSelectedListener
+import android.widget.FrameLayout
 import android.widget.Spinner
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,23 +16,33 @@ import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.wl.turbidimetric.R
+import com.wl.turbidimetric.ex.getChartEntry
 import com.wl.turbidimetric.ex.getEquation
 import com.wl.turbidimetric.ex.getFitGoodness
 import com.wl.turbidimetric.ex.getIndexOrNullDefault
 import com.wl.turbidimetric.ex.getResource
-import com.wl.turbidimetric.matchingargs.SpnSampleAdapter
 import com.wl.turbidimetric.matchingargs.MatchingStateAdapter
+import com.wl.turbidimetric.matchingargs.SpnSampleAdapter
 import com.wl.turbidimetric.model.CurveModel
 import com.wl.turbidimetric.util.FitterType
-import com.wl.wllib.LogToFile.i
+import com.wl.turbidimetric.view.dialog.isShow
+import com.wl.wllib.LogToFile
 
-/**
- * 显示拟合中的状态
- *
- * 比如已经拟合过的结果
- */
-class MatchingStateDialog(val ct: Context) :
-    CustomBtn3Popup(ct, R.layout.dialog_matching_state) {
+class MatchingStateLayout : FrameLayout {
+    private var root: View? = null
+
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attributeSet: AttributeSet) : super(context, attributeSet)
+    constructor(context: Context, attributeSet: AttributeSet, defStyleAttr: Int) : super(
+        context,
+        attributeSet,
+        defStyleAttr
+    )
+
+    init {
+        root = LayoutInflater.from(context).inflate(R.layout.layout_matching_state, this, true)
+    }
+
     var vHeader: View? = null
     var vFooter: View? = null
     var tvHeaderTitle: TextView? = null
@@ -43,6 +55,8 @@ class MatchingStateDialog(val ct: Context) :
     var tvHeader6: TextView? = null
     var tvHeader7: TextView? = null
     var tvHeader8: TextView? = null
+    var tvHeaderQualityL: TextView? = null
+    var tvHeaderQualityH: TextView? = null
     var tvFooter1: TextView? = null
     var tvFooter2: TextView? = null
     var tvFooter3: TextView? = null
@@ -51,6 +65,8 @@ class MatchingStateDialog(val ct: Context) :
     var tvFooter6: TextView? = null
     var tvFooter7: TextView? = null
     var tvFooter8: TextView? = null
+    var tvFooterQualityL: TextView? = null
+    var tvFooterQualityH: TextView? = null
     var rv: RecyclerView? = null
     var selectFitterType: FitterType = FitterType.Three
     var tvEquation: TextView? = null
@@ -60,6 +76,7 @@ class MatchingStateDialog(val ct: Context) :
     var gradsNum: Int = 5
     var targets: MutableList<Double> = mutableListOf()
     var means: MutableList<Double> = mutableListOf()
+    var isQuality: Boolean = false
     private var spnFitterTypeAdapter: SpnSampleAdapter? = null
     private var stateAdapter: MatchingStateAdapter? = null
     private val bgGray = getResource().getColor(R.color.bg_gray)
@@ -68,7 +85,9 @@ class MatchingStateDialog(val ct: Context) :
     var fitterTypes = mutableListOf<FitterType>()
     var fitterTypeNames = mutableListOf<String>()
     var curProject: CurveModel? = null
-    override fun initDialogView() {
+    private fun initView() {
+        if (vHeader != null) return
+
         vHeader = findViewById(R.id.inc_header)
         vFooter = findViewById(R.id.inc_footer)
         rv = findViewById(R.id.rv)
@@ -85,6 +104,8 @@ class MatchingStateDialog(val ct: Context) :
             tvHeader6 = it.findViewById(R.id.tv_result_6)
             tvHeader7 = it.findViewById(R.id.tv_result_7)
             tvHeader8 = it.findViewById(R.id.tv_result_8)
+            tvHeaderQualityL = it.findViewById(R.id.tv_quality_l)
+            tvHeaderQualityH = it.findViewById(R.id.tv_quality_h)
         }
         vFooter?.let { it ->
             tvFooterTitle = it.findViewById(R.id.tv_result_header)
@@ -96,6 +117,8 @@ class MatchingStateDialog(val ct: Context) :
             tvFooter6 = it.findViewById(R.id.tv_result_6)
             tvFooter7 = it.findViewById(R.id.tv_result_7)
             tvFooter8 = it.findViewById(R.id.tv_result_8)
+            tvFooterQualityL = it.findViewById(R.id.tv_quality_l)
+            tvFooterQualityH = it.findViewById(R.id.tv_quality_h)
         }
         fitterTypes.addAll(FitterType.values())
         fitterTypeNames.addAll(fitterTypes.map { it.showName })
@@ -104,35 +127,35 @@ class MatchingStateDialog(val ct: Context) :
 
         vHeader?.setBackgroundResource(R.drawable.bg_item)
 
-        initChart()
-        i("$tvHeaderTitle $tvFooterTitle")
+        initCurveView()
+        LogToFile.i("$tvHeaderTitle $tvFooterTitle")
     }
 
-    private fun initChart() {
-        lcCurve?.let { chart ->
+    private fun initCurveView() {
+        lcCurve?.let { lcCurve ->
             val set1 = LineDataSet(arrayListOf(), null)
             set1.setDrawValues(false)//不绘制值在点上
             set1.setDrawIcons(false)//不绘制值icon在点上
             set1.color = lineColor
             set1.label = ""
-            set1.enableDashedLine(6f, 6f, 0f)//线连成虚线
+            set1.enableDashedLine(10f, 0f, 0f)//线连成虚线
             set1.circleColors = listOf(lineColor)
-            set1.circleRadius = 4f //点的半径
+            set1.circleRadius = 1f //点的半径
             set1.setDrawCircleHole(false)
 
             //数据集,一个数据集一条线
             val data = LineData(set1)
 
             //横向的轴
-            val xAxis = chart.xAxis
+            val xAxis = lcCurve.xAxis
             xAxis.position = XAxis.XAxisPosition.BOTTOM //数字显示在下方
             xAxis.gridColor = bgGray
             xAxis.axisLineColor = bgGray
             xAxis.textColor = textColor
 
             //竖轴 L是左边的，R是右边的
-            val yAxisL = chart.axisLeft
-            val yAxisR = chart.axisRight
+            val yAxisL = lcCurve.axisLeft
+            val yAxisR = lcCurve.axisRight
             yAxisL.gridColor = bgGray
             yAxisR.gridColor = bgGray
 
@@ -150,21 +173,20 @@ class MatchingStateDialog(val ct: Context) :
             //右边的轴不显示值
             yAxisR.setValueFormatter { value, axis -> "" }
 
-            chart.animateXY(1000, 1000)
+            lcCurve.animateXY(1000, 1000)
 
             //数据集的文字不显示，不启用
-            chart.description?.isEnabled = false
+            lcCurve.description.isEnabled = false
             //数据集的色块不显示，不启用
-            chart.legend?.isEnabled = false
+            lcCurve.legend.isEnabled = false
             //空数据显示文字
-            chart.setNoDataText("无数据")
+            lcCurve.setNoDataText("无数据")
             //设置数据，更新
-            chart.data = data
+            lcCurve.data = data
         }
     }
 
-    override fun setContent() {
-        super.setContent()
+    fun setContent() {
 
         tvHeaderTitle?.text = "目标值"
         tvFooterTitle?.text = "平均值"
@@ -172,12 +194,12 @@ class MatchingStateDialog(val ct: Context) :
         setTarget()
         setMean()
 
-        stateAdapter = MatchingStateAdapter(gradsNum, abss)
+        stateAdapter = MatchingStateAdapter(gradsNum, abss, isQuality)
         rv?.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         rv?.adapter = stateAdapter
 
         changeEquation()
-        spnFitterType?.onItemSelectedListener = object : OnItemSelectedListener {
+        spnFitterType?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>?,
                 view: View?,
@@ -211,6 +233,16 @@ class MatchingStateDialog(val ct: Context) :
         tvFooter7?.text = getIndexOrNullDefault(means, 6, "-")
         tvFooter8?.text = getIndexOrNullDefault(means, 7, "-")
 
+        tvFooterQualityL?.visibility = isQuality.isShow()
+        tvFooterQualityH?.visibility = isQuality.isShow()
+        tvHeaderQualityL?.visibility = isQuality.isShow()
+        tvHeaderQualityH?.visibility = isQuality.isShow()
+        if (isQuality) {
+            tvHeaderQualityL?.text = "L"
+            tvHeaderQualityH?.text = "H"
+            tvFooterQualityL?.text = "${getIndexOrNullDefault(means, gradsNum, "-")}"
+            tvFooterQualityH?.text = "${getIndexOrNullDefault(means, gradsNum + 1, "-")}"
+        }
     }
 
     /**
@@ -218,33 +250,36 @@ class MatchingStateDialog(val ct: Context) :
      */
     private fun changeEquation() {
         val values = ArrayList<Entry>()
-        if (means != null && means.isNotEmpty()) {
-            means.forEachIndexed { i, it ->
-                if (i < gradsNum) {
-                    values.add(Entry(targets[i].toFloat(), it.toFloat()))
-                }
-            }
-        } else {
-            return
-        }
-        lcCurve?.let { chart ->
-            if (chart.data != null && lcCurve?.data?.dataSetCount!! > 0) {
+        if (curProject == null) {
+            tvEquation?.text = ""
+            lcCurve?.let { chart ->
                 val set1 = chart.data.getDataSetByIndex(0) as LineDataSet
-                set1.values = values
+                set1.values = mutableListOf()
                 chart.data.notifyDataChanged()
                 chart.notifyDataSetChanged()
                 chart.animateXY(300, 300)
             }
         }
-        curProject?.let {
+        curProject?.let { curve ->
+            if (curve.reactionValues != null && curve.reactionValues.isNotEmpty()) {
+                values.addAll(getChartEntry(curve))
+            }
+            lcCurve?.let { chart ->
+                if (chart.data != null && chart.data.dataSetCount > 0) {
+                    val set1 = chart.data.getDataSetByIndex(0) as LineDataSet
+                    set1.values = values
+                    chart.data.notifyDataChanged()
+                    chart.notifyDataSetChanged()
+                    chart.animateXY(300, 300)
+                }
+            }
             tvEquation?.text =
                 "${
                     getEquation(
                         selectFitterType,
-                        mutableListOf(it.f0, it.f1, it.f2, it.f3)
+                        mutableListOf(curve.f0, curve.f1, curve.f2, curve.f3)
                     )
-                }\n ${getFitGoodness(selectFitterType, it.fitGoodness)}"
-
+                }\n ${getFitGoodness(selectFitterType, curve.fitGoodness)}"
         }
     }
 
@@ -264,6 +299,8 @@ class MatchingStateDialog(val ct: Context) :
     }
 
     var onFitterTypeChange: ((selectFitterType: FitterType) -> Unit)? = null
+
+
     fun showDialog(
         gradsNum: Int,
         abss: MutableList<MutableList<Double>>,
@@ -271,12 +308,13 @@ class MatchingStateDialog(val ct: Context) :
         means: List<Double>,
         selectFitterType: FitterType,
         curProject: CurveModel?,
-        onConfirm: onClick,
-        onConfirm2: onClick,
-        onFitterTypeChange: (selectFitterType: FitterType) -> Unit,
-        debug: Boolean = false,
-        onClickDebug: onClick
+        isQuality: Boolean,
+        onFitterTypeChange: (selectFitterType: FitterType) -> Unit
     ) {
+        initView()
+        listenerView()
+
+        this.curProject = curProject
         this.gradsNum = gradsNum
         this.abss.clear()
         this.abss.addAll(abss)
@@ -285,33 +323,16 @@ class MatchingStateDialog(val ct: Context) :
         this.means.clear()
         this.means.addAll(means)
         this.selectFitterType = selectFitterType
-
-        this.confirmText = "添加拟合数据"
-        this.confirmClick = onConfirm
-        this.confirmText2 = "拟合结束"
-        this.confirmClick2 = onConfirm2
-
-        this.curProject = curProject
-
         this.onFitterTypeChange = onFitterTypeChange
-//        this.cancelText = "取消"
-//        this.cancelClick = onCancel
-        if (debug) {
-            this.cancelText = "调试框"
-            this.cancelClick = onClickDebug
-        }
+        this.isQuality = isQuality
 
-        if (isCreated) {
-            setContent()
-        }
-        super.show()
+        setContent()
+
     }
 
-    override fun getResId(): Int {
-        return 0
+    private fun listenerView() {
+
     }
 
-    override fun showIcon(): Boolean {
-        return false
-    }
+
 }

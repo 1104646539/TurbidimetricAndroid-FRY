@@ -41,6 +41,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import org.greenrobot.eventbus.EventBus
 import java.util.Date
 
 class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.fragment_home) {
@@ -141,7 +142,9 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             }
         }
 
-
+        vd?.vConfig?.post {
+            EventBus.getDefault().post((EventMsg<Any>(what = EventGlobal.WHAT_HOME_INIT_FINISH)))
+        }
     }
 
 
@@ -264,6 +267,11 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 vm.clickStart()
             }
         }
+        lifecycleScope.launch {
+            SystemGlobal.obDebugMode.collectLatest {
+                vd.btnDebugDialog.visibility = it.isShow()
+            }
+        }
         vd.btnDebugDialog.setOnClickListener {
             debugShowDetailsDialog.showPop(requireContext(), width = 1500) {
                 it.showDialog(
@@ -285,10 +293,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 showConfigDialog()
             }
         }
-//        vd.btnGetTestPatientInfo.setOnClickListener {
-//            u("获取待检信息")
-//            showGetTestPatientInfo()
-//        }
+
     }
 
     override fun onMessageEvent(event: EventMsg<Any>) {

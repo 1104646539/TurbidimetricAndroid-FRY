@@ -45,6 +45,7 @@ abstract class CustomBtn3Popup(val ctx: Context, val viewId: Int) : CenterPopupV
     var cancelClick: onClick? = null
     val imm: InputMethodManager =
         ctx.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+    var layoutRootView: LinearLayout? = null
 
     // 返回自定义弹窗的布局
     override fun getImplLayoutId(): Int {
@@ -54,9 +55,9 @@ abstract class CustomBtn3Popup(val ctx: Context, val viewId: Int) : CenterPopupV
     // 执行初始化操作，比如：findView，设置点击，或者任何你弹窗内的业务逻辑
     override fun onCreate() {
         super.onCreate()
-
+        layoutRootView = (findViewById<LinearLayout>(R.id.root))
         LayoutInflater.from(context).inflate(viewId, null)?.let {
-               (findViewById<LinearLayout>(R.id.root)).addView(it, 1)
+            layoutRootView!!.addView(it, 1)
         }
         btnConfirm = findViewById(R.id.btn_confirm)
         btnConfirm2 = findViewById(R.id.btn_confirm2)

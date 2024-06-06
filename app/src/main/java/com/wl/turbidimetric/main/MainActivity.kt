@@ -156,16 +156,18 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     override fun init() {
         showSplash()
         listener()
-//        initNav()
         initNav2()
         test()
         initTime()
         initUploadClient()
         initPrintSDK()
         OrderUtil.showHideNav(this, false)
-        vd.ivStart.post {
-            showAnimStart()
-        }
+        vd.ivStart.postDelayed({
+            //如果10s还没有隐藏就直接执行隐藏
+            if (vd.ivStart.visibility == View.VISIBLE) {
+                showAnimStart()
+            }
+        }, 10000)
     }
 
     private fun showAnimStart() {
@@ -177,7 +179,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
             0.0.toFloat()
         )
         vd.ivStart.visibility = View.VISIBLE
-        anim.duration = 1000
+        anim.duration = 800
         anim.interpolator = LinearInterpolator()
         //监听动画结束，进行回调
         anim.addListener(object : AnimatorListenerAdapter() {
@@ -632,6 +634,8 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
             hideSplash()
         } else if (event.what == EventGlobal.WHAT_UPLOAD_CHANGE) {
             initUploadClient()
+        } else if (event.what == EventGlobal.WHAT_HOME_INIT_FINISH) {
+            showAnimStart()
         }
     }
 }

@@ -9,6 +9,7 @@ object EventGlobal {
      */
     const val WHAT_INIT_QRCODE = 100
 
+
     /**
      * 首页是否获取温度
      */
@@ -32,4 +33,8 @@ object EventGlobal {
      * 编号发生变化
      */
     const val WHAT_DETECTION_NUM_CHANGE = 150
+    /**
+     * HomeFragment首屏加载完毕
+     */
+    const val WHAT_HOME_INIT_FINISH = 160
 }

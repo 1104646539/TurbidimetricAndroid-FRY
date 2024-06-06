@@ -15,6 +15,7 @@
     <color name="shelf_bg_color">#d5d5d5</color>
     <color name="chart_line_gray">#dddddd</color>
     <color name="bg_gray">#f5f5f5</color>
+    <color name="enable_n">#c3c3c3</color>
     <color name="white">#FFFFFFFF</color>
     <color name="config_bg">#ff7f7f7f</color>
     <color name="info_bg">#ffe5e5e5</color>

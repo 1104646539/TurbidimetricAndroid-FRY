@@ -284,7 +284,7 @@ class MatchingArgsFragment :
             vm.dialogUiState.collect { state ->
                 when (state) {
                     is MatchingArgsDialogUiState.GetStateNotExistMsg -> {//开始检测，确实清洗液等
-                        dialog.showPop(requireContext()) { dialog ->
+                        dialog.showPop(requireContext(), isCancelable = false) { dialog ->
                             dialog.showDialog(
                                 msg = "${state.msg}",
                                 confirmText = "我已添加",
@@ -315,7 +315,7 @@ class MatchingArgsFragment :
                     }
 
                     is MatchingArgsDialogUiState.Accident -> {//意外的检测结束等
-                        dialog.showPop(requireContext()) { dialog ->
+                        dialog.showPop(requireContext(), isCancelable = false) { dialog ->
                             dialog.showDialog(
                                 msg = "${state.msg}",
                                 confirmText = "我知道了",

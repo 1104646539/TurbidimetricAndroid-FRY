@@ -2526,6 +2526,7 @@ class HomeViewModel(
             errorInfo?.let {
                 for (error in it) {
                     sb.append(error.errorMsg)
+                    sb.append(" ")
                     sb.append(error.motorMsg)
                     sb.append("\n")
                 }

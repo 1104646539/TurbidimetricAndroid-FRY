@@ -14,6 +14,7 @@ import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.mcuupdate.McuUpdateHelper
 import com.wl.turbidimetric.mcuupdate.UpdateResult
+import com.wl.turbidimetric.model.TestState
 import com.wl.turbidimetric.project.list.ProjectListActivity
 import com.wl.turbidimetric.settings.detectionnum.DetectionNumFragment
 import com.wl.turbidimetric.settings.network.NetworkFragment
@@ -256,7 +257,7 @@ class SettingsFragment constructor() :
      * 启动调试页面
      */
     private fun debug() {
-        if (appVm.testState.isTestRunning()) {
+        if (appVm.testState != TestState.NotGetMachineState && appVm.testState.isTestRunning()) {
             toast("正在检测，请稍后")
             return
         }

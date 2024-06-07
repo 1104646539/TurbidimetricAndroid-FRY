@@ -241,7 +241,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                         vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg)
                         vm.enableView(false)
                     } else {
-                        vd.tvAnalyse.setText("分析")
+                        vd.tvAnalyse.setText("开始分析")
                         vd.tvAnalyse2.setText("(点击分析)")
                         vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg2)
                         vm.enableView(true)
@@ -521,7 +521,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                                         vm.dialogGetMachineFailedCancel()
                                     }.throttle(),
                                     showIcon = true,
-                                    iconId = ICON_HINT
+                                    iconId = ICON_HINT,
+                                    textGravity = Gravity.LEFT
                                 )
                             }
                         }

@@ -2,6 +2,7 @@ package com.wl.turbidimetric.main
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.app.Activity
 import android.app.PendingIntent
@@ -173,9 +174,9 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     private fun showAnimStart() {
         val anim = ViewAnimationUtils.createCircularReveal(
             vd.ivStart,
-            100,
-            50,
-            (vd.rlRoot.width * 1.2).toFloat(),
+            -100,
+            -100,
+            (vd.rlRoot.width * 1.5).toFloat(),
             0.0.toFloat()
         )
         vd.ivStart.visibility = View.VISIBLE
@@ -228,6 +229,9 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         vm.curIndex.observe(this) {
             vd.vp.setCurrentItem(it, false)
         }
+    }
+
+    fun initShutDown() {
         vd.tnv.setShutdownListener {
             showShutdownDialog()
         }
@@ -310,17 +314,12 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         val lp = LayoutParams(vd.rlRoot.width, vd.rlRoot.height)
         view.alpha = 0f
         vd.rlRoot.addView(view, lp)
-        val fromW = 0f
-        val targetW = 1f
-        val animW = ValueAnimator.ofFloat(fromW, targetW)
-        animW.setDuration(2000)
-        animW.addUpdateListener {
-            val v = (it.animatedValue as Float)
-            view.alpha = v
-        }
-        animW.interpolator = LinearInterpolator()
-        animW.addListener(onEnd = { onAnimFinish.invoke() })
-        animW.start()
+        ObjectAnimator.ofFloat(view, "alpha", 0f, 1f).apply {
+            addListener(onEnd = {
+                i("结束")
+                onAnimFinish.invoke()
+            })
+        }.setDuration(2000).start()
     }
 
     val shutdownDialog by lazy {
@@ -632,10 +631,12 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         super.onMessageEvent(event)
         if (event.what == EventGlobal.WHAT_HIDE_SPLASH) {
             hideSplash()
+            initShutDown()
         } else if (event.what == EventGlobal.WHAT_UPLOAD_CHANGE) {
             initUploadClient()
         } else if (event.what == EventGlobal.WHAT_HOME_INIT_FINISH) {
             showAnimStart()
+
         }
     }
 }

@@ -36,17 +36,23 @@ object LogToFile {
     @JvmStatic
     fun stopInput() {
         isAllowInput = false
+        fos?.let {
+            synchronized(it) {
+                fos?.close()
+            }
+        }
     }
 
     @JvmStatic
     fun startInput() {
+        init()
         isAllowInput = true
         putMsgTs()
     }
 
     private fun putMsgTs() {
-        for ((k,v) in tsHashMap){
-            input(v.code,v.tag,v.msg)
+        for ((k, v) in tsHashMap) {
+            input(v.code, v.tag, v.msg)
         }
         tsHashMap.clear()
     }
@@ -91,8 +97,8 @@ object LogToFile {
             Log.d(tag, "$code>>>[$msg]")
             if (isAllowInput) {
                 write("$it\n")
-            }else{
-                tsHashMap.put(code,TSModel(code,tag,msg))
+            } else {
+                tsHashMap.put(code, TSModel(code, tag, msg))
             }
         }
     }
@@ -145,8 +151,13 @@ object LogToFile {
 
     @JvmStatic
     fun write(msg: String) {
-        fos?.write(msg.toByteArray())
-        fos?.flush()
+        fos?.let {
+            synchronized(it){
+                fos?.write(msg.toByteArray())
+                fos?.flush()
+            }
+        }
+
     }
 
 
@@ -167,5 +178,6 @@ object LogToFile {
             return "${DateFormat.format(Date())}>${tag}/${code}>>>[${msg}]"
         }
     }
-    data class TSModel(val code:String,val tag:String,val msg:String)
+
+    data class TSModel(val code: String, val tag: String, val msg: String)
 }

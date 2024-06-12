@@ -558,10 +558,24 @@ private fun resolveDefaultReturnValue(method: Method): Any? {
         else -> throw IllegalArgumentException("无法正确对返回值不为空的回调进行节流")
     }
 }
-fun Activity.transitionTo( i: Intent?) {
+
+fun Activity.transitionTo(i: Intent?) {
     val pairs: Array<Pair<View, String>> =
         arrayOf()
     val transitionActivityOptions =
         ActivityOptionsCompat.makeSceneTransitionAnimation(this, *pairs)
     this.startActivity(i, transitionActivityOptions.toBundle())
+}
+
+/**
+ * 如果一个Double不是有效的值，例如Nan或无穷，则返回默认的值
+ */
+fun Double.isNotValid(defaultValue: Double = 0.0): Double {
+    return this.let {
+        if (it.isNaN() || it.isInfinite()) {
+            defaultValue
+        } else {
+            it
+        }
+    }
 }

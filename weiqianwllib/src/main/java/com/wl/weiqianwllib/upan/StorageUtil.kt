@@ -15,6 +15,7 @@ import java.io.FileInputStream
 import java.io.InputStream
 import java.io.OutputStream
 import java.lang.reflect.Method
+import kotlin.concurrent.thread
 
 object StorageUtil {
     const val TAG = "StorageUtil"
@@ -337,10 +338,11 @@ object StorageUtil {
         } catch (e: Exception) {
             onFailed("文件复制失败")
         } finally {
+            targetOs?.flush()
             targetOs?.close()
             sourceIs.close()
         }
-
+        Thread.sleep(3000)
         onSuccess()
     }
 }

@@ -395,7 +395,7 @@ class SerialPortImpl(
 //                    println("take=$take")
                     if (take != null) {
                         if (isNeedRetry(take)) {
-                            i("需要重发 ${take}")
+//                            i("需要重发 ${take}")
                             val job = launch {
                                 delay(timeout)
                                 addRetry(take)

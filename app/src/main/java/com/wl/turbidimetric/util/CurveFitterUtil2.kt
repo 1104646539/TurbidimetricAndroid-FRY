@@ -1,5 +1,6 @@
 package com.wl.turbidimetric.util
 
+import com.wl.turbidimetric.ex.isNotValid
 import org.apache.commons.math3.analysis.ParametricUnivariateFunction
 import org.apache.commons.math3.fitting.PolynomialCurveFitter
 import org.apache.commons.math3.fitting.SimpleCurveFitter
@@ -96,9 +97,9 @@ class ThreeFun : Fitter {
 
 
     private fun calcRSquared2(): Double {
-        return CurveFitterUtil.calcuteNumerator(
+        return (CurveFitterUtil.calcuteNumerator(
             guess, yss
-        ) / CurveFitterUtil.calculateDenominator(guess, yss)
+        ) / CurveFitterUtil.calculateDenominator(guess, yss)).isNotValid()
     }
 
     companion object {
@@ -134,7 +135,7 @@ class LinearFun : Fitter {
         }
 
         //step3、计算R方
-        fitGoodness = simple.rSquare
+        fitGoodness = simple.rSquare.isNotValid()
     }
 
     override fun ratCalcCon(p: DoubleArray, x: Double): Double {
@@ -186,7 +187,7 @@ class FourFun : Fitter {
         }
 
         //step3、计算R方
-        fitGoodness = cf.fitGoodness
+        fitGoodness = cf.fitGoodness.isNotValid()
 
     }
 

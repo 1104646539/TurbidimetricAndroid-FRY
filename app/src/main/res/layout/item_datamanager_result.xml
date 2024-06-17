@@ -18,34 +18,48 @@
         <TextView
             android:id="@+id/tv_id"
             style="@style/TextHilt"
-            android:layout_width="60dp"
+            android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:text="ID" />
 
         <TextView
             android:id="@+id/tv_project_name"
-            style="@style/TextTitle"
-            android:layout_width="wrap_content"
+            style="@style/TextHilt"
+            android:layout_width="115dp"
             android:layout_height="wrap_content"
-            android:minWidth="100dp"
+            android:minWidth="115dp"
             android:text="项目名"
-            android:visibility="visible" />
+            android:visibility="visible"
+            app:autoSizeMaxTextSize="28sp"
+            app:autoSizeMinTextSize="10sp"
+            app:autoSizeStepGranularity="1sp"
+            app:autoSizeTextType="uniform" />
 
         <TextView
             android:id="@+id/tv_barcode"
-            style="@style/TextTitle"
-            android:layout_width="wrap_content"
+            style="@style/TextHilt"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
+            android:maxLines="2"
             android:minWidth="100dp"
             android:text="条码"
-            android:visibility="visible" />
+            android:visibility="visible"
+            app:autoSizeMaxTextSize="28sp"
+            app:autoSizeMinTextSize="10sp"
+            app:autoSizeStepGranularity="1sp"
+            app:autoSizeTextType="uniform" />
 
         <TextView
             android:id="@+id/tv_detection_num"
             style="@style/TextHilt"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:text="编号" />
+            android:maxLines="2"
+            android:text="编号"
+            app:autoSizeMaxTextSize="28sp"
+            app:autoSizeMinTextSize="10sp"
+            app:autoSizeStepGranularity="1sp"
+            app:autoSizeTextType="uniform" />
 
 
         <TextView
@@ -75,7 +89,6 @@
             android:visibility="gone" />
 
 
-
         <TextView
             android:id="@+id/tv_concentration"
             style="@style/TextHilt"
@@ -98,6 +111,7 @@
             android:layout_width="220dp"
             android:layout_height="wrap_content"
             android:text="检测时间" />
+
         <TextView
             android:id="@+id/tv_absorbances"
             style="@style/TextHilt"
@@ -108,7 +122,7 @@
         <TextView
             android:id="@+id/tv_test_value1"
             style="@style/TextHilt"
-            android:layout_width="100dp"
+            android:layout_width="90dp"
             android:layout_height="wrap_content"
             android:text="第一次" />
 
@@ -116,7 +130,7 @@
         <TextView
             android:id="@+id/tv_test_value2"
             style="@style/TextHilt"
-            android:layout_width="100dp"
+            android:layout_width="90dp"
             android:layout_height="wrap_content"
             android:text="第二次" />
 
@@ -124,7 +138,7 @@
         <TextView
             android:id="@+id/tv_test_value3"
             style="@style/TextHilt"
-            android:layout_width="100dp"
+            android:layout_width="90dp"
             android:layout_height="wrap_content"
             android:text="第三次" />
 
@@ -132,41 +146,42 @@
         <TextView
             android:id="@+id/tv_test_value4"
             style="@style/TextHilt"
-            android:layout_width="100dp"
+            android:layout_width="90dp"
             android:layout_height="wrap_content"
-            android:text="第四次" />
+            android:text="第四次"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/tv_test_original_value1"
-            style="@style/TextTitle"
-            android:layout_width="100dp"
+            style="@style/TextHilt"
+            android:layout_width="90dp"
             android:layout_height="wrap_content"
-            android:text="原始值1" />
+            android:text="原始1" />
 
 
         <TextView
             android:id="@+id/tv_test_original_value2"
-            style="@style/TextTitle"
-            android:layout_width="100dp"
+            style="@style/TextHilt"
+            android:layout_width="90dp"
             android:layout_height="wrap_content"
-            android:text="原始值2" />
+            android:text="原始2" />
 
 
         <TextView
             android:id="@+id/tv_test_original_value3"
-            style="@style/TextTitle"
-            android:layout_width="100dp"
+            style="@style/TextHilt"
+            android:layout_width="90dp"
             android:layout_height="wrap_content"
-            android:text="原始值3"
-            android:visibility="gone" />
+            android:text="原始3"
+            android:visibility="visible" />
 
 
         <TextView
             android:id="@+id/tv_test_original_value4"
-            style="@style/TextTitle"
-            android:layout_width="100dp"
+            style="@style/TextHilt"
+            android:layout_width="90dp"
             android:layout_height="wrap_content"
-            android:text="原始值4"
+            android:text="原始4"
             android:visibility="gone" />
 
     </LinearLayout>

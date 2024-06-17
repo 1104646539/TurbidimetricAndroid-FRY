@@ -45,6 +45,7 @@ class ResultDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog
         this.confirmText = "确定"
         this.confirmClick = {
             result.result.name = etName?.text.toString()
+            result.result.detectionNum = etDetectionNum?.text.toString()
             result.result.gender = spnGender?.selectedItem as String
             result.result.absorbances =
                 (etAbs?.text.toString().toDoubleOrNull() ?: 0.0).toBigDecimal()

@@ -77,9 +77,9 @@ class ThreeFun : Fitter {
         params = fitter.fit(points.toList()) // 曲线拟合，结果保存于数组
 
 
-        yss = DoubleArray(guess.size)
+        yss = DoubleArray(values.size)
         //step2、验算
-        for (i in guess.indices) {
+        for (i in yss.indices) {
             yss[i] = ratCalcCon(params, values[i])
         }
 
@@ -129,8 +129,8 @@ class LinearFun : Fitter {
         params[1] = getParamK(simple)
 
         //step2、验算
-        yss = DoubleArray(guess.size)
-        for (i in guess.indices) {
+        yss = DoubleArray(values.size)
+        for (i in yss.indices) {
             yss[i] = ratCalcCon(params, values[i])
         }
 
@@ -181,8 +181,8 @@ class FourFun : Fitter {
         params = cf.params
 
         //step2、验算
-        yss = DoubleArray(guess.size)
-        for (i in guess.indices) {
+        yss = DoubleArray(values.size)
+        for (i in yss.indices) {
             yss[i] = ratCalcCon(params, values[i])
         }
 

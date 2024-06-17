@@ -946,7 +946,7 @@ class HomeViewModel(
         if (!runningTest()) return
         if (appViewModel.testState.isNotPrepare()) return
         c("接收到 移动样本 reply=$reply cuvettePos=$cuvettePos lastCuvetteShelfPos=$lastCuvetteShelfPos cuvetteShelfPos=$cuvetteShelfPos samplePos=$samplePos samplingProbeCleaningFinish=$samplingProbeCleaningFinish")
-        samplingNum++
+
         sampleMoveFinish = true
         samplingFinish = false
         dripSampleFinish = false
@@ -956,6 +956,7 @@ class HomeViewModel(
         val isCuvette = reply.data.type.isCuvette()
         //最后一个位置不需要扫码，直接取样
         if (samplePos < sampleMax) {
+            samplingNum++
 //            if ((SystemGlobal.isCodeDebug && !sampleExists[samplePos]) || (isAuto() && LocalData.SampleExist && isNonexistent)) {
             //如果是自动模式并且已开启样本传感器,并且是未识别到样本，才是没有样本
             if ((isAuto() && localDataRepository.getSampleExist() && isNonexistent)) {
@@ -2548,6 +2549,7 @@ class HomeViewModel(
      * @return Boolean
      */
     fun manualModelSamplingFinish(): Boolean {
+        i("manualModelSamplingFinish needSamplingNum=$needSamplingNum samplingNum=$samplingNum")
         return needSamplingNum < samplingNum
     }
 

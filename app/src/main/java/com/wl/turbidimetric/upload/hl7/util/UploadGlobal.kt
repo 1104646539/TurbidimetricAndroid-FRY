@@ -15,4 +15,10 @@ object UploadGlobal {
      * 上传文件名
      */
     val UploadConfigFileName = "/sdcard/UploadConfig.txt"
+
+    /**
+     * 上传间隔
+     */
+    val UpoadInterval = 500L
+
 }

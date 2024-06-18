@@ -141,9 +141,9 @@
             android:id="@+id/tv_test_value4"
             style="@style/TextHilt"
             android:layout_width="90dp"
-            android:visibility="gone"
             android:layout_height="wrap_content"
-            android:text="第四次" />
+            android:text="第四次"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/tv_test_original_value1"
@@ -178,6 +178,13 @@
             android:text="原始4"
             android:visibility="gone" />
 
+        <TextView
+            android:id="@+id/tv_state_upload"
+            style="@style/TextHilt"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:text="上传"
+            android:visibility="visible" />
 
     </LinearLayout>
 </layout>

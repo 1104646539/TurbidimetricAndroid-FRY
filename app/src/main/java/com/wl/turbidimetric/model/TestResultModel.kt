@@ -105,7 +105,11 @@ data class TestResultModel(
     /**
      * 曲线ID
      */
-    var curveOwnerId: Long = 0
+    var curveOwnerId: Long = 0,
+    /**
+     * 已上传
+     */
+    var uploaded: Boolean = false
 
 ) {
 
@@ -152,6 +156,7 @@ data class TestResultModel(
         if (resultState != other.resultState) return false
         if (deliveryTime != other.deliveryTime) return false
         if (deliveryDepartment != other.deliveryDepartment) return false
+        if (uploaded != other.uploaded) return false
         return deliveryDoctor == other.deliveryDoctor
     }
 
@@ -182,11 +187,12 @@ data class TestResultModel(
         result = 31 * result + deliveryTime.hashCode()
         result = 31 * result + deliveryDepartment.hashCode()
         result = 31 * result + deliveryDoctor.hashCode()
+        result = 31 * result + uploaded.hashCode()
         return result
     }
 
     override fun toString(): String {
-        return "TestResultModel(resultId=$resultId, isSelect=$isSelect, name='$name', sampleType='$sampleType', resultState='$resultState',gender='$gender', age='$age', sampleBarcode='$sampleBarcode', detectionNum='$detectionNum', testState=$testState, testResult='$testResult', absorbances=$absorbances, concentration=$concentration, testValue1=$testValue1, testValue2=$testValue2, testValue3=$testValue3, testValue4=$testValue4, testOriginalValue1=$testOriginalValue1, testOriginalValue2=$testOriginalValue2, testOriginalValue3=$testOriginalValue3, testOriginalValue4=$testOriginalValue4, createTime='$createTime', testTime='$testTime',)"
+        return "TestResultModel(resultId=$resultId, isSelect=$isSelect, name='$name', sampleType='$sampleType', resultState='$resultState',gender='$gender', age='$age', sampleBarcode='$sampleBarcode', detectionNum='$detectionNum', testState=$testState, testResult='$testResult', absorbances=$absorbances, concentration=$concentration, testValue1=$testValue1, testValue2=$testValue2, testValue3=$testValue3, testValue4=$testValue4, testOriginalValue1=$testOriginalValue1, testOriginalValue2=$testOriginalValue2, testOriginalValue3=$testOriginalValue3, testOriginalValue4=$testOriginalValue4, createTime='$createTime', testTime='$testTime', uploaded='$uploaded',)"
     }
 
 }

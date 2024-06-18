@@ -2,6 +2,7 @@ package com.wl.turbidimetric.upload.hl7.service
 
 import com.wl.turbidimetric.upload.hl7.util.ConnectResult
 import com.wl.turbidimetric.upload.hl7.util.ConnectStatus
+import com.wl.turbidimetric.upload.hl7.util.ErrorEnum
 import com.wl.turbidimetric.upload.hl7.util.HL7Reader
 import com.wl.turbidimetric.upload.hl7.util.HL7Write
 import com.wl.turbidimetric.upload.model.ConnectConfig
@@ -54,7 +55,7 @@ class SerialPortConnectService(successListener: () -> Unit) :
                     onConnectListener?.onConnectStatusChange(ConnectStatus.DISCONNECTED)
                     onConnectListener?.onConnectResult(
                         ConnectResult.OrderError(
-                            100,
+                            ErrorEnum.NOT_CONNECTED.code,
                             "连接失败 串口打开失败"
                         )
                     )
@@ -65,7 +66,7 @@ class SerialPortConnectService(successListener: () -> Unit) :
                 onConnectListener?.onConnectStatusChange(ConnectStatus.DISCONNECTED)
                 onConnectListener?.onConnectResult(
                     ConnectResult.OrderError(
-                        100,
+                        ErrorEnum.ORDER.code,
                         "连接失败 ${e.message}"
                     )
                 )

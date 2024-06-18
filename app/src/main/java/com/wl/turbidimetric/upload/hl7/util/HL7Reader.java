@@ -24,16 +24,6 @@ public class HL7Reader {
     }
 
     public String getMessage(InputStream in) throws IOException, LLPException {
-//        ByteArrayOutputStream out = new ByteArrayOutputStream();
-//
-//        try {
-//            for (MllpDecoderState state = MllpDecoderState.START; state != MllpDecoderState.END; state = state.read(in, out)) {
-//            }
-//        } catch (SocketTimeoutException var4) {
-//            return null;
-//        }
-//
-//        return out.size() > 0 ? this.toString(out.toByteArray()) : null;
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         while (true) {

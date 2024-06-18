@@ -2,6 +2,7 @@ package com.wl.turbidimetric.upload.hl7
 
 import android.os.Handler
 import android.os.Message
+import com.wl.turbidimetric.app.UploadState
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.ConditionModel
 import com.wl.turbidimetric.model.TestResultAndCurveModel
@@ -26,7 +27,6 @@ object HL7Helper : UploadService {
             field = value
             uploadService.hl7Log = value
         }
-
     /**
      * 上传
      */
@@ -49,7 +49,10 @@ object HL7Helper : UploadService {
             } else if (WHAT_GET_INFO_NEXT == msg.what) {
                 removeMessages(WHAT_GET_INFO_NEXT)
                 getPatientInfoHelper?.curCondition()?.let { cur ->
-                    getPatientInfoHelper!!.getPatientInfoNext(cur, getPatientInfoHelper!!.curCallback())
+                    getPatientInfoHelper!!.getPatientInfoNext(
+                        cur,
+                        getPatientInfoHelper!!.curCallback()
+                    )
                 }
 
             }
@@ -160,7 +163,7 @@ object HL7Helper : UploadService {
             callbacks.add(callback2)
             lastIndex = testResults.lastIndex
             if (testResults.size == 1) {
-                handler.sendEmptyMessageDelayed(WHAT_UPLOAD_NEXT, 500)
+                handler.sendEmptyMessageDelayed(WHAT_UPLOAD_NEXT, UploadGlobal.UpoadInterval)
             }
         }
 
@@ -170,7 +173,7 @@ object HL7Helper : UploadService {
         ) {
             uploadTestResult(testResult, object : OnUploadCallback {
                 override fun onUploadSuccess(msg: String) {
-                    LogToFile.i("onUploadSuccess msg=$msg index=$index")
+                    LogToFile.i("onUploadSuccess msg=$msg index=$index lastIndex=$lastIndex")
                     index++
                     successCount++
                     if (index > lastIndex) {
@@ -178,13 +181,17 @@ object HL7Helper : UploadService {
                         onUploadTestResults?.invoke(testResults.size, successCount, failedCount)
                         clearUploadInfo()
                     } else {
-                        handler.sendEmptyMessageDelayed(WHAT_UPLOAD_NEXT, 500)
+                        handler.sendEmptyMessageDelayed(WHAT_UPLOAD_NEXT, UploadGlobal.UpoadInterval)
                     }
                     onUploadCallback?.onUploadSuccess(msg)
                 }
 
                 override fun onUploadFailed(code: Int, msg: String) {
-                    LogToFile.i("onUploadFailed msg=$msg index=$index")
+                    LogToFile.i("onUploadFailed msg=$msg index=$index lastIndex=$lastIndex")
+                    if (code == ErrorEnum.BE_COMMUNICATION.code) {//如果正在通讯，隔UploadGlobal.UpoadIntervalms再次尝试
+                        handler.sendEmptyMessageDelayed(WHAT_UPLOAD_NEXT, UploadGlobal.UpoadInterval)
+                        return
+                    }
                     index++
                     failedCount++
                     if (index > lastIndex) {
@@ -192,7 +199,7 @@ object HL7Helper : UploadService {
                         onUploadTestResults?.invoke(testResults.size, successCount, failedCount)
                         clearUploadInfo()
                     } else {
-                        handler.sendEmptyMessageDelayed(WHAT_UPLOAD_NEXT, 500)
+                        handler.sendEmptyMessageDelayed(WHAT_UPLOAD_NEXT, UploadGlobal.UpoadInterval)
                     }
                     onUploadCallback?.onUploadFailed(code, msg)
                 }
@@ -290,16 +297,17 @@ object HL7Helper : UploadService {
             this.callbacks.add(onGetPatientCallback)
             lastIndex = conditions.lastIndex
             if (conditions.size == 1) {
-                handler.sendEmptyMessageDelayed(WHAT_GET_INFO_NEXT, 500)
+                handler.sendEmptyMessageDelayed(WHAT_GET_INFO_NEXT, UploadGlobal.UpoadInterval)
             }
         }
 
         override fun getPatientInfo(
             condition: GetPatientCondition, onGetPatientCallback: OnGetPatientCallback
         ) {
-            uploadService.getPatientInfo(condition,onGetPatientCallback)
+            uploadService.getPatientInfo(condition, onGetPatientCallback)
         }
-         fun getPatientInfoNext(
+
+        fun getPatientInfoNext(
             condition: GetPatientCondition, onGetPatientCallback: OnGetPatientCallback?
         ) {
             uploadService.getPatientInfo(condition, object : OnGetPatientCallback {
@@ -310,18 +318,22 @@ object HL7Helper : UploadService {
                         LogToFile.i("index=$index lastIndex=$lastIndex")
                         clearUploadInfo()
                     } else {
-                        handler.sendEmptyMessageDelayed(WHAT_GET_INFO_NEXT, 500)
+                        handler.sendEmptyMessageDelayed(WHAT_GET_INFO_NEXT, UploadGlobal.UpoadInterval)
                     }
                 }
 
                 override fun onGetPatientFailed(code: Int, msg: String) {
+                    if (code == ErrorEnum.BE_COMMUNICATION.code) {//如果正在通讯，隔UploadGlobal.UpoadIntervalms再次尝试
+                        handler.sendEmptyMessageDelayed(WHAT_GET_INFO_NEXT, UploadGlobal.UpoadInterval)
+                        return
+                    }
                     onGetPatientCallback?.onGetPatientFailed(code, msg)
                     index++
                     if (index > lastIndex) {
                         LogToFile.i("index=$index lastIndex=$lastIndex")
                         clearUploadInfo()
                     } else {
-                        handler.sendEmptyMessageDelayed(WHAT_GET_INFO_NEXT, 500)
+                        handler.sendEmptyMessageDelayed(WHAT_GET_INFO_NEXT, UploadGlobal.UpoadInterval)
                     }
                 }
             })

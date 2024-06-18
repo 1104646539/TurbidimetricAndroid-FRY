@@ -7,6 +7,7 @@ import com.wl.turbidimetric.model.TestResultModel
 import com.wl.turbidimetric.upload.hl7.util.*
 import com.wl.wllib.DateUtil
 import com.wl.wllib.toTimeStr
+import java.math.RoundingMode
 
 /**
  * 检测结果
@@ -103,7 +104,7 @@ object OruMsg {
                 6 to t.curve.projectUnit,
                 7 to range,
                 9 to t.result.testResult,
-                13 to t.result.absorbances.setScale(5).toString(),
+                13 to t.result.absorbances.setScale(5,RoundingMode.DOWN).toString(),
                 14 to t.result.testTime.toTimeStr(DateUtil.Time5Format),
             )
         )

@@ -3,6 +3,7 @@ package com.wl.turbidimetric.upload.hl7.service
 import android.util.Log
 import com.wl.turbidimetric.upload.hl7.util.ConnectResult
 import com.wl.turbidimetric.upload.hl7.util.ConnectStatus
+import com.wl.turbidimetric.upload.hl7.util.ErrorEnum
 import com.wl.turbidimetric.upload.hl7.util.HL7Reader
 import com.wl.turbidimetric.upload.hl7.util.HL7Write
 import com.wl.turbidimetric.upload.model.ConnectConfig
@@ -50,7 +51,7 @@ open class SocketConnectService(successListener: () -> Unit) : AbstractConnectSe
                 onConnectListener?.onConnectStatusChange(ConnectStatus.DISCONNECTED)
                 onConnectListener?.onConnectResult(
                     ConnectResult.OrderError(
-                        100, "连接失败 ${e.message}"
+                        ErrorEnum.NOT_CONNECTED.code, "连接失败 ${e.message}"
                     )
                 )
                 cancelConnectionMsg()

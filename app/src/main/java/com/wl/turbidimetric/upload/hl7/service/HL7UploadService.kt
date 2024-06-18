@@ -46,7 +46,10 @@ class HL7UploadService : UploadService {
      * 同时只能发送一条数据，上一条没回只能等待
      */
     var canSend = true
-
+        set(value) {
+            field = value
+            i("canSend=$value")
+        }
     var hl7Log: Hl7Log? = null
         set(value) {
             field = value
@@ -79,7 +82,7 @@ class HL7UploadService : UploadService {
                 if (connectService.isConnected()) {
                     if (msgStr.isNullOrEmpty()) {
                         canSend = true
-                        onUploadCallback.onUploadFailed(1, "上传数据为空")
+                        onUploadCallback.onUploadFailed(ErrorEnum.ORDER.code, "上传数据为空")
                     } else if(connectService.connectService!!.config!!.twoWay){//双向通讯
                         val response =
                             connectService.sendWaitResponseRetry(
@@ -115,18 +118,18 @@ class HL7UploadService : UploadService {
                                     }
                                 } else {
                                     canSend = true
-                                    onUploadCallback.onUploadFailed(-1, "未响应")
+                                    onUploadCallback.onUploadFailed(ErrorEnum.ORDER.code, "未响应")
                                     0
                                 }
                             }
                         if (response == -1) {
                             canSend = true
-                            onUploadCallback.onUploadFailed(-1, "响应超时")
+                            onUploadCallback.onUploadFailed(ErrorEnum.ORDER.code, "响应超时")
                         }
                     }else{//单向通讯
                         connectService.sendData(msgStr)
                         GlobalScope.launch {
-                            delay(500)
+                            delay(UploadGlobal.UpoadInterval)
                             canSend = true
                             onUploadCallback.onUploadSuccess("上传成功")
                         }
@@ -214,8 +217,6 @@ class HL7UploadService : UploadService {
         }
         canSend = false
         connectService.submitThread {
-//            val msgStr = parser?.encode(msg)
-//            Log.d(TAG, "getPatientInfo: msgStr=$msgStr")
             if (connectService.isConnected()) {
                 if (msgStr.isNullOrEmpty()) {
                     onGetPatientCallback.onGetPatientFailed(1, "数据为空")
@@ -280,11 +281,11 @@ class HL7UploadService : UploadService {
                         }
                     if (response == -1) {
                         canSend = true
-                        onGetPatientCallback.onGetPatientFailed(-1, "响应超时")
+                        onGetPatientCallback.onGetPatientFailed(ErrorEnum.ORDER.code, "响应超时")
                     }
                 }else{
                     canSend = true
-                    onGetPatientCallback.onGetPatientFailed(-1, "非双向通讯")
+                    onGetPatientCallback.onGetPatientFailed(ErrorEnum.ORDER.code, "非双向通讯")
                 }
             } else {
                 canSend = true

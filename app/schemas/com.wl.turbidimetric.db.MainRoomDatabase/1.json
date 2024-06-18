@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "144d65ae76ae6ae62d54105d3f87396e",
+    "identityHash": "7e5e3d9e36436428d6bb1fac8425e769",
     "entities": [
       {
         "tableName": "TestResultModel",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`resultId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `isSelect` INTEGER NOT NULL, `name` TEXT NOT NULL, `gender` TEXT NOT NULL, `age` TEXT NOT NULL, `sampleBarcode` TEXT NOT NULL, `sampleType` INTEGER NOT NULL, `resultState` INTEGER NOT NULL, `detectionNum` TEXT NOT NULL, `testState` INTEGER NOT NULL, `testResult` TEXT NOT NULL, `absorbances` REAL NOT NULL, `concentration` INTEGER NOT NULL, `deliveryTime` TEXT NOT NULL, `deliveryDepartment` TEXT NOT NULL, `deliveryDoctor` TEXT NOT NULL, `testValue1` REAL NOT NULL, `testValue2` REAL NOT NULL, `testValue3` REAL NOT NULL, `testValue4` REAL NOT NULL, `testOriginalValue1` INTEGER NOT NULL, `testOriginalValue2` INTEGER NOT NULL, `testOriginalValue3` INTEGER NOT NULL, `testOriginalValue4` INTEGER NOT NULL, `createTime` INTEGER NOT NULL, `testTime` INTEGER NOT NULL, `curveOwnerId` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`resultId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `isSelect` INTEGER NOT NULL, `name` TEXT NOT NULL, `gender` TEXT NOT NULL, `age` TEXT NOT NULL, `sampleBarcode` TEXT NOT NULL, `sampleType` INTEGER NOT NULL, `resultState` INTEGER NOT NULL, `detectionNum` TEXT NOT NULL, `testState` INTEGER NOT NULL, `testResult` TEXT NOT NULL, `absorbances` REAL NOT NULL, `concentration` INTEGER NOT NULL, `deliveryTime` TEXT NOT NULL, `deliveryDepartment` TEXT NOT NULL, `deliveryDoctor` TEXT NOT NULL, `testValue1` REAL NOT NULL, `testValue2` REAL NOT NULL, `testValue3` REAL NOT NULL, `testValue4` REAL NOT NULL, `testOriginalValue1` INTEGER NOT NULL, `testOriginalValue2` INTEGER NOT NULL, `testOriginalValue3` INTEGER NOT NULL, `testOriginalValue4` INTEGER NOT NULL, `createTime` INTEGER NOT NULL, `testTime` INTEGER NOT NULL, `curveOwnerId` INTEGER NOT NULL, `uploaded` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "resultId",
@@ -167,6 +167,12 @@
           {
             "fieldPath": "curveOwnerId",
             "columnName": "curveOwnerId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "uploaded",
+            "columnName": "uploaded",
             "affinity": "INTEGER",
             "notNull": true
           }
@@ -368,7 +374,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '144d65ae76ae6ae62d54105d3f87396e')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7e5e3d9e36436428d6bb1fac8425e769')"
     ]
   }
 }

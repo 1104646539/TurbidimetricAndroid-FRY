@@ -1532,6 +1532,10 @@ class HomeViewModel(
             HL7Helper.uploadTestResult(testResultModel, object : OnUploadCallback {
                 override fun onUploadSuccess(msg: String) {
                     i("onUploadSuccess msg=$msg")
+                    viewModelScope.launch {
+                        testResultModel.result.uploaded = true
+                        update(testResultModel)
+                    }
                 }
 
                 override fun onUploadFailed(code: Int, msg: String) {

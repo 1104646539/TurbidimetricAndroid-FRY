@@ -80,7 +80,11 @@ class DataManagerAdapter :
             binding.tvTestOriginalValue2.text = item?.result?.testOriginalValue2?.toString() ?: "-"
             binding.tvTestOriginalValue3.text = item?.result?.testOriginalValue3?.toString() ?: "-"
             binding.tvTestOriginalValue4.text = item?.result?.testOriginalValue4?.toString() ?: "-"
-
+            if(item?.result?.uploaded == true){
+                binding.ivStateUpload.setImageResource(R.drawable.icon_state_upload_finish)
+            }else{
+                binding.ivStateUpload.setImageResource(R.drawable.icon_state_upload_wait)
+            }
             updateResult(binding, item)
 
             binding.root.setOnLongClickListener {

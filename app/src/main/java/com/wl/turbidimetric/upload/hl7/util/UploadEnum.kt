@@ -31,10 +31,17 @@ enum class ErrorEnum(val code: Int, val msg: String) {
     NF(10, "NF"),//无匹配的数据，无错误
     AE(100, "AE"),//程序出错
     AR(200, "AR"),//拒绝访问
-    NOT_CONNECTED(500, "AR"),
-    ORDER(501, "AE");
+    NOT_CONNECTED(500, "AR"),//未连接
+    ORDER(501, "AE");//其他错误
 }
 
+/**
+ * 上传结果
+ */
+enum class UploadResultEnum(val code: Int,val msg: String){
+    SUCCESS(0, "OK"),//正常响应
+
+}
 /**
  * 根据 ErrorEnum的code，返回ErrorEnum，找不到则返回null
  * @param code Int

@@ -184,5 +184,11 @@
             android:text="原始4"
             android:visibility="gone" />
 
+        <ImageView
+            android:id="@+id/iv_state_upload"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:visibility="visible" />
+
     </LinearLayout>
 </layout>

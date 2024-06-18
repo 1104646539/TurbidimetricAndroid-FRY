@@ -6,25 +6,24 @@ import androidx.lifecycle.ViewModelProvider
 import com.wl.turbidimetric.app.AppViewModel
 import com.wl.turbidimetric.base.BaseViewModel
 import com.wl.turbidimetric.ex.getAppViewModel
-import com.wl.turbidimetric.global.SystemGlobal
-import com.wl.turbidimetric.home.HomeViewModel
 
-class MainViewModel constructor(private val appViewModel: AppViewModel) : BaseViewModel() {
+class MainViewModel(private val appViewModel: AppViewModel) : BaseViewModel() {
+    /**
+     * 关机命令
+     */
     fun shutdown() {
         appViewModel.serialPort.shutdown()
     }
 
+    /**
+     * 不允许发送命令
+     */
     fun allowRunning() {
         appViewModel.serialPort.allowRunning()
     }
 
     val curIndex = MutableLiveData<Int>(0)
 
-    val navItems = SystemGlobal.navItems
-
-    init {
-
-    }
 }
 
 class MainViewModelFactory(

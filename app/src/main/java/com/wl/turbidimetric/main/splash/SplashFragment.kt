@@ -19,6 +19,6 @@ class SplashFragment :
 
     }
     companion object{
-        val TAG = "splash"
+        const val TAG = "splash"
     }
 }

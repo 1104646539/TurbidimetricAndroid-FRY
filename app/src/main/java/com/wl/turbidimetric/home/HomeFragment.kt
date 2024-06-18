@@ -28,7 +28,6 @@ import com.wl.turbidimetric.view.ShelfView
 import com.wl.turbidimetric.view.dialog.GetTestPatientInfoDialog
 import com.wl.turbidimetric.view.dialog.HiltDialog
 import com.wl.turbidimetric.view.dialog.HomeConfigDialog
-import com.wl.turbidimetric.view.dialog.HomeDetailsDialog
 import com.wl.turbidimetric.view.dialog.ICON_FINISH
 import com.wl.turbidimetric.view.dialog.ICON_HINT
 import com.wl.turbidimetric.view.dialog.PatientInfoDialog
@@ -45,7 +44,16 @@ import org.greenrobot.eventbus.EventBus
 import java.util.Date
 
 class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.fragment_home) {
-    private val TAG = "HomeFragment"
+
+    companion object {
+        @JvmStatic
+        fun newInstance() = HomeFragment()
+        private const val TAG = "HomeFragment"
+    }
+
+    override val vm: HomeViewModel by viewModels {
+        HomeViewModelFactory()
+    }
 
     /**
      * 最新的项目
@@ -110,15 +118,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
     }
 
 
-    companion object {
-        @JvmStatic
-        fun newInstance() = HomeFragment()
-    }
-
-    override val vm: HomeViewModel by viewModels {
-        HomeViewModelFactory()
-    }
-
     override fun initViewModel() {
     }
 
@@ -142,7 +141,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             }
         }
 
-        vd?.vConfig?.post {
+        vd.vConfig.post {
             EventBus.getDefault().post((EventMsg<Any>(what = EventGlobal.WHAT_HOME_INIT_FINISH)))
         }
     }
@@ -170,23 +169,17 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 vd.tvTemp.text = it.reactionTemp.toString().plus("℃")
             }
         }
-        vd.svSample1.clickIndex = { it, item ->
-            showDetails(0, it, item)
-        }
-        vd.svSample2.clickIndex = { it, item ->
-            showDetails(1, it, item)
-        }
-        vd.svSample3.clickIndex = { it, item ->
-            showDetails(2, it, item)
-        }
-        vd.svSample4.clickIndex = { it, item ->
-            showDetails(3, it, item)
-        }
+        vd.svSample1.clickIndex = { it, item -> showDetails(0, it, item) }
+        vd.svSample2.clickIndex = { it, item -> showDetails(1, it, item) }
+        vd.svSample3.clickIndex = { it, item -> showDetails(2, it, item) }
+        vd.svSample4.clickIndex = { it, item -> showDetails(3, it, item) }
+
         vd.svSample1.shape = ShelfView.Shape.Circle
         vd.svSample2.shape = ShelfView.Shape.Circle
         vd.svSample3.shape = ShelfView.Shape.Circle
         vd.svSample4.shape = ShelfView.Shape.Circle
-        lifecycleScope.launch {
+
+        lifecycleScope.launchWhenCreated {
             vm.sampleStates.collectLatest {
                 vd.svSample1.itemStates = it[0]
                 vd.svSample2.itemStates = it[1]
@@ -210,7 +203,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         vd.svCuvette4.clickIndex = { it, item ->
             showDetails(0, it, item)
         }
-        lifecycleScope.launch {
+        lifecycleScope.launchWhenCreated {
             vm.cuvetteStates.collectLatest {
                 vd.svCuvette1.itemStates = it[3]
                 vd.svCuvette2.itemStates = it[2]
@@ -218,31 +211,31 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 vd.svCuvette4.itemStates = it[0]
             }
         }
-        lifecycleScope.launch {
+        lifecycleScope.launchWhenCreated {
             appVm.obTestState.collectLatest {
                 if (!appVm.testType.isTest() && it.isRunning()) {
                     vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg)
-                    vd.tvAnalyse.setText("正在运行……")
+                    vd.tvAnalyse.text = "正在运行……"
                     vm.enableView(false)
                 } else {
                     if (it.machineStateIng()) {
-                        vd.tvAnalyse.setText("正在自检")
-                        vd.tvAnalyse2.setText("(正在自检，请稍后)")
+                        vd.tvAnalyse.text = "正在自检"
+                        vd.tvAnalyse2.text = "(正在自检，请稍后)"
                         vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg)
                         vm.enableView(true)
                     } else if (it.isNotPrepare()) {
-                        vd.tvAnalyse.setText("重新自检")
-                        vd.tvAnalyse2.setText("(请重新自检)")
+                        vd.tvAnalyse.text = "重新自检"
+                        vd.tvAnalyse2.text = "(请重新自检)"
                         vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg)
                         vm.enableView(true)
                     } else if (it.isRunning()) {
-                        vd.tvAnalyse.setText("检测中")
-                        vd.tvAnalyse2.setText("(仓门已锁，请勿打开,请等待检测结束)")
+                        vd.tvAnalyse.text = "检测中"
+                        vd.tvAnalyse2.text = "(仓门已锁，请勿打开,请等待检测结束)"
                         vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg)
                         vm.enableView(false)
                     } else {
-                        vd.tvAnalyse.setText("开始分析")
-                        vd.tvAnalyse2.setText("(点击分析)")
+                        vd.tvAnalyse.text = "开始分析"
+                        vd.tvAnalyse2.text = "(点击分析)"
                         vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg2)
                         vm.enableView(true)
                     }
@@ -251,7 +244,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         }
 
         vd.vTest.setOnClickListener {
-            u("开始")
             if (appVm.testState.isNotPrepare()) {
                 vm.dialogGetMachineFailedConfirm()
                 toast("自检中……")
@@ -267,7 +259,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 vm.clickStart()
             }
         }
-        lifecycleScope.launch {
+        lifecycleScope.launchWhenCreated {
             SystemGlobal.obDebugMode.collectLatest {
                 vd.btnDebugDialog.visibility = it.isShow()
             }

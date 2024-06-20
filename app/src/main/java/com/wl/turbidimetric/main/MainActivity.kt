@@ -172,7 +172,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         showSplash()
         listener()
         initNavigation()
-        test()
+//        test()
         initTime()
         initUploadClient()
         initPrintSDK()
@@ -295,13 +295,15 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
      */
     private fun showShutdownDialog() {
         if (!appVm.testState.isRunning()) {
-            shutdownDialog.showPop(this) { dialog ->
+            shutdownDialog.showPop(this, isCancelable = false) { dialog ->
                 dialog.showDialog(
                     "确定要关机吗？请确定仪器检测结束。",
                     "关机",
                     {
-                        it.dismiss()
-                        showShutdownView { shutdown() }
+                        shutdown()
+                        dialog.showDialog(
+                            "正在执行关机动作，请稍后……",)
+
                     },
                     "取消",
                     { it.dismiss() })
@@ -312,6 +314,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
             }
         }
     }
+
 
     /**
      * 显示关机动画

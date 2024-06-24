@@ -76,7 +76,7 @@ class App : Application() {
 
     private fun initDB() {
         GlobalScope.launch {
-           val projectSource =  ServiceLocator.provideProjectSource(this@App)
+            val projectSource = ServiceLocator.provideProjectSource(this@App)
             val ps = mainDao.getProjectModels().first()
 
             if (ps.isEmpty()) {
@@ -100,7 +100,7 @@ class App : Application() {
     }
 
     private suspend fun insertTestCurve(project: ProjectModel) {
-        val curveSource =  ServiceLocator.provideCurveSource(this@App)
+        val curveSource = ServiceLocator.provideCurveSource(this@App)
         repeat(1) {
             //三次方
             curveSource.addCurve(CurveModel().apply {
@@ -196,7 +196,7 @@ class App : Application() {
         private val viewModelStore = ViewModelStore()
         private val viewModelProvider: ViewModelProvider by lazy {
             ViewModelProvider(
-                this, AppViewModelFactory()
+                this, AppViewModelFactory(app = App.instance!!)
             )
         }
 
@@ -210,11 +210,12 @@ class App : Application() {
     }
 
     class AppViewModelFactory(
-        private val localDataDataSource: LocalDataSource = ServiceLocator.provideLocalDataSource(App.instance!!)
+        private val localDataDataSource: LocalDataSource = ServiceLocator.provideLocalDataSource(App.instance!!),
+        private val app: Application
     ) : ViewModelProvider.NewInstanceFactory() {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(AppViewModel::class.java)) {
-                return AppViewModel(localDataDataSource) as T
+                return AppViewModel(localDataDataSource, app) as T
             }
             throw IllegalArgumentException("Unknown ViewModel class")
         }

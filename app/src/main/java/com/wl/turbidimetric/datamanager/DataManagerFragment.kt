@@ -1,13 +1,7 @@
 package com.wl.turbidimetric.datamanager
 
-import android.animation.Animator
-import android.animation.ValueAnimator
-import android.graphics.Path
-import android.graphics.PathMeasure
 import android.os.Bundle
 import android.util.Log
-import android.widget.ImageView
-import android.widget.RelativeLayout
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -17,27 +11,21 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.wl.turbidimetric.R
-import com.wl.turbidimetric.app.PrinterState
 import com.wl.turbidimetric.base.BaseFragment
 import com.wl.turbidimetric.databinding.FragmentDataManagerBinding
 import com.wl.turbidimetric.ex.calcShowTestResult
+import com.wl.turbidimetric.ex.getPrintParamsAnim
 import com.wl.turbidimetric.ex.toast
 import com.wl.turbidimetric.global.SystemGlobal
-import com.wl.turbidimetric.main.MainActivity
 import com.wl.turbidimetric.model.ConditionModel
 import com.wl.turbidimetric.model.TestResultAndCurveModel
-import com.wl.turbidimetric.print.PrintUtil
 import com.wl.turbidimetric.upload.hl7.HL7Helper
-import com.wl.turbidimetric.util.ExportExcelHelper
-import com.wl.turbidimetric.util.ExportReportHelper
-import com.wl.turbidimetric.util.PrintHelper
 import com.wl.turbidimetric.util.PrintSDKHelper
 import com.wl.turbidimetric.view.dialog.*
 import com.wl.wllib.LogToFile.i
 import com.wl.wllib.LogToFile.u
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
-import java.util.*
 
 
 /**
@@ -45,9 +33,11 @@ import java.util.*
  */
 class DataManagerFragment :
     BaseFragment<DataManagerViewModel, FragmentDataManagerBinding>(R.layout.fragment_data_manager) {
+
     init {
         i("init create")
     }
+
 
     override val vm: DataManagerViewModel by viewModels {
         DataManagerViewModelFactory()
@@ -60,24 +50,17 @@ class DataManagerFragment :
     /**
      * 筛选对话框
      */
-    val conditionDialog by lazy {
+    private val conditionDialog by lazy {
         ConditionDialog(requireContext())
-    }
-
-    /**
-     * 删除对话框
-     */
-    val deleteDialog by lazy {
-        HiltDialog(requireContext())
     }
 
     /**
      * 等待任务对话框
      */
-    val waitDialog by lazy {
+    private val waitDialog by lazy {
         HiltDialog(requireContext())
     }
-
+    private var datasJob: Job? = null
     override fun init(savedInstanceState: Bundle?) {
         initView()
         listener()
@@ -178,6 +161,7 @@ class DataManagerFragment :
             exportExcelAll()
         }
         vd.btnUpload.setOnClickListener {
+            u("上传")
             upload()
         }
         lifecycleScope.launch {
@@ -188,13 +172,7 @@ class DataManagerFragment :
 
         adapter.onLongClick = { id ->
             u("详情$id")
-            if (id > 0) {
-                lifecycleScope.launch {
-                    vm.showDetails(id)
-                }
-            } else {
-                toast("ID错误")
-            }
+            vm.showResultDetailsDialog(id)
         }
 
         vd.btnPrint.setOnClickListener {
@@ -213,108 +191,23 @@ class DataManagerFragment :
             u("打印报告")
             printReport()
         }
-        adapter.onSelectChange = { pos, selected ->
 
-        }
-        lifecycleScope.launch {
-            vm.dialogUiState.collectLatest { state ->
-                when (state) {
-                    DataManagerUiState.None -> {
-                    }
-
-                    is DataManagerUiState.ResultDetailsDialog -> {
-                        resultDialog.showPop(requireContext(), isCancelable = false) {
-                            it.showDialog(state.model, SystemGlobal.isDebugMode) { result ->
-                                lifecycleScope.launch {
-                                    if (SystemGlobal.isDebugMode) {
-                                        val newResult = calcShowTestResult(
-                                            result.result.concentration,
-                                            result.curve?.projectLjz ?: 0
-                                        )
-                                        result.result.testResult = newResult
-                                    }
-                                    val ret = vm.update(result)
-                                    toast("更新${if (ret > 0) "成功" else "失败"}")
-                                }
-                                true
-                            }
-                        }
-                    }
-
-                    is DataManagerUiState.DeleteDialog -> {
-                        deleteDialog.showPop(requireContext(), isCancelable = false) {
-                            it.showDialog("确定要删除数据吗?", "确定", {
-                                val results = getSelectData()
-                                it.dismiss()
-                                if (!results.isNullOrEmpty()) {
-                                    lifecycleScope.launch {
-                                        vm.clickDeleteDialogConfirm(results.map { it.result })
-                                    }
-                                }
-                            }, "取消", {
-                                it.dismiss()
-                            }, showIcon = true, iconId = ICON_HINT)
-                        }
-                    }
-                }
-            }
-        }
     }
 
 
     private fun printReport() {
         val data = getSelectData()
-        if (data.isNullOrEmpty()) {
-            waitDialog.showPop(requireContext(), isCancelable = false) { dialog ->
-                dialog.showDialog("未选择数据", "确定", { dialog -> dialog.dismiss() })
-            }
-            return
-        }
-        waitDialog.showPop(requireContext(), isCancelable = true) { dialog ->
-            if (PrintSDKHelper.printerState == PrinterState.Success) {
-                ((requireActivity()) as MainActivity).addPrintWorkAnim(vd.btnPrintPdf) {
-                    PrintHelper.addPrintWork(data, "xxx医院", false)
-                }
-            } else if (PrintSDKHelper.printerState == PrinterState.None || PrintSDKHelper.printerState == PrinterState.InitSdkFailed) {
-                dialog.showDialog("打印未初始化")
-            } else if (PrintSDKHelper.printerState == PrinterState.NotInstallApk) {
-                dialog.showDialog("打印程序未安装")
-            } else if (PrintSDKHelper.printerState == PrinterState.NotPrinter) {
-                dialog.showDialog("未设置打印机，请先设置打印机", "选择打印机", {
-                    PrintSDKHelper.showSetupPrinterUi()
-                    it.dismiss()
-                }, "取消", { it.dismiss() })
-            }
-        }
+        vm.processIntent(
+            DataManagerViewModel.DataManagerIntent.PrintReportSelected(
+                vd.btnPrintPdf.getPrintParamsAnim(),
+                data
+            )
+        )
     }
 
     private fun exportReport() {
         val data = getSelectData()
-        waitDialog.showPop(requireContext(), isCancelable = false) { dialog ->
-            dialog.showDialog("正在导出数据，请等待……")
-
-            ExportReportHelper.exportReport(
-                requireContext(),
-                data,
-                "XX人民医院",
-                lifecycleScope,
-                false,
-                { count, successCount, failedCount ->
-                    i("导出报告完成，本次导出总数${count}条,成功${successCount}条,失败${failedCount}条")
-                    dialog.showDialog(
-                        "导出报告完成，本次导出总数${count}条,成功${successCount}条,失败${failedCount}条",
-                        "确定",
-                        {
-                            it.dismiss()
-                        })
-                }, { err ->
-                    i("导出报告失败 $err")
-                    dialog.showDialog("导出报告失败,$err", "确定", {
-                        it.dismiss()
-                    })
-                }
-            )
-        }
+        vm.processIntent(DataManagerViewModel.DataManagerIntent.ExportExcelSelected(data))
     }
 
     private fun delete() {
@@ -327,79 +220,13 @@ class DataManagerFragment :
      */
     private fun upload() {
         val results = getSelectData()
-        var verifyRet: String? = null
-        //验证上传数据
-        if (verifyUploadData(results).also { verifyRet = it } != null) {
-//            toast("$verifyRet")
-            waitDialog.showPop(requireContext()) { dialog ->
-                dialog.showDialog("$verifyRet", "确定", {
-                    it.dismiss()
-                })
-            }
-            return
-        }
-        //批量上传
-        waitDialog.showPop(requireContext(), isCancelable = false) { dialog ->
-            dialog.showDialog("请等待……", confirmText = "", confirmClick = {})
-
-            lifecycleScope.launch(Dispatchers.IO) {
-                if (HL7Helper.isConnected()) {
-                    HL7Helper.uploadTestResult(results) { count, success, failed ->
-                        lifecycleScope.launch(Dispatchers.Main) {
-                            dialog.showDialog(
-                                "上传结束，本次上传共${count}条，成功${success}条,失败${failed}条",
-                                confirmText = "我知道了",
-                                confirmClick = { d ->
-                                    d.dismiss()
-                                })
-                        }
-                    }
-                } else {
-                    lifecycleScope.launch(Dispatchers.Main) {
-//                        dialog.dismiss()
-                        dialog.showDialog(
-                            "上传未连接",
-                            confirmText = "确定",
-                            confirmClick = { dialog -> dialog.dismiss() })
-                    }
-                    i("上传未连接")
-                }
-            }
-        }
+        vm.processIntent(DataManagerViewModel.DataManagerIntent.UploadSelected(results))
     }
 
-    /**
-     * 验证上传的数据
-     * @param results List<TestResultModel>?
-     * @return String?
-     */
-    private fun verifyUploadData(results: List<TestResultAndCurveModel>?): String? {
-
-        if (results.isNullOrEmpty()) {
-            return "请选择数据"
-        }
-
-        if (appVm.testState.isTestRunning() && SystemGlobal.uploadConfig.autoUpload) {
-            return "请等待检测结束后上传"
-        }
-
-        if (results.any {
-                it.result.curveOwnerId <= 0
-            }) {
-            return "没有检测项目"
-        }
-
-        if (results.any {
-                it.result.testResult.isNullOrEmpty()
-            }) {
-            return "未检测的数据"
-        }
-        return null
-    }
 
     private fun listenerData() {
 
-        lifecycleScope.launch {
+        lifecycleScope.launchWhenCreated {
             adapter.loadStateFlow.collectLatest { loadState ->
                 if (loadState.source.refresh is LoadState.NotLoading && loadState.append.endOfPaginationReached && adapter.itemCount < 1) {
                     vd.rv.isVisible = false
@@ -415,80 +242,233 @@ class DataManagerFragment :
                 queryData(it)
             }
         }
-        lifecycleScope.launch {
+        lifecycleScope.launchWhenCreated {
             SystemGlobal.obDebugMode.collectLatest {
                 vd.btnDelete.visibility = it.isShow()
             }
         }
-    }
 
-    private fun print() {
-        val results = getSelectData()
-        if (results.isNullOrEmpty()) {
-//            toast("请选择数据")
-            waitDialog.showPop(requireContext()) { dialog ->
-                dialog.showDialog("请选择数据", "确定", {
-                    it.dismiss()
-                })
-            }
-            return
-        }
+        lifecycleScope.launchWhenCreated {
+            launch {
+                vm.exportExcelUIState.collectLatest {
+                    when (it) {
+                        is DataManagerViewModel.ExportExcelUIState.Failed -> {
+                            waitDialog.showPop(requireContext(), isCancelable = false) { dialog ->
+                                dialog.showDialog(it.err, "确定", { d ->
+                                    d.dismiss()
+                                })
+                            }
+                        }
 
-        PrintUtil.printTest(results)
-    }
+                        DataManagerViewModel.ExportExcelUIState.Loading -> {
+                            waitDialog.showPop(requireContext(), isCancelable = false) { dialog ->
+                                dialog.showDialog(
+                                    "正在导出,请等待……",
+                                    confirmText = "",
+                                    confirmClick = {})
+                            }
+                        }
 
-    private fun exportExcelSelected() {
-        exportExcel(false)
-    }
+                        DataManagerViewModel.ExportExcelUIState.None -> {
 
+                        }
 
-    private fun exportExcelAll() {
-        exportExcel(true)
-    }
-
-    /**
-     * 导出数据到U盘 （excel格式.xls）
-     * @param exportAll Boolean
-     * @param dialog HiltDialog
-     * @param items List<TestResultModel>?
-     */
-    private fun exportExcel(exportAll: Boolean) {
-        waitDialog.showPop(requireContext(), isCancelable = false) { dialog ->
-            //step1、 显示等待对话框
-            dialog.showDialog("正在导出,请等待……", confirmText = "", confirmClick = {})
-            lifecycleScope.launch(Dispatchers.IO) {
-                //step2、 获取数据
-                val data = if (exportAll) {
-                    val condition = vm.conditionModel.value
-                    vm.getFilterAll(condition)
-                } else {
-                    getSelectData()
+                        is DataManagerViewModel.ExportExcelUIState.Success -> {
+                            waitDialog.showPop(requireContext(), isCancelable = false) { dialog ->
+                                dialog.showDialog(it.msg, "确定", { d ->
+                                    d.dismiss()
+                                })
+                            }
+                        }
+                    }
                 }
-                //step3、 导出 等待结果
-                val err = exportExcelVerify(data)
-                if (err.isEmpty()) {
-                    ExportExcelHelper.export(
-                        requireContext(),
-                        data,
-                        { msg ->
-                            lifecycleScope.launch(Dispatchers.Main) {
-                                dialog.showDialog("导出成功,文件保存在 $msg", "确定", { d ->
-                                    d.dismiss()
+            }
+            launch {
+                vm.printUIState.collectLatest {
+                    when (it) {
+                        is DataManagerViewModel.PrintUIState.Failed -> {
+                            waitDialog.showPop(requireContext()) { dialog ->
+                                dialog.showDialog(it.err, "确定", { dialog ->
+                                    dialog.dismiss()
                                 })
                             }
-                        },
-                        { it ->
-                            lifecycleScope.launch(Dispatchers.Main) {
-                                dialog.showDialog("导出失败,$it", "确定", { d ->
-                                    d.dismiss()
+                        }
+
+                        DataManagerViewModel.PrintUIState.Loading -> {}
+                        DataManagerViewModel.PrintUIState.None -> {}
+                        is DataManagerViewModel.PrintUIState.Success -> {
+
+                        }
+                    }
+                }
+            }
+            launch {
+                vm.printReportUIState.collectLatest {
+                    when (it) {
+                        is DataManagerViewModel.PrintReportUIState.Failed -> {
+                            waitDialog.showPop(requireContext(), isCancelable = false) { dialog ->
+                                dialog.showDialog(it.err, "确定", { dialog.dismiss() })
+                            }
+                        }
+
+                        DataManagerViewModel.PrintReportUIState.Loading -> {}
+                        is DataManagerViewModel.PrintReportUIState.NoSelectedPrinter -> {
+                            waitDialog.showPop(requireContext(), isCancelable = false) { dialog ->
+                                dialog.showDialog(it.msg, "选择打印机", {
+                                    PrintSDKHelper.showSetupPrinterUi()
+                                    dialog.dismiss()
+                                }, "取消", { dialog.dismiss() })
+                            }
+                        }
+
+                        DataManagerViewModel.PrintReportUIState.None -> {}
+                        is DataManagerViewModel.PrintReportUIState.Success -> {
+
+                        }
+                    }
+                }
+            }
+            launch {
+                vm.exportReportSelectedUIState.collectLatest {
+                    when (it) {
+                        is DataManagerViewModel.ExportReportSelectedUIState.Failed -> {
+                            waitDialog.showPop(requireContext(), isCancelable = false) { dialog ->
+                                dialog.showDialog(it.err, "确定", { dialog.dismiss() })
+                            }
+                        }
+
+                        DataManagerViewModel.ExportReportSelectedUIState.Loading -> {
+                            waitDialog.showPop(requireContext(), isCancelable = false) { dialog ->
+                                dialog.showDialog("正在导出报告，请稍后……")
+                            }
+                        }
+
+                        DataManagerViewModel.ExportReportSelectedUIState.None -> {
+
+                        }
+
+                        is DataManagerViewModel.ExportReportSelectedUIState.Success -> {
+                            waitDialog.showPop(requireContext(), isCancelable = false) { dialog ->
+                                dialog.showDialog(it.msg)
+                            }
+                        }
+                    }
+                }
+            }
+
+            launch {
+                vm.uploadUIState.collectLatest {
+                    when (it) {
+                        is DataManagerViewModel.UploadUIState.Failed -> {
+                            waitDialog.showPop(requireContext(), isCancelable = false) { dialog ->
+                                dialog.showDialog(it.err, "确定", { dialog.dismiss() })
+                            }
+                        }
+
+                        DataManagerViewModel.UploadUIState.Loading -> {
+                            waitDialog.showPop(requireContext(), isCancelable = false) { dialog ->
+                                dialog.showDialog("正在上传，请稍后……")
+                            }
+                        }
+
+                        DataManagerViewModel.UploadUIState.None -> {}
+                        is DataManagerViewModel.UploadUIState.Success -> {
+                            waitDialog.showPop(requireContext(), isCancelable = false) { dialog ->
+                                dialog.showDialog(it.msg, "确定", { dialog.dismiss() })
+                            }
+                        }
+                    }
+                }
+            }
+
+            launch {
+                vm.deleteResultUIState.collectLatest {
+                    when (it) {
+                        is DataManagerViewModel.DeleteResultUIState.Failed -> {
+                            waitDialog.showPop(requireContext(), isCancelable = false) { dialog ->
+                                dialog.showDialog(it.err, "确定", { dialog.dismiss() })
+                            }
+                        }
+
+                        DataManagerViewModel.DeleteResultUIState.Loading -> {}
+                        DataManagerViewModel.DeleteResultUIState.None -> {}
+                        DataManagerViewModel.DeleteResultUIState.ShowDialog -> {
+                            waitDialog.showPop(requireContext(), isCancelable = false) { dialog ->
+                                dialog.showDialog(
+                                    "确定要删除数据吗？删除后不可恢复！",
+                                    "确定",
+                                    {
+                                        vm.processIntent(
+                                            DataManagerViewModel.DataManagerIntent.DeleteResult(
+                                                getSelectData()
+                                            )
+                                        )
+                                        dialog.dismiss()
+                                    }, "取消", { dialog.dismiss() })
+                            }
+                        }
+
+                        is DataManagerViewModel.DeleteResultUIState.Success -> {
+                            if (waitDialog != null && waitDialog.isShow) {
+                                waitDialog.dismiss()
+                            }
+                        }
+                    }
+                }
+            }
+            launch {
+                vm.resultDetailsUIState.collectLatest {
+                    when (it) {
+                        is DataManagerViewModel.ResultDetailsUIState.Failed -> {
+                            i("${it.err}")
+                        }
+
+                        DataManagerViewModel.ResultDetailsUIState.None -> {}
+                        is DataManagerViewModel.ResultDetailsUIState.ShowDialog -> {
+                            resultDialog.showPop(requireContext(), isCancelable = false) { dialog ->
+                                dialog.showDialog(it.item, SystemGlobal.isDebugMode) { result ->
+                                    vm.processIntent(
+                                        DataManagerViewModel.DataManagerIntent.ResultDetailsUpdate(
+                                            SystemGlobal.isDebugMode,
+                                            result
+                                        )
+                                    )
+                                    true
+                                }
+                            }
+                        }
+
+                        is DataManagerViewModel.ResultDetailsUIState.Success -> {
+                            i("${it.msg}")
+                        }
+                    }
+                }
+            }
+            launch {
+                vm.conditionUIState.collectLatest {
+                    when (it) {
+                        DataManagerViewModel.ConditionUIState.None -> {
+
+                        }
+
+                        is DataManagerViewModel.ConditionUIState.ShowDialog -> {
+                            conditionDialog.showPop(
+                                requireContext(),
+                                isCancelable = false
+                            ) { dialog ->
+                                dialog.showDialog({ conditionModel ->
+                                    vm.processIntent(
+                                        DataManagerViewModel.DataManagerIntent.ConditionUpdate(
+                                            conditionModel
+                                        )
+                                    )
+                                    dialog.dismiss()
+                                    i("conditionModel=$conditionModel")
+                                }, {
+                                    dialog.dismiss()
                                 })
                             }
-                        })
-                } else {
-                    lifecycleScope.launch(Dispatchers.Main) {
-                        dialog.showDialog("导出失败,$err", "确定", { d ->
-                            d.dismiss()
-                        })
+                        }
                     }
                 }
             }
@@ -496,16 +476,32 @@ class DataManagerFragment :
     }
 
     /**
-     * 验证
+     * 打印热敏
      */
-    private fun exportExcelVerify(items: List<TestResultAndCurveModel>?): String {
-        return if (items.isNullOrEmpty()) {
-            "请选择数据"
-        } else if (items.size > 4000) {
-            "一次操作不能大于4000条，当前操作了${items.size}条"
-        } else {
-            ""
-        }
+    private fun print() {
+        val results = getSelectData()
+        vm.processIntent(DataManagerViewModel.DataManagerIntent.PrintSelected(results))
+    }
+
+
+    /**
+     * 导出数据到U盘 （excel格式.xls）
+     * 导出的为选中的
+     */
+    private fun exportExcelSelected() {
+        vm.processIntent(
+            DataManagerViewModel.DataManagerIntent.ExportExcelSelected(
+                getSelectData()
+            )
+        )
+    }
+
+    /**
+     * 导出数据到U盘 （excel格式.xls）
+     * 导出的为全部筛选的
+     */
+    private fun exportExcelAll() {
+        vm.processIntent(DataManagerViewModel.DataManagerIntent.ExportExcelAll)
     }
 
 
@@ -517,20 +513,10 @@ class DataManagerFragment :
      * 显示筛选对话框
      */
     private fun showConditionDialog() {
-        conditionDialog.showPop(requireContext(), isCancelable = false) {
-            it.showDialog({ conditionModel ->
-                lifecycleScope.launch {
-                    vm.conditionChange(conditionModel)
-                    it.dismiss()
-                }
-                i("conditionModel=$conditionModel")
-            }, {
-                it.dismiss()
-            })
-        }
+        vm.showConditionDialog()
     }
 
-    var datasJob: Job? = null
+
     private suspend fun queryData(condition: ConditionModel) {
         datasJob?.cancelAndJoin()
         datasJob = lifecycleScope.launch {
@@ -552,7 +538,6 @@ class DataManagerFragment :
         ResultDetailsDialog(requireContext())
     }
 
-    val TAG = "DataManagerFragment"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate")
@@ -578,6 +563,7 @@ class DataManagerFragment :
     companion object {
         @JvmStatic
         fun newInstance() = DataManagerFragment()
+        private const val TAG = "DataManagerFragment"
     }
 
     override fun initViewModel() {

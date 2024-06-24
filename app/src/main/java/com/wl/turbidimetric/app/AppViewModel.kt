@@ -1,7 +1,10 @@
 package com.wl.turbidimetric.app
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.wl.turbidimetric.base.BaseViewModel
+import com.wl.turbidimetric.ex.toState
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.MachineTestModel
 import com.wl.turbidimetric.model.TestState
@@ -21,7 +24,8 @@ import kotlin.concurrent.timer
 /**
  * 全局唯一的ViewModel，用来保存全局通用的属性
  */
-class AppViewModel(val localDataSource: LocalDataSource) : BaseViewModel() {
+class AppViewModel(val localDataSource: LocalDataSource, val app: Application) :
+    AndroidViewModel(app) {
     val serialPort: SerialPortIF = SerialPortImpl(SystemGlobal.isCodeDebug)
 
     /**
@@ -91,22 +95,10 @@ class AppViewModel(val localDataSource: LocalDataSource) : BaseViewModel() {
     private val _detectionNum = MutableStateFlow(localDataSource.getDetectionNum().toLong())
     val detectionNum = _detectionNum.asSharedFlow()
 
-
-    fun changeMachineTestModel(machineTestModel: MachineTestModel) {
-        this._machineTestMode.value = machineTestModel
-    }
-
-    fun setLooperTest(looperTest: Boolean) {
-        localDataSource.setLooperTest(looperTest)
-    }
-
     fun getLooperTest(): Boolean {
         return localDataSource.getLooperTest()
     }
 
-    fun changeDetectionNum(detectionNum: Long) {
-        this._detectionNum.value = detectionNum
-    }
 
     fun getAutoPrintReceipt(): Boolean {
         return localDataSource.getAutoPrintReceipt()
@@ -124,10 +116,22 @@ class AppViewModel(val localDataSource: LocalDataSource) : BaseViewModel() {
         return localDataSource.getAutoPrintReport()
     }
 
+    private fun changeMachineTestModel(machineTestModel: MachineTestModel) {
+        this._machineTestMode.value = machineTestModel
+    }
+
+    private fun setLooperTest(looperTest: Boolean) {
+        localDataSource.setLooperTest(looperTest)
+    }
+
+    private fun changeDetectionNum(detectionNum: Long) {
+        this._detectionNum.value = detectionNum
+    }
+
     /**
      * 更新当前时间
      */
-    fun listenerTime() {
+    private fun listenerTime() {
         timer("更新时间", false, Date(), 1000 * 10) {
             viewModelScope.launch {
                 _nowTimeStr.emit(DateUtil.date2Str(Date(), DateUtil.Time6Format))
@@ -138,13 +142,8 @@ class AppViewModel(val localDataSource: LocalDataSource) : BaseViewModel() {
     /**
      * 更新u盘状态
      */
-    fun changeStorageState(state: com.wl.weiqianwllib.upan.StorageState) {
-        val s = when (state) {
-            com.wl.weiqianwllib.upan.StorageState.NONE -> StorageState.None
-            com.wl.weiqianwllib.upan.StorageState.INSERTED -> StorageState.Inserted
-            com.wl.weiqianwllib.upan.StorageState.EXIST -> StorageState.Exist
-            com.wl.weiqianwllib.upan.StorageState.UNAUTHORIZED -> StorageState.Unauthorized
-        }
+    private fun changeStorageState(state: com.wl.weiqianwllib.upan.StorageState) {
+        val s = state.toState()
         viewModelScope.launch {
             _storageState.emit(s)
         }
@@ -153,7 +152,7 @@ class AppViewModel(val localDataSource: LocalDataSource) : BaseViewModel() {
     /**
      * 更新上传状态
      */
-    fun changeUploadState(state: ConnectStatus) {
+    private fun changeUploadState(state: ConnectStatus) {
         val s = when (state) {
             ConnectStatus.NONE -> UploadState.None
             ConnectStatus.RECONNECTION -> UploadState.ReConnection
@@ -168,7 +167,7 @@ class AppViewModel(val localDataSource: LocalDataSource) : BaseViewModel() {
     /**
      * 更新打印机状态
      */
-    fun changePrinterState(state: PrinterState) {
+    private fun changePrinterState(state: PrinterState) {
         viewModelScope.launch {
             _printerState.emit(state)
         }
@@ -177,7 +176,7 @@ class AppViewModel(val localDataSource: LocalDataSource) : BaseViewModel() {
     /**
      * 更新打印机状态
      */
-    fun changePrintNum(num: Int) {
+    private fun changePrintNum(num: Int) {
         viewModelScope.launch {
             _printNum.emit(num)
         }
@@ -186,7 +185,7 @@ class AppViewModel(val localDataSource: LocalDataSource) : BaseViewModel() {
     /**
      * 更新上传状态
      */
-    fun changeMachineState(state: TestState) {
+    private fun changeMachineState(state: TestState) {
         serialPort?.testStateChange(state)
         val s = when (state) {
             TestState.NotGetMachineState -> MachineState.MachineError
@@ -198,5 +197,60 @@ class AppViewModel(val localDataSource: LocalDataSource) : BaseViewModel() {
             _machineState.emit(s)
         }
     }
+
+    fun processIntent(intent: AppIntent) {
+        when (intent) {
+            AppIntent.ListenerTime -> {
+                listenerTime()
+            }
+
+            is AppIntent.PrintNumChange -> {
+                changePrintNum(intent.printNum)
+            }
+
+            is AppIntent.PrinterStateChange -> {
+                changePrinterState(intent.printerState)
+            }
+
+            is AppIntent.StorageStateChange -> {
+                changeStorageState(intent.storageState)
+            }
+
+            is AppIntent.UploadStateChange -> {
+                changeUploadState(intent.uploadState)
+            }
+
+            is AppIntent.MachineStateChange -> {
+                changeMachineState(intent.state)
+            }
+
+            is AppIntent.MachineTestModelChange -> {
+                changeMachineTestModel(intent.machineTestModel)
+            }
+
+            is AppIntent.LooperTestChange -> {
+                setLooperTest(intent.looperTest)
+            }
+
+            is AppIntent.DetectionNumChange -> {
+                changeDetectionNum(intent.detectionNum)
+            }
+        }
+    }
+
 }
 
+sealed class AppIntent {
+    object ListenerTime : AppIntent()
+    data class PrintNumChange(val printNum: Int) : AppIntent()
+    data class PrinterStateChange(val printerState: PrinterState) : AppIntent()
+    data class StorageStateChange(val storageState: com.wl.weiqianwllib.upan.StorageState) :
+        AppIntent()
+
+    data class UploadStateChange(val uploadState: ConnectStatus) : AppIntent()
+    data class MachineStateChange(val state: TestState) : AppIntent()
+    data class MachineTestModelChange(val machineTestModel: MachineTestModel) : AppIntent()
+    data class LooperTestChange(val looperTest: Boolean) : AppIntent()
+    data class DetectionNumChange(val detectionNum: Long) : AppIntent()
+
+}

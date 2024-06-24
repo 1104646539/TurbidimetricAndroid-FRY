@@ -31,10 +31,12 @@ import androidx.core.animation.addListener
 import androidx.lifecycle.lifecycleScope
 import com.lxj.xpopup.XPopup
 import com.wl.turbidimetric.R
+import com.wl.turbidimetric.app.AppIntent
 import com.wl.turbidimetric.app.MachineState
 import com.wl.turbidimetric.app.PrinterState
 import com.wl.turbidimetric.base.BaseActivity
 import com.wl.turbidimetric.databinding.ActivityMainBinding
+import com.wl.turbidimetric.ex.toState
 import com.wl.turbidimetric.global.EventGlobal
 import com.wl.turbidimetric.global.EventMsg
 import com.wl.turbidimetric.main.splash.SplashFragment
@@ -104,6 +106,10 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
             HANDLER_INIT_QRCODE -> initQrCode()
         }
         true
+    }
+
+    private fun sendShowOpenDocumentTreeIntent() {
+        vm.processIntent(MainIntent.ShowOpenDocumentTree)
     }
 
     private fun showOpenDocumentTree() {
@@ -208,10 +214,10 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
 
     private fun initPrintSDK() {
         PrintSDKHelper.printerStateChange = { state ->
-            appVm.changePrinterState(state)
+            appVm.processIntent(AppIntent.PrinterStateChange(state))
         }
         PrintHelper.onSizeChange = { size ->
-            appVm.changePrintNum(size)
+            appVm.processIntent(AppIntent.PrintNumChange(size))
         }
         PrintSDKHelper.init(this)
     }
@@ -237,11 +243,9 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
             R.drawable.left_nav_item_bg, R.drawable.left_nav_item_bg2
         )
         vd.lnv.onItemChangeListener = {
-            vm.curIndex.value = it
+            vm.processIntent(MainIntent.ChangeNavCurIndex(it))
         }
-        vm.curIndex.observe(this) {
-            vd.vp.setCurrentItem(it, false)
-        }
+
     }
 
     private fun initShutDown() {
@@ -274,7 +278,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     }
 
     private fun initTime() {
-        appVm.listenerTime()
+        vm.processIntent(MainIntent.ListenerTime)
     }
 
 
@@ -302,7 +306,8 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
                     {
                         shutdown()
                         dialog.showDialog(
-                            "正在执行关机动作，请稍后……",)
+                            "正在执行关机动作，请稍后……",
+                        )
 
                     },
                     "取消",
@@ -335,7 +340,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
 
 
     private fun shutdown() {
-        vm.shutdown()
+        vm.processIntent(MainIntent.ShutDown)
     }
 
     private fun test() {
@@ -354,7 +359,6 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     private fun listenerView() {
         lifecycleScope.launch {
             launch {
-
                 appVm.nowTimeStr.collectLatest {
                     vd.tnv.setTime(it)
                 }
@@ -363,7 +367,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
                 appVm.machineState.collectLatest {
                     vd.tnv.setStateMachineSrc(it.id)
                     if (it == MachineState.MachineRunningError) {
-                        vm.allowRunning()
+                        vm.processIntent(MainIntent.AllowRunning)
                     }
                 }
             }
@@ -376,15 +380,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
                 appVm.storageState.collectLatest {
                     vd.tnv.setStateStorageSrc(it.id)
                     if (it != com.wl.turbidimetric.app.StorageState.None) {
-                        showPopupView(vd.tnv.getStateStorage(), it.str)
-                    }
-                }
-            }
-            launch {
-                appVm.storageState.collectLatest {
-                    vd.tnv.setStateStorageSrc(it.id)
-                    if (it != com.wl.turbidimetric.app.StorageState.None) {
-                        showPopupView(vd.tnv.getStateStorage(), it.str)
+                        vm.processIntent(MainIntent.ShowPopupViewForStorageState)
                     }
                 }
             }
@@ -399,30 +395,52 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
                     vd.tnv.setPrintNum(it)
                 }
             }
+            launch {
+                vm.uiState.collectLatest {
+                    when (it) {
+                        is MainState.CurIndex -> {
+                            vd.vp.setCurrentItem(it.index, false)
+                        }
+
+                        MainState.None -> {}
+                        MainState.ShowOpenDocumentTree -> {
+                            showOpenDocumentTree()
+                        }
+
+                        is MainState.ShowPopupViewForUploadState -> {
+                            showPopupView(vd.tnv.getStateUpload(), it.uploadState.str)
+                        }
+
+                        is MainState.ShowPopupViewForStorageState -> {
+                            showPopupView(vd.tnv.getStateStorage(), it.storageState.str)
+                        }
+
+                        is MainState.ShowPopupViewForMachineState -> {
+                            showPopupView(vd.tnv.getStateMachine(), it.machineState.str)
+                        }
+
+                        is MainState.ShowPopupViewForPrinterState -> {
+                            showPopupView(
+                                vd.tnv.getStatePrinter(),
+                                "${it.printerState.str}\n还有${it.printNum}个打印任务正在等待"
+                            )
+                        }
+                    }
+                }
+            }
         }
 
         vd.tnv.getStateUpload()?.setOnClickListener {
-            lifecycleScope.launch {
-                showPopupView(vd.tnv.getStateUpload(), appVm.uploadState.first().str)
-            }
+            vm.processIntent(MainIntent.ShowPopupViewForUploadState)
         }
         vd.tnv.getStateMachine()?.setOnClickListener {
-            lifecycleScope.launch {
-                showPopupView(vd.tnv.getStateMachine(), appVm.machineState.first().str)
-            }
+            vm.processIntent(MainIntent.ShowPopupViewForMachineState)
         }
         vd.tnv.getStateStorage()?.setOnClickListener {
-            lifecycleScope.launch {
-                showPopupView(vd.tnv.getStateStorage(), appVm.storageState.first().str)
-            }
+            vm.processIntent(MainIntent.ShowPopupViewForStorageState)
         }
         vd.tnv.getStatePrinter()?.setOnClickListener {
-            lifecycleScope.launch {
-                showPopupView(
-                    vd.tnv.getStatePrinter(),
-                    "${appVm.printerState.first().str}\n还有${appVm.printNum.first()}个打印任务正在等待"
-                )
-            }
+            vm.processIntent(MainIntent.ShowPopupViewForPrinterState)
         }
     }
 
@@ -434,7 +452,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     /**
      * 添加打印任务动画
      */
-    fun addPrintWorkAnim(formView: View, onAnimFinish: () -> Unit) {
+    fun addPrintWorkAnim(params: PrintAnimParams) {
         val targetView = getTopPrint() ?: return
 
         val animatedIcon = ImageView(this).apply {
@@ -446,14 +464,12 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         val parentLocation = IntArray(2)
         vd.rlRoot.getLocationInWindow(parentLocation)
 
-        val startLoc = IntArray(2)
-        formView.getLocationInWindow(startLoc)
 
         val endLoc = IntArray(2)
         targetView.getLocationInWindow(endLoc)
 
-        val startX = (startLoc[0] - parentLocation[0] + formView.width / 2).toFloat()
-        val startY = (startLoc[1] - parentLocation[1]).toFloat()
+        val startX = (params.formX - parentLocation[0] + params.formWidth / 2).toFloat()
+        val startY = (params.formY - parentLocation[1]).toFloat()
 
         val toX = (endLoc[0] - parentLocation[0] + targetView.width / 5).toFloat()
         val toY = (endLoc[1] - parentLocation[1]).toFloat()
@@ -478,7 +494,6 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
                 override fun onAnimationStart(animation: Animator) {}
                 override fun onAnimationEnd(animation: Animator) {
                     vd.rlRoot.removeView(animatedIcon)
-                    onAnimFinish.invoke()
                 }
 
                 override fun onAnimationCancel(animation: Animator) {}
@@ -519,7 +534,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
             StorageUtil.startInit(this@MainActivity) { allow: Boolean ->
                 Log.d(TAG, "listenerSDCard allow=$allow")
                 if (!allow) {
-                    showOpenDocumentTree()
+                    sendShowOpenDocumentTreeIntent()
                 } else {
                     changeStorageState(StorageState.EXIST)
                 }
@@ -543,7 +558,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
                 ktxRunOnBgCache {
                     StorageUtil.startInit(context) { allow: Boolean? ->
                         if (!allow!!) {
-                            showOpenDocumentTree()
+                            sendShowOpenDocumentTreeIntent()
                         } else {
                             changeStorageState(StorageState.EXIST)
                         }
@@ -553,9 +568,8 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         }
     }
 
-    fun changeStorageState(state: StorageState?) {
-        StorageUtil.state = state!!
-        appVm.changeStorageState(state)
+    fun changeStorageState(state: StorageState) {
+        vm.processIntent(MainIntent.ChangeStorageState(state))
     }
 
     private fun initUploadClient() {
@@ -567,21 +581,24 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
                         override fun onConnectResult(connectResult: ConnectResult) {
                             i("onConnectResult connectResult=$connectResult")
                             if (connectResult is ConnectResult.AlreadyConnected) {
-                                appVm.changeUploadState(ConnectStatus.CONNECTED)
+                                changeUploadState(ConnectStatus.CONNECTED)
                             }
-
                         }
 
                         override fun onConnectStatusChange(connectStatus: ConnectStatus) {
                             i("onConnectStatusChange connectStatus=$connectStatus")
-                            appVm.changeUploadState(connectStatus)
+                            changeUploadState(connectStatus)
                         }
                     })
                 } else {
-                    appVm.changeUploadState(ConnectStatus.NONE)
+                    changeUploadState(ConnectStatus.NONE)
                 }
             }
         }
+    }
+
+    private fun changeUploadState(connected: ConnectStatus) {
+        appVm.processIntent(AppIntent.UploadStateChange(connected))
     }
 
     /**
@@ -603,6 +620,8 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         }
     }
 
+    data class PrintAnimParams(val formX: Int, val formY: Int, val formWidth: Int)
+
     override fun onMessageEvent(event: EventMsg<Any>) {
         super.onMessageEvent(event)
         when (event.what) {
@@ -617,6 +636,12 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
 
             EventGlobal.WHAT_HOME_INIT_FINISH -> {//首屏加载完毕，执行显示主页面动画
                 showAnimStart()
+            }
+
+            EventGlobal.WHAT_HOME_ADD_PRINT_ANIM -> {//首屏加载完毕，执行显示主页面动画
+                if (event.data is PrintAnimParams) {
+                    addPrintWorkAnim(event.data)
+                }
             }
         }
     }

@@ -18,6 +18,8 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.github.mikephil.charting.data.Entry
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.app.App
+import com.wl.turbidimetric.app.StorageState
+import com.wl.turbidimetric.main.MainActivity
 import com.wl.turbidimetric.model.CurveModel
 import com.wl.turbidimetric.model.MachineTestModel
 import com.wl.turbidimetric.model.ProjectModel
@@ -578,4 +580,44 @@ fun Double.isNotValid(defaultValue: Double = 0.0): Double {
             it
         }
     }
+}
+
+/**
+ * 两种u盘格式互相转换，其实对一对一的
+ * @receiver com.wl.weiqianwllib.upan.StorageState
+ * @return com.wl.turbidimetric.app.StorageState
+ */
+fun com.wl.weiqianwllib.upan.StorageState.toState(): com.wl.turbidimetric.app.StorageState {
+    return when (this) {
+        com.wl.weiqianwllib.upan.StorageState.NONE -> com.wl.turbidimetric.app.StorageState.None
+        com.wl.weiqianwllib.upan.StorageState.INSERTED -> com.wl.turbidimetric.app.StorageState.Inserted
+        com.wl.weiqianwllib.upan.StorageState.EXIST -> com.wl.turbidimetric.app.StorageState.Exist
+        com.wl.weiqianwllib.upan.StorageState.UNAUTHORIZED -> com.wl.turbidimetric.app.StorageState.Unauthorized
+    }
+}
+
+/**
+ * 两种u盘格式互相转换，其实对一对一的
+ * @receiver com.wl.turbidimetric.app.StorageState
+ * @return com.wl.weiqianwllib.upan.StorageState
+ */
+fun com.wl.turbidimetric.app.StorageState.toState(): com.wl.weiqianwllib.upan.StorageState {
+    return when (this) {
+        com.wl.turbidimetric.app.StorageState.None -> com.wl.weiqianwllib.upan.StorageState.NONE
+        com.wl.turbidimetric.app.StorageState.Inserted -> com.wl.weiqianwllib.upan.StorageState.INSERTED
+        com.wl.turbidimetric.app.StorageState.Exist -> com.wl.weiqianwllib.upan.StorageState.EXIST
+        com.wl.turbidimetric.app.StorageState.Unauthorized -> com.wl.weiqianwllib.upan.StorageState.UNAUTHORIZED
+    }
+}
+
+/**
+ * 获取一个View的动画参数 x,y和width
+ * @receiver View
+ * @return MainActivity.PrintAnimParams
+ */
+fun View.getPrintParamsAnim(): MainActivity.PrintAnimParams {
+    val xy = IntArray(2)
+    getLocationInWindow(xy)
+    return MainActivity.PrintAnimParams(xy[0],xy[1],width)
+
 }

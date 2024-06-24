@@ -37,4 +37,8 @@ object EventGlobal {
      * HomeFragment首屏加载完毕
      */
     const val WHAT_HOME_INIT_FINISH = 160
+    /**
+     * 执行打印添加到队列动画
+     */
+    const val WHAT_HOME_ADD_PRINT_ANIM = 170
 }

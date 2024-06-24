@@ -3,6 +3,7 @@ package com.wl.turbidimetric.test.debug.debugSettings
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.wl.turbidimetric.app.AppIntent
 import com.wl.turbidimetric.app.AppViewModel
 import com.wl.turbidimetric.base.BaseViewModel
 import com.wl.turbidimetric.datastore.LocalData
@@ -14,7 +15,7 @@ class DebugSettingsViewModel(private val appViewModel: AppViewModel) : BaseViewM
     val looperTest = MutableLiveData(LocalData.LooperTest)
 
     fun changeLooperTest(looperTest: Boolean) {
-        appViewModel.setLooperTest(looperTest)
+        appViewModel.processIntent(AppIntent.LooperTestChange(looperTest))
     }
 
 

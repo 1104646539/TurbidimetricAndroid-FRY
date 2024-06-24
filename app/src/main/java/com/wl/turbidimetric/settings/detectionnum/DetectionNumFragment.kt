@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.wl.turbidimetric.R
+import com.wl.turbidimetric.app.AppIntent
 import com.wl.turbidimetric.base.BaseFragment
 import com.wl.turbidimetric.databinding.FragmentDetectionNumBinding
 import com.wl.turbidimetric.global.EventGlobal
@@ -31,7 +32,7 @@ class DetectionNumFragment :
     private fun listenerData() {
         lifecycleScope.launch {
             vm.detectionNumUiState.collectLatest {
-                appVm.changeDetectionNum(it.detectionNum)
+                appVm.processIntent(AppIntent.DetectionNumChange(it.detectionNum))
                 vd.tietDetectionNum.setText(it.detectionNum.toString())
                 EventBus.getDefault().post(EventMsg<String>(EventGlobal.WHAT_DETECTION_NUM_CHANGE))
             }

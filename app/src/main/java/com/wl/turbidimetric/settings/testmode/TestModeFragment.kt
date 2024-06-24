@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.wl.turbidimetric.R
+import com.wl.turbidimetric.app.AppIntent
 import com.wl.turbidimetric.base.BaseFragment
 import com.wl.turbidimetric.databinding.FragmentTestModeBinding
 import com.wl.turbidimetric.model.MachineTestModel
@@ -80,7 +81,7 @@ class TestModeFragment :
                 vd.cbSample.isChecked,
                 vd.cbScanCode.isChecked,
             )
-            appVm.changeMachineTestModel(machineTestModel)
+            appVm.processIntent(AppIntent.MachineTestModelChange(machineTestModel))
 
         }
     }

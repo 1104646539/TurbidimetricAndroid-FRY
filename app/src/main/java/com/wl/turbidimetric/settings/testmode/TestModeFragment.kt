@@ -88,6 +88,6 @@ class TestModeFragment :
 
     companion object {
         @JvmStatic
-        val instance: TestModeFragment by lazy { TestModeFragment() }
+        fun newInstance() = TestModeFragment()
     }
 }

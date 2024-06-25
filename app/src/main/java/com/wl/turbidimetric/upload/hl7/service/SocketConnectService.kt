@@ -60,6 +60,10 @@ open class SocketConnectService(successListener: () -> Unit) : AbstractConnectSe
         }
     }
 
+    override fun setOnConnectListener2(onConnectListener: OnConnectListener?) {
+        this.onConnectListener = onConnectListener
+    }
+
 
     override fun disconnect() {
         isConnect = false

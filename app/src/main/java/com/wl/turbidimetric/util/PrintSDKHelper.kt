@@ -20,10 +20,10 @@ import com.wl.wllib.LogToFile.i
  * PrintingSdk
  */
 object PrintSDKHelper {
-    private lateinit var intentApi: IntentAPI
-    private lateinit var printingSdk: PrintingSdk
+    private var intentApi: IntentAPI? = null
+    private var printingSdk: PrintingSdk? = null
     private val packageName1: String = "com.dynamixsoftware.printhand"
-    private lateinit var mContext: Context
+    private var mContext: Context? = null
 
     private var intentApiInitSuccess: Boolean = false
     private var printingSdkInitSuccess: Boolean = false
@@ -36,6 +36,15 @@ object PrintSDKHelper {
             printerStateChange?.invoke(value)
         }
 
+    @JvmStatic
+    fun close() {
+        mContext = null
+        printerStateChange = null
+        printingSdk?.stopService()
+        intentApi?.stopService(intentServiceCallback)
+        printingSdk = null
+        intentApi = null
+    }
 
     @JvmStatic
     fun init(context: Context) {
@@ -49,60 +58,89 @@ object PrintSDKHelper {
         }
     }
 
+    val intentServiceCallback = object : IServiceCallback.Stub() {
+        override fun onServiceConnected() {
+            i("runService onServiceConnected")
+            intentApiInitSuccess = true
+
+        }
+
+        override fun onServiceDisconnected() {
+            i("runService onServiceDisconnected")
+            intentApiInitSuccess = false
+            printerState = PrinterState.InitSdkFailed
+        }
+
+        override fun onRenderLibraryCheck(
+            renderLibrary: Boolean,
+            fontLibrary: Boolean
+        ): Boolean {
+            i("runService onRenderLibraryCheck renderLibrary=$renderLibrary fontLibrary=$fontLibrary")
+            return true
+        }
+
+        override fun onLibraryDownload(progress: Int) {
+            i("runService onLibraryDownload")
+        }
+
+        override fun onFileOpen(progress: Int, finished: Int) {
+            i("runService onFileOpen")
+
+        }
+
+        override fun onPasswordRequired(): String {
+            i("runService onPasswordRequired")
+            return "123456"
+        }
+
+        override fun onError(result: com.dynamixsoftware.intentapi.Result?) {
+            i("runService onError result=$result")
+            intentApiInitSuccess = false
+            printerState = PrinterState.InitSdkFailed
+        }
+    }
+    private val printingServiceCallback = object : com.dynamixsoftware.printingsdk.IServiceCallback {
+        override fun onServiceConnected() {
+            i("startService onServiceConnected")
+            printingSdkInitSuccess = true
+            initRecentPrinters()
+        }
+
+        override fun onServiceDisconnected() {
+            i("startService onServiceDisconnected")
+            printingSdkInitSuccess = false
+        }
+    }
+
     private fun initSdkService() {
-        intentApi.runService(object : IServiceCallback.Stub() {
-            override fun onServiceConnected() {
-                i("runService onServiceConnected")
-                intentApiInitSuccess = true
+        intentApi?.runService(intentServiceCallback)
+        printingSdk?.startService(printingServiceCallback)
+    }
 
-            }
+    private val recentPrinters = object : ISetupPrinterListener.Stub() {
+        override fun start() {
+            i("initRecentPrinters start")
+        }
 
-            override fun onServiceDisconnected() {
-                i("runService onServiceDisconnected")
-                intentApiInitSuccess = false
-                printerState = PrinterState.InitSdkFailed
-            }
+        override fun libraryPackInstallationProcess(percent: Int) {
+            i("initRecentPrinters libraryPackInstallationProcess percent=$percent")
+        }
 
-            override fun onRenderLibraryCheck(
-                renderLibrary: Boolean,
-                fontLibrary: Boolean
-            ): Boolean {
-                i("runService onRenderLibraryCheck renderLibrary=$renderLibrary fontLibrary=$fontLibrary")
-                return true
+        override fun finish(result: Result?) {
+            i("initRecentPrinters finish result=$result")
+            try {
+                if (getCurPrinter() == null) {
+                    printerState = PrinterState.NotPrinter
+                    return
+                }
+                printingSdkRecentSuccess = result == Result.OK
+                if (intentApiInitSuccess && printingSdkInitSuccess && printingSdkRecentSuccess) {
+                    printerState = PrinterState.Success
+                }
+            } catch (e: Exception) {
+                printerState = PrinterState.NotPrinter
             }
-
-            override fun onLibraryDownload(progress: Int) {
-                i("runService onLibraryDownload")
-            }
-
-            override fun onFileOpen(progress: Int, finished: Int) {
-                i("runService onFileOpen")
-
-            }
-
-            override fun onPasswordRequired(): String {
-                i("runService onPasswordRequired")
-                return "123456"
-            }
-
-            override fun onError(result: com.dynamixsoftware.intentapi.Result?) {
-                i("runService onError result=$result")
-                intentApiInitSuccess = false
-                printerState = PrinterState.InitSdkFailed
-            }
-        })
-        printingSdk.startService(object : com.dynamixsoftware.printingsdk.IServiceCallback {
-            override fun onServiceConnected() {
-                i("startService onServiceConnected")
-                printingSdkInitSuccess = true
-                initRecentPrinters()
-            }
-
-            override fun onServiceDisconnected() {
-                i("startService onServiceDisconnected")
-                printingSdkInitSuccess = false
-            }
-        })
+        }
     }
 
     /**
@@ -110,31 +148,7 @@ object PrintSDKHelper {
      */
     fun initRecentPrinters() {
         printerState = PrinterState.NotPrinter
-        printingSdk.initRecentPrinters(object : ISetupPrinterListener.Stub() {
-            override fun start() {
-                i("initRecentPrinters start")
-            }
-
-            override fun libraryPackInstallationProcess(percent: Int) {
-                i("initRecentPrinters libraryPackInstallationProcess percent=$percent")
-            }
-
-            override fun finish(result: Result?) {
-                i("initRecentPrinters finish result=$result")
-                try {
-                    if (getCurPrinter() == null) {
-                        printerState = PrinterState.NotPrinter
-                        return
-                    }
-                    printingSdkRecentSuccess = result == Result.OK
-                    if (intentApiInitSuccess && printingSdkInitSuccess && printingSdkRecentSuccess) {
-                        printerState = PrinterState.Success
-                    }
-                } catch (e: Exception) {
-                    printerState = PrinterState.NotPrinter
-                }
-            }
-        })
+        printingSdk?.initRecentPrinters(recentPrinters)
     }
 
     @JvmStatic
@@ -142,7 +156,8 @@ object PrintSDKHelper {
         return isAvilible(mContext, packageName1)
     }
 
-    private fun isAvilible(context: Context, packageName: String): Boolean {
+    private fun isAvilible(context: Context?, packageName: String): Boolean {
+        if (context == null) return false
         val packageManager = context.packageManager //获取packagemanager
         val pinfo: List<PackageInfo> = packageManager.getInstalledPackages(0) //获取所有已安装程序的包信息
         val pName: MutableList<String> = ArrayList() //用于存储所有已安装程序的包名
@@ -169,7 +184,7 @@ object PrintSDKHelper {
         }
         if (!(printingSdkInitSuccess && intentApiInitSuccess && printingSdkRecentSuccess)) return false
 
-        if (printingSdk.currentPrinter == null) {
+        if (printingSdk?.currentPrinter == null) {
             return false
         }
         return true
@@ -182,21 +197,21 @@ object PrintSDKHelper {
     @JvmStatic
     fun showSetupPrinterUi() {
         if (isInstallApk()) {
-            intentApi.setupCurrentPrinter()
+            intentApi?.setupCurrentPrinter()
         }
     }
 
     @JvmStatic
     fun printImage(pages: List<IPage>, printListener: IPrintListener) {
         i("printImage")
-        printingSdk.print(pages, 1, printListener)
+        printingSdk?.print(pages, 1, printListener)
     }
 
     @JvmStatic
     fun getCurPrinter(): Printer? {
         var p: Printer? = null
         try {
-            p = printingSdk.currentPrinter
+            p = printingSdk?.currentPrinter
         } catch (e: Exception) {
             return null
         }

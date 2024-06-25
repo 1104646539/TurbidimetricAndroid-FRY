@@ -127,7 +127,7 @@ class ParamsViewModel constructor(
 }
 
 class ParamsViewModelFactory(
-    private val localDataSource: LocalDataSource = ServiceLocator.provideLocalDataSource(App.instance!!)
+    private val localDataSource: LocalDataSource = ServiceLocator.provideLocalDataSource()
 ) : ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ParamsViewModel::class.java)) {

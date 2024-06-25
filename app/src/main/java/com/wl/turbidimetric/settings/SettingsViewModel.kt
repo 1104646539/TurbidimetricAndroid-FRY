@@ -24,7 +24,7 @@ class SettingsViewModel constructor(
 }
 
 class SettingsViewModelFactory(
-    private val localDataSource: LocalDataSource = ServiceLocator.provideLocalDataSource(App.instance!!)
+    private val localDataSource: LocalDataSource = ServiceLocator.provideLocalDataSource()
 ) : ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(SettingsViewModel::class.java)) {

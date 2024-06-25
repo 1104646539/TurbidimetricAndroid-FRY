@@ -18,7 +18,7 @@ import java.io.File
 object PrintHelper {
 
     private val queue = WorkQueue<PrintReport>(35000L)
-    lateinit var context: Context
+    var context: Context? = null
     var onSizeChange: ((num: Int) -> Unit)? = null
     var size = queue.queue.size
         private set(value) {
@@ -121,7 +121,8 @@ object PrintHelper {
                 val fWidth = hResolution.toFloat() / 72 * paperWidth
                 val fHeight = fragment.height()
                 i("getBitmapFragment: fWidth=$fWidth fHeight=$fHeight height=$height")
-                val bitmap = Bitmap.createBitmap(fWidth.toInt(), fHeight.toInt(), Bitmap.Config.ARGB_8888)
+                val bitmap =
+                    Bitmap.createBitmap(fWidth.toInt(), fHeight.toInt(), Bitmap.Config.ARGB_8888)
                 val imageBMP: Bitmap = FilesUtils.pdfToBitmaps(
                     context,
                     File(path)

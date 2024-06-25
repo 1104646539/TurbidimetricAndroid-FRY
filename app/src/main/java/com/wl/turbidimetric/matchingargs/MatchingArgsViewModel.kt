@@ -1982,7 +1982,7 @@ class MatchingArgsViewModelFactory(
     private val appViewModel: AppViewModel = getAppViewModel(AppViewModel::class.java),
     private val projectRepository: ProjectSource = ServiceLocator.provideProjectSource(App.instance!!),
     private val curveRepository: CurveSource = ServiceLocator.provideCurveSource(App.instance!!),
-    private val localDataRepository: LocalDataSource = ServiceLocator.provideLocalDataSource(App.instance!!)
+    private val localDataRepository: LocalDataSource = ServiceLocator.provideLocalDataSource()
 ) : ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MatchingArgsViewModel::class.java)) {

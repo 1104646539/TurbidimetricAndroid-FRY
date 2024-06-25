@@ -78,7 +78,6 @@ class ParamsFragment :
 
     companion object {
         @JvmStatic
-//        fun newInstance() = ParamsFragment()
-        val instance: ParamsFragment by lazy { ParamsFragment() }
+        fun newInstance() = ParamsFragment()
     }
 }

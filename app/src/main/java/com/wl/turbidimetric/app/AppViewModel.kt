@@ -1,32 +1,29 @@
 package com.wl.turbidimetric.app
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.wl.turbidimetric.base.BaseViewModel
 import com.wl.turbidimetric.ex.toState
-import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.MachineTestModel
 import com.wl.turbidimetric.model.TestState
 import com.wl.turbidimetric.model.TestType
 import com.wl.turbidimetric.repository.if2.LocalDataSource
 import com.wl.turbidimetric.upload.hl7.util.ConnectStatus
 import com.wl.turbidimetric.util.SerialPortIF
-import com.wl.turbidimetric.util.SerialPortImpl
 import com.wl.wllib.DateUtil
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.Date
-import kotlin.concurrent.timer
 
 /**
  * 全局唯一的ViewModel，用来保存全局通用的属性
  */
-class AppViewModel(val localDataSource: LocalDataSource, val app: Application) :
-    AndroidViewModel(app) {
-    val serialPort: SerialPortIF = SerialPortImpl(SystemGlobal.isCodeDebug)
+class AppViewModel(private val localDataSource: LocalDataSource, val serialPort: SerialPortIF) :
+    ViewModel() {
 
     /**
      * 仪器状态
@@ -132,9 +129,10 @@ class AppViewModel(val localDataSource: LocalDataSource, val app: Application) :
      * 更新当前时间
      */
     private fun listenerTime() {
-        timer("更新时间", false, Date(), 1000 * 10) {
-            viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
+            while (true) {
                 _nowTimeStr.emit(DateUtil.date2Str(Date(), DateUtil.Time6Format))
+                delay(30000)
             }
         }
     }

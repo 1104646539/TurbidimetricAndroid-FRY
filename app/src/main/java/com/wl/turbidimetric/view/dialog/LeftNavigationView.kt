@@ -267,10 +267,10 @@ class LeftNavigationView @JvmOverloads constructor(
             canvas.drawRect(itemRect[index], paintBg)
         } else {
             canvas.drawBitmap(
-                    itemBgBitmap,
-            itemBgSrcRangeRect,
-            itemRect[index],
-            paintBg
+                itemBgBitmap,
+                itemBgSrcRangeRect,
+                itemRect[index],
+                paintBg
             )
         }
     }

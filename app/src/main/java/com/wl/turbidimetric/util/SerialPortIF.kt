@@ -25,6 +25,15 @@ interface SerialPortIF {
     fun allowRunning()
 
     /**
+     * 打开
+     */
+    fun open(scope: CoroutineScope)
+    /**
+     * 关闭
+     */
+    fun close()
+
+    /**
      * 检测状态发生改变
      * @param testState TestState
      */
@@ -211,6 +220,7 @@ interface SerialPortIF {
      */
     fun motor(motorNum: Int, direction: Int, params: Int)
 
+
     /**
      * 创建一个完整的命令
      */
@@ -229,39 +239,3 @@ interface SerialPortIF {
     }
 
 }
-//
-//interface Callback2 {
-//    fun readDataGetMachineStateModel(reply: ReplyModel<GetMachineStateModel>)
-//    fun readDataGetStateModel(reply: ReplyModel<GetStateModel>)
-//    fun readDataMoveSampleShelfModel(reply: ReplyModel<MoveSampleShelfModel>)
-//    fun readDataMoveCuvetteShelfModel(reply: ReplyModel<MoveCuvetteShelfModel>)
-//    fun readDataMoveSampleModel(reply: ReplyModel<MoveSampleModel>)
-//    fun readDataMoveCuvetteDripSampleModel(reply: ReplyModel<MoveCuvetteDripSampleModel>)
-//    fun readDataMoveCuvetteDripReagentModel(reply: ReplyModel<MoveCuvetteDripReagentModel>)
-//    fun readDataMoveCuvetteTestModel(reply: ReplyModel<MoveCuvetteTestModel>)
-//    fun readDataSamplingModel(reply: ReplyModel<SamplingModel>)
-//    fun readDataTakeReagentModel(reply: ReplyModel<TakeReagentModel>)
-//    fun readDataDripSampleModel(reply: ReplyModel<DripSampleModel>)
-//    fun readDataDripReagentModel(reply: ReplyModel<DripReagentModel>)
-//    fun readDataStirModel(reply: ReplyModel<StirModel>)
-//    fun readDataStirProbeCleaningModel(reply: ReplyModel<StirProbeCleaningModel>)
-//    fun readDataSamplingProbeCleaningModelModel(reply: ReplyModel<SamplingProbeCleaningModel>)
-//    fun readDataTestModel(reply: ReplyModel<TestModel>)
-//    fun readDataCuvetteDoorModel(reply: ReplyModel<CuvetteDoorModel>)
-//    fun readDataSampleDoorModel(reply: ReplyModel<SampleDoorModel>)
-//    fun readDataPiercedModel(reply: ReplyModel<PiercedModel>)
-//    fun readDataGetVersionModel(reply: ReplyModel<GetVersionModel>)
-//    fun readDataTempModel(reply: ReplyModel<TempModel>)
-//    fun stateSuccess(cmd: Int, state: Int): Boolean
-//    fun readDataSqueezing(reply: ReplyModel<SqueezingModel>)
-//}
-//
-//fun interface McuUpdateCallBack {
-//    fun readDataMcuUpdate(reply: ReplyModel<McuUpdateModel>)
-//}
-//
-//interface OriginalDataCall {
-//    fun readDataOriginalData(ready: UByteArray)
-//    fun sendOriginalData(ready: UByteArray)
-//}
-

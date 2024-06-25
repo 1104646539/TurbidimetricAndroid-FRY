@@ -1,5 +1,6 @@
 package com.wl.turbidimetric.util
 
+import android.util.Log
 import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.SerialGlobal
 import com.wl.turbidimetric.global.SystemGlobal
@@ -13,6 +14,7 @@ import com.wl.wllib.CRC.VerifyCrc16
 import com.wl.wllib.LogToFile.c
 import com.wl.wllib.LogToFile.i
 import kotlinx.coroutines.*
+import java.lang.ref.WeakReference
 import java.util.*
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.ConcurrentHashMap
@@ -24,9 +26,12 @@ import java.util.concurrent.LinkedBlockingQueue
 class SerialPortImpl(
     private val isCodeDebug: Boolean
 ) : SerialPortIF {
+//    private val scope = externalScope ?: CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+    private var scope: CoroutineScope? = null
     private val serialPort: BaseSerialPort = BaseSerialPort()
 
-    val callback: MutableList<Callback2> = mutableListOf()
+    val callback: MutableList<WeakReference<Callback2>> = mutableListOf()
     val originalCallback: MutableList<OriginalDataCall> = mutableListOf()
     private var data: MutableList<UByte> = mutableListOf<UByte>()
     private val header = arrayOf<UByte>(0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u)
@@ -34,7 +39,7 @@ class SerialPortImpl(
     private val allCount = 8
     var byteArray = ByteArray(100)
     private val responseCommand1: UByte = SerialGlobal.CMD_Response
-    var testState :TestState= TestState.None
+    var testState: TestState = TestState.None
 
     /**
      * 等待发送的命令队列
@@ -79,10 +84,12 @@ class SerialPortImpl(
     private var mOnResult: ((UpdateResult) -> Unit)? = null
 
     init {
-        open()
+        Log.d("SerialPortImpl", "init: ")
+//        open()
     }
 
-    fun open() {
+   override fun open(scope: CoroutineScope) {
+       this.scope = scope
         if (isCodeDebug) {
             TestSerialPort.callback = this::dispatchData
         } else {
@@ -93,7 +100,7 @@ class SerialPortImpl(
         openRetry()
     }
 
-    override fun testStateChange(testState: TestState){
+    override fun testStateChange(testState: TestState) {
         this.testState = testState
     }
 
@@ -139,13 +146,29 @@ class SerialPortImpl(
     }
 
     override fun addCallback(call: Callback2) {
-        callback.add(call)
+        callback.add(WeakReference(call))
     }
 
     override fun removeCallback(call: Callback2) {
-        callback.remove(call)
+        callback?.forEach {
+            it.let { w ->
+                it.get()?.let {
+                    c->
+                    if (c == call) {
+                        callback.remove(w)
+                    }
+                }
+            }
+        }
     }
-
+    override fun close() {
+        scope?.cancel()
+        serialPort?.close()
+        callback?.clear()
+        originalCallback?.clear()
+        mMcuUpdateCallBack = null
+        mOnResult = null
+    }
     override fun addOriginalCallback(call: OriginalDataCall) {
         originalCallback.add(call)
     }
@@ -157,7 +180,9 @@ class SerialPortImpl(
 
     fun callback(call: (Callback2) -> Unit) {
         callback.forEach {
-            call.invoke(it)
+            it.get()?.let {
+                call.invoke(it)
+            }
         }
     }
 
@@ -383,7 +408,7 @@ class SerialPortImpl(
      */
     @OptIn(ExperimentalUnsignedTypes::class)
     private fun openWrite() {
-        GlobalScope.launch {
+        scope?.launch(Dispatchers.IO) {
             launch {
                 while (true) {
                     Thread.sleep(50)
@@ -422,7 +447,7 @@ class SerialPortImpl(
      *
      */
     private fun openRetry() {
-        GlobalScope.launch {
+        scope?.launch(Dispatchers.IO) {
             launch {
                 while (true) {
                     Thread.sleep(50)
@@ -448,73 +473,72 @@ class SerialPortImpl(
      *
      */
     private fun openRead() {
-        GlobalScope.launch {
-            withContext(Dispatchers.IO) {
-                while (true) {
-                    delay(50)
-                    val count = serialPort.read(byteArray, byteArray.size)
-                    if (count > 0) {
-                        val re = byteArray.copyOf(count).toUByteArray()
-                        data.addAll(re)
+        scope?.launch(Dispatchers.IO) {
+            while (true) {
+                delay(50)
+                val count = serialPort.read(byteArray, byteArray.size)
+                if (count > 0) {
+                    val re = byteArray.copyOf(count).toUByteArray()
+                    data.addAll(re)
 //                        c("每次接收的re=${re.toHex()}")
-                    }
-                    if (SystemGlobal.mcuUpdate) {
-                        parseMcuUpdate()
-                        continue
-                    }
-                    if (data.size < hCount + allCount) {
-                        continue
-                    }
-                    i@ for (i in data.indices) {
-                        if (data.size >= hCount + allCount && data[i] == header[0]) {
-                            var k = i
-                            var count = 0
-                            j@ for (element in header) {
-                                if (data[k] == element) {
-                                    count++
-                                    if (hCount == count) {
-                                        //找到了前缀
-                                        val temp: UByteArray =
-                                            data.toUByteArray().copyOfRange(i, k + allCount + 1)
-                                        val ready =
-                                            temp.copyOfRange(temp.size - allCount, temp.size)
-                                        if (temp.size < data.size) {
-                                            val remaining = data.toUByteArray()
-                                                .copyOfRange(k + allCount + 1, data.size)
-                                            data.clear()
-                                            data.addAll(remaining)
-                                        } else {
-                                            data.clear()
-                                        }
+                }
+                if (SystemGlobal.mcuUpdate) {
+                    parseMcuUpdate()
+                    continue
+                }
+                if (data.size < hCount + allCount) {
+                    continue
+                }
+                i@ for (i in data.indices) {
+                    if (data.size >= hCount + allCount && data[i] == header[0]) {
+                        var k = i
+                        var count = 0
+                        j@ for (element in header) {
+                            if (data[k] == element) {
+                                count++
+                                if (hCount == count) {
+                                    //找到了前缀
+                                    val temp: UByteArray =
+                                        data.toUByteArray().copyOfRange(i, k + allCount + 1)
+                                    val ready =
+                                        temp.copyOfRange(temp.size - allCount, temp.size)
+                                    if (temp.size < data.size) {
+                                        val remaining = data.toUByteArray()
+                                            .copyOfRange(k + allCount + 1, data.size)
+                                        data.clear()
+                                        data.addAll(remaining)
+                                    } else {
+                                        data.clear()
+                                    }
 
 //                                        println(
 //                                            "带前缀的 temp=${temp.toHex()} data=${
 //                                                data.toUByteArray().toHex()
 //                                            } ready=${ready.toHex()}"
 //                                        )
-                                        parse(ready)
-                                        break@i
-                                    }
-                                } else {
-                                    i("不对了")
-                                    continue@i
+                                    parse(ready)
+                                    break@i
                                 }
-                                k++
+                            } else {
+                                i("不对了")
+                                continue@i
                             }
-                        } else {
-                            if (!data.isNullOrEmpty()) {
-                                i(
-                                    "data.size ${
-                                        data.toUByteArray().toHex()
-                                    }"
-                                )
-                            }
+                            k++
+                        }
+                    } else {
+                        if (!data.isNullOrEmpty()) {
+                            i(
+                                "data.size ${
+                                    data.toUByteArray().toHex()
+                                }"
+                            )
+                        }
 
 //                            break@i
-                        }
                     }
                 }
             }
+
         }
     }
 
@@ -543,6 +567,7 @@ class SerialPortImpl(
         if (isAllowRunning(data)) {
             sendQueue.add(data)
         }
+        i("writeAsync $originalCallback ${callback.size} ${isCodeDebug}")
     }
 
 
@@ -562,9 +587,8 @@ class SerialPortImpl(
 
 
     private fun write(data: UByteArray) {
-        c("write ${data.toHex()}")
         if (isCodeDebug) {
-            GlobalScope.launch(Dispatchers.IO) {
+            scope?.launch(Dispatchers.IO) {
                 TestSerialPort.testReply(data)
             }
         } else {
@@ -716,7 +740,7 @@ class SerialPortImpl(
     override fun samplingProbeCleaning(samplingProbeCleaningDuration: Int) {
 //        c("发送 取样针清洗")
         if (isCodeDebug) {
-            GlobalScope.launch {
+            scope?.launch(Dispatchers.IO) {
                 delay(300)
                 writeAsync(
                     createCmd(
@@ -787,7 +811,7 @@ class SerialPortImpl(
         r2Volume: Int
     ) {
 //        c("发送 取试剂")
-        GlobalScope.launch {
+        scope?.launch(Dispatchers.IO) {
             if (isCodeDebug) {
                 delay(1000)
             }
@@ -823,7 +847,7 @@ class SerialPortImpl(
     override fun stirProbeCleaning(stirProbeCleaningDuration: Int) {
 //        c("发送 搅拌针清洗")
         if (isCodeDebug) {
-            GlobalScope.launch {
+            scope?.launch(Dispatchers.IO) {
                 delay(300)
                 writeAsync(
                     createCmd(
@@ -850,7 +874,7 @@ class SerialPortImpl(
     override fun test() {
 //        c("发送 检测")
         if (isCodeDebug) {
-            GlobalScope.launch {
+            scope?.launch(Dispatchers.IO) {
 //                delay(10000)
                 writeAsync(createCmd(SerialGlobal.CMD_Test))
             }
@@ -1006,6 +1030,8 @@ class SerialPortImpl(
             )
         )
     }
+
+
 
     /**
      * 创建一个完整的命令

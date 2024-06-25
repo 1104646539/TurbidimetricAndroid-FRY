@@ -106,6 +106,6 @@ class ReportFragment :
 
     companion object {
         @JvmStatic
-        val instance: ReportFragment by lazy { ReportFragment() }
+        fun newInstance() = ReportFragment()
     }
 }

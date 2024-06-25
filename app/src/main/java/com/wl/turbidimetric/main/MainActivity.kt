@@ -31,14 +31,16 @@ import androidx.core.animation.addListener
 import androidx.lifecycle.lifecycleScope
 import com.lxj.xpopup.XPopup
 import com.wl.turbidimetric.R
+import com.wl.turbidimetric.app.App
 import com.wl.turbidimetric.app.AppIntent
 import com.wl.turbidimetric.app.MachineState
 import com.wl.turbidimetric.app.PrinterState
 import com.wl.turbidimetric.base.BaseActivity
 import com.wl.turbidimetric.databinding.ActivityMainBinding
-import com.wl.turbidimetric.ex.toState
+import com.wl.turbidimetric.ex.getResource
 import com.wl.turbidimetric.global.EventGlobal
 import com.wl.turbidimetric.global.EventMsg
+import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.main.splash.SplashFragment
 import com.wl.turbidimetric.upload.hl7.HL7Helper
 import com.wl.turbidimetric.upload.hl7.util.ConnectResult
@@ -47,6 +49,7 @@ import com.wl.turbidimetric.upload.service.OnConnectListener
 import com.wl.turbidimetric.util.ActivityDataBindingDelegate
 import com.wl.turbidimetric.util.PrintHelper
 import com.wl.turbidimetric.util.PrintSDKHelper
+import com.wl.turbidimetric.util.ScanCodeUtil
 import com.wl.turbidimetric.view.CustomBubbleAttachPopup
 import com.wl.turbidimetric.view.dialog.HiltDialog
 import com.wl.turbidimetric.view.dialog.isShow
@@ -60,7 +63,6 @@ import com.wl.wllib.ktxRunOnBgCache
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.greenrobot.eventbus.EventBus
@@ -97,6 +99,9 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        if(savedInstanceState == null){
+            App.instance?.serialPort?.open(lifecycleScope)
+        }
         setTheme(R.style.Theme_Mvvmdemo) //恢复原有的样式
         super.onCreate(savedInstanceState)
     }
@@ -153,6 +158,19 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        ScanCodeUtil.onScanResult = null
+        App.instance?.serialPort?.close()
+        unregisterReceiver(usbFlashDiskReceiver)
+        unregisterReceiver(mUsbReceiver)
+        PrintSDKHelper.printerStateChange = null
+        PrintHelper.onSizeChange = null
+        PrintSDKHelper.close()
+        HL7Helper.setOnConnectListener2(null)
+        HL7Helper.disconnect()
+    }
+
     private fun handleUriPermission(treeUri: Uri) {
         try {
             grantUriPermission(
@@ -175,6 +193,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     }
 
     override fun init() {
+        initShutDown()
         showSplash()
         listener()
         initNavigation()
@@ -183,12 +202,6 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         initUploadClient()
         initPrintSDK()
         OrderUtil.showHideNav(this, false)
-        vd.ivStart.postDelayed({
-            //如果10s还没有隐藏就直接执行隐藏
-            if (vd.ivStart.visibility == View.VISIBLE) {
-                showAnimStart()
-            }
-        }, 10000)
     }
 
     private fun showAnimStart() {
@@ -357,7 +370,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     }
 
     private fun listenerView() {
-        lifecycleScope.launch {
+        lifecycleScope.launchWhenCreated {
             launch {
                 appVm.nowTimeStr.collectLatest {
                     vd.tnv.setTime(it)
@@ -511,7 +524,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         if (mPermissionIntent == null) {
 //            //其他设备权限的广播
             mPermissionIntent = PendingIntent.getBroadcast(
-                this,
+                App.instance,
                 USB_PERMISSION_REQUEST_CODE,
                 Intent(StorageUtil.ACTION_USB_PERMISSION),
                 PendingIntent.FLAG_IMMUTABLE
@@ -530,8 +543,8 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
             registerReceiver(usbFlashDiskReceiver, usbFilter)
         }
 
-        lifecycleScope.launch {
-            StorageUtil.startInit(this@MainActivity) { allow: Boolean ->
+        lifecycleScope.launchWhenCreated {
+            StorageUtil.startInit(App.instance!!) { allow: Boolean ->
                 Log.d(TAG, "listenerSDCard allow=$allow")
                 if (!allow) {
                     sendShowOpenDocumentTreeIntent()
@@ -573,8 +586,8 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     }
 
     private fun initUploadClient() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            delay(3000)
+        lifecycleScope.launchWhenCreated {
+            delay(10000)
             withContext(Dispatchers.Main) {
                 if (HL7Helper.getConfig().openUpload) {
                     HL7Helper.connect(object : OnConnectListener {
@@ -588,6 +601,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
                         override fun onConnectStatusChange(connectStatus: ConnectStatus) {
                             i("onConnectStatusChange connectStatus=$connectStatus")
                             changeUploadState(connectStatus)
+                            SystemGlobal.connectStatus = connectStatus
                         }
                     })
                 } else {

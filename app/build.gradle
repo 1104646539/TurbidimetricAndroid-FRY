@@ -32,7 +32,7 @@ android {
         minSdk 24
         targetSdk 32
         versionCode 1
-        versionName "1.0.0.0-31修改关机动画改为对话框"
+        versionName "1.0.0.0-32修复软件闪退后不能再次打开的问题"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 
@@ -232,4 +232,7 @@ dependencies {
     //printhand
     implementation 'com.dynamixsoftware.intentapi:intentAPI:12'
     implementation 'com.dynamixsoftware.printingsdk:printingSDK:12'
+    //内存泄露检测
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.10'
+
 }

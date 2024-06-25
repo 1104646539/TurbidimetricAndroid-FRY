@@ -36,7 +36,7 @@ class ProjectDetailsActivity :
         vd.nav.setTitle("项目详情")
         id = intent.getLongExtra(ID, 0)
         if (id > 0) {
-            lifecycleScope.launchWhenStarted {
+            lifecycleScope.launchWhenCreated {
                 project = vm.getProjectModelForId(id)
 
                 if (project == null) {
@@ -59,7 +59,7 @@ class ProjectDetailsActivity :
     }
 
     private fun listenerView() {
-        lifecycleScope.launchWhenStarted {
+        lifecycleScope.launchWhenCreated {
             vm.project.observe(this@ProjectDetailsActivity) {
                 if (it != null) {
                     vd.etProjectName.setText(project?.projectName ?: "")
@@ -74,7 +74,7 @@ class ProjectDetailsActivity :
                 }
             }
         }
-        lifecycleScope.launchWhenStarted {
+        lifecycleScope.launchWhenCreated {
             vm.dialogState.collectLatest { state->
                 when (state.dialogState) {
                     ProjectDetailsDialogState.NONE -> {

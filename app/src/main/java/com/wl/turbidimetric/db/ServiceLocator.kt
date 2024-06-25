@@ -26,7 +26,7 @@ object ServiceLocator {
         }
     }
 
-    fun provideLocalDataSource(context: Context): LocalDataSource {
+    fun provideLocalDataSource(): LocalDataSource {
         synchronized(this) {
             return localDataSource ?: DefaultLocalDataDataSource().apply {
                 localDataSource = this

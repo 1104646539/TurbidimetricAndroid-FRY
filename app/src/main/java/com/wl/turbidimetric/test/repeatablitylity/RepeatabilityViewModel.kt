@@ -1410,7 +1410,7 @@ class RepeatabilityViewModelFactory(
     private val appViewModel: AppViewModel = getAppViewModel(AppViewModel::class.java),
     private val curveRepository: CurveSource = ServiceLocator.provideCurveSource(App.instance!!),
     private val testResultRepository: TestResultSource = ServiceLocator.provideTestResultSource(App.instance!!),
-    private val localDataRepository: LocalDataSource = ServiceLocator.provideLocalDataSource(App.instance!!)
+    private val localDataRepository: LocalDataSource = ServiceLocator.provideLocalDataSource()
 ) :
     ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

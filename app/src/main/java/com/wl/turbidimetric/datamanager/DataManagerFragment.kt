@@ -13,19 +13,32 @@ import androidx.recyclerview.widget.RecyclerView
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.base.BaseFragment
 import com.wl.turbidimetric.databinding.FragmentDataManagerBinding
-import com.wl.turbidimetric.ex.calcShowTestResult
 import com.wl.turbidimetric.ex.getPrintParamsAnim
-import com.wl.turbidimetric.ex.toast
+import com.wl.turbidimetric.global.EventGlobal
+import com.wl.turbidimetric.global.EventMsg
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.ConditionModel
 import com.wl.turbidimetric.model.TestResultAndCurveModel
+import com.wl.turbidimetric.print.PrintUtil
 import com.wl.turbidimetric.upload.hl7.HL7Helper
+import com.wl.turbidimetric.util.ExportExcelHelper
+import com.wl.turbidimetric.util.ExportReportHelper
+import com.wl.turbidimetric.util.PrintHelper
 import com.wl.turbidimetric.util.PrintSDKHelper
-import com.wl.turbidimetric.view.dialog.*
+import com.wl.turbidimetric.view.dialog.ConditionDialog
+import com.wl.turbidimetric.view.dialog.HiltDialog
+import com.wl.turbidimetric.view.dialog.ResultDetailsDialog
+import com.wl.turbidimetric.view.dialog.isShow
+import com.wl.turbidimetric.view.dialog.showPop
 import com.wl.wllib.LogToFile.i
 import com.wl.wllib.LogToFile.u
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.greenrobot.eventbus.EventBus
 
 
 /**
@@ -207,7 +220,7 @@ class DataManagerFragment :
 
     private fun exportReport() {
         val data = getSelectData()
-        vm.processIntent(DataManagerViewModel.DataManagerIntent.ExportExcelSelected(data))
+        vm.processIntent(DataManagerViewModel.DataManagerIntent.ExportReportSelected(data))
     }
 
     private fun delete() {
@@ -220,7 +233,12 @@ class DataManagerFragment :
      */
     private fun upload() {
         val results = getSelectData()
-        vm.processIntent(DataManagerViewModel.DataManagerIntent.UploadSelected(results))
+        vm.processIntent(
+            DataManagerViewModel.DataManagerIntent.Upload(
+                HL7Helper.isConnected(),
+                results
+            )
+        )
     }
 
 
@@ -250,7 +268,7 @@ class DataManagerFragment :
 
         lifecycleScope.launchWhenCreated {
             launch {
-                vm.exportExcelUIState.collectLatest {
+                vm.exportExcelUIState.collectLatest { it ->
                     when (it) {
                         is DataManagerViewModel.ExportExcelUIState.Failed -> {
                             waitDialog.showPop(requireContext(), isCancelable = false) { dialog ->
@@ -260,12 +278,19 @@ class DataManagerFragment :
                             }
                         }
 
-                        DataManagerViewModel.ExportExcelUIState.Loading -> {
+                        is DataManagerViewModel.ExportExcelUIState.Export -> {
                             waitDialog.showPop(requireContext(), isCancelable = false) { dialog ->
                                 dialog.showDialog(
                                     "正在导出,请等待……",
                                     confirmText = "",
                                     confirmClick = {})
+                            }
+                            launch(Dispatchers.IO) {
+                                ExportExcelHelper.export(requireContext(), it.item, onSuccess = {
+                                    vm.exportExcelSuccess("导出成功,文件保存在 $it")
+                                }, onFailed = {
+                                    vm.exportExcelFailed("导出失败,$it")
+                                })
                             }
                         }
 
@@ -294,7 +319,11 @@ class DataManagerFragment :
                             }
                         }
 
-                        DataManagerViewModel.PrintUIState.Loading -> {}
+                        is DataManagerViewModel.PrintUIState.Print -> {
+                            PrintUtil.printTest(it.items)
+                            vm.printSuccess("打印成功")
+                        }
+
                         DataManagerViewModel.PrintUIState.None -> {}
                         is DataManagerViewModel.PrintUIState.Success -> {
 
@@ -311,7 +340,12 @@ class DataManagerFragment :
                             }
                         }
 
-                        DataManagerViewModel.PrintReportUIState.Loading -> {}
+                        is DataManagerViewModel.PrintReportUIState.PrintReport -> {
+                            PrintHelper.addPrintWork(it.items, appVm.getHospitalName(), false)
+                            EventBus.getDefault()
+                                .post(EventMsg(EventGlobal.WHAT_HOME_ADD_PRINT_ANIM, it.params))
+                        }
+
                         is DataManagerViewModel.PrintReportUIState.NoSelectedPrinter -> {
                             waitDialog.showPop(requireContext(), isCancelable = false) { dialog ->
                                 dialog.showDialog(it.msg, "选择打印机", {
@@ -329,27 +363,41 @@ class DataManagerFragment :
                 }
             }
             launch {
-                vm.exportReportSelectedUIState.collectLatest {
+                vm.exportReportUIState.collectLatest {
                     when (it) {
-                        is DataManagerViewModel.ExportReportSelectedUIState.Failed -> {
+                        is DataManagerViewModel.ExportReportUIState.Failed -> {
                             waitDialog.showPop(requireContext(), isCancelable = false) { dialog ->
                                 dialog.showDialog(it.err, "确定", { dialog.dismiss() })
                             }
                         }
 
-                        DataManagerViewModel.ExportReportSelectedUIState.Loading -> {
+                        is DataManagerViewModel.ExportReportUIState.Export -> {
                             waitDialog.showPop(requireContext(), isCancelable = false) { dialog ->
                                 dialog.showDialog("正在导出报告，请稍后……")
                             }
+                            launch(Dispatchers.IO) {
+                                ExportReportHelper.exportReport(
+                                    requireContext(),
+                                    it.item,
+                                    appVm.getHospitalName(),
+                                    lifecycleScope,
+                                    false,
+                                    { count, successCount, failedCount ->
+                                        vm.exportReportSuccess("导出报告完成，本次导出总数${count}条,成功${successCount}条,失败${failedCount}条")
+                                    }, { err ->
+                                        vm.exportReportFailed("导出报告失败 $err")
+                                    }
+                                )
+                            }
                         }
 
-                        DataManagerViewModel.ExportReportSelectedUIState.None -> {
+                        DataManagerViewModel.ExportReportUIState.None -> {
 
                         }
 
-                        is DataManagerViewModel.ExportReportSelectedUIState.Success -> {
+                        is DataManagerViewModel.ExportReportUIState.Success -> {
                             waitDialog.showPop(requireContext(), isCancelable = false) { dialog ->
-                                dialog.showDialog(it.msg)
+                                dialog.showDialog(it.msg, "确定", { dialog.dismiss() })
                             }
                         }
                     }
@@ -365,9 +413,14 @@ class DataManagerFragment :
                             }
                         }
 
-                        DataManagerViewModel.UploadUIState.Loading -> {
+                        is DataManagerViewModel.UploadUIState.Upload -> {
                             waitDialog.showPop(requireContext(), isCancelable = false) { dialog ->
                                 dialog.showDialog("正在上传，请稍后……")
+                            }
+                            launch(Dispatchers.IO) {
+                                HL7Helper.uploadTestResult(it.items) { count, success, failed ->
+                                    vm.uploadResultSuccess("上传结束，本次上传共${count}条，成功${success}条,失败${failed}条")
+                                }
                             }
                         }
 

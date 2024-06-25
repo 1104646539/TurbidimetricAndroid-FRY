@@ -92,6 +92,6 @@ class NetworkFragment :
 
     companion object {
         @JvmStatic
-        val instance: NetworkFragment by lazy { NetworkFragment() }
+        fun newInstance() = NetworkFragment()
     }
 }

@@ -561,13 +561,13 @@ private fun resolveDefaultReturnValue(method: Method): Any? {
     }
 }
 
-fun Activity.transitionTo(i: Intent?) {
-    val pairs: Array<Pair<View, String>> =
-        arrayOf()
-    val transitionActivityOptions =
-        ActivityOptionsCompat.makeSceneTransitionAnimation(this, *pairs)
-    this.startActivity(i, transitionActivityOptions.toBundle())
-}
+//fun Activity.transitionTo(i: Intent?) {
+//    val pairs: Array<Pair<View, String>> =
+//        arrayOf()
+//    val transitionActivityOptions =
+//        ActivityOptionsCompat.makeSceneTransitionAnimation(this, *pairs)
+//    this.startActivity(i, transitionActivityOptions.toBundle())
+//}
 
 /**
  * 如果一个Double不是有效的值，例如Nan或无穷，则返回默认的值

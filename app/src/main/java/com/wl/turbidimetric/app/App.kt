@@ -3,6 +3,7 @@ package com.wl.turbidimetric.app
 import android.app.Activity
 import android.app.Application
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStore
@@ -23,6 +24,8 @@ import com.wl.turbidimetric.util.ExportReportHelper
 import com.wl.turbidimetric.util.FitterType
 import com.wl.turbidimetric.util.PdfCreateUtil
 import com.wl.turbidimetric.util.PrintHelper
+import com.wl.turbidimetric.util.SerialPortIF
+import com.wl.turbidimetric.util.SerialPortImpl
 import com.wl.wllib.LogToFile
 import com.wl.wllib.ToastUtil
 import com.wl.wllib.ktxRunOnBgCache
@@ -41,6 +44,13 @@ class App : Application() {
         super.attachBaseContext(base)
     }
 
+    val serialPort: SerialPortIF by lazy {
+        SerialPortImpl(
+            SystemGlobal.isCodeDebug,
+        )
+
+    }
+
     override fun onCreate() {
         super.onCreate()
         instance = this
@@ -49,17 +59,15 @@ class App : Application() {
         initData()
         ktxRunOnBgCache {
             PrintHelper.context = this@App
-//            DBManager.init(this)
             initDataStore()
             LogToFile.init()
-//            UploadUtil.open()
             initPop()
 //
-            //没有项目参数的时候，添加一个默认参数
+//            没有项目参数的时候，添加一个默认参数
             initDB()
-            //记录当前的版本
+//            记录当前的版本
             initVersion()
-            //删除检测报告的缓存
+//            删除检测报告的缓存
             PdfCreateUtil.deleteCacheFolder(File(ExportReportHelper.defaultReportSavePath))
         }
     }
@@ -172,6 +180,7 @@ class App : Application() {
 
     companion object {
         var instance: App? = null
+        const val TAG = "App"
     }
 
     //添加Activity到容器中
@@ -196,7 +205,7 @@ class App : Application() {
         private val viewModelStore = ViewModelStore()
         private val viewModelProvider: ViewModelProvider by lazy {
             ViewModelProvider(
-                this, AppViewModelFactory(app = App.instance!!)
+                this, AppViewModelFactory()
             )
         }
 
@@ -210,12 +219,11 @@ class App : Application() {
     }
 
     class AppViewModelFactory(
-        private val localDataDataSource: LocalDataSource = ServiceLocator.provideLocalDataSource(App.instance!!),
-        private val app: Application
+        private val localDataDataSource: LocalDataSource = ServiceLocator.provideLocalDataSource(),
     ) : ViewModelProvider.NewInstanceFactory() {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(AppViewModel::class.java)) {
-                return AppViewModel(localDataDataSource, app) as T
+                return AppViewModel(localDataDataSource, App.instance!!.serialPort) as T
             }
             throw IllegalArgumentException("Unknown ViewModel class")
         }

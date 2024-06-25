@@ -10,7 +10,7 @@ import android.widget.Toast
  */
 object ToastUtil {
     private var context: Context? = null
-    val toast: Toast by lazy { Toast.makeText(context, "", Toast.LENGTH_SHORT) }
+    val toast: Toast by lazy { Toast.makeText(context!!.applicationContext, "", Toast.LENGTH_SHORT) }
 
     fun init(context: Context) {
         this.context = context

@@ -113,28 +113,28 @@ class SettingsFragment constructor() :
         }
         vd.sivParamsSetting.setOnClickListener {
             u("参数设置")
-            changeContent(ParamsFragment.instance)
+            changeContent(ParamsFragment::class.java)
             vd.wgpSelectable.setSelected(it.id)
         }
         vd.sivDetectionNumSetting.setOnClickListener {
             u("编号设置")
-            changeContent(DetectionNumFragment.instance)
+            changeContent(DetectionNumFragment::class.java)
             vd.wgpSelectable.setSelected(it.id)
         }
 
         vd.sivMachineTestMode.setOnClickListener {
             u("检测模式设置")
-            changeContent(TestModeFragment.instance)
+            changeContent(TestModeFragment::class.java)
             vd.wgpSelectable.setSelected(it.id)
         }
         vd.sivMachineNetwork.setOnClickListener {
             u("本机网络设置")
-            changeContent(NetworkFragment.instance)
+            changeContent(NetworkFragment::class.java)
             vd.wgpSelectable.setSelected(it.id)
         }
         vd.sivReportSettings.setOnClickListener {
             u("报告设置")
-            changeContent(ReportFragment.instance)
+            changeContent(ReportFragment::class.java)
             vd.wgpSelectable.setSelected(it.id)
         }
 
@@ -221,10 +221,8 @@ class SettingsFragment constructor() :
     }
 
     var curFragment: Fragment? = null
-    private fun changeContent(fragment: Fragment) {
-        if (curFragment != null && curFragment == fragment) {
-            return
-        }
+    private  fun <T:Fragment> changeContent (classFragment: Class<T>) {
+
         val bt = childFragmentManager.beginTransaction()
         bt.setCustomAnimations(
             R.anim.card_flip_right_in,
@@ -236,11 +234,18 @@ class SettingsFragment constructor() :
             bt.hide(curFragment!!)
             curFragment = null
         }
-
-        if (childFragmentManager.findFragmentByTag(fragment::class.java.name) == null) {
-            bt.add(R.id.fl_content, fragment, fragment::class.java.name).show(fragment)
-        } else {
-            bt.show(fragment)
+        var fragment: Fragment? = null
+        childFragmentManager.findFragmentByTag(classFragment.name).let { it ->
+            fragment = it
+            if(fragment == null){
+                fragment = classFragment.newInstance()
+                bt.add(R.id.fl_content, fragment!!, classFragment.name).show(fragment!!)
+            }else{
+                if (curFragment != null && fragment == curFragment) {
+                    return
+                }
+                bt.show(fragment!!)
+            }
         }
         curFragment = fragment
 
@@ -248,9 +253,13 @@ class SettingsFragment constructor() :
         bt.commit()
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        curFragment = null
+    }
 
     private fun projectList() {
-        requireActivity().transitionTo(Intent(requireActivity(), ProjectListActivity::class.java))
+        requireActivity().startActivity(Intent(requireActivity(), ProjectListActivity::class.java))
     }
 
     /**
@@ -261,7 +270,7 @@ class SettingsFragment constructor() :
             toast("正在检测，请稍后")
             return
         }
-        requireActivity().transitionTo(Intent(requireContext(), DebugActivity::class.java))
+        requireActivity().startActivity(Intent(requireContext(), DebugActivity::class.java))
     }
 
     /**
@@ -316,11 +325,11 @@ class SettingsFragment constructor() :
     }
 
     private fun startUpload() {
-        requireActivity().transitionTo(Intent(requireContext(), UploadSettingsActivity::class.java))
+        requireActivity().startActivity(Intent(requireContext(), UploadSettingsActivity::class.java))
     }
 
     private fun showLauncher() {
-        requireActivity().transitionTo(getLauncher())
+        requireActivity().startActivity(getLauncher())
     }
 
     /**
@@ -347,7 +356,7 @@ class SettingsFragment constructor() :
             toast("正在检测，请稍后")
             return
         }
-        requireActivity().transitionTo(
+        requireActivity().startActivity(
             Intent(requireContext(), TestActivity::class.java).putExtra(
                 TestActivity.flag, TestActivity.flag_Repeatability
             )

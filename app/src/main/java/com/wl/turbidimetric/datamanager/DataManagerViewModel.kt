@@ -12,30 +12,20 @@ import com.wl.turbidimetric.base.BaseViewModel
 import com.wl.turbidimetric.db.ServiceLocator
 import com.wl.turbidimetric.ex.calcShowTestResult
 import com.wl.turbidimetric.ex.getAppViewModel
-import com.wl.turbidimetric.global.EventGlobal
-import com.wl.turbidimetric.global.EventMsg
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.main.MainActivity.PrintAnimParams
 import com.wl.turbidimetric.model.ConditionModel
 import com.wl.turbidimetric.model.TestResultAndCurveModel
 import com.wl.turbidimetric.model.TestResultModel
-import com.wl.turbidimetric.print.PrintUtil
 import com.wl.turbidimetric.repository.if2.ProjectSource
 import com.wl.turbidimetric.repository.if2.TestResultSource
-import com.wl.turbidimetric.upload.hl7.HL7Helper
-import com.wl.turbidimetric.util.ExportExcelHelper
-import com.wl.turbidimetric.util.ExportReportHelper
-import com.wl.turbidimetric.util.PrintHelper
 import com.wl.turbidimetric.util.PrintSDKHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import org.greenrobot.eventbus.EventBus
 
 
 class DataManagerViewModel(
@@ -62,9 +52,9 @@ class DataManagerViewModel(
     val printUIState = _printUIState.asStateFlow()
     private val _printReportUIState = MutableStateFlow<PrintReportUIState>(PrintReportUIState.None)
     val printReportUIState = _printReportUIState.asStateFlow()
-    private val _exportReportSelectedUiState =
-        MutableStateFlow<ExportReportSelectedUIState>(ExportReportSelectedUIState.None)
-    val exportReportSelectedUIState = _exportReportSelectedUiState.asStateFlow()
+    private val _exportReportUiState =
+        MutableStateFlow<ExportReportUIState>(ExportReportUIState.None)
+    val exportReportUIState = _exportReportUiState.asStateFlow()
     private val _uploadUIState = MutableStateFlow<UploadUIState>(UploadUIState.None)
     val uploadUIState = _uploadUIState.asStateFlow()
     private val _deleteResultUIState =
@@ -148,8 +138,8 @@ class DataManagerViewModel(
                 exportReport(intent.items)
             }
 
-            is DataManagerIntent.UploadSelected -> {
-                upload(intent.items)
+            is DataManagerIntent.Upload -> {
+                upload(intent.isConnected, intent.items)
             }
 
             is DataManagerIntent.DeleteResult -> {
@@ -212,17 +202,14 @@ class DataManagerViewModel(
         }
     }
 
-    private fun upload(items: List<TestResultAndCurveModel>) {
+    private fun upload(isConnected: Boolean, items: List<TestResultAndCurveModel>) {
         viewModelScope.launch {
-            _uploadUIState.emit(UploadUIState.Loading)
             dataUploadVerify(items).also { verifyRet ->
                 if (verifyRet.isEmpty()) {
-                    if (HL7Helper.isConnected()) {
-                        HL7Helper.uploadTestResult(items) { count, success, failed ->
-                            launch {
-                                _uploadUIState.emit(UploadUIState.Success("上传结束，本次上传共${count}条，成功${success}条,失败${failed}条"))
-                            }
-                        }
+                    if (isConnected) {
+                        _uploadUIState.emit(UploadUIState.Upload(items))
+                    } else {
+                        _uploadUIState.emit(UploadUIState.Failed("上传未连接"))
                     }
                 } else {
                     _uploadUIState.emit(UploadUIState.Failed(verifyRet))
@@ -256,35 +243,11 @@ class DataManagerViewModel(
 
     private fun exportReport(items: List<TestResultAndCurveModel>) {
         viewModelScope.launch {
-            _exportReportSelectedUiState.emit(ExportReportSelectedUIState.Loading)
             dataEmptyVerify(items).also { verifyRet ->
                 if (verifyRet.isEmpty()) {
-                    ExportReportHelper.exportReport(
-                        appViewModel.getApplication(),
-                        items,
-                        appViewModel.getHospitalName(),
-                        viewModelScope,
-                        false,
-                        { count, successCount, failedCount ->
-                            launch {
-                                _exportReportSelectedUiState.emit(
-                                    ExportReportSelectedUIState.Success(
-                                        "导出报告完成，本次导出总数${count}条,成功${successCount}条,失败${failedCount}条"
-                                    )
-                                )
-                            }
-                        }, { err ->
-                            launch {
-                                _exportReportSelectedUiState.emit(
-                                    ExportReportSelectedUIState.Success(
-                                        "导出报告失败 $err"
-                                    )
-                                )
-                            }
-                        }
-                    )
+                    _exportReportUiState.emit(ExportReportUIState.Export(items))
                 } else {
-                    _exportReportSelectedUiState.emit(ExportReportSelectedUIState.Failed(verifyRet))
+                    _exportReportUiState.emit(ExportReportUIState.Failed(verifyRet))
                 }
             }
         }
@@ -292,15 +255,11 @@ class DataManagerViewModel(
 
     private fun printReport(params: PrintAnimParams, items: List<TestResultAndCurveModel>) {
         viewModelScope.launch {
-            _printReportUIState.emit(PrintReportUIState.Loading)
             dataEmptyVerify(items).also { verifyRet ->
                 if (verifyRet.isEmpty()) {
                     when (PrintSDKHelper.printerState) {
                         PrinterState.Success -> {
-                            PrintHelper.addPrintWork(items, appViewModel.getHospitalName(), false)
-                            EventBus.getDefault()
-                                .post(EventMsg(EventGlobal.WHAT_HOME_ADD_PRINT_ANIM, params))
-                            _printReportUIState.emit(PrintReportUIState.Success("添加到打印队列成功"))
+                            _printReportUIState.emit(PrintReportUIState.PrintReport(params, items))
                         }
 
                         PrinterState.None, PrinterState.InitSdkFailed -> {
@@ -340,34 +299,61 @@ class DataManagerViewModel(
     ) {
 
         viewModelScope.launch(Dispatchers.IO) {
-            //step1、显示加载框
-            _exportExcelUIState.emit(ExportExcelUIState.Loading)
-            //step2、 获取数据
+
+            //step1、 获取数据
             val data = if (exportAll) {
                 val condition = conditionModel.value
                 getFilterAll(condition)
             } else {
                 items
             }
-            //step3、 验证 导出 等待结果
+            //step2、 验证 导出 等待结果
             val err = exportExcelVerify(data)
             if (err.isEmpty()) {
-                ExportExcelHelper.export(
-                    appViewModel.getApplication(),
-                    data,
-                    { msg ->
-                        launch(Dispatchers.Main) {
-                            _exportExcelUIState.emit(ExportExcelUIState.Success("导出成功,文件保存在 $msg"))
-                        }
-                    },
-                    { error ->
-                        launch(Dispatchers.Main) {
-                            _exportExcelUIState.emit(ExportExcelUIState.Failed("导出失败,$error"))
-                        }
-                    })
+                _exportExcelUIState.emit(ExportExcelUIState.Export(data))
             } else {
                 _exportExcelUIState.emit(ExportExcelUIState.Failed("导出失败,$err"))
             }
+        }
+    }
+
+    /**
+     * 导出excel成功
+     * @param msg String
+     */
+    fun exportExcelSuccess(msg: String) {
+        viewModelScope.launch(Dispatchers.Main) {
+            _exportExcelUIState.emit(ExportExcelUIState.Success(msg))
+        }
+    }
+
+    /**
+     * 导出excel失败
+     * @param error String
+     */
+    fun exportExcelFailed(error: String) {
+        viewModelScope.launch(Dispatchers.Main) {
+            _exportExcelUIState.emit(ExportExcelUIState.Failed(error))
+        }
+    }
+
+    /**
+     * 导出报告成功
+     * @param msg String
+     */
+    fun exportReportSuccess(msg: String) {
+        viewModelScope.launch(Dispatchers.Main) {
+            _exportReportUiState.emit(ExportReportUIState.Success(msg))
+        }
+    }
+
+    /**
+     * 导出报告失败
+     * @param error String
+     */
+    fun exportReportFailed(error: String) {
+        viewModelScope.launch(Dispatchers.Main) {
+            _exportReportUiState.emit(ExportReportUIState.Failed(error))
         }
     }
 
@@ -392,11 +378,9 @@ class DataManagerViewModel(
      */
     private fun print(items: List<TestResultAndCurveModel>) {
         viewModelScope.launch {
-            _printUIState.emit(PrintUIState.Loading)
             dataEmptyVerify(items).also { ret ->
                 if (ret.isEmpty()) {
-                    PrintUtil.printTest(items)
-                    _printUIState.emit(PrintUIState.Success())
+                    _printUIState.emit(PrintUIState.Print(items))
                 } else {
                     _printUIState.emit(PrintUIState.Failed(ret))
                 }
@@ -405,10 +389,40 @@ class DataManagerViewModel(
         }
     }
 
+    /**
+     * 上传完成
+     * @param msg String
+     */
+    fun uploadResultSuccess(msg: String) {
+        viewModelScope.launch {
+            _uploadUIState.emit(UploadUIState.Success(msg))
+        }
+    }
+
+    /**
+     * 打印热敏成功
+     * @param msg String
+     */
+    fun printSuccess(msg: String) {
+        viewModelScope.launch {
+            _printUIState.emit(PrintUIState.Success(msg))
+        }
+    }
+
+    /**
+     * 打印热敏失败
+     * @param msg String
+     */
+    fun printFailed(msg: String) {
+        viewModelScope.launch {
+            _printUIState.emit(PrintUIState.Failed(msg))
+        }
+    }
+
 
     sealed class ExportExcelUIState {
         object None : ExportExcelUIState()
-        object Loading : ExportExcelUIState()
+        data class Export(val item: List<TestResultAndCurveModel>) : ExportExcelUIState()
         data class Success(val msg: String) : ExportExcelUIState()
         data class Failed(val err: String) : ExportExcelUIState()
     }
@@ -416,21 +430,21 @@ class DataManagerViewModel(
 
     sealed class PrintUIState {
         object None : PrintUIState()
-        object Loading : PrintUIState()
+        data class Print(val items: List<TestResultAndCurveModel>) : PrintUIState()
         data class Success(val msg: String = "") : PrintUIState()
         data class Failed(val err: String) : PrintUIState()
     }
 
-    sealed class ExportReportSelectedUIState {
-        object None : ExportReportSelectedUIState()
-        object Loading : ExportReportSelectedUIState()
-        data class Success(val msg: String = "") : ExportReportSelectedUIState()
-        data class Failed(val err: String) : ExportReportSelectedUIState()
+    sealed class ExportReportUIState {
+        object None : ExportReportUIState()
+        data class Export(val item: List<TestResultAndCurveModel>) : ExportReportUIState()
+        data class Success(val msg: String = "") : ExportReportUIState()
+        data class Failed(val err: String) : ExportReportUIState()
     }
 
     sealed class UploadUIState {
         object None : UploadUIState()
-        object Loading : UploadUIState()
+        data class Upload(val items: List<TestResultAndCurveModel>) : UploadUIState()
         data class Success(val msg: String = "") : UploadUIState()
         data class Failed(val err: String) : UploadUIState()
     }
@@ -438,7 +452,11 @@ class DataManagerViewModel(
 
     sealed class PrintReportUIState {
         object None : PrintReportUIState()
-        object Loading : PrintReportUIState()
+        data class PrintReport(
+            val params: PrintAnimParams,
+            val items: List<TestResultAndCurveModel>
+        ) : PrintReportUIState()
+
         data class Success(val msg: String = "") : PrintReportUIState()
         data class NoSelectedPrinter(val msg: String = "") : PrintReportUIState()
         data class Failed(val err: String) : PrintReportUIState()
@@ -481,7 +499,10 @@ class DataManagerViewModel(
         data class ExportReportSelected(val items: List<TestResultAndCurveModel>) :
             DataManagerIntent()
 
-        data class UploadSelected(val items: List<TestResultAndCurveModel>) :
+        data class Upload(
+            val isConnected: Boolean,
+            val items: List<TestResultAndCurveModel>
+        ) :
             DataManagerIntent()
 
         data class DeleteResult(val items: List<TestResultAndCurveModel>) :

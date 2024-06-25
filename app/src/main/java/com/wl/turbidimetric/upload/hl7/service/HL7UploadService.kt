@@ -301,6 +301,10 @@ class HL7UploadService : UploadService {
         connectService.connect(config, onConnectListener)
     }
 
+    override fun setOnConnectListener2(onConnectListener: OnConnectListener?) {
+        connectService.setOnConnectListener2(onConnectListener)
+    }
+
 
     override fun disconnect() {
         connectService.disconnect()

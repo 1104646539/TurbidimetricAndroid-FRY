@@ -96,16 +96,11 @@ object HL7Helper : UploadService {
         config: ConnectConfig, onConnectListener: OnConnectListener?
     ) {
         if (!config.openUpload) return
-        uploadService.connect(config, object : OnConnectListener {
-            override fun onConnectResult(connectResult: ConnectResult) {
-                onConnectListener?.onConnectResult(connectResult)
-            }
+        uploadService.connect(config, onConnectListener)
+    }
 
-            override fun onConnectStatusChange(connectStatus: ConnectStatus) {
-                onConnectListener?.onConnectStatusChange(connectStatus)
-                SystemGlobal.connectStatus = connectStatus
-            }
-        })
+    override fun setOnConnectListener2(onConnectListener: OnConnectListener?) {
+        uploadService?.setOnConnectListener2(onConnectListener)
     }
 
     fun connect(onConnectListener: OnConnectListener?) {
@@ -116,12 +111,14 @@ object HL7Helper : UploadService {
         }
     }
 
+
     fun getConfig(): ConnectConfig {
         return SystemGlobal.uploadConfig
     }
 
     override fun disconnect() {
         uploadService.disconnect()
+        handler.removeCallbacksAndMessages(null)
     }
 
     override fun isConnected(): Boolean {
@@ -234,6 +231,9 @@ object HL7Helper : UploadService {
 
         }
 
+        override fun setOnConnectListener2(onConnectListener: OnConnectListener?) {
+        }
+
         override fun disconnect() {
             uploadService.disconnect()
         }
@@ -343,6 +343,9 @@ object HL7Helper : UploadService {
             config: ConnectConfig, onConnectListener: OnConnectListener?
         ) {
 
+        }
+
+        override fun setOnConnectListener2(onConnectListener: OnConnectListener?) {
         }
 
         override fun disconnect() {

@@ -187,7 +187,15 @@ class HL7ConnectService : ConnectService {
 
 
         return Patient(
-            name, age, sexHl7ToNormal(sex), deliveryTime, deliveryDoctor, deliveryDepartments, bc, sn, tdh
+            name,
+            age,
+            sexHl7ToNormal(sex),
+            deliveryTime,
+            deliveryDoctor,
+            deliveryDepartments,
+            bc,
+            sn,
+            tdh
         )
     }
 
@@ -316,10 +324,17 @@ class HL7ConnectService : ConnectService {
         return condition.invoke(ret)
     }
 
+    var onConnectListener: OnConnectListener? = null
     override fun connect(config: ConnectConfig, onConnectListener: OnConnectListener?) {
+        setOnConnectListener2(onConnectListener)
         disconnect()//连接前先断开以前的连接
         connectService = ConnectServiceFactory.create(config) { startListener() }
         connectService?.connect(config, onConnectListener)
+    }
+
+    override fun setOnConnectListener2(onConnectListener: OnConnectListener?) {
+        this.onConnectListener = onConnectListener
+        connectService?.setOnConnectListener2(onConnectListener)
     }
 
     override fun disconnect() {

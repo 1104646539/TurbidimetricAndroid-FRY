@@ -1,5 +1,6 @@
 package com.wl.turbidimetric.home
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -78,6 +79,7 @@ import com.wl.turbidimetric.util.OnScanResult
 import com.wl.turbidimetric.util.PrintHelper
 import com.wl.turbidimetric.util.PrintSDKHelper
 import com.wl.turbidimetric.util.ScanCodeUtil
+import com.wl.turbidimetric.util.SerialPortImpl
 import com.wl.wllib.LogToFile.c
 import com.wl.wllib.LogToFile.i
 import kotlinx.coroutines.Dispatchers
@@ -111,9 +113,6 @@ class HomeViewModel(
      * 自检
      */
     fun goGetMachineState() {
-//        viewModelScope.launch(Dispatchers.IO) {
-//            _dialogUiState.emit(HomeDialogUiState.GetMachineShow)
-//        }
         appViewModel.testState = TestState.GetMachineState
         getMachineState()
     }
@@ -123,9 +122,18 @@ class HomeViewModel(
     }
 
     private fun listener() {
+        if (appViewModel.serialPort is SerialPortImpl) {
+            appViewModel.serialPort.apply {
+                i("listener ${originalCallback} ${callback.size}")
+            }
+        }
         appViewModel.serialPort.addCallback(this)
         ScanCodeUtil.onScanResult = this
-
+        if (appViewModel.serialPort is SerialPortImpl) {
+            appViewModel.serialPort.apply {
+                i("listener2 ${originalCallback} ${callback.size}")
+            }
+        }
         listenerTempState()
     }
 
@@ -550,11 +558,12 @@ class HomeViewModel(
      * 一直获取温度状态
      */
     private fun listenerTempState() {
-        viewModelScope.launch {
-            timer("", true, Date(), 30000) {
+        viewModelScope.launch(Dispatchers.IO) {
+            while (true) {
                 if (allowTemp && !appViewModel.testState.isRunningError()) {
                     appViewModel.serialPort.getTemp()
                 }
+                delay(30000)
             }
         }
     }
@@ -3176,7 +3185,7 @@ class HomeViewModelFactory(
     private val projectRepository: ProjectSource = ServiceLocator.provideProjectSource(App.instance!!),
     private val curveRepository: CurveSource = ServiceLocator.provideCurveSource(App.instance!!),
     private val testResultRepository: TestResultSource = ServiceLocator.provideTestResultSource(App.instance!!),
-    private val localDataRepository: LocalDataSource = ServiceLocator.provideLocalDataSource(App.instance!!)
+    private val localDataRepository: LocalDataSource = ServiceLocator.provideLocalDataSource()
 ) : ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(HomeViewModel::class.java)) {

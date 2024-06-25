@@ -52,7 +52,7 @@ class ReportViewModel(private val localDataDataSource: LocalDataSource) : BaseVi
 }
 
 class ReportViewModelFactory(
-    private val localDataDataSource: LocalDataSource = ServiceLocator.provideLocalDataSource(App.instance!!)
+    private val localDataDataSource: LocalDataSource = ServiceLocator.provideLocalDataSource()
 ) : ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ReportViewModel::class.java)) {

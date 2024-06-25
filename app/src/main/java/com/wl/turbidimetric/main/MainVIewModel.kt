@@ -1,6 +1,5 @@
 package com.wl.turbidimetric.main
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -16,20 +15,21 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.lang.ref.WeakReference
 
-class MainViewModel(private val appViewModel: AppViewModel) : BaseViewModel() {
+class MainViewModel(private val appViewModel: WeakReference<AppViewModel>) : BaseViewModel() {
     /**
      * 关机命令
      */
     private fun shutdown() {
-        appViewModel.serialPort.shutdown()
+        appViewModel.get()?.serialPort?.shutdown()
     }
 
     /**
      * 不允许发送命令
      */
     private fun allowRunning() {
-        appViewModel.serialPort.allowRunning()
+        appViewModel.get()?.serialPort?.allowRunning()
     }
 
     private var curIndex = 0
@@ -66,30 +66,39 @@ class MainViewModel(private val appViewModel: AppViewModel) : BaseViewModel() {
 
     private fun showPopupViewForUploadState() {
         viewModelScope.launch {
-            _uiState.emit(MainState.ShowPopupViewForUploadState(appViewModel.uploadState.first()))
+            appViewModel.get()?.let { appViewModel ->
+                _uiState.emit(MainState.ShowPopupViewForUploadState(appViewModel.uploadState.first()))
+            }
         }
     }
 
     private fun showPopupViewForStorageState() {
         viewModelScope.launch {
-            _uiState.emit(MainState.ShowPopupViewForStorageState(appViewModel.storageState.first()))
+            appViewModel.get()?.let { appViewModel ->
+                _uiState.emit(MainState.ShowPopupViewForStorageState(appViewModel.storageState.first()))
+            }
         }
     }
 
     private fun showPopupViewForMachineState() {
         viewModelScope.launch {
-            _uiState.emit(MainState.ShowPopupViewForMachineState(appViewModel.machineState.first()))
+            appViewModel.get()?.let { appViewModel ->
+                _uiState.emit(MainState.ShowPopupViewForMachineState(appViewModel.machineState.first()))
+            }
         }
     }
 
     private fun showPopupViewForPrinterState() {
         viewModelScope.launch {
-            _uiState.emit(
-                MainState.ShowPopupViewForPrinterState(
-                    appViewModel.printerState.first(),
-                    appViewModel.printNum.first()
+            appViewModel.get()?.let { appViewModel ->
+                _uiState.emit(
+                    MainState.ShowPopupViewForPrinterState(
+                        appViewModel.printerState.first(),
+                        appViewModel.printNum.first()
+                    )
                 )
-            )
+            }
+
         }
     }
 
@@ -101,7 +110,7 @@ class MainViewModel(private val appViewModel: AppViewModel) : BaseViewModel() {
     }
 
     private fun listenerTime() {
-        appViewModel.processIntent(AppIntent.ListenerTime)
+        appViewModel.get()?.processIntent(AppIntent.ListenerTime)
     }
 
     private fun changeNavCurIndex(index: Int) {
@@ -112,7 +121,7 @@ class MainViewModel(private val appViewModel: AppViewModel) : BaseViewModel() {
     }
 
     private fun changeStorageState(state: StorageState) {
-        appViewModel.processIntent(AppIntent.StorageStateChange(state))
+        appViewModel.get()?.processIntent(AppIntent.StorageStateChange(state))
     }
 }
 
@@ -149,7 +158,7 @@ class MainViewModelFactory(
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
             return MainViewModel(
-                appViewModel
+                WeakReference(appViewModel)
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")

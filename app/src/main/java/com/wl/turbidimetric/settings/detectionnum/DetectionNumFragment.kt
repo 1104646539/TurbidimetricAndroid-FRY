@@ -77,7 +77,6 @@ class DetectionNumFragment :
 
     companion object {
         @JvmStatic
-//        fun newInstance() = ParamsFragment()
-        val instance: DetectionNumFragment by lazy { DetectionNumFragment() }
+        fun newInstance() = DetectionNumFragment()
     }
 }

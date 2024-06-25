@@ -411,6 +411,7 @@ class UploadSettingsActivity :
 
             override fun onConnectStatusChange(connectStatus: ConnectStatus) {
                 i("onConnectStatusChange connectStatus=$connectStatus")
+                SystemGlobal.connectStatus = connectStatus
             }
         })
 

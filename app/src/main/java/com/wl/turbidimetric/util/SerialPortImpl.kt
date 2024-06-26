@@ -567,7 +567,6 @@ class SerialPortImpl(
         if (isAllowRunning(data)) {
             sendQueue.add(data)
         }
-        i("writeAsync $originalCallback ${callback.size} ${isCodeDebug}")
     }
 
 

@@ -666,6 +666,17 @@ class HomeViewModel(
         cons.clear()
         resultModels.clear()
         resultModelsForSample.clear()
+        //初始化跳过的比色皿
+        initSkipCuvetteResultModels()
+    }
+
+    /**
+     * 初始化跳过的比色皿，添加空的检测结果让比色皿的下标和检测结果的下标同步
+     */
+    private fun initSkipCuvetteResultModels() {
+        for (i in 0 until cuvetteStartPos) {
+            resultModels.add(null)
+        }
     }
 
     /**
@@ -997,6 +1008,24 @@ class HomeViewModel(
             //最后一个样本，并且不需要取样时，下一步
             nextStepDripReagent()
         }
+    }
+
+    /**
+     * 判断是否是最后一个比色皿。
+     * 1、直接是最后一排，
+     * 1.1 最后一个 返回是
+     * 1.2 不是最后一个
+     * 1.2.1 正在移动比色皿，并且是倒数第二个 返回是
+     * 1.2.2 没有在移动比色皿 返回否
+     * 2、不是最后一排 返回否
+     * @return Any
+     */
+    private fun lastCuvette(): Boolean {
+        var last =
+            (lastCuvetteShelf(cuvetteShelfPos) && lastCuvettePos(cuvettePos)) || (lastCuvetteShelf(
+                cuvetteShelfPos
+            ) && (cuvettePos == 9) && !cuvetteMoveFinish)
+        return last
     }
 
     /**

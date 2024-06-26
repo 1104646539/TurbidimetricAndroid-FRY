@@ -89,16 +89,13 @@ class MatchingConfigLayout : FrameLayout {
     private var spnProjectAdapter: SpnSampleAdapter? = null
     private var spnFitterTypeAdapter: SpnSampleAdapter? = null
 
-    private var rlRoot: ViewGroup? = null
-
 
     //5个梯度可以自动稀释或人工稀释
     //6个梯度只能人工稀释
     //人工稀释时才可以手动输入目标浓度，自动稀释则是按照固定的浓度比例去稀释
     fun initView() {
-        if (rlRoot != null) return
+        if (swQuality != null) return
 
-        rlRoot = findViewById(R.id.rl_root)
         swQuality = findViewById(R.id.sw_quality)
         etReagentNo = findViewById(R.id.et_reagent_no)
         spnProject = findViewById(R.id.spn_project)
@@ -140,6 +137,8 @@ class MatchingConfigLayout : FrameLayout {
         targetCons: List<Double> = mutableListOf()
     ) {
         initView()
+        this.projects.clear()
+        this.projectNames.clear()
 
         this.reagentNoStr = reagentNo
         this.quality = quality

@@ -313,6 +313,8 @@ class MatchingStateLayout : FrameLayout {
     ) {
         initView()
         listenerView()
+        this.targets.clear()
+        this.means.clear()
 
         this.curProject = curProject
         this.gradsNum = gradsNum

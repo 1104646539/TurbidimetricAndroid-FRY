@@ -341,7 +341,7 @@ class DataManagerFragment :
                         }
 
                         is DataManagerViewModel.PrintReportUIState.PrintReport -> {
-                            PrintHelper.addPrintWork(it.items, appVm.getHospitalName(), false)
+                            PrintHelper.addPrintWork(it.items, appVm.getHospitalName(), appVm.getReportFileNameBarcode())
                             EventBus.getDefault()
                                 .post(EventMsg(EventGlobal.WHAT_HOME_ADD_PRINT_ANIM, it.params))
                         }
@@ -381,7 +381,7 @@ class DataManagerFragment :
                                     it.item,
                                     appVm.getHospitalName(),
                                     lifecycleScope,
-                                    false,
+                                    appVm.getReportFileNameBarcode(),
                                     { count, successCount, failedCount ->
                                         vm.exportReportSuccess("导出报告完成，本次导出总数${count}条,成功${successCount}条,失败${failedCount}条")
                                     }, { err ->

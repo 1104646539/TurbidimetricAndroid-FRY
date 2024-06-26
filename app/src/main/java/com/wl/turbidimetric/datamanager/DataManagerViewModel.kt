@@ -22,8 +22,10 @@ import com.wl.turbidimetric.repository.if2.TestResultSource
 import com.wl.turbidimetric.util.PrintSDKHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
@@ -46,26 +48,26 @@ class DataManagerViewModel(
     private val _resultSize = MutableStateFlow(0L)
     val resultSize: StateFlow<Long> = _resultSize.asStateFlow()
 
-    private val _exportExcelUIState = MutableStateFlow<ExportExcelUIState>(ExportExcelUIState.None)
-    val exportExcelUIState = _exportExcelUIState.asStateFlow()
-    private val _printUIState = MutableStateFlow<PrintUIState>(PrintUIState.None)
-    val printUIState = _printUIState.asStateFlow()
-    private val _printReportUIState = MutableStateFlow<PrintReportUIState>(PrintReportUIState.None)
-    val printReportUIState = _printReportUIState.asStateFlow()
+    private val _exportExcelUIState = MutableSharedFlow<ExportExcelUIState>()
+    val exportExcelUIState = _exportExcelUIState.asSharedFlow()
+    private val _printUIState = MutableSharedFlow<PrintUIState>()
+    val printUIState = _printUIState.asSharedFlow()
+    private val _printReportUIState = MutableSharedFlow<PrintReportUIState>()
+    val printReportUIState = _printReportUIState.asSharedFlow()
     private val _exportReportUiState =
-        MutableStateFlow<ExportReportUIState>(ExportReportUIState.None)
-    val exportReportUIState = _exportReportUiState.asStateFlow()
-    private val _uploadUIState = MutableStateFlow<UploadUIState>(UploadUIState.None)
-    val uploadUIState = _uploadUIState.asStateFlow()
+        MutableSharedFlow<ExportReportUIState>()
+    val exportReportUIState = _exportReportUiState.asSharedFlow()
+    private val _uploadUIState = MutableSharedFlow<UploadUIState>()
+    val uploadUIState = _uploadUIState.asSharedFlow()
     private val _deleteResultUIState =
-        MutableStateFlow<DeleteResultUIState>(DeleteResultUIState.None)
-    val deleteResultUIState = _deleteResultUIState.asStateFlow()
+        MutableSharedFlow<DeleteResultUIState>()
+    val deleteResultUIState = _deleteResultUIState.asSharedFlow()
     private val _resultDetailsUIState =
-        MutableStateFlow<ResultDetailsUIState>(ResultDetailsUIState.None)
-    val resultDetailsUIState = _resultDetailsUIState.asStateFlow()
+        MutableSharedFlow<ResultDetailsUIState>()
+    val resultDetailsUIState = _resultDetailsUIState.asSharedFlow()
     private val _conditionUIState =
-        MutableStateFlow<ConditionUIState>(ConditionUIState.None)
-    val conditionUIState = _conditionUIState.asStateFlow()
+        MutableSharedFlow<ConditionUIState>()
+    val conditionUIState = _conditionUIState.asSharedFlow()
 
     fun item(condition: ConditionModel): Flow<PagingData<TestResultAndCurveModel>> {
         viewModelScope.launch {
@@ -421,7 +423,6 @@ class DataManagerViewModel(
 
 
     sealed class ExportExcelUIState {
-        object None : ExportExcelUIState()
         data class Export(val item: List<TestResultAndCurveModel>) : ExportExcelUIState()
         data class Success(val msg: String) : ExportExcelUIState()
         data class Failed(val err: String) : ExportExcelUIState()
@@ -429,21 +430,18 @@ class DataManagerViewModel(
 
 
     sealed class PrintUIState {
-        object None : PrintUIState()
         data class Print(val items: List<TestResultAndCurveModel>) : PrintUIState()
         data class Success(val msg: String = "") : PrintUIState()
         data class Failed(val err: String) : PrintUIState()
     }
 
     sealed class ExportReportUIState {
-        object None : ExportReportUIState()
         data class Export(val item: List<TestResultAndCurveModel>) : ExportReportUIState()
         data class Success(val msg: String = "") : ExportReportUIState()
         data class Failed(val err: String) : ExportReportUIState()
     }
 
     sealed class UploadUIState {
-        object None : UploadUIState()
         data class Upload(val items: List<TestResultAndCurveModel>) : UploadUIState()
         data class Success(val msg: String = "") : UploadUIState()
         data class Failed(val err: String) : UploadUIState()
@@ -451,7 +449,6 @@ class DataManagerViewModel(
 
 
     sealed class PrintReportUIState {
-        object None : PrintReportUIState()
         data class PrintReport(
             val params: PrintAnimParams,
             val items: List<TestResultAndCurveModel>
@@ -463,7 +460,6 @@ class DataManagerViewModel(
     }
 
     sealed class DeleteResultUIState {
-        object None : DeleteResultUIState()
         object Loading : DeleteResultUIState()
         object ShowDialog : DeleteResultUIState()
         data class Success(val msg: String = "") : DeleteResultUIState()
@@ -471,14 +467,12 @@ class DataManagerViewModel(
     }
 
     sealed class ResultDetailsUIState {
-        object None : ResultDetailsUIState()
         data class ShowDialog(val item: TestResultAndCurveModel) : ResultDetailsUIState()
         data class Success(val msg: String = "") : ResultDetailsUIState()
         data class Failed(val err: String) : ResultDetailsUIState()
     }
 
     sealed class ConditionUIState {
-        object None : ConditionUIState()
         data class ShowDialog(val condition: ConditionModel) : ConditionUIState()
     }
 

@@ -294,10 +294,6 @@ class DataManagerFragment :
                             }
                         }
 
-                        DataManagerViewModel.ExportExcelUIState.None -> {
-
-                        }
-
                         is DataManagerViewModel.ExportExcelUIState.Success -> {
                             waitDialog.showPop(requireContext(), isCancelable = false) { dialog ->
                                 dialog.showDialog(it.msg, "确定", { d ->
@@ -324,7 +320,6 @@ class DataManagerFragment :
                             vm.printSuccess("打印成功")
                         }
 
-                        DataManagerViewModel.PrintUIState.None -> {}
                         is DataManagerViewModel.PrintUIState.Success -> {
 
                         }
@@ -355,7 +350,6 @@ class DataManagerFragment :
                             }
                         }
 
-                        DataManagerViewModel.PrintReportUIState.None -> {}
                         is DataManagerViewModel.PrintReportUIState.Success -> {
 
                         }
@@ -391,10 +385,6 @@ class DataManagerFragment :
                             }
                         }
 
-                        DataManagerViewModel.ExportReportUIState.None -> {
-
-                        }
-
                         is DataManagerViewModel.ExportReportUIState.Success -> {
                             waitDialog.showPop(requireContext(), isCancelable = false) { dialog ->
                                 dialog.showDialog(it.msg, "确定", { dialog.dismiss() })
@@ -424,7 +414,6 @@ class DataManagerFragment :
                             }
                         }
 
-                        DataManagerViewModel.UploadUIState.None -> {}
                         is DataManagerViewModel.UploadUIState.Success -> {
                             waitDialog.showPop(requireContext(), isCancelable = false) { dialog ->
                                 dialog.showDialog(it.msg, "确定", { dialog.dismiss() })
@@ -444,7 +433,6 @@ class DataManagerFragment :
                         }
 
                         DataManagerViewModel.DeleteResultUIState.Loading -> {}
-                        DataManagerViewModel.DeleteResultUIState.None -> {}
                         DataManagerViewModel.DeleteResultUIState.ShowDialog -> {
                             waitDialog.showPop(requireContext(), isCancelable = false) { dialog ->
                                 dialog.showDialog(
@@ -476,7 +464,6 @@ class DataManagerFragment :
                             i("${it.err}")
                         }
 
-                        DataManagerViewModel.ResultDetailsUIState.None -> {}
                         is DataManagerViewModel.ResultDetailsUIState.ShowDialog -> {
                             resultDialog.showPop(requireContext(), isCancelable = false) { dialog ->
                                 dialog.showDialog(it.item, SystemGlobal.isDebugMode) { result ->
@@ -499,11 +486,8 @@ class DataManagerFragment :
             }
             launch {
                 vm.conditionUIState.collectLatest {
+                    i("conditionUIState $it")
                     when (it) {
-                        DataManagerViewModel.ConditionUIState.None -> {
-
-                        }
-
                         is DataManagerViewModel.ConditionUIState.ShowDialog -> {
                             conditionDialog.showPop(
                                 requireContext(),

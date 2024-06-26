@@ -32,7 +32,7 @@ android {
         minSdk 24
         targetSdk 32
         versionCode 1
-        versionName "1.0.0.0-34修复数据管理弹窗第二次不显示的问题"
+        versionName "1.0.0.0-35修复跳过比色皿时检测结果错乱的问题"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 

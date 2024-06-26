@@ -139,6 +139,7 @@ class HomeViewModel(
 
     /**
      * 检测结果 这排每个比色皿对应的
+     * 跳过的也会添加，值为null
      */
     val resultModels = arrayListOf<TestResultAndCurveModel?>()
 
@@ -1132,7 +1133,7 @@ class HomeViewModel(
         testResult?.let { mCuvetteStates[cuvetteShelfPos]!![cuvettePos].testResult = testResult }
         samplePos?.let { mCuvetteStates[cuvetteShelfPos]!![cuvettePos].id = samplePos }
         _cuvetteStates.value = mCuvetteStates.copyOf()
-        i("updateCuvetteState2 ShelfPos=$cuvetteShelfPos cuvettePos=$cuvettePos cuvetteStates=${mCuvetteStates.print()}")
+        i("updateCuvetteState2 ShelfPos=$cuvetteShelfPos cuvettePos=$cuvettePos cuvetteStates=${mCuvetteStates.print()} testResult=$testResult")
     }
 
 
@@ -1367,16 +1368,22 @@ class HomeViewModel(
      * 计算结果
      */
     private fun calcTestResult(value: Int) {
+//        * cuvetteCorrPos 比色皿的下标【cuvettePos】，用来找到当前位置对应的结果
+//        * 在有跳过比色皿时，cuvetteCorrPos不包含跳过的比色皿数量
+        var cuvetteCorrPos = cuvettePos
+        if (cuvetteStartPos > 0 && isFirstCuvetteShelf()) {
+            cuvetteCorrPos -= cuvetteStartPos
+        }
         when (appViewModel.testState) {
             TestState.DripReagent -> {
                 updateCuvetteState(cuvettePos - 5, CuvetteState.Test1)
-                updateTestResultModel(value, cuvettePos - 5, CuvetteState.Test1)
+                updateTestResultModel(value, cuvettePos - 5, cuvetteCorrPos - 5, CuvetteState.Test1)
                 nextDripReagent()
             }
 
             TestState.Test2 -> {
                 updateCuvetteState(cuvettePos, CuvetteState.Test2)
-                updateTestResultModel(value, cuvettePos, CuvetteState.Test2)
+                updateTestResultModel(value, cuvettePos, cuvetteCorrPos, CuvetteState.Test2)
                 selectFocChange(
                     cuvetteShelfPos,
                     cuvettePos,
@@ -1393,7 +1400,7 @@ class HomeViewModel(
 
             TestState.Test3 -> {
                 updateCuvetteState(cuvettePos, CuvetteState.Test3)
-                updateTestResultModel(value, cuvettePos, CuvetteState.Test3)
+                updateTestResultModel(value, cuvettePos, cuvetteCorrPos, CuvetteState.Test3)
                 selectFocChange(
                     cuvetteShelfPos,
                     cuvettePos,
@@ -1410,7 +1417,7 @@ class HomeViewModel(
 
             TestState.Test4 -> {
                 updateCuvetteState(cuvettePos, CuvetteState.Test4)
-                updateTestResultModel(value, cuvettePos, CuvetteState.Test4)
+                updateTestResultModel(value, cuvettePos, cuvetteCorrPos, CuvetteState.Test4)
                 selectFocChange(
                     cuvetteShelfPos,
                     cuvettePos,
@@ -1431,72 +1438,86 @@ class HomeViewModel(
 
     /**
      * 更新检测结果
+     * @param value Int 检测值
+     * @param resultIndex Int resultModels的下标，用来找到当前位置对应的TestResult
+     * @param cuvetteCorrPos Int 比色皿的下标【cuvettePos】，用来找到当前位置对应的结果
+     * @param state CuvetteState
+     * 在没有跳过比色皿时，resultIndex 和 cuvetteCorrPos 是一致的。
+     * 在有跳过比色皿时，resultIndex是绝对位置，而cuvetteCorrPos不包含跳过的比色皿数量
+     *
      */
-    private fun updateTestResultModel(value: Int, index: Int, state: CuvetteState) {
-        var pos = index
-        i("updateTestResultModel pos=$pos size=${resultModels.size}")
-        if (cuvetteStartPos > 0 && isFirstCuvetteShelf()) {
-            pos -= cuvetteStartPos
-        }
-        if (pos < 0 || pos >= resultModels.size) {
+    private fun updateTestResultModel(
+        value: Int,
+        resultIndex: Int,
+        cuvetteCorrPos: Int,
+        state: CuvetteState
+    ) {
+        i("updateTestResultModel resultIndex=$resultIndex cuvetteCorrPos=$cuvetteCorrPos size=${resultModels.size} cuvetteStartPos=$cuvetteStartPos isFirstCuvetteShelf=${isFirstCuvetteShelf()}")
+        if (resultIndex < 0 || resultIndex >= resultModels.size || cuvetteCorrPos < 0 || cuvetteCorrPos >= 10) {
             return
         }
-        val resultIndex = pos
         when (state) {
             CuvetteState.Test1 -> {
                 if (SystemGlobal.isCodeDebug) {
-                    resultTest1.add(testValues1[pos].toBigDecimal())
-                    resultOriginalTest1.add(testOriginalValues1[pos])
+                    resultTest1.add(testValues1[cuvetteCorrPos].toBigDecimal())
+                    resultOriginalTest1.add(testOriginalValues1[cuvetteCorrPos])
                 } else {
                     resultOriginalTest1.add(value)
                     resultTest1.add(calcAbsorbance(value.toBigDecimal()))
                 }
-                resultModels[resultIndex]?.result?.testValue1 = resultTest1[pos]
-                resultModels[resultIndex]?.result?.testOriginalValue1 = resultOriginalTest1[pos]
+                resultModels[resultIndex]?.result?.testValue1 = resultTest1[cuvetteCorrPos]
+                resultModels[resultIndex]?.result?.testOriginalValue1 =
+                    resultOriginalTest1[cuvetteCorrPos]
 
-                mCuvetteStates[cuvetteShelfPos]?.get(pos)?.testResult =
+                mCuvetteStates[cuvetteShelfPos]?.get(resultIndex)?.testResult =
                     resultModels[resultIndex]?.result
                 _cuvetteStates.value = mCuvetteStates
             }
 
             CuvetteState.Test2 -> {
                 if (SystemGlobal.isCodeDebug) {
-                    resultTest2.add(testValues2[pos].toBigDecimal())
-                    resultOriginalTest2.add(testOriginalValues2[pos])
+                    resultTest2.add(testValues2[cuvetteCorrPos].toBigDecimal())
+                    resultOriginalTest2.add(testOriginalValues2[cuvetteCorrPos])
                 } else {
                     resultOriginalTest2.add(value)
                     resultTest2.add(calcAbsorbance(value.toBigDecimal()))
                 }
-                resultModels[resultIndex]?.result?.testValue2 = resultTest2[pos]
-                resultModels[resultIndex]?.result?.testOriginalValue2 = resultOriginalTest2[pos]
+                resultModels[resultIndex]?.result?.testValue2 = resultTest2[cuvetteCorrPos]
+                resultModels[resultIndex]?.result?.testOriginalValue2 =
+                    resultOriginalTest2[cuvetteCorrPos]
             }
 
             CuvetteState.Test3 -> {
                 if (SystemGlobal.isCodeDebug) {
-                    resultTest3.add(testValues3[pos].toBigDecimal())
-                    resultOriginalTest3.add(testOriginalValues3[pos])
+                    resultTest3.add(testValues3[cuvetteCorrPos].toBigDecimal())
+                    resultOriginalTest3.add(testOriginalValues3[cuvetteCorrPos])
                 } else {
                     resultOriginalTest3.add(value)
                     resultTest3.add(calcAbsorbance(value.toBigDecimal()))
                 }
-                resultModels[resultIndex]?.result?.testValue3 = resultTest3[pos]
-                resultModels[resultIndex]?.result?.testOriginalValue3 = resultOriginalTest3[pos]
+                resultModels[resultIndex]?.result?.testValue3 = resultTest3[cuvetteCorrPos]
+                resultModels[resultIndex]?.result?.testOriginalValue3 =
+                    resultOriginalTest3[cuvetteCorrPos]
             }
 
             CuvetteState.Test4 -> {
                 if (SystemGlobal.isCodeDebug) {
-                    resultTest4.add(testValues4[pos].toBigDecimal())
-                    resultOriginalTest4.add(testOriginalValues4[pos])
+                    resultTest4.add(testValues4[cuvetteCorrPos].toBigDecimal())
+                    resultOriginalTest4.add(testOriginalValues4[cuvetteCorrPos])
                 } else {
                     resultOriginalTest4.add(value)
                     resultTest4.add(calcAbsorbance(value.toBigDecimal()))
                 }
-                resultModels[resultIndex]?.result?.testValue4 = resultTest4[pos]
-                resultModels[resultIndex]?.result?.testOriginalValue4 = resultOriginalTest4[pos]
+                resultModels[resultIndex]?.result?.testValue4 = resultTest4[cuvetteCorrPos]
+                resultModels[resultIndex]?.result?.testOriginalValue4 =
+                    resultOriginalTest4[cuvetteCorrPos]
                 resultModels[resultIndex]?.result?.testTime = Date().time
                 resultModels[resultIndex]?.result?.resultState = ResultState.Test.ordinal
                 //计算单个结果浓度
-                val abs = calcAbsorbanceDifference(resultTest1[pos], resultTest2[pos])
+                val abs = calcAbsorbanceDifference(
+                    resultTest1[cuvetteCorrPos],
+                    resultTest2[cuvetteCorrPos]
+                )
                 absorbances.add(abs)
                 selectProject?.let { project ->
                     var con = calcCon(abs, project)
@@ -1514,7 +1535,7 @@ class HomeViewModel(
                 mSamplesStates.forEachIndexed { i, items ->
                     items?.forEachIndexed { j, item ->
                         if (item.testResult?.resultId == _cuvetteStates.value[cuvetteShelfPos]?.get(
-                                cuvettePos
+                                cuvetteCorrPos
                             )!!.testResult?.resultId
                         ) {
                             mSamplesStates[i]?.get(j)?.testResult?.testResult =

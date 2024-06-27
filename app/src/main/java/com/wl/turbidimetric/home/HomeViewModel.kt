@@ -21,6 +21,7 @@ import com.wl.turbidimetric.ex.isManualSampling
 import com.wl.turbidimetric.ex.isNonexistent
 import com.wl.turbidimetric.ex.isSample
 import com.wl.turbidimetric.ex.print
+import com.wl.turbidimetric.ex.toast
 import com.wl.turbidimetric.global.EventGlobal
 import com.wl.turbidimetric.global.EventMsg
 import com.wl.turbidimetric.global.SystemGlobal
@@ -1604,7 +1605,10 @@ class HomeViewModel(
         }
         //自动打印小票
         if (appViewModel.getAutoPrintReceipt()) {
-            PrintUtil.printTest(mutableListOf(testResultModel))
+            appViewModel.printUtil.printTest(
+                mutableListOf(testResultModel),
+                onPrintListener = null
+            )
         }
         //自动打印A4报告
         if (appViewModel.getAutoPrintReport() && PrintSDKHelper.isPreparePrint()) {

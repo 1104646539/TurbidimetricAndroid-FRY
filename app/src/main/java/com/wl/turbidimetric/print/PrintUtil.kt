@@ -2,40 +2,82 @@ package com.wl.turbidimetric.print
 
 import com.wl.turbidimetric.ex.scale
 import com.wl.turbidimetric.model.TestResultAndCurveModel
-import com.wl.turbidimetric.print.PrintUtil.serialPort
 import com.wl.turbidimetric.util.FitterType
 import com.wl.weiqianwllib.serialport.BaseSerialPort
 import com.wl.weiqianwllib.serialport.WQSerialGlobal
 import com.wl.wllib.toTimeStr
 import java.nio.charset.Charset
 import com.wl.wllib.LogToFile.i
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 
 /**
  * 热敏打印
  * @property serialPort BaseSerialPortUtil
  * @constructor
  */
-object PrintUtil {
-    private val serialPort: BaseSerialPort = BaseSerialPort()
-
-    init {
-        open()
+class PrintUtil(private val serialPort: BaseSerialPort) {
+    companion object {
+        private val GET_STATE = byteArrayOf(0x1C, 0x76)
+        private val PAGER_OUT: Byte = 0x55
+        private val PAGER_FULL: Byte = 0x04
     }
 
-    private fun open() {
-        serialPort.openSerial(WQSerialGlobal.COM2, 9600, 8)
+    var scope: CoroutineScope? = null
+
+    private val byteArray = ByteArray(4)
+    var onPrintListener: OnPrintListener? = null
+
+    private fun readData() {
+        scope?.launch(Dispatchers.IO) {
+            while (true) {
+                val ret = serialPort.read(byteArray, byteArray.size)
+                if (ret == 1) {
+                    parse(byteArray[0])
+                }
+            }
+        }
+    }
+
+    fun open(scope: CoroutineScope) {
+        this.scope = scope
+        serialPort.openSerial(WQSerialGlobal.COM3, 9600, 8)
+        readData()
+    }
+
+    fun close() {
+        scope?.cancel()
+        serialPort?.close()
+    }
+
+    private fun parse(byte: Byte) {
+        if (byte == PAGER_FULL) {
+            printByte?.let {
+                send(it)
+            }
+        } else if (byte == PAGER_OUT) {
+            scope?.launch(Dispatchers.Main) {
+                onPrintListener?.onPrinterPagerOut()
+            }
+        }
     }
 
 
     fun test() {
-        send("test\n\n\n\n")
+        send(getPrintByte("test\n\n\n\n"))
     }
 
-    fun printTest(results: List<TestResultAndCurveModel?>) {
+    private fun getPrintByte(msg: String): ByteArray {
+        return msg.toByteArray(Charset.forName("GB2312"))
+    }
+
+    fun printTest(results: List<TestResultAndCurveModel?>, onPrintListener: OnPrintListener?) {
         results.forEach {
             it?.let {
                 val msg = getTestResultMsg(it)
-                send(msg)
+                sendAndCheckState(getPrintByte(msg), onPrintListener);
             }
         }
     }
@@ -63,13 +105,29 @@ object PrintUtil {
         sb.append("\n")
         sb.append("\n")
         sb.append("\n")
+        sb.append("\n")
+        sb.append("\n")
 
         return sb.toString()
     }
 
-    fun send(msg: String) {
-        i("$msg")
-        serialPort.write(msg.toByteArray(Charset.forName("GB2312")))
+    private fun send(byte: ByteArray) {
+        serialPort.write(byte)
+    }
+
+    private var printByte: ByteArray? = null
+    private fun sendAndCheckState(byte: ByteArray, onPrintListener: OnPrintListener?) {
+        i("sendAndCheckState")
+        this.printByte = byte
+        this.onPrintListener = onPrintListener
+        sendGetState()
+    }
+
+    /**
+     * 获取打印机状态
+     */
+    private fun sendGetState() {
+        send(GET_STATE)
     }
 
     fun printMatchingQuality(
@@ -80,7 +138,8 @@ object PrintUtil {
         createTime: String,
         projectName: String,
         reagentNo: String,
-        matchingNum: Int
+        matchingNum: Int,
+        onPrintListener: OnPrintListener?
     ) {
         val msg = getMatchingQualityMsg(
             absorbancys.toMutableList(),
@@ -92,7 +151,7 @@ object PrintUtil {
             reagentNo,
             matchingNum
         )
-        send(msg)
+        sendAndCheckState(getPrintByte(msg), onPrintListener)
     }
 
     /**
@@ -183,4 +242,9 @@ object PrintUtil {
             sb.toString()
         }
     }
+
+    interface OnPrintListener {
+        fun onPrinterPagerOut()
+    }
 }
+

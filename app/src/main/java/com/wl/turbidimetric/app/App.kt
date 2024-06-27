@@ -17,6 +17,7 @@ import com.wl.turbidimetric.ex.getPackageInfo
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.CurveModel
 import com.wl.turbidimetric.model.ProjectModel
+import com.wl.turbidimetric.print.PrintUtil
 import com.wl.turbidimetric.repository.if2.LocalDataSource
 import com.wl.turbidimetric.upload.hl7.util.getLocalConfig
 import com.wl.turbidimetric.util.CrashHandler
@@ -26,6 +27,7 @@ import com.wl.turbidimetric.util.PdfCreateUtil
 import com.wl.turbidimetric.util.PrintHelper
 import com.wl.turbidimetric.util.SerialPortIF
 import com.wl.turbidimetric.util.SerialPortImpl
+import com.wl.weiqianwllib.serialport.BaseSerialPort
 import com.wl.wllib.LogToFile
 import com.wl.wllib.ToastUtil
 import com.wl.wllib.ktxRunOnBgCache
@@ -48,7 +50,9 @@ class App : Application() {
         SerialPortImpl(
             SystemGlobal.isCodeDebug,
         )
-
+    }
+    val printUtil: PrintUtil by lazy {
+        PrintUtil(BaseSerialPort())
     }
 
     override fun onCreate() {
@@ -223,7 +227,11 @@ class App : Application() {
     ) : ViewModelProvider.NewInstanceFactory() {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(AppViewModel::class.java)) {
-                return AppViewModel(localDataDataSource, App.instance!!.serialPort) as T
+                return AppViewModel(
+                    localDataDataSource,
+                    App.instance!!.serialPort,
+                    App.instance!!.printUtil
+                ) as T
             }
             throw IllegalArgumentException("Unknown ViewModel class")
         }

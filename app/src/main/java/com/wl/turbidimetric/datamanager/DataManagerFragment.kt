@@ -14,6 +14,7 @@ import com.wl.turbidimetric.R
 import com.wl.turbidimetric.base.BaseFragment
 import com.wl.turbidimetric.databinding.FragmentDataManagerBinding
 import com.wl.turbidimetric.ex.getPrintParamsAnim
+import com.wl.turbidimetric.ex.toast
 import com.wl.turbidimetric.global.EventGlobal
 import com.wl.turbidimetric.global.EventMsg
 import com.wl.turbidimetric.global.SystemGlobal
@@ -316,7 +317,13 @@ class DataManagerFragment :
                         }
 
                         is DataManagerViewModel.PrintUIState.Print -> {
-                            PrintUtil.printTest(it.items)
+                            appVm.printUtil.printTest(
+                                it.items,
+                                onPrintListener = object : PrintUtil.OnPrintListener {
+                                    override fun onPrinterPagerOut() {
+                                        toast("打印机缺纸，请重新安装纸后再次尝试打印")
+                                    }
+                                })
                             vm.printSuccess("打印成功")
                         }
 
@@ -336,7 +343,11 @@ class DataManagerFragment :
                         }
 
                         is DataManagerViewModel.PrintReportUIState.PrintReport -> {
-                            PrintHelper.addPrintWork(it.items, appVm.getHospitalName(), appVm.getReportFileNameBarcode())
+                            PrintHelper.addPrintWork(
+                                it.items,
+                                appVm.getHospitalName(),
+                                appVm.getReportFileNameBarcode()
+                            )
                             EventBus.getDefault()
                                 .post(EventMsg(EventGlobal.WHAT_HOME_ADD_PRINT_ANIM, it.params))
                         }

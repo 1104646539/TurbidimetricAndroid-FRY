@@ -32,7 +32,7 @@ android {
         minSdk 24
         targetSdk 32
         versionCode 1
-        versionName "1.0.0.0-35修复跳过比色皿时检测结果错乱的问题"
+        versionName "1.0.0.0-36增加热敏打印机缺纸提示"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 

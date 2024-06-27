@@ -6,9 +6,11 @@ import com.wl.turbidimetric.ex.toState
 import com.wl.turbidimetric.model.MachineTestModel
 import com.wl.turbidimetric.model.TestState
 import com.wl.turbidimetric.model.TestType
+import com.wl.turbidimetric.print.PrintUtil
 import com.wl.turbidimetric.repository.if2.LocalDataSource
 import com.wl.turbidimetric.upload.hl7.util.ConnectStatus
 import com.wl.turbidimetric.util.SerialPortIF
+import com.wl.weiqianwllib.serialport.BaseSerialPort
 import com.wl.wllib.DateUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -22,7 +24,11 @@ import java.util.Date
 /**
  * 全局唯一的ViewModel，用来保存全局通用的属性
  */
-class AppViewModel(private val localDataSource: LocalDataSource, val serialPort: SerialPortIF) :
+class AppViewModel(
+    private val localDataSource: LocalDataSource,
+    val serialPort: SerialPortIF,
+    val printUtil: PrintUtil
+) :
     ViewModel() {
 
     /**

@@ -18,6 +18,7 @@ import com.wl.turbidimetric.ex.getFitGoodness
 import com.wl.turbidimetric.ex.isSample
 import com.wl.turbidimetric.ex.matchingArg
 import com.wl.turbidimetric.ex.scale
+import com.wl.turbidimetric.ex.toast
 import com.wl.turbidimetric.global.EventGlobal
 import com.wl.turbidimetric.global.EventMsg
 import com.wl.turbidimetric.global.SystemGlobal
@@ -391,7 +392,8 @@ class MatchingArgsViewModel(
     private val testValues1 = doubleArrayOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
     private val testValues2 =
         doubleArrayOf(0.1, 15.9, 37.5, 178.8, 329.3, 437.7, 0.3, 0.3, 0.3, 0.3)
-//    private val testValues2 =
+
+    //    private val testValues2 =
 //        doubleArrayOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
     private val testValues3 = doubleArrayOf(0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3)
     private val testValues4 =
@@ -1186,7 +1188,7 @@ class MatchingArgsViewModel(
     fun print() {
         selectProject?.let {
             if (it.reactionValues.isNotEmpty() == true && it.yzs.isNotEmpty() == true) {
-                PrintUtil.printMatchingQuality(
+                appViewModel.printUtil.printMatchingQuality(
                     it.reactionValues.toList(),
                     it.targets,
                     it.yzs.toList(),
@@ -1194,8 +1196,12 @@ class MatchingArgsViewModel(
                     it.createTime,
                     it.projectName,
                     it.reagentNO,
-                    it.gradsNum
-                )
+                    it.gradsNum,
+                    onPrintListener = object : PrintUtil.OnPrintListener {
+                        override fun onPrinterPagerOut() {
+                            toast("打印机缺纸，请重新安装纸后再次尝试打印")
+                        }
+                    })
             }
         }
     }

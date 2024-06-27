@@ -75,6 +75,7 @@ object StorageUtil {
      */
     @JvmStatic
     fun isExist(): Boolean {
+        if(!state.isExist())  return false
         if (curPath.isNullOrEmpty()) return false
         return File(curPath).exists()
     }

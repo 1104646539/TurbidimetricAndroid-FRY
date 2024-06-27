@@ -129,10 +129,10 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == OPEN_DOCUMENT_TREE_CODE && resultCode == RESULT_OK) {
+        Log.d(TAG, "onActivityResult data==null ${data == null} resultCode=$resultCode requestCode=$requestCode")
+        if (requestCode == OPEN_DOCUMENT_TREE_CODE) {
             val uri = data?.data
-            if (uri != null) {
+            if (uri != null && resultCode == RESULT_OK) {
                 StorageUtil.saveTreeUri(this, StorageUtil.curPath!!, uri)
                 Log.d(TAG, "onActivityResult path=${StorageUtil.curPath}")
                 changeStorageState(StorageState.EXIST)

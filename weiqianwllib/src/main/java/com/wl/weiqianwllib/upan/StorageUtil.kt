@@ -75,7 +75,7 @@ object StorageUtil {
      */
     @JvmStatic
     fun isExist(): Boolean {
-        if(!state.isExist())  return false
+        if (!state.isExist()) return false
         if (curPath.isNullOrEmpty()) return false
         return File(curPath).exists()
     }
@@ -314,6 +314,7 @@ object StorageUtil {
         onSuccess: () -> Unit,
         onFailed: (err: String) -> Unit
     ) {
+        Log.d(TAG, "copyStorageToUpan file=$file targetPath=$targetPath")
         if (!isExist()) {
             onFailed("U盘不存在")
             return
@@ -339,11 +340,18 @@ object StorageUtil {
         } catch (e: Exception) {
             onFailed("文件复制失败")
         } finally {
-            targetOs?.flush()
             targetOs?.close()
             sourceIs.close()
         }
-        Thread.sleep(3000)
+        val m = (file.length() / 1024 / 1024 / 10).let {
+            if (it < 5) {
+                5000
+            } else {
+                it * 1000
+            }
+        }
+        //如果不等待这个时间，那有几率拷贝下一个文件时会失败,每1M的文件等待1s，最小为5s
+        Thread.sleep(m)
         onSuccess()
     }
 }

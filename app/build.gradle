@@ -32,7 +32,7 @@ android {
         minSdk 24
         targetSdk 32
         versionCode 1
-        versionName "1.0.0.0-38修复U盘授权完不能正常使用的问题"
+        versionName "1.0.0.0-39修复导出日志可能的乱码和不全的问题"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 

@@ -584,6 +584,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     }
 
     fun changeStorageState(state: StorageState) {
+        StorageUtil.state = state
         vm.processIntent(MainIntent.ChangeStorageState(state))
     }
 

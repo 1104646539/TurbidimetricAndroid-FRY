@@ -642,9 +642,7 @@ class HomeViewModel(
         _samplesStates.update {
             mSamplesStates
         }
-
-
-        i("跳过 $cuvetteStartPos 个比色皿")
+        i("检测模式:${getTestMode()} \n跳过比色皿:$cuvetteStartPos \n输入检测数量:$needSamplingNum \n选择标曲:$selectProject \n起始编号:${getDetectionNum()}")
 
         if (SystemGlobal.isCodeDebug) {
             testShelfInterval1 = testS
@@ -670,6 +668,7 @@ class HomeViewModel(
         resultModelsForSample.clear()
         //初始化跳过的比色皿
         initSkipCuvetteResultModels()
+
     }
 
     /**
@@ -1177,7 +1176,14 @@ class HomeViewModel(
     override fun scanSuccess(barcode: String) {
         viewModelScope.launch {
             i("扫码成功 barcode=$barcode")
-            insertResult(barcode, samplePos, sampleShelfPos, sampleType)
+            insertResult(
+                barcode,
+                samplePos,
+                mSamplesStates[sampleShelfPos]?.get(samplePos),
+                SampleState.ScanSuccess,
+                sampleType,
+                false
+            )
             scanFinish = true
             pierced()
             scanResults.add(barcode)
@@ -1186,21 +1192,27 @@ class HomeViewModel(
     }
 
     private suspend fun insertResult(
-        barcode: String, samplePos: Int, sampleShelfPos: Int, sampleType: SampleType?
+        barcode: String,
+        samplePos: Int,
+        sampleItem: Item?,
+        sampleState: SampleState,
+        sampleType: SampleType?,
+        onlyCreateResult: Boolean = false
     ) {
 
         //创建检测结果
         val result = createResultModel(
-            barcode, mSamplesStates[sampleShelfPos]?.get(samplePos)
+            barcode, sampleItem
         )
-        //更新当前样本管的信息
-        updateSampleState(
-            samplePos, SampleState.ScanSuccess, sampleType = sampleType, testResult = result
-        )
+        if (!onlyCreateResult) {
+            //更新当前样本管的信息
+            updateSampleState(
+                samplePos, sampleState, sampleType = sampleType, testResult = result
+            )
 
-        //实时获取信息
-        realTimeGetInfo(result)
-
+            //实时获取信息
+            realTimeGetInfo(result)
+        }
     }
 
     /**
@@ -1210,7 +1222,8 @@ class HomeViewModel(
         val config = HL7Helper.getConfig()
         val isConnected = HL7Helper.isConnected()
         if (isConnected && config.twoWay) {
-            HL7Helper.getPatientInfo(generateCondition(config, result),
+            HL7Helper.getPatientInfo(
+                generateCondition(config, result),
                 object : OnGetPatientCallback {
                     override fun onGetPatientSuccess(patients: List<Patient>?) {
                         i("realTimeGetInfo onGetPatientSuccess=${result.resultId} patients=${patients?.size}")
@@ -1448,10 +1461,7 @@ class HomeViewModel(
      *
      */
     private fun updateTestResultModel(
-        value: Int,
-        resultIndex: Int,
-        cuvetteCorrPos: Int,
-        state: CuvetteState
+        value: Int, resultIndex: Int, cuvetteCorrPos: Int, state: CuvetteState
     ) {
         i("updateTestResultModel resultIndex=$resultIndex cuvetteCorrPos=$cuvetteCorrPos size=${resultModels.size} cuvetteStartPos=$cuvetteStartPos isFirstCuvetteShelf=${isFirstCuvetteShelf()}")
         if (resultIndex < 0 || resultIndex >= resultModels.size || cuvetteCorrPos < 0 || cuvetteCorrPos >= 10) {
@@ -1516,8 +1526,7 @@ class HomeViewModel(
                 resultModels[resultIndex]?.result?.resultState = ResultState.Test.ordinal
                 //计算单个结果浓度
                 val abs = calcAbsorbanceDifference(
-                    resultTest1[cuvetteCorrPos],
-                    resultTest2[cuvetteCorrPos]
+                    resultTest1[cuvetteCorrPos], resultTest2[cuvetteCorrPos]
                 )
                 absorbances.add(abs)
                 selectProject?.let { project ->
@@ -1606,8 +1615,7 @@ class HomeViewModel(
         //自动打印小票
         if (appViewModel.getAutoPrintReceipt()) {
             appViewModel.printUtil.printTest(
-                mutableListOf(testResultModel),
-                onPrintListener = null
+                mutableListOf(testResultModel), onPrintListener = null
             )
         }
         //自动打印A4报告
@@ -2369,7 +2377,7 @@ class HomeViewModel(
 
         if (appViewModel.testState != TestState.TestFinish) {
             if (isManualSampling()) {//手动加样模式，不需要自动加样，直接设为已加样后加加试剂
-                initManualSamplingCuvetteStatus()
+                initManualSampling()
                 stepDripReagent()
             } else {//自动加样模式，去取样、加样
                 val needMoveStep = getFirstCuvetteStartPos()
@@ -2382,36 +2390,45 @@ class HomeViewModel(
         }
     }
 
+    /**
+     * 初始化手动加样的状态。
+     * 1、初始化手动加样的结果。在手动加样时不需要自动加样，而是直接加试剂检测。
+     * 2、初始化手动加样的比色皿状态，设为已加样，这样才能进行下一步的加试剂和检测。
+     */
+    private fun initManualSampling() {
+        if (needSamplingNum <= 0 || !isManualSampling()) return
+        i("initManualSamplingTestResult needSamplingNum=$needSamplingNum sampleShelfPos=$sampleShelfPos")
+        viewModelScope.launch {
+            //当没有跳过比色皿时，resultIndex和cuvetteIndex一致
+            //当有跳过时，resultIndex从0开始，cuvetteIndex从cuvetteStartPos开始
+            var resultIndex = 0
+            for (cuvetteIndex in cuvetteStartPos until (mCuvetteStates[cuvetteShelfPos]?.size ?: 0)) {
+                if (needSamplingNum > 0) {
+                    needSamplingNum--
+                    insertResult(
+                        "",
+                        resultIndex,
+                        null,
+                        SampleState.None,
+                        SampleType.NONEXISTENT,
+                        true
+                    )
+                    changeSampleResultToCuvette(resultIndex)
+                    updateCuvetteState(
+                        cuvetteIndex, CuvetteState.DripSample, null, ""
+                    )
+                }
+                resultIndex++
+            }
+        }
+    }
+
     private fun showCuvetteDeficiencyDialog() {
         viewModelScope.launch {
             _dialogUiState.emit(
                 HomeDialogUiState.CuvetteDeficiency
             )
         }
-    }
-
-    /**
-     * 初始化手动加样的比色皿状态，设为已加样
-     */
-    private fun initManualSamplingCuvetteStatus() {
-        i("initManualSamplingCuvetteStatus cuvetteStartPos=$cuvetteStartPos")
-        val need = needSamplingNum
-        viewModelScope.launch {
-            for (i in cuvetteStartPos until (mCuvetteStates[cuvetteShelfPos]?.size ?: 0)) {
-                if (needSamplingNum > 0) {
-                    mCuvetteStates[cuvetteShelfPos]?.get(i)?.state = CuvetteState.DripSample
-                    needSamplingNum--
-                    val result = createResultModel(
-                        "", null
-                    )
-                    updateCuvetteState(
-                        i, CuvetteState.DripSample, result, ""
-                    )
-
-                }
-            }
-        }
-        i("needSamplingNum=$needSamplingNum")
     }
 
     /**
@@ -3211,15 +3228,19 @@ class HomeViewModel(
     }
 
     fun isAuto(): Boolean {
-        return isAuto(MachineTestModel.valueOf(localDataRepository.getCurMachineTestModel()))
+        return isAuto(getTestMode())
+    }
+
+    fun getTestMode(): MachineTestModel {
+        return MachineTestModel.valueOf(localDataRepository.getCurMachineTestModel())
     }
 
     fun isManualSampling(): Boolean {
-        return isManualSampling(MachineTestModel.valueOf(localDataRepository.getCurMachineTestModel()))
+        return isManualSampling(getTestMode())
     }
 
     fun isManual(): Boolean {
-        return isManual(MachineTestModel.valueOf(localDataRepository.getCurMachineTestModel()))
+        return isManual(getTestMode())
     }
 
 //    data class CuvetteItem(

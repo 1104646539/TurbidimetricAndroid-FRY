@@ -166,6 +166,11 @@ class UploadSettingsActivity :
 
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        HL7Helper.hl7Log = null
+    }
+
     private fun saveConfig() {
         vm.verifySave().let { ret ->
             if (ret.isNotEmpty()) {

@@ -10,7 +10,6 @@ import android.widget.Toast
  */
 object ToastUtil {
     private var context: Context? = null
-    val toast: Toast by lazy { Toast.makeText(context!!.applicationContext, "", Toast.LENGTH_SHORT) }
 
     fun init(context: Context) {
         this.context = context
@@ -18,10 +17,8 @@ object ToastUtil {
 
     @JvmStatic
     fun showToast(msg: String, duration: Int = Toast.LENGTH_SHORT) {
-        if (msg.isNullOrEmpty()) return
-        toast.setText(msg)
-        toast.duration = duration
-        toast.show()
+        if (context == null) throw Exception("未设置context")
+        Toast.makeText(context!!.applicationContext, msg, duration).show()
     }
 
     @JvmStatic

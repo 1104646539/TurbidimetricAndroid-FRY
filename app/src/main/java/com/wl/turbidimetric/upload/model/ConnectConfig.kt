@@ -7,6 +7,7 @@ data class ConnectConfig(
     var port: Int = 22222,//网络连接的IP
     var charset: String = "UTF-8",//字符集
     var reconnectionTimeout: Long = 15000,//重新建立连接的间隔
+    var uploadInterval: Long = 500,//上传结果的间隔时间
     var timeout: Long = 5000,//消息的超时时间
     var retryCount: Int = 1,//发送消息超时的超时重试次数
     var serialPortName: String = "",//串口名

@@ -43,7 +43,7 @@ class PrintUtil(private val serialPort: BaseSerialPort) {
 
     fun open(scope: CoroutineScope) {
         this.scope = scope
-        serialPort.openSerial(WQSerialGlobal.COM3, 9600, 8)
+        serialPort.openSerial(WQSerialGlobal.COM2, 9600, 8)
         readData()
     }
 

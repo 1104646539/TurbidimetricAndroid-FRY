@@ -35,6 +35,7 @@ class UploadSettingsViewModel(
     var realTimeGetPatient = MutableStateFlow(false)
     var getPatientType = MutableStateFlow(GetPatientType.BC)
     var getPatient = MutableStateFlow(false)
+    var uploadInterval = MutableStateFlow("")
     override fun init() {
         openUpload.value = SystemGlobal.uploadConfig.openUpload
         autoUpload.value = SystemGlobal.uploadConfig.autoUpload
@@ -49,6 +50,7 @@ class UploadSettingsViewModel(
         twoway.value = SystemGlobal.uploadConfig.twoWay
         getPatientType.value = SystemGlobal.uploadConfig.getPatientType
         getPatient.value = SystemGlobal.uploadConfig.getPatient
+        uploadInterval.value = SystemGlobal.uploadConfig.uploadInterval.toString()
     }
 
     suspend fun getProjects(): List<ProjectModel> {
@@ -81,7 +83,8 @@ class UploadSettingsViewModel(
             realTimeGetPatient = realTimeGetPatient.value,
             getPatientType = getPatientType.value,
             getPatient = getPatient.value,
-            twoWay = twoway.value
+            twoWay = twoway.value,
+            uploadInterval = uploadInterval.value.toLong()
         )
     }
 

@@ -8,23 +8,23 @@ plugins {
 }
 
 android {
-//    signingConfigs {
-//        debug {
-//            storeFile file('E:\\platform.keystore')
-//            storePassword '123456'
-//            keyAlias 'platform'
-//            keyPassword '123456'
-//        }
-//        release {
-////            manifestPlaceholders = [
-////                    APP_NAME: "@string/app_name",
-////            ]
-//            storeFile file('E:\\platform.keystore')
-//            storePassword '123456'
-//            keyAlias 'platform'
-//            keyPassword '123456'
-//        }
-//    }
+    signingConfigs {
+        debug {
+            storeFile file('E:\\platform.keystore')
+            storePassword '123456'
+            keyAlias 'platform'
+            keyPassword '123456'
+        }
+        release {
+//            manifestPlaceholders = [
+//                    APP_NAME: "@string/app_name",
+//            ]
+            storeFile file('E:\\platform.keystore')
+            storePassword '123456'
+            keyAlias 'platform'
+            keyPassword '123456'
+        }
+    }
     compileSdk 33
 
     defaultConfig {

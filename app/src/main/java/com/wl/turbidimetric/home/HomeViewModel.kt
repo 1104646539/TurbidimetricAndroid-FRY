@@ -1221,7 +1221,7 @@ class HomeViewModel(
     private fun realTimeGetInfo(result: TestResultModel) {
         val config = HL7Helper.getConfig()
         val isConnected = HL7Helper.isConnected()
-        if (isConnected && config.twoWay) {
+        if (isConnected && config.twoWay && config.getPatient) {
             HL7Helper.getPatientInfo(
                 generateCondition(config, result),
                 object : OnGetPatientCallback {
@@ -1238,7 +1238,7 @@ class HomeViewModel(
                     }
                 })
         } else {
-            i("realTimeGetInfo resultId=${result.resultId} twoWay=${config.twoWay} isConnected=$isConnected")
+            i("realTimeGetInfo resultId=${result.resultId} twoWay=${config.twoWay} getPatient=${config.getPatient} isConnected=$isConnected")
         }
     }
 

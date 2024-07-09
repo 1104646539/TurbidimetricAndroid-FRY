@@ -108,9 +108,10 @@ class UploadSettingsActivity :
             vm.twoway.value = isChecked
             vd.llTimeout.visibility = isChecked.isShow()
         }
-//        vd.swGetPatient.setOnCheckedChangeListener { buttonView, isChecked ->
-//            vm.getPatient.value = isChecked
-//        }
+        vd.swGetPatient.setOnCheckedChangeListener { buttonView, isChecked ->
+            vm.getPatient.value = isChecked
+
+        }
 //        vd.rbRealTime.setOnCheckedChangeListener { buttonView, isChecked ->
 //            vm.realTimeGetPatient.value = isChecked
 //        }
@@ -120,6 +121,9 @@ class UploadSettingsActivity :
         }
         vd.etTimeoutTime.addTextChangedListener {
             vm.timeout.value = it.toString()
+        }
+        vd.etUploadInterval.addTextChangedListener {
+            vm.uploadInterval.value = it.toString()
         }
         vd.etSocketIp.addTextChangedListener {
             vm.ip.value = it.toString()
@@ -204,6 +208,8 @@ class UploadSettingsActivity :
         vd.etTimeoutTime.isEnabled = checked
         vd.etSocketIp.isEnabled = checked
         vd.etSocketPort.isEnabled = checked
+        vd.etUploadInterval.isEnabled = checked
+        vd.swGetPatient.isEnabled = checked
         vd.rbBc.isEnabled = checked
         vd.rbSn.isEnabled = checked
         vd.rbSerial.isEnabled = checked
@@ -323,7 +329,8 @@ class UploadSettingsActivity :
                                         detectionNum = detectionNum,
                                         sampleBarcode = barcode,
                                         testTime = testTime.toLong(DateUtil.Time1Format),
-                                        deliveryTime = deliveryTime.toLong(DateUtil.Time1Format).toTimeStr(DateUtil.Time5Format),
+                                        deliveryTime = deliveryTime.toLong(DateUtil.Time1Format)
+                                            .toTimeStr(DateUtil.Time5Format),
                                         deliveryDepartment = deliveryDepartment,
                                         deliveryDoctor = deliveryDoctor,
                                     ), curve = CurveModel().apply {
@@ -435,7 +442,11 @@ class UploadSettingsActivity :
         }
         val timeout = vm.timeout.value.toIntOrNull() ?: -1
         if (timeout < 5000) {
-            return "重发次数必须大于等于5000"
+            return "重发间隔必须大于等于5000"
+        }
+        val uploadInterval = vm.uploadInterval.value.toIntOrNull() ?: -1
+        if (uploadInterval < 100) {
+            return "上传间隔必须大于等于100"
         }
         //网口才需要判断
         if (!vm.serialPort.value) {
@@ -477,11 +488,18 @@ class UploadSettingsActivity :
             }
         }
         lifecycleScope.launch {
+            vm.uploadInterval.collectLatest {
+                vd.etUploadInterval.setText(it)
+                vd.etUploadInterval.selectionLast()
+            }
+        }
+        lifecycleScope.launch {
             vm.twoway.collectLatest {
                 vd.llTimeout.visibility = it.isShow()
                 vd.swTwoway.isChecked = it
 
-                vd.llRealTime.visibility = it.isShow()
+                vd.llGetPatient.visibility = it.isShow()
+                vd.llRealTime.visibility = (it && vm.getPatient.value).isShow()
             }
         }
         lifecycleScope.launch {
@@ -548,10 +566,8 @@ class UploadSettingsActivity :
         }
         lifecycleScope.launch {
             vm.getPatient.collectLatest {
-//                vd.swGetPatient.isChecked = it
-//                vd.llGetPatient1.visibility = if (it) View.VISIBLE else View.GONE
-//                vd.llRealTime.visibility =
-//                    if (it && vm.realTimeGetPatient.value) View.VISIBLE else View.GONE
+                vd.swGetPatient.isChecked = it
+                vd.llRealTime.visibility = (it && vm.twoway.value).isShow()
             }
         }
 

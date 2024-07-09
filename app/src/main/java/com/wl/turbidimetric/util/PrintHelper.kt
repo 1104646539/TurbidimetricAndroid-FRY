@@ -112,7 +112,7 @@ object PrintHelper {
             val imageArea = PrintSDKHelper.getCurPrinter()!!.context.imageArea
             val paperHeight = PrintSDKHelper.getCurPrinter()!!.context.paperHeight
             val paperWidth = PrintSDKHelper.getCurPrinter()!!.context.paperWidth
-            i("getBitmapFragment hResolution=$hResolution vResolution=$vResolution imageArea=$imageArea paperHeight=$paperHeight paperWidth=$paperWidth")
+//            i("getBitmapFragment hResolution=$hResolution vResolution=$vResolution imageArea=$imageArea paperHeight=$paperHeight paperWidth=$paperWidth")
 
             val pages: MutableList<IPage> = ArrayList()
             pages.add(IPage { fragment ->
@@ -120,7 +120,7 @@ object PrintHelper {
                 val height = vResolution.toFloat() / 72 * paperHeight
                 val fWidth = hResolution.toFloat() / 72 * paperWidth
                 val fHeight = fragment.height()
-                i("getBitmapFragment: fWidth=$fWidth fHeight=$fHeight height=$height")
+//                i("getBitmapFragment: fWidth=$fWidth fHeight=$fHeight height=$height")
                 val bitmap =
                     Bitmap.createBitmap(fWidth.toInt(), fHeight.toInt(), Bitmap.Config.ARGB_8888)
                 val imageBMP: Bitmap = FilesUtils.pdfToBitmaps(
@@ -138,10 +138,10 @@ object PrintHelper {
                 }
                 val aspectH = (height / imageHeight).toFloat()
                 val dst = RectF(0f, 0f, fWidth.toFloat(), height.toFloat())
-                i("getBitmapFragment:  aspectH=$aspectH")
-                i(
-                    "getBitmapFragment: imageWidth=$imageWidth imageHeight=$imageHeight"
-                )
+//                i("getBitmapFragment:  aspectH=$aspectH")
+//                i(
+//                    "getBitmapFragment: imageWidth=$imageWidth imageHeight=$imageHeight"
+//                )
                 val sLeft = 0f
                 val sTop = fragment.top / aspectH
                 val sRight = imageWidth.toFloat()
@@ -150,7 +150,7 @@ object PrintHelper {
                 val canvas = Canvas(bitmap)
                 canvas.drawColor(Color.WHITE)
                 // move image to actual printing area
-                i("getBitmapFragment: source=$source dst=$dst")
+//                i("getBitmapFragment: source=$source dst=$dst")
                 dst.offsetTo(0f, 0f)
                 val matrix = Matrix()
                 matrix.setRectToRect(source, dst, Matrix.ScaleToFit.START)

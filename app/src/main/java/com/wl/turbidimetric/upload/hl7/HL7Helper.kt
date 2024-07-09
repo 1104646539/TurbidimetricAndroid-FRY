@@ -178,7 +178,7 @@ object HL7Helper : UploadService {
                         onUploadTestResults?.invoke(testResults.size, successCount, failedCount)
                         clearUploadInfo()
                     } else {
-                        handler.sendEmptyMessageDelayed(WHAT_UPLOAD_NEXT, UploadGlobal.UpoadInterval)
+                        handler.sendEmptyMessageDelayed(WHAT_UPLOAD_NEXT, getConfig().uploadInterval)
                     }
                     onUploadCallback?.onUploadSuccess(msg)
                 }
@@ -186,7 +186,7 @@ object HL7Helper : UploadService {
                 override fun onUploadFailed(code: Int, msg: String) {
                     LogToFile.i("onUploadFailed msg=$msg index=$index lastIndex=$lastIndex")
                     if (code == ErrorEnum.BE_COMMUNICATION.code) {//如果正在通讯，隔UploadGlobal.UpoadIntervalms再次尝试
-                        handler.sendEmptyMessageDelayed(WHAT_UPLOAD_NEXT, UploadGlobal.UpoadInterval)
+                        handler.sendEmptyMessageDelayed(WHAT_UPLOAD_NEXT, getConfig().uploadInterval)
                         return
                     }
                     index++
@@ -196,7 +196,7 @@ object HL7Helper : UploadService {
                         onUploadTestResults?.invoke(testResults.size, successCount, failedCount)
                         clearUploadInfo()
                     } else {
-                        handler.sendEmptyMessageDelayed(WHAT_UPLOAD_NEXT, UploadGlobal.UpoadInterval)
+                        handler.sendEmptyMessageDelayed(WHAT_UPLOAD_NEXT, getConfig().uploadInterval)
                     }
                     onUploadCallback?.onUploadFailed(code, msg)
                 }
@@ -297,7 +297,7 @@ object HL7Helper : UploadService {
             this.callbacks.add(onGetPatientCallback)
             lastIndex = conditions.lastIndex
             if (conditions.size == 1) {
-                handler.sendEmptyMessageDelayed(WHAT_GET_INFO_NEXT, UploadGlobal.UpoadInterval)
+                handler.sendEmptyMessageDelayed(WHAT_GET_INFO_NEXT, getConfig().uploadInterval)
             }
         }
 
@@ -318,13 +318,13 @@ object HL7Helper : UploadService {
                         LogToFile.i("index=$index lastIndex=$lastIndex")
                         clearUploadInfo()
                     } else {
-                        handler.sendEmptyMessageDelayed(WHAT_GET_INFO_NEXT, UploadGlobal.UpoadInterval)
+                        handler.sendEmptyMessageDelayed(WHAT_GET_INFO_NEXT, getConfig().uploadInterval)
                     }
                 }
 
                 override fun onGetPatientFailed(code: Int, msg: String) {
-                    if (code == ErrorEnum.BE_COMMUNICATION.code) {//如果正在通讯，隔UploadGlobal.UpoadIntervalms再次尝试
-                        handler.sendEmptyMessageDelayed(WHAT_GET_INFO_NEXT, UploadGlobal.UpoadInterval)
+                    if (code == ErrorEnum.BE_COMMUNICATION.code) {//如果正在通讯，隔getConfig().uploadIntervalms再次尝试
+                        handler.sendEmptyMessageDelayed(WHAT_GET_INFO_NEXT, getConfig().uploadInterval)
                         return
                     }
                     onGetPatientCallback?.onGetPatientFailed(code, msg)
@@ -333,7 +333,7 @@ object HL7Helper : UploadService {
                         LogToFile.i("index=$index lastIndex=$lastIndex")
                         clearUploadInfo()
                     } else {
-                        handler.sendEmptyMessageDelayed(WHAT_GET_INFO_NEXT, UploadGlobal.UpoadInterval)
+                        handler.sendEmptyMessageDelayed(WHAT_GET_INFO_NEXT, getConfig().uploadInterval)
                     }
                 }
             })

@@ -11,7 +11,9 @@ import com.wl.turbidimetric.app.UploadState
 import com.wl.turbidimetric.base.BaseViewModel
 import com.wl.turbidimetric.ex.getAppViewModel
 import com.wl.weiqianwllib.upan.StorageState
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -33,8 +35,8 @@ class MainViewModel(private val appViewModel: WeakReference<AppViewModel>) : Bas
     }
 
     private var curIndex = 0
-    private val _uiState = MutableStateFlow<MainState>(MainState.None)
-    val uiState = _uiState.asStateFlow()
+    private val _uiState = MutableSharedFlow<MainState>()
+    val uiState = _uiState.asSharedFlow()
 
     fun processIntent(intent: MainIntent) {
         viewModelScope.launch {

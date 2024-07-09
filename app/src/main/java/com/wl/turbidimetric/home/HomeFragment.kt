@@ -448,8 +448,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 //        DBManager.ProjectBox.put(project)
     }
 
-    var arraySample = mutableListOf<ShelfView>()
-    var arrayCuvette = mutableListOf<ShelfView>()
+    private val arraySample = mutableListOf<ShelfView>()
+    private val arrayCuvette = mutableListOf<ShelfView>()
     private fun listenerData() {
         arraySample.add(vd.svSample1)
         arraySample.add(vd.svSample2)

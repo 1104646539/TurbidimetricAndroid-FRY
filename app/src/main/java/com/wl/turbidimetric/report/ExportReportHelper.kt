@@ -1,4 +1,4 @@
-package com.wl.turbidimetric.util
+package com.wl.turbidimetric.report
 
 import android.content.Context
 import com.wl.turbidimetric.model.TestResultAndCurveModel
@@ -6,8 +6,6 @@ import com.wl.weiqianwllib.upan.StorageUtil
 import com.wl.wllib.DateUtil
 import com.wl.wllib.LogToFile
 import com.wl.wllib.toTimeStr
-import jxl.write.Label
-import jxl.write.WritableSheet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

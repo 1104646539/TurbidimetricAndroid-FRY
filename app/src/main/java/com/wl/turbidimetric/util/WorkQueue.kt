@@ -4,9 +4,7 @@ import java.util.concurrent.BlockingQueue
 import java.util.concurrent.LinkedBlockingQueue
 import kotlin.concurrent.thread
 
-class WorkQueue<T>(private val intervalTime:Long = 30000L) {
-//    private val intervalTime = 30000L
-
+class WorkQueue<T>(var intervalTime: Long = 30000L) {
     val queue: BlockingQueue<T> = LinkedBlockingQueue()
     var onWorkStart: ((t: T) -> Unit)? = null
 

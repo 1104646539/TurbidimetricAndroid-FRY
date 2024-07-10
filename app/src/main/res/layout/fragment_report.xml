@@ -98,16 +98,38 @@
             app:layout_constraintTop_toBottomOf="@id/tv_title_print" />
 
         <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_setup_printer"
             style="@style/BtnNegative"
             android:layout_width="wrap_content"
-            android:paddingTop="0dp"
-            android:paddingBottom="0dp"
-            android:id="@+id/btn_setup_printer"
             android:layout_height="wrap_content"
             android:layout_marginLeft="50dp"
+            android:paddingTop="0dp"
+            android:paddingBottom="0dp"
             android:text="去设置"
             app:layout_constraintLeft_toRightOf="@id/tv_cur_printer"
             app:layout_constraintTop_toTopOf="@id/tv_cur_printer" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_report_interval_time"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="50dp"
+            android:layout_marginTop="8dp"
+            android:hint="打印间隔时间"
+            android:textSize="28sp"
+            app:layout_constraintBottom_toBottomOf="@id/btn_setup_printer"
+            app:layout_constraintLeft_toRightOf="@id/btn_setup_printer"
+            app:layout_constraintTop_toTopOf="@id/btn_setup_printer"
+            app:suffixText="s">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tiet_report_interval_time"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="numberDecimal"
+                android:text="30"
+                android:textSize="26dp" />
+        </com.google.android.material.textfield.TextInputLayout>
 
         <CheckBox
             android:id="@+id/cb_auto_print_receipt"

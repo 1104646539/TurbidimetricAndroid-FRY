@@ -21,11 +21,10 @@ import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.ConditionModel
 import com.wl.turbidimetric.model.TestResultAndCurveModel
 import com.wl.turbidimetric.print.PrintUtil
+import com.wl.turbidimetric.report.ExportReportHelper
+import com.wl.turbidimetric.report.PrintSDKHelper
 import com.wl.turbidimetric.upload.hl7.HL7Helper
 import com.wl.turbidimetric.util.ExportExcelHelper
-import com.wl.turbidimetric.util.ExportReportHelper
-import com.wl.turbidimetric.util.PrintHelper
-import com.wl.turbidimetric.util.PrintSDKHelper
 import com.wl.turbidimetric.view.dialog.ConditionDialog
 import com.wl.turbidimetric.view.dialog.HiltDialog
 import com.wl.turbidimetric.view.dialog.ResultDetailsDialog
@@ -343,7 +342,7 @@ class DataManagerFragment :
                         }
 
                         is DataManagerViewModel.PrintReportUIState.PrintReport -> {
-                            PrintHelper.addPrintWork(
+                            appVm.printHelper.addPrintWork(
                                 it.items,
                                 appVm.getHospitalName(),
                                 appVm.getReportFileNameBarcode()

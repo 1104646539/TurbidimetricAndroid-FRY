@@ -3,7 +3,6 @@ package com.wl.turbidimetric.app
 import android.app.Activity
 import android.app.Application
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStore
@@ -21,10 +20,10 @@ import com.wl.turbidimetric.print.PrintUtil
 import com.wl.turbidimetric.repository.if2.LocalDataSource
 import com.wl.turbidimetric.upload.hl7.util.getLocalConfig
 import com.wl.turbidimetric.util.CrashHandler
-import com.wl.turbidimetric.util.ExportReportHelper
+import com.wl.turbidimetric.report.ExportReportHelper
 import com.wl.turbidimetric.util.FitterType
-import com.wl.turbidimetric.util.PdfCreateUtil
-import com.wl.turbidimetric.util.PrintHelper
+import com.wl.turbidimetric.report.PdfCreateUtil
+import com.wl.turbidimetric.report.PrintHelper
 import com.wl.turbidimetric.util.SerialPortIF
 import com.wl.turbidimetric.util.SerialPortImpl
 import com.wl.weiqianwllib.serialport.BaseSerialPort
@@ -54,6 +53,9 @@ class App : Application() {
     val printUtil: PrintUtil by lazy {
         PrintUtil(BaseSerialPort())
     }
+    val printHelper: PrintHelper by lazy {
+        PrintHelper(LocalData.ReportIntervalTime,this)
+    }
 
     override fun onCreate() {
         super.onCreate()
@@ -62,11 +64,9 @@ class App : Application() {
         Thread.setDefaultUncaughtExceptionHandler(CrashHandler())
         initData()
         ktxRunOnBgCache {
-            PrintHelper.context = this@App
             initDataStore()
             LogToFile.init()
             initPop()
-//
 //            没有项目参数的时候，添加一个默认参数
             initDB()
 //            记录当前的版本
@@ -230,7 +230,8 @@ class App : Application() {
                 return AppViewModel(
                     localDataDataSource,
                     App.instance!!.serialPort,
-                    App.instance!!.printUtil
+                    App.instance!!.printUtil,
+                    App.instance!!.printHelper,
                 ) as T
             }
             throw IllegalArgumentException("Unknown ViewModel class")

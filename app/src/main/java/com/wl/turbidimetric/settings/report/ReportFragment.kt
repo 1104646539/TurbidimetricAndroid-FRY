@@ -9,7 +9,8 @@ import com.wl.turbidimetric.R
 import com.wl.turbidimetric.app.PrinterState
 import com.wl.turbidimetric.base.BaseFragment
 import com.wl.turbidimetric.databinding.FragmentReportBinding
-import com.wl.turbidimetric.util.PrintSDKHelper
+import com.wl.turbidimetric.ex.toast
+import com.wl.turbidimetric.report.PrintSDKHelper
 import com.wl.turbidimetric.view.dialog.HiltDialog
 import com.wl.turbidimetric.view.dialog.showPop
 import kotlinx.coroutines.Dispatchers
@@ -58,6 +59,7 @@ class ReportFragment :
                     } else {
                         vd.tvCurPrinter.text = "当前打印机:${state.curPrinter.name}"
                     }
+                    vd.tietReportIntervalTime.setText(state.reportIntervalTime.toString())
                 }
             }
         }
@@ -92,16 +94,26 @@ class ReportFragment :
 
     private fun listenerView() {
         vd.btnChange.setOnClickListener {
-            vm.change(
-                vd.tietHospitalName.text?.toString() ?: "",
-                vd.cbAutoPrintReceipt.isChecked,
-                vd.cbAutoPrintReport.isChecked,
-                vd.rbFileNameBarcode.isChecked,
-            )
+            changeConfig()
         }
         vd.btnSetupPrinter.setOnClickListener {
             PrintSDKHelper.showSetupPrinterUi()
         }
+    }
+
+    private fun changeConfig() {
+        val intervalTime = vd.tietReportIntervalTime.text?.toString()?.toIntOrNull() ?: 0
+        if (intervalTime < 30) {
+            toast("报告间隔时长不能小于等于30S")
+            return
+        }
+        vm.change(
+            vd.tietHospitalName.text?.toString() ?: "",
+            vd.cbAutoPrintReceipt.isChecked,
+            vd.cbAutoPrintReport.isChecked,
+            vd.rbFileNameBarcode.isChecked,
+            intervalTime,
+        )
     }
 
     companion object {

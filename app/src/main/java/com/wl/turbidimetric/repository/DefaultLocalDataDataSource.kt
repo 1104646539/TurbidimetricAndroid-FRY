@@ -3,7 +3,7 @@ package com.wl.turbidimetric.repository
 import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.repository.if2.LocalDataSource
 
-class DefaultLocalDataDataSource:LocalDataSource{
+class DefaultLocalDataDataSource : LocalDataSource {
     override fun getDetectionNum(): String {
         return LocalData.DetectionNum
     }
@@ -94,6 +94,10 @@ class DefaultLocalDataDataSource:LocalDataSource{
 
     override fun getReportFileNameBarcode(): Boolean {
         return LocalData.ReportFileNameBarcode
+    }
+
+    override fun getReportIntervalTime(): Int {
+        return LocalData.ReportIntervalTime
     }
 
     override fun setLooperTest(looperTest: Boolean) {
@@ -188,4 +192,7 @@ class DefaultLocalDataDataSource:LocalDataSource{
         LocalData.ReportFileNameBarcode = value
     }
 
+    override fun setReportIntervalTime(value: Int) {
+        LocalData.ReportIntervalTime = value
+    }
 }

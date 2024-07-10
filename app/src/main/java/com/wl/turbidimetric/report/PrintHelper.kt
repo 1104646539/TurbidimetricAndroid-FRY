@@ -1,4 +1,4 @@
-package com.wl.turbidimetric.util
+package com.wl.turbidimetric.report
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -12,13 +12,14 @@ import com.dynamixsoftware.printingsdk.IPage
 import com.dynamixsoftware.printingsdk.IPrintListener
 import com.dynamixsoftware.printingsdk.Result
 import com.wl.turbidimetric.model.TestResultAndCurveModel
+import com.wl.turbidimetric.util.FilesUtils
+import com.wl.turbidimetric.util.WorkQueue
 import com.wl.wllib.LogToFile.i
 import java.io.File
 
-object PrintHelper {
+class PrintHelper(private val intervalTime: Int,private val context: Context) {
 
-    private val queue = WorkQueue<PrintReport>(35000L)
-    var context: Context? = null
+    private val queue = WorkQueue<PrintReport>((intervalTime * 1000).toLong())
     var onSizeChange: ((num: Int) -> Unit)? = null
     var size = queue.queue.size
         private set(value) {
@@ -31,6 +32,10 @@ object PrintHelper {
             printReport(result.result, result.hospitalName, result.barcode)
             size = queue.queue.size
         }
+    }
+
+    fun setIntervalTime(intervalTime: Int) {
+        queue.intervalTime = (intervalTime * 1000).toLong()
     }
 
     /**
@@ -47,7 +52,6 @@ object PrintHelper {
         }
     }
 
-    @JvmStatic
     fun addPrintWork(
         result: TestResultAndCurveModel,
         hospitalName: String,
@@ -57,7 +61,6 @@ object PrintHelper {
         size = queue.queue.size
     }
 
-    @JvmStatic
     fun addPrintWork(
         result: List<TestResultAndCurveModel>,
         hospitalName: String,
@@ -68,7 +71,6 @@ object PrintHelper {
         }
     }
 
-    @JvmStatic
     private fun print(path: String) {
         try {
             PrintSDKHelper.printImage(createPages(path), object : IPrintListener.Stub() {
@@ -162,59 +164,6 @@ object PrintHelper {
         }
         return mutableListOf()
     }
-// 7180 正常打印
-//    private fun createPages(path: String): List<IPage> {
-//        if(PrintSDKHelper.getCurPrinter()!=null){
-//            val hResolution = PrintSDKHelper.getCurPrinter()!!.context.hResolution
-//            val vResolution = PrintSDKHelper.getCurPrinter()!!.context.vResolution
-//            val imageArea = PrintSDKHelper.getCurPrinter()!!.context.imageArea
-//            val paperHeight = PrintSDKHelper.getCurPrinter()!!.context.paperHeight
-//            val paperWidth = PrintSDKHelper.getCurPrinter()!!.context.paperWidth
-//            i("getBitmapFragment hResolution=$hResolution vResolution=$vResolution imageArea=$imageArea paperHeight=$paperHeight paperWidth=$paperWidth")
-//        }
-//        val pages: MutableList<IPage> = ArrayList()
-//        pages.add(IPage { fragment ->
-//            val height = 3392
-//            val fWidth = fragment.width()
-//            val fHeight = fragment.height()
-//            i("getBitmapFragment: fWidth=$fWidth fHeight=$fHeight")
-//            val bitmap = Bitmap.createBitmap(fWidth, fHeight, Bitmap.Config.ARGB_8888)
-//            val imageBMP: Bitmap = FilesUtils.pdfToBitmaps(
-//                context,
-//                File(path)
-//            )[0]
-//            val p = Paint()
-//            p.isAntiAlias = true
-//            p.isDither = true
-//            var imageWidth = 0
-//            var imageHeight = 0
-//            if (imageBMP != null) {
-//                imageWidth = imageBMP.width
-//                imageHeight = imageBMP.height
-//            }
-//            val aspectH = (height / imageHeight).toFloat()
-//            val dst = RectF(0f, 0f, fWidth.toFloat(), height.toFloat())
-//            i("getBitmapFragment:  aspectH=$aspectH")
-//            i(
-//                "getBitmapFragment: imageWidth=$imageWidth imageHeight=$imageHeight"
-//            )
-//            val sLeft = 0f
-//            val sTop = fragment.top / aspectH
-//            val sRight = imageWidth.toFloat()
-//            val sBottom = imageHeight.toFloat()
-//            val source = RectF(sLeft, sTop, sRight, sBottom)
-//            val canvas = Canvas(bitmap)
-//            canvas.drawColor(Color.WHITE)
-//            // move image to actual printing area
-//            i("getBitmapFragment: source=$source dst=$dst")
-//            dst.offsetTo(0f, 0f)
-//            val matrix = Matrix()
-//            matrix.setRectToRect(source, dst, Matrix.ScaleToFit.START)
-//            canvas.drawBitmap(imageBMP!!, matrix, p)
-//            bitmap
-//        })
-//        return pages
-//    }
 
     data class PrintReport(
         val result: TestResultAndCurveModel,

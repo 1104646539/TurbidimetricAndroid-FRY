@@ -1,4 +1,4 @@
-package com.wl.turbidimetric.util
+package com.wl.turbidimetric.report
 
 import android.os.Environment
 import com.itextpdf.kernel.font.PdfFont
@@ -79,6 +79,11 @@ object PdfCreateUtil {
      * 浓度临界值
      */
     var projectLjz: String = ""
+
+    /**
+     * 送检医生
+     */
+    var deliveryDoctor: String = ""
     lateinit var pdfFont: PdfFont
 
     /**
@@ -100,8 +105,8 @@ object PdfCreateUtil {
     @Throws(IOException::class)
     fun create(drm: TestResultAndCurveModel, filePath: File, hospitalName: String): String? {
         pdfFile = filePath.absolutePath
-        this.resultModel = drm
-        this.hospitalName = hospitalName
+        resultModel = drm
+        PdfCreateUtil.hospitalName = hospitalName
         init()
 
         LogToFile.i(TAG, "pdfFile=$pdfFile drm=$drm")
@@ -164,6 +169,7 @@ object PdfCreateUtil {
         projecteUnit =
             if (resultModel?.curve == null) " " else " " + resultModel?.curve?.projectUnit
         projectLjz = resultModel?.curve?.projectLjz.toString()
+        deliveryDoctor = resultModel?.result?.deliveryDoctor ?: ""
     }
 
     private fun createPdf() {
@@ -203,7 +209,7 @@ object PdfCreateUtil {
         paragraphPeople1_1.setTextAlignment(TextAlignment.RIGHT)
         val cellPeople1_1: Cell = Cell(1, 1).add(paragraphPeople1_1)
             .setBorder(Border.NO_BORDER)
-        val paragraphPeople1_2 = Paragraph("结果")
+        val paragraphPeople1_2 = Paragraph("$deliveryDoctor")
         paragraphPeople1_2.setTextAlignment(TextAlignment.LEFT)
         val cellPeople1_2: Cell = Cell(1, 1).add(paragraphPeople1_2).setBorder(Border.NO_BORDER)
             .setBorderBottom(SolidBorder(1f))
@@ -258,7 +264,7 @@ object PdfCreateUtil {
         paragraphPeople2_2.setTextAlignment(TextAlignment.CENTER)
         val cellPeople2_2: Cell = Cell(1, 1).add(paragraphPeople2_2).setBorder(Border.NO_BORDER)
             .setBorderBottom(SolidBorder(1f))
-        val paragraphPeople2_3 = Paragraph("<${projectLjz}")
+        val paragraphPeople2_3 = Paragraph("<$projectLjz")
         paragraphPeople2_3.setTextAlignment(TextAlignment.CENTER)
         val cellPeople2_3: Cell = Cell(1, 1).add(paragraphPeople2_3).setBorder(Border.NO_BORDER)
             .setBorderBottom(SolidBorder(1f))
@@ -274,7 +280,7 @@ object PdfCreateUtil {
 
         document.add(table)
 
-        val paragraphPeopleResult = Paragraph("检测结果:${detectionResult}")
+        val paragraphPeopleResult = Paragraph("检测结果:$detectionResult")
         paragraphPeopleResult.setTextAlignment(TextAlignment.LEFT)
         paragraphPeopleResult.setMarginLeft(20f)
         document.add(paragraphPeopleResult)

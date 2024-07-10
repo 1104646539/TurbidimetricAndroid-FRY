@@ -40,15 +40,16 @@ object LocalDataGlobal {
         val ScanCode = false
         val SelectProjectID = 0L
         val DebugMode = false
-        val test1DelayTime = 30 * 1000L
-        val test2DelayTime = 220 * 1000L
-        val test3DelayTime = 0 * 1000L
-        val test4DelayTime = 0 * 1000L
-        val looperTest = false
-        val hospitalName = ""
-        val autoPrintReceipt = false
-        val autoPrintReport = false
-        val reportFileNameBarcode = false
+        val Test1DelayTime = 30 * 1000L
+        val Test2DelayTime = 220 * 1000L
+        val Test3DelayTime = 0 * 1000L
+        val Test4DelayTime = 0 * 1000L
+        val LooperTest = false
+        val HospitalName = ""
+        val AutoPrintReceipt = false
+        val AutoPrintReport = false
+        val ReportFileNameBarcode = false
+        val ReportIntervalTime = 35
     }
 
 

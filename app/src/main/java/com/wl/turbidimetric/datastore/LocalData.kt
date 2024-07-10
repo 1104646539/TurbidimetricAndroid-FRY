@@ -71,46 +71,54 @@ object LocalData {
     /**
      * 检测第一次的等待时间
      */
-    var Test1DelayTime by LongDataStoreProperty(LocalDataGlobal.Default.test1DelayTime)
+    var Test1DelayTime by LongDataStoreProperty(LocalDataGlobal.Default.Test1DelayTime)
+
     /**
      * 检测第二次的等待时间
      */
-    var Test2DelayTime by LongDataStoreProperty(LocalDataGlobal.Default.test2DelayTime)
+    var Test2DelayTime by LongDataStoreProperty(LocalDataGlobal.Default.Test2DelayTime)
 
     /**
      * 检测第三次的等待时间
      */
-    var Test3DelayTime by LongDataStoreProperty(LocalDataGlobal.Default.test3DelayTime)
+    var Test3DelayTime by LongDataStoreProperty(LocalDataGlobal.Default.Test3DelayTime)
 
     /**
      * 检测第四次的等待时间
      */
-    var Test4DelayTime by LongDataStoreProperty(LocalDataGlobal.Default.test4DelayTime)
+    var Test4DelayTime by LongDataStoreProperty(LocalDataGlobal.Default.Test4DelayTime)
 
     /**
      * 循环测试
      */
-    var LooperTest by BooleanDataStoreProperty(LocalDataGlobal.Default.looperTest)
+    var LooperTest by BooleanDataStoreProperty(LocalDataGlobal.Default.LooperTest)
+
     /**
      * 报告医院名
      */
-    var HospitalName by StringDataStoreProperty(LocalDataGlobal.Default.hospitalName)
+    var HospitalName by StringDataStoreProperty(LocalDataGlobal.Default.HospitalName)
 
     /**
      * 是否自动打印小票
      */
-    var AutoPrintReceipt by BooleanDataStoreProperty(LocalDataGlobal.Default.autoPrintReceipt)
+    var AutoPrintReceipt by BooleanDataStoreProperty(LocalDataGlobal.Default.AutoPrintReceipt)
+
     /**
      * 是否自动打印A4报告
      */
-    var AutoPrintReport by BooleanDataStoreProperty(LocalDataGlobal.Default.autoPrintReport)
+    var AutoPrintReport by BooleanDataStoreProperty(LocalDataGlobal.Default.AutoPrintReport)
 
     /**
      * 生成报告文件的规则
      * true 条码
      * false 编号
      */
-    var ReportFileNameBarcode by BooleanDataStoreProperty(LocalDataGlobal.Default.reportFileNameBarcode)
+    var ReportFileNameBarcode by BooleanDataStoreProperty(LocalDataGlobal.Default.ReportFileNameBarcode)
+
+    /**
+     * 打印报告的间隔时间
+     */
+    var ReportIntervalTime by IntDataStoreProperty(LocalDataGlobal.Default.ReportIntervalTime)
 
 
     /**

@@ -1,4 +1,4 @@
-package com.wl.turbidimetric.util
+package com.wl.turbidimetric.report
 
 import android.content.Context
 import android.content.pm.PackageInfo

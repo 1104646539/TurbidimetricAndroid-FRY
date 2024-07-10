@@ -1,6 +1,5 @@
 package com.wl.turbidimetric.home
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -21,7 +20,6 @@ import com.wl.turbidimetric.ex.isManualSampling
 import com.wl.turbidimetric.ex.isNonexistent
 import com.wl.turbidimetric.ex.isSample
 import com.wl.turbidimetric.ex.print
-import com.wl.turbidimetric.ex.toast
 import com.wl.turbidimetric.global.EventGlobal
 import com.wl.turbidimetric.global.EventMsg
 import com.wl.turbidimetric.global.SystemGlobal
@@ -63,7 +61,7 @@ import com.wl.turbidimetric.model.TestResultModel
 import com.wl.turbidimetric.model.TestState
 import com.wl.turbidimetric.model.TestType
 import com.wl.turbidimetric.model.convertReplyState
-import com.wl.turbidimetric.print.PrintUtil
+import com.wl.turbidimetric.report.PrintSDKHelper
 import com.wl.turbidimetric.repository.if2.CurveSource
 import com.wl.turbidimetric.repository.if2.LocalDataSource
 import com.wl.turbidimetric.repository.if2.ProjectSource
@@ -77,8 +75,6 @@ import com.wl.turbidimetric.upload.service.OnGetPatientCallback
 import com.wl.turbidimetric.upload.service.OnUploadCallback
 import com.wl.turbidimetric.util.Callback2
 import com.wl.turbidimetric.util.OnScanResult
-import com.wl.turbidimetric.util.PrintHelper
-import com.wl.turbidimetric.util.PrintSDKHelper
 import com.wl.turbidimetric.util.ScanCodeUtil
 import com.wl.turbidimetric.util.SerialPortImpl
 import com.wl.wllib.LogToFile.c
@@ -95,7 +91,6 @@ import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import java.math.BigDecimal
 import java.util.Date
-import kotlin.concurrent.timer
 import kotlin.math.absoluteValue
 
 class HomeViewModel(
@@ -1620,7 +1615,7 @@ class HomeViewModel(
         }
         //自动打印A4报告
         if (appViewModel.getAutoPrintReport() && PrintSDKHelper.isPreparePrint()) {
-            PrintHelper.addPrintWork(
+            appViewModel.printHelper.addPrintWork(
                 testResultModel,
                 appViewModel.getHospitalName(),
                 appViewModel.getReportFileNameBarcode()
@@ -2402,7 +2397,8 @@ class HomeViewModel(
             //当没有跳过比色皿时，resultIndex和cuvetteIndex一致
             //当有跳过时，resultIndex从0开始，cuvetteIndex从cuvetteStartPos开始
             var resultIndex = 0
-            for (cuvetteIndex in cuvetteStartPos until (mCuvetteStates[cuvetteShelfPos]?.size ?: 0)) {
+            for (cuvetteIndex in cuvetteStartPos until (mCuvetteStates[cuvetteShelfPos]?.size
+                ?: 0)) {
                 if (needSamplingNum > 0) {
                     needSamplingNum--
                     insertResult(

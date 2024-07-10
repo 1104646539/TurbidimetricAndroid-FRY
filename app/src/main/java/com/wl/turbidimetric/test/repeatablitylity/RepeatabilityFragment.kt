@@ -19,8 +19,7 @@ import kotlinx.coroutines.launch
 import com.wl.wllib.LogToFile.i
 
 /**
- * 拟合参数
- * @property viewModel MatchingArgsViewModel
+ * 重复性测试
  */
 class RepeatabilityFragment :
     BaseFragment<RepeatabilityViewModel, FragmentRepeatabilityBinding>(R.layout.fragment_repeatability) {

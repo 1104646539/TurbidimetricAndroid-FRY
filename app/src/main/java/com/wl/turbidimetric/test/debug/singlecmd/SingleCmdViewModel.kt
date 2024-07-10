@@ -111,7 +111,7 @@ class SingleCmdViewModel(private val appViewModel: AppViewModel) : BaseViewModel
     }
 
     override fun readDataTakeReagentModel(reply: ReplyModel<TakeReagentModel>) {
-        var msg = "加试剂完成"
+        var msg = "取试剂完成"
         changeResult(msg)
     }
 

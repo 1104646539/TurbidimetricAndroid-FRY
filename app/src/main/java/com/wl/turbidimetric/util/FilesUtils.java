@@ -18,7 +18,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 
-class FilesUtils {
+public class FilesUtils {
     static String TAG = "FilesUtils";
     static final String FILE_PNG = "test_page.png";
     static final String FILE_DOC = "What is PrintHand.doc";

@@ -37,18 +37,16 @@ import com.wl.turbidimetric.app.MachineState
 import com.wl.turbidimetric.app.PrinterState
 import com.wl.turbidimetric.base.BaseActivity
 import com.wl.turbidimetric.databinding.ActivityMainBinding
-import com.wl.turbidimetric.ex.getResource
 import com.wl.turbidimetric.global.EventGlobal
 import com.wl.turbidimetric.global.EventMsg
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.main.splash.SplashFragment
+import com.wl.turbidimetric.report.PrintSDKHelper
 import com.wl.turbidimetric.upload.hl7.HL7Helper
 import com.wl.turbidimetric.upload.hl7.util.ConnectResult
 import com.wl.turbidimetric.upload.hl7.util.ConnectStatus
 import com.wl.turbidimetric.upload.service.OnConnectListener
 import com.wl.turbidimetric.util.ActivityDataBindingDelegate
-import com.wl.turbidimetric.util.PrintHelper
-import com.wl.turbidimetric.util.PrintSDKHelper
 import com.wl.turbidimetric.util.ScanCodeUtil
 import com.wl.turbidimetric.view.CustomBubbleAttachPopup
 import com.wl.turbidimetric.view.dialog.HiltDialog
@@ -167,7 +165,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         unregisterReceiver(usbFlashDiskReceiver)
         unregisterReceiver(mUsbReceiver)
         PrintSDKHelper.printerStateChange = null
-        PrintHelper.onSizeChange = null
+        appVm.printHelper.onSizeChange = null
         PrintSDKHelper.close()
         HL7Helper.setOnConnectListener2(null)
         HL7Helper.disconnect()
@@ -231,7 +229,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         PrintSDKHelper.printerStateChange = { state ->
             appVm.processIntent(AppIntent.PrinterStateChange(state))
         }
-        PrintHelper.onSizeChange = { size ->
+        appVm.printHelper.onSizeChange = { size ->
             appVm.processIntent(AppIntent.PrintNumChange(size))
         }
         PrintSDKHelper.init(this)

@@ -57,19 +57,12 @@ class LeftNavigationView @JvmOverloads constructor(
     private val itemMargin = 8
     private val itemHeight = 186
 
-    private val srcs = mutableListOf<Int>()
-    private val selectSrcs = mutableListOf<Int>()
-    private val texts = mutableListOf<String>()
+    private val navItems = mutableListOf<NavItem>()
     private var bg: Int = 0
     private var bg2: Int = 0
-    fun setItem(srcs: List<Int>, selectSrcs: List<Int>, texts: List<String>, bg: Int, bg2: Int) {
-        if (srcs.size != texts.size) throw Exception("item数量不一致")
-        this.srcs.clear()
-        this.srcs.addAll(srcs)
-        this.selectSrcs.clear()
-        this.selectSrcs.addAll(selectSrcs)
-        this.texts.clear()
-        this.texts.addAll(texts)
+    fun setItem(navItems: List<NavItem>, bg: Int, bg2: Int) {
+        this.navItems.clear()
+        this.navItems.addAll(navItems)
         this.bg = bg
         this.bg2 = bg2
 
@@ -116,7 +109,7 @@ class LeftNavigationView @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas?) {
         canvas?.let {
-            srcs.forEachIndexed { index, item ->
+            navItems.forEachIndexed { index, item ->
                 drawItem(canvas, index)
             }
             drawBg2(canvas)
@@ -179,7 +172,7 @@ class LeftNavigationView @JvmOverloads constructor(
     }
 
     private fun drawItem(canvas: Canvas, index: Int) {
-        if (srcs.isEmpty()) return
+        if (navItems.isEmpty()) return
         drawBg(canvas, index)
         drawIcon(canvas, index)
         drawText(canvas, index)
@@ -196,13 +189,13 @@ class LeftNavigationView @JvmOverloads constructor(
         val x = leftPadding.toFloat()
         val y = (itemSrcRect[index].bottom + textHeight / 2 + 10 + textMarginTop).toFloat()
         canvas.drawText(
-            texts[index], x, y,
+            navItems[index].title, x, y,
             paintText
         )
     }
 
     private fun initParams() {
-        srcs?.forEachIndexed { index, src ->
+        navItems?.forEachIndexed { index, src ->
             //背景区域
             val tempH =
                 if (index == 0) {
@@ -223,8 +216,8 @@ class LeftNavigationView @JvmOverloads constructor(
 
             //主图标
             val item = itemRect[index]
-            itemBitmap.add((resources.getDrawable(src) as BitmapDrawable).bitmap)
-            selectItemBitmap.add((resources.getDrawable(selectSrcs[index]) as BitmapDrawable).bitmap)
+            itemBitmap.add((resources.getDrawable(navItems[index].icon) as BitmapDrawable).bitmap)
+            selectItemBitmap.add((resources.getDrawable(navItems[index].selectIcon) as BitmapDrawable).bitmap)
             itemSrcRangeRect.add(Rect(0, 0, itemBitmap[index].width, itemBitmap[index].height))
             itemSrcRect.add(
                 Rect(
@@ -280,6 +273,8 @@ class LeftNavigationView @JvmOverloads constructor(
 
         initParams()
     }
+
+    data class NavItem(val icon: Int, val selectIcon: Int, val title: String)
 }
 typealias OnItemChangeListener = (index: Int) -> Unit
 

@@ -97,7 +97,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        if(savedInstanceState == null){
+        if (savedInstanceState == null) {
             App.instance?.serialPort?.open(lifecycleScope)
             App.instance?.printUtil?.open(lifecycleScope)
         }
@@ -127,7 +127,10 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        Log.d(TAG, "onActivityResult data==null ${data == null} resultCode=$resultCode requestCode=$requestCode")
+        Log.d(
+            TAG,
+            "onActivityResult data==null ${data == null} resultCode=$resultCode requestCode=$requestCode"
+        )
         if (requestCode == OPEN_DOCUMENT_TREE_CODE) {
             val uri = data?.data
             if (uri != null && resultCode == RESULT_OK) {
@@ -240,20 +243,9 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         vd.vp.isUserInputEnabled = false
         vd.vp.offscreenPageLimit = 6
         vd.lnv.setItem(
-            mutableListOf(
-                R.drawable.left_nav_analyse,
-                R.drawable.left_nav_datamanager,
-                R.drawable.left_nav_matching,
-                R.drawable.left_nav_settings
-            ),
-            mutableListOf(
-                R.drawable.left_nav_analyse_selected,
-                R.drawable.left_nav_datamanager_selected,
-                R.drawable.left_nav_matching_selected,
-                R.drawable.left_nav_settings_selected
-            ),
-            mutableListOf("样本分析", "数据管理", "曲线拟合", "参数设置"),
-            R.drawable.left_nav_item_bg, R.drawable.left_nav_item_bg2
+            SystemGlobal.navItems,
+            R.drawable.left_nav_item_bg,
+            R.drawable.left_nav_item_bg2
         )
         vd.lnv.onItemChangeListener = {
             vm.processIntent(MainIntent.ChangeNavCurIndex(it))

@@ -9,21 +9,21 @@ plugins {
 
 android {
     signingConfigs {
-        debug {
-            storeFile file('E:\\platform.keystore')
-            storePassword '123456'
-            keyAlias 'platform'
-            keyPassword '123456'
-        }
-        release {
-//            manifestPlaceholders = [
-//                    APP_NAME: "@string/app_name",
-//            ]
-            storeFile file('E:\\platform.keystore')
-            storePassword '123456'
-            keyAlias 'platform'
-            keyPassword '123456'
-        }
+//        debug {
+//            storeFile file('E:\\platform.keystore')
+//            storePassword '123456'
+//            keyAlias 'platform'
+//            keyPassword '123456'
+//        }
+//        release {
+////            manifestPlaceholders = [
+////                    APP_NAME: "@string/app_name",
+////            ]
+//            storeFile file('E:\\platform.keystore')
+//            storePassword '123456'
+//            keyAlias 'platform'
+//            keyPassword '123456'
+//        }
     }
     compileSdk 33
 
@@ -32,7 +32,7 @@ android {
         minSdk 24
         targetSdk 32
         versionCode 1
-        versionName "1.0.0.0-40修复手动加样模式闪退的问题"
+        versionName "1.0.0.0-41修复跳过一个比色皿时，取试剂失败不继续检测的问题"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 

@@ -1790,14 +1790,6 @@ class HomeViewModel(
                     //取试剂，移动比色皿
                     takeReagent()
                 }
-//                if (!allowTakeReagent) {//如果是取试剂失败，就不需要再取试剂了，检测完直接结束
-//                    if (lastNeedTest1(cuvettePos-1)) {
-//                        stepTest(TestState.Test2)
-//                    } else {
-//                        i("nextDripReagent 未知的")
-//                    }
-//
-//                } else
                 if (cuvettePos >= 5 && lastNeedTest1(cuvettePos - 5)) {
                     stepTest(TestState.Test2)
                 } else {
@@ -1890,7 +1882,7 @@ class HomeViewModel(
             return true
         }
         for (i in takeReagentFailedIndex - 1 downTo 0) {
-            if (mCuvetteStates[cuvetteShelfPos]!![i].state != CuvetteState.Test1) {
+            if (mCuvetteStates[cuvetteShelfPos]!![i].state != CuvetteState.Test1 && mCuvetteStates[cuvetteShelfPos]!![i].state != CuvetteState.Skip) {
                 return false
             }
         }
@@ -2825,6 +2817,11 @@ class HomeViewModel(
                 )
                 if (cuvetteShelfPos == -1) {
                     cuvetteShelfPos = i
+                    if (cuvetteStartPos > -1) {//有跳过的并且是第一排,将跳过的比色皿状态置为CuvetteState.Skip
+                        for (skipIndex in 0 until cuvetteStartPos) {
+                            array[i] = Item(CuvetteState.Skip)
+                        }
+                    }
                 }
                 lastCuvetteShelfPos = i
             }

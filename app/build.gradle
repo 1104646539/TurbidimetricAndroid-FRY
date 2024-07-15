@@ -32,7 +32,7 @@ android {
         minSdk 24
         targetSdk 32
         versionCode 1
-        versionName "1.0.0.0-41修复跳过一个比色皿时，取试剂失败不继续检测的问题"
+        versionName "1.0.0.0-42修复手动模式跳过比色皿检测异常的问题"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 

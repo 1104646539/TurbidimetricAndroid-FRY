@@ -1365,7 +1365,7 @@ class HomeViewModel(
     override fun readDataTestModel(reply: ReplyModel<TestModel>) {
         if (!runningTest()) return
         if (appViewModel.testState.isNotPrepare()) return
-        c("接收到 检测完成 reply=$reply cuvettePos=$cuvettePos appViewModel.testState=${appViewModel.testState}")
+        c("接收到 检测完成 reply=$reply cuvettePos=$cuvettePos appViewModel.testState=${appViewModel.testState} samplePos=${samplePos}")
 
         testFinish = true
 
@@ -1629,7 +1629,7 @@ class HomeViewModel(
      */
     private fun showResultFinishAndNext() {
         testMsg.postValue(
-            testMsg.value?.plus("这排比色皿检测结束 比色皿位置=$cuvetteShelfPos 样本位置=$sampleShelfPos \n 第一次:$resultTest1 \n 第二次:$resultTest2 \n 第三次:$resultTest3 \n 第四次:$resultTest4 \n  吸光度:$absorbances \n 浓度=$cons \n选择的四参数为${selectProject ?: "未选择"}\n\n")
+            testMsg.value?.plus("这排比色皿检测结束 比色皿架位置=$cuvetteShelfPos 样本架位置=$sampleShelfPos \n 第一次:$resultTest1 \n 第二次:$resultTest2 \n 第三次:$resultTest3 \n 第四次:$resultTest4 \n  吸光度:$absorbances \n 浓度=$cons \n选择的四参数为${selectProject ?: "未选择"}\n\n")
         )
         resultModels.forEach {
             i("resultModel=$it")
@@ -1707,7 +1707,7 @@ class HomeViewModel(
             testFinishAction()
             return
         }
-        if ((isAuto() && lastSamplePos(samplePos)) || isManual() || isManualSampling()) {//这排最后一个样本
+//        if ((isAuto() && lastSamplePos(samplePos)) || isManual() || isManualSampling()) {//这排最后一个样本
             if (isManual() && manualModelSamplingFinish()) {//手动模式已经取完样
                 //手动模式，检测完了
                 testFinishAction()
@@ -1732,7 +1732,11 @@ class HomeViewModel(
                     checkTestState(accord = {
                         if (!isManualSampling()) {
                             //移动样本架
-                            moveSampleShelfNext()
+                            if (lastSamplePos(samplePos)) {
+                                moveSampleShelfNext()
+                            }else{
+                                moveSample()
+                            }
                         }
                         //还有比色皿。继续移动比色皿，检测
                         moveCuvetteShelfNext()
@@ -1746,31 +1750,7 @@ class HomeViewModel(
                     })
                 }
             }
-        } else {
-            if (lastCuvetteShelf(cuvetteShelfPos)) {//最后一排比色皿
-                if (isManualSampling()) {
-                    testFinishAction()
-                } else {
-                    //复位后提示，比色皿不足了
-                    continueTestCuvetteState = true
-                    cuvetteShelfPos = -1
-                    moveCuvetteShelf(cuvetteShelfPos)
-                }
-            } else {
-                //还有比色皿。继续移动比色皿，检测
-                checkTestState(accord = {
-                    moveSample()
-                    moveCuvetteShelfNext()
-                }, discrepancy = { str ->
-                    continueTestGetState = true
-                    viewModelScope.launch {
-                        _dialogUiState.emit(
-                            HomeDialogUiState.GetStateNotExist("试剂和清洗液不足")
-                        )
-                    }
-                })
-            }
-        }
+//        }
     }
 
     /**

@@ -15,19 +15,20 @@ import com.wl.turbidimetric.model.TestResultAndCurveModel
 import com.wl.turbidimetric.util.FilesUtils
 import com.wl.turbidimetric.util.WorkQueue
 import com.wl.wllib.LogToFile.i
+import kotlinx.coroutines.CoroutineScope
 import java.io.File
 
-class PrintHelper(private val intervalTime: Int,private val context: Context) {
+class PrintHelper(private val intervalTime: Int, private val context: Context) {
 
-    private val queue = WorkQueue<PrintReport>((intervalTime * 1000).toLong())
+    private lateinit var queue: WorkQueue<PrintReport>
     var onSizeChange: ((num: Int) -> Unit)? = null
-    var size = queue.queue.size
+    var size = 0
         private set(value) {
             field = value
             onSizeChange?.invoke(value)
         }
-
-    init {
+    fun open(scope: CoroutineScope) {
+        queue = WorkQueue((intervalTime * 1000).toLong(), scope)
         queue.onWorkStart = { result ->
             printReport(result.result, result.hospitalName, result.barcode)
             size = queue.queue.size

@@ -2,6 +2,7 @@ package com.wl.turbidimetric.datamanager
 
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -20,7 +21,7 @@ import com.wl.turbidimetric.global.EventMsg
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.ConditionModel
 import com.wl.turbidimetric.model.TestResultAndCurveModel
-import com.wl.turbidimetric.print.PrintUtil
+import com.wl.turbidimetric.print.ThermalPrintUtil
 import com.wl.turbidimetric.report.ExportReportHelper
 import com.wl.turbidimetric.report.PrintSDKHelper
 import com.wl.turbidimetric.upload.hl7.HL7Helper
@@ -316,11 +317,21 @@ class DataManagerFragment :
                         }
 
                         is DataManagerViewModel.PrintUIState.Print -> {
-                            appVm.printUtil.printTest(
+                            appVm.thermalPrintUtil.printTest(
                                 it.items,
-                                onPrintListener = object : PrintUtil.OnPrintListener {
+                                onPrintListener = object : ThermalPrintUtil.OnPrintListener {
                                     override fun onPrinterPagerOut() {
-                                        toast("打印机缺纸，请重新安装纸后再次尝试打印")
+                                        toast(
+                                            "打印机缺纸，请重新安装纸后再次尝试打印",
+                                            Toast.LENGTH_LONG
+                                        )
+                                    }
+
+                                    override fun onPrinterOvertime() {
+                                        toast(
+                                            "打印机未响应，请检查打印机线路异常",
+                                            Toast.LENGTH_LONG
+                                        )
                                     }
                                 })
                             vm.printSuccess("打印成功")

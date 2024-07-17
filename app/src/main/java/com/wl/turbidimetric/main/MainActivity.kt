@@ -99,7 +99,8 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         if (savedInstanceState == null) {
             App.instance?.serialPort?.open(lifecycleScope)
-            App.instance?.printUtil?.open(lifecycleScope)
+            App.instance?.thermalPrintUtil?.open(lifecycleScope)
+            App.instance?.printHelper?.open(lifecycleScope)
         }
         setTheme(R.style.Theme_Mvvmdemo) //恢复原有的样式
         super.onCreate(savedInstanceState)
@@ -164,7 +165,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         super.onDestroy()
         ScanCodeUtil.onScanResult = null
         App.instance?.serialPort?.close()
-        App.instance?.printUtil?.close()
+        App.instance?.thermalPrintUtil?.close()
         unregisterReceiver(usbFlashDiskReceiver)
         unregisterReceiver(mUsbReceiver)
         PrintSDKHelper.printerStateChange = null

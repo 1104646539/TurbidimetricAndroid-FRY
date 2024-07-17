@@ -1595,7 +1595,7 @@ class HomeViewModel(
         }
         //自动打印小票
         if (appViewModel.getAutoPrintReceipt()) {
-            appViewModel.printUtil.printTest(
+            appViewModel.thermalPrintUtil.printTest(
                 mutableListOf(testResultModel), onPrintListener = null
             )
         }

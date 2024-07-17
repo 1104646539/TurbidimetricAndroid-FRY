@@ -1,5 +1,6 @@
 package com.wl.turbidimetric.matchingargs
 
+import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -54,7 +55,7 @@ import com.wl.turbidimetric.model.TestModel
 import com.wl.turbidimetric.model.TestState
 import com.wl.turbidimetric.model.TestType
 import com.wl.turbidimetric.model.convertReplyState
-import com.wl.turbidimetric.print.PrintUtil
+import com.wl.turbidimetric.print.ThermalPrintUtil
 import com.wl.turbidimetric.repository.if2.CurveSource
 import com.wl.turbidimetric.repository.if2.LocalDataSource
 import com.wl.turbidimetric.repository.if2.ProjectSource
@@ -1188,7 +1189,7 @@ class MatchingArgsViewModel(
     fun print() {
         selectProject?.let {
             if (it.reactionValues.isNotEmpty() == true && it.yzs.isNotEmpty() == true) {
-                appViewModel.printUtil.printMatchingQuality(
+                appViewModel.thermalPrintUtil.printMatchingQuality(
                     it.reactionValues.toList(),
                     it.targets,
                     it.yzs.toList(),
@@ -1197,9 +1198,16 @@ class MatchingArgsViewModel(
                     it.projectName,
                     it.reagentNO,
                     it.gradsNum,
-                    onPrintListener = object : PrintUtil.OnPrintListener {
+                    onPrintListener = object : ThermalPrintUtil.OnPrintListener {
                         override fun onPrinterPagerOut() {
-                            toast("打印机缺纸，请重新安装纸后再次尝试打印")
+                            toast("打印机缺纸，请重新安装纸后再次尝试打印", Toast.LENGTH_LONG)
+                        }
+
+                        override fun onPrinterOvertime() {
+                            toast(
+                                "打印机未响应，请检查打印机线路异常",
+                                Toast.LENGTH_LONG
+                            )
                         }
                     })
             }

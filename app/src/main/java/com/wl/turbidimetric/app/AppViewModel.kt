@@ -6,7 +6,7 @@ import com.wl.turbidimetric.ex.toState
 import com.wl.turbidimetric.model.MachineTestModel
 import com.wl.turbidimetric.model.TestState
 import com.wl.turbidimetric.model.TestType
-import com.wl.turbidimetric.print.PrintUtil
+import com.wl.turbidimetric.print.ThermalPrintUtil
 import com.wl.turbidimetric.report.PrintHelper
 import com.wl.turbidimetric.repository.if2.LocalDataSource
 import com.wl.turbidimetric.upload.hl7.util.ConnectStatus
@@ -26,7 +26,7 @@ import java.util.Date
 class AppViewModel(
     private val localDataSource: LocalDataSource,
     val serialPort: SerialPortIF,
-    val printUtil: PrintUtil,
+    val thermalPrintUtil: ThermalPrintUtil,
     val printHelper: PrintHelper,
 ) :
     ViewModel() {

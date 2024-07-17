@@ -1,10 +1,14 @@
 package com.wl.turbidimetric.util
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.LinkedBlockingQueue
 import kotlin.concurrent.thread
 
-class WorkQueue<T>(var intervalTime: Long = 30000L) {
+class WorkQueue<T>(var intervalTime: Long = 30000L, var scope: CoroutineScope) {
     val queue: BlockingQueue<T> = LinkedBlockingQueue()
     var onWorkStart: ((t: T) -> Unit)? = null
 
@@ -13,7 +17,7 @@ class WorkQueue<T>(var intervalTime: Long = 30000L) {
     }
 
     private fun startWork() {
-        thread {
+        scope.launch(Dispatchers.IO) {
             while (true) {
                 val t = queue.take()
                 onWorkStart?.invoke(t)
@@ -26,5 +30,11 @@ class WorkQueue<T>(var intervalTime: Long = 30000L) {
         queue.add(work)
     }
 
+    fun clear() {
+        queue.clear()
+    }
 
+    fun dispose() {
+        scope.cancel()
+    }
 }

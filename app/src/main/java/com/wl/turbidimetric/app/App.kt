@@ -16,7 +16,7 @@ import com.wl.turbidimetric.ex.getPackageInfo
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.CurveModel
 import com.wl.turbidimetric.model.ProjectModel
-import com.wl.turbidimetric.print.PrintUtil
+import com.wl.turbidimetric.print.ThermalPrintUtil
 import com.wl.turbidimetric.repository.if2.LocalDataSource
 import com.wl.turbidimetric.upload.hl7.util.getLocalConfig
 import com.wl.turbidimetric.util.CrashHandler
@@ -50,8 +50,8 @@ class App : Application() {
             SystemGlobal.isCodeDebug,
         )
     }
-    val printUtil: PrintUtil by lazy {
-        PrintUtil(BaseSerialPort())
+    val thermalPrintUtil: ThermalPrintUtil by lazy {
+        ThermalPrintUtil(BaseSerialPort())
     }
     val printHelper: PrintHelper by lazy {
         PrintHelper(LocalData.ReportIntervalTime,this)
@@ -230,7 +230,7 @@ class App : Application() {
                 return AppViewModel(
                     localDataDataSource,
                     App.instance!!.serialPort,
-                    App.instance!!.printUtil,
+                    App.instance!!.thermalPrintUtil,
                     App.instance!!.printHelper,
                 ) as T
             }

@@ -2,7 +2,8 @@ package com.wl.turbidimetric.print
 
 import com.wl.turbidimetric.ex.scale
 import com.wl.turbidimetric.model.TestResultAndCurveModel
-import com.wl.turbidimetric.util.FitterType
+import com.wl.turbidimetric.report.PrintHelper.PrintReport
+import com.wl.turbidimetric.util.WorkQueue
 import com.wl.weiqianwllib.serialport.BaseSerialPort
 import com.wl.weiqianwllib.serialport.WQSerialGlobal
 import com.wl.wllib.toTimeStr
@@ -10,7 +11,9 @@ import java.nio.charset.Charset
 import com.wl.wllib.LogToFile.i
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
@@ -18,33 +21,76 @@ import kotlinx.coroutines.launch
  * @property serialPort BaseSerialPortUtil
  * @constructor
  */
-class PrintUtil(private val serialPort: BaseSerialPort) {
+class ThermalPrintUtil(private val serialPort: BaseSerialPort) {
     companion object {
+        /**
+         * 获取打印机状态的命令
+         */
         private val GET_STATE = byteArrayOf(0x1C, 0x76)
-        private val PAGER_OUT: Byte = 0x55
-        private val PAGER_FULL: Byte = 0x04
+
+        /**
+         * 打印机状态 缺纸
+         */
+        private const val PAGER_OUT: Byte = 0x55
+
+        /**
+         * 打印机状态 有纸
+         */
+        private const val PAGER_FULL: Byte = 0x04
+
+        /**
+         * 发送打印信息后的间隔时间
+         */
+        private const val INTERVAL_TIME = 100;
+
+        /**
+         * 发送获取打印机状态的超时时长
+         */
+        private const val OVERTIME = 1500L;
     }
 
-    var scope: CoroutineScope? = null
+    private lateinit var queue: WorkQueue<TestResultAndCurveModel>
+
+    private var scope: CoroutineScope? = null
 
     private val byteArray = ByteArray(4)
-    var onPrintListener: OnPrintListener? = null
+    private var onPrintListener: OnPrintListener? = null
 
     private fun readData() {
         scope?.launch(Dispatchers.IO) {
             while (true) {
                 val ret = serialPort.read(byteArray, byteArray.size)
                 if (ret == 1) {
+                    overtimeTask?.cancel()
                     parse(byteArray[0])
                 }
             }
         }
     }
 
+
     fun open(scope: CoroutineScope) {
         this.scope = scope
         serialPort.openSerial(WQSerialGlobal.COM2, 9600, 8)
+        queue = WorkQueue((INTERVAL_TIME).toLong(), scope)
         readData()
+        printTask()
+    }
+
+    private var overtimeTask: Job? = null
+    private fun printTask() {
+        queue.onWorkStart = { t ->
+            sendAndCheckState(getPrintByte(getTestResultMsg(t)), onPrintListener)
+            overtimeTask = scope?.launch(Dispatchers.IO) {
+                //获取检测状态超时,报错并取消所有打印任务
+                delay(OVERTIME)
+                i("打印机超时")
+                scope?.launch(Dispatchers.Main) {
+                    onPrintListener?.onPrinterOvertime()
+                }
+                queue.clear()
+            }
+        }
     }
 
     fun close() {
@@ -74,10 +120,10 @@ class PrintUtil(private val serialPort: BaseSerialPort) {
     }
 
     fun printTest(results: List<TestResultAndCurveModel?>, onPrintListener: OnPrintListener?) {
+        this.onPrintListener = onPrintListener
         results.forEach {
             it?.let {
-                val msg = getTestResultMsg(it)
-                sendAndCheckState(getPrintByte(msg), onPrintListener);
+                queue.addWork(it)
             }
         }
     }
@@ -244,7 +290,15 @@ class PrintUtil(private val serialPort: BaseSerialPort) {
     }
 
     interface OnPrintListener {
+        /**
+         * 打印机缺纸
+         */
         fun onPrinterPagerOut()
+
+        /**
+         * 打印机超时未响应
+         */
+        fun onPrinterOvertime()
     }
 }
 

@@ -525,7 +525,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     is HomeDialogUiState.CuvetteDeficiency -> {
                         dialog.showPop(requireContext(), isCancelable = false) {
                             it.showDialog(
-                                msg = "比色皿检测结束，是否添加？",
+                                msg = "请更换比色皿",
                                 confirmText = "我已添加",
                                 confirmClick = { baseDialog: BasePopupView ->
                                     it.dismiss()

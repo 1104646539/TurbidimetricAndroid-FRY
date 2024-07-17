@@ -33,24 +33,23 @@ object TestSerialPort {
 //                if (index <= 0) {
 //                    reply = reply.plus(ubyteArrayOf(0x3Fu, 0xFFu, 0xFFu, 0xFFu))
 //                } else {
-                    reply = reply.plus(ubyteArrayOf(0x00u, 0x00u, 0x00u, 0x00u))
+                reply = reply.plus(ubyteArrayOf(0x00u, 0x00u, 0x00u, 0x00u))
 //                }
 //                index++
             }
 
             SerialGlobal.CMD_GetState -> {
 //                delay(4000)
-                reply = reply.plus(ubyteArrayOf(0x0u, 0x2u, 0xFFu, 0xffu))// 0011 0011
+                reply = reply.plus(ubyteArrayOf(0x0u, 0x2u, 0x31u, 0xffu))// 0011 0011
 //                reply = reply.plus(ubyteArrayOf(0x0u, 0x2u, 0x13u, 0x00u))//0001 0001
             }
 
             SerialGlobal.CMD_MoveSample -> {
-//                if (index in 0..3) {
-                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x2u))//0不存在 1样本管 2比色杯
-//                } else {
+//                if (index in 8..9) {
 //                    reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x0u))//0不存在 1样本管 2比色杯
+//                } else {
+                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x1u))//0不存在 1样本管 2比色杯
 //                }
-////
 //                index++
 //                if (index == 10) {
 //                    index = 0
@@ -115,7 +114,7 @@ object TestSerialPort {
             }
 
             SerialGlobal.CMD_Sampling -> {
-//                if (index == 0) {
+//                if (index == 8 || index == 9) {
 //                    reply = ubyteArrayOf(data[0], 0x04u, 0x0u, 0x0u, 0x0u, 0x0u)//取样失败
 //                } else {
 //                    reply = ubyteArrayOf(data[0], 0x00u, 0x0u, 0x0u, 0x0u, 0x0u)//取样成功

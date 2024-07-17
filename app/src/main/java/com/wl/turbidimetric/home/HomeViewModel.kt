@@ -1697,7 +1697,7 @@ class HomeViewModel(
         if (isManualSampling() && needTestNum <= 0) {//手动取样模式已经检测指定数量的比色皿
             //手动加样模式，检测完了
             testFinishAction()
-        } else if (isAuto() && lastSampleShelf(sampleShelfPos)) {//最后一排
+        } else if (isAuto() && lastSampleShelf(sampleShelfPos) && lastSamplePos(samplePos)) {//最后一排并且最后一个
             //结束检测，样本已经取完样了
             testFinishAction()
         } else {

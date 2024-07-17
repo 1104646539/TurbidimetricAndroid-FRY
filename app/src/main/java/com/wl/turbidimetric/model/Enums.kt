@@ -2,47 +2,14 @@ package com.wl.turbidimetric.model
 
 import com.wl.turbidimetric.R
 
-/**
- * 比色皿当前的状态
- */
-//enum class CuvetteState(state: String) {
-//    None("未知"),//啥也没干
-//    Skip("跳过"),//跳过
-//    CuvetteNotEmpty("比色皿非空"),//比色皿非空
-//    DripSample("已加样"),//已经加样
-//    TakeReagentFailed("取试剂失败"),//取试剂失败
-//    DripReagent("已加试剂"),//已经加过试剂
-//    Stir("已搅拌"),//已经搅拌
-//    Test1("已检测1次"),//检测过第一次
-//    Test2("已检测2次"),//检测过第二次
-//    Test3("已检测3次"),//检测过第三次
-//    Test4("已检测4次")//检测过第四次
-//}
 
 /**
  * 仪器检测模式
  */
 enum class MachineTestModel {
     Auto,//全自动模式 。指自动识别样本是否存在，扫码等
-    Manual,//手动模式。指手动输入样本数量
     ManualSampling;//手动加样模式。指手动输入样本数量
 }
-
-///**
-// * 样本当前的状态
-// */
-//enum class SampleState {
-//    None,//啥也没干
-//    NONEXISTENT,//确定没有任何样本
-//    Exist,//确定存在
-//    ScanSuccess,//扫码成功
-//    ScanFailed,//扫码失败
-//    Pierced,//刺破完成
-//    Squeezing,//挤压完成
-//    SamplingFailed,//取样失败
-//    Sampling,//取样完成
-//
-//}
 
 interface ItemState {
     var state: String

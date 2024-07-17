@@ -267,14 +267,6 @@ fun isManualSampling(machineTestModel: MachineTestModel): Boolean {
     return machineTestModel == MachineTestModel.ManualSampling
 }
 
-/**
- * 是否是手动模式
- * @return Boolean
- */
-fun isManual(machineTestModel: MachineTestModel): Boolean {
-    return machineTestModel == MachineTestModel.Manual
-}
-
 
 /**
  * 获取打开桌面的intent

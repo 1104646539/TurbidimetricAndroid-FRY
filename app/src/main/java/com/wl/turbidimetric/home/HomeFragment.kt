@@ -252,7 +252,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             } else if (vm.selectProject == null) {
                 showConfigDialog()
                 toast("请选择标曲")
-            } else if (!vm.isAuto() && vm.needSamplingNum <= 0) {
+            } else if (!vm.isAuto() && vm.needTestNum <= 0) {
                 showConfigDialog()
                 toast("请输入检测数量")
             } else {
@@ -309,7 +309,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                         vm.selectProject,
                         vm.cuvetteStartPos,
                         vm.getDetectionNum(),
-                        vm.needSamplingNum
+                        vm.needTestNum
                     )
                 }
             }
@@ -401,7 +401,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 vm.selectProject,
                 vm.cuvetteStartPos,
                 if (vm.detectionNumInput.isNullOrEmpty()) vm.getDetectionNum() else vm.detectionNumInput,
-                vm.needSamplingNum,
+                vm.needTestNum,
                 vm.isAuto(),
                 { projectModel, skipNum, detectionNum, sampleNum, baseDialog ->
                     if (projectModel == null) {

@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 
 class TestModeFragment :
     BaseFragment<TestModeViewModel, FragmentTestModeBinding>(R.layout.fragment_test_mode) {
-    override val vm: TestModeViewModel by viewModels{TestModeViewModelFactory()}
+    override val vm: TestModeViewModel by viewModels { TestModeViewModelFactory() }
     private val hiltDialog by lazy { HiltDialog(requireContext()) }
     override fun initViewModel() {
 
@@ -33,8 +33,6 @@ class TestModeFragment :
             vm.testModeUiState.collectLatest {
                 if (it.machineTestModel == MachineTestModel.Auto) {
                     vd.rbAuto?.isChecked = true
-                } else if (it.machineTestModel == MachineTestModel.Manual) {
-                    vd.rbManual?.isChecked = true
                 } else {
                     vd.rbManualSampling?.isChecked = true
                 }
@@ -43,7 +41,6 @@ class TestModeFragment :
                     vd.llAuto?.visibility = isChecked.isShow()
                 }
                 vd.llAuto?.visibility = vd.rbAuto?.isChecked.isShow()
-                vd.cbSample?.isChecked = it.sampleExist == true
                 vd.cbScanCode?.isChecked = it.scanCode == true
             }
         }
@@ -71,18 +68,15 @@ class TestModeFragment :
         vd.btnChange.setOnClickListener {
             val machineTestModel = if (vd.rbAuto.isChecked) {
                 MachineTestModel.Auto
-            } else if (vd.rbManual?.isChecked) {
-                MachineTestModel.Manual
             } else {
                 MachineTestModel.ManualSampling
             }
             vm.change(
                 machineTestModel,
-                vd.cbSample.isChecked,
+                true,//原来是是否使用样本管传感器，后面崔总说取消这个功能，一定要用
                 vd.cbScanCode.isChecked,
             )
             appVm.processIntent(AppIntent.MachineTestModelChange(machineTestModel))
-
         }
     }
 

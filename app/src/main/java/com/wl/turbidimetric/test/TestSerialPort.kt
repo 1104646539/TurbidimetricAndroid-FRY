@@ -35,7 +35,7 @@ object TestSerialPort {
 //                } else {
                     reply = reply.plus(ubyteArrayOf(0x00u, 0x00u, 0x00u, 0x00u))
 //                }
-                index++
+//                index++
             }
 
             SerialGlobal.CMD_GetState -> {
@@ -115,7 +115,7 @@ object TestSerialPort {
             }
 
             SerialGlobal.CMD_Sampling -> {
-//                if (index == 2) {
+//                if (index == 0) {
 //                    reply = ubyteArrayOf(data[0], 0x04u, 0x0u, 0x0u, 0x0u, 0x0u)//取样失败
 //                } else {
 //                    reply = ubyteArrayOf(data[0], 0x00u, 0x0u, 0x0u, 0x0u, 0x0u)//取样成功

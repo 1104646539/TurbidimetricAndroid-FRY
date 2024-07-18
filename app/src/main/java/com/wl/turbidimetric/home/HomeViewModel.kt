@@ -2764,7 +2764,7 @@ class HomeViewModel(
                     cuvetteShelfPos = i
                     if (cuvetteStartPos > -1) {//有跳过的并且是第一排,将跳过的比色皿状态置为CuvetteState.Skip
                         for (skipIndex in 0 until cuvetteStartPos) {
-                            array[i] = Item(CuvetteState.Skip)
+                            array[skipIndex] = Item(CuvetteState.Skip)
                         }
                     }
                 }
@@ -2933,20 +2933,20 @@ class HomeViewModel(
     }
 
     /**
-     * 移动比色皿到 滴样位
+     * 移动比色皿 滴样位
      */
     private fun moveCuvetteDripSample(step: Int = 1) {
-        c("发送 移动比色皿到 加样位 step=$step cuvettePos=$cuvettePos")
+        c("发送 移动比色皿 加样位 step=$step cuvettePos=$cuvettePos")
         cuvetteMoveFinish = false
         cuvettePos += step
         appViewModel.serialPort.moveCuvetteDripSample(step > 0, step.absoluteValue)
     }
 
     /**
-     * 移动比色皿到 加试剂位
+     * 移动比色皿 加试剂位
      */
     private fun moveCuvetteDripReagent(step: Int = 1) {
-        c("发送 移动比色皿到 加试剂位 step=$step")
+        c("发送 移动比色皿 加试剂位 step=$step")
         cuvetteMoveFinish = false
         cuvettePos += step
         appViewModel.serialPort.moveCuvetteDripReagent(step > 0, step.absoluteValue)
@@ -2954,10 +2954,10 @@ class HomeViewModel(
 
 
     /**
-     * 移动比色皿到 检测位
+     * 移动比色皿 检测位
      */
     private fun moveCuvetteTest(step: Int = 1) {
-        c("发送 移动比色皿到 检测位 appViewModel.testState=${appViewModel.testState} step=$step")
+        c("发送 移动比色皿 检测位 appViewModel.testState=${appViewModel.testState} step=$step")
         cuvettePos += step
         testFinish = false
         testing = true

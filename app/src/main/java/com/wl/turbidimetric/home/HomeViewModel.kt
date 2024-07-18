@@ -825,8 +825,8 @@ class HomeViewModel(
      * 去加样
      */
     private fun goDripSample() {
-        i("sampleMoveFinish=$sampleMoveFinish samplingFinish=$samplingFinish cuvetteMoveFinish=$cuvetteMoveFinish")
-        if (samplePos > 0 && sampleMoveFinish && samplingFinish && cuvetteMoveFinish && sampleNeedDripSampling(
+        i("sampleMoveFinish=$sampleMoveFinish samplingFinish=$samplingFinish cuvetteMoveFinish=$cuvetteMoveFinish cuvetteShelfMoveFinish=$cuvetteShelfMoveFinish")
+        if (samplePos > 0 && sampleMoveFinish && samplingFinish && cuvetteMoveFinish && cuvetteShelfMoveFinish && sampleNeedDripSampling(
                 samplePos - 1
             )
         ) {

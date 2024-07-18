@@ -2507,7 +2507,7 @@ class HomeViewModel(
      * 因为在只有一排时调用，会直接显示样本不足
      */
     private fun moveSampleShelfNext() {
-        if (lastSampleShelfPos == sampleShelfPos) {
+        if (lastSampleShelf(sampleShelfPos) && lastSamplePos(samplePos)) {
             //已经是最后一排了，结束检测
             i("样本取样结束")
             showTestSampleDeficiencyDialog()
@@ -2524,7 +2524,7 @@ class HomeViewModel(
         }
 
         moveSampleShelf(sampleShelfPos)
-        i("moveSampleShelfNext sampleShelfPos=$sampleShelfPos oldPos=$oldPos")
+        i("moveSampleShelfNext sampleShelfPos=$sampleShelfPos oldPos=$oldPos samplePos=$samplePos sampleMax=$sampleMax")
     }
 
     /**
@@ -2611,28 +2611,33 @@ class HomeViewModel(
             }
             continueTestCuvetteState = false
             moveCuvetteShelf(cuvetteShelfPos)
-            moveSampleShelfNext()
+            if (lastSamplePos(samplePos)) {
+                moveSampleShelfNext()
+            } else {
+                moveSample()
+            }
+//            moveSampleShelfNext()
             return
         }
         //样本不足才获取的状态
         //如果还是没有样本，继续弹框，如果有就移动比色皿架，继续检测
-        if (continueTestSampleState) {
-            sampleShelfStates = reply.data.sampleShelfs
-            sampleShelfPos = -1
-            getInitSampleShelfPos()
-            if (sampleShelfPos == -1) {
-                i("没有样本架")
-                viewModelScope.launch {
-                    _dialogUiState.emit(
-                        HomeDialogUiState.GetStateNotExist("样本不足，请添加")
-                    )
-                }
-                return
-            }
-            continueTestSampleState = false
-            moveSampleShelf(sampleShelfPos)
-            return
-        }
+//        if (continueTestSampleState) {
+//            sampleShelfStates = reply.data.sampleShelfs
+//            sampleShelfPos = -1
+//            getInitSampleShelfPos()
+//            if (sampleShelfPos == -1) {
+//                i("没有样本架")
+//                viewModelScope.launch {
+//                    _dialogUiState.emit(
+//                        HomeDialogUiState.GetStateNotExist("样本不足，请添加")
+//                    )
+//                }
+//                return
+//            }
+//            continueTestSampleState = false
+//            moveSampleShelf(sampleShelfPos)
+//            return
+//        }
 //        //开始下一排时R1|R2试剂不足|清洗液不足 才获取的状态
         if (continueTestGetState) {
             continueTestGetState = false

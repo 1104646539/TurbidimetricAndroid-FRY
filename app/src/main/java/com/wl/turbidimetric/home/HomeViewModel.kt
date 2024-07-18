@@ -2073,7 +2073,7 @@ class HomeViewModel(
 //            } else if ((isAuto() && lastSamplePos(samplePos)) || !isAuto() && (lastSamplePos(samplePos) || manualModelSamplingFinish())) {//这排最后一个样本
             } else if ((isAuto() && lastSamplePos(samplePos)) || (!isAuto() && (lastSamplePos(
                     samplePos
-                ) ))
+                )))
             ) {//这排最后一个样本
                 if (lastSampleShelf(sampleShelfPos)) {//最后一排
                     //已经加完了最后一个样本了，加样结束，去下一个步骤，加试剂
@@ -2214,18 +2214,8 @@ class HomeViewModel(
             if (mCuvetteStates[cuvetteShelfPos]?.filter { it.state == CuvetteState.DripReagent || it.state == CuvetteState.Stir }
                     ?.isNotEmpty() == true) {
                 i("继续移动")
-                viewModelScope.launch {
-                    moveCuvetteDripReagent()
-                }
+                moveCuvetteDripReagent()
             }
-        }
-
-        /**
-         * 此步骤用于在跳过9个比色皿 && 正在跳过的这一排 && 在cuvettePos == 10时， 直接移动比色皿
-         * 因为这个位置不需要加试剂，搅拌和检测。直接移动到下一个位置即可正常搅拌。下下个位置检测
-         */
-        if (cuvettePos == 10 && getFirstCuvetteStartPos() == 8 && getFirstCuvetteShelfIndex() == cuvetteShelfPos) {
-            moveCuvetteDripReagent()
         }
     }
 

@@ -32,7 +32,7 @@ android {
         minSdk 24
         targetSdk 32
         versionCode 1
-        versionName "1.0.0.0-49修复跳过比色皿不显示为跳过的问题"
+        versionName "1.0.0.0-50修复跳过9个比色皿并且样本前面9个都是空时闪退的问题"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 

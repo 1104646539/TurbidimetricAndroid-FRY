@@ -2044,12 +2044,10 @@ class HomeViewModel(
      * 如果已经加完一排比色皿或者样本已经完全加完样了，就去进行加试剂步骤，
      * 否则则去下一个样本和比色皿处取样加样
      */
-
     private fun nextStepDripReagent() {
-
         i("piercedFinish=$piercedFinish scanFinish=$scanFinish samplingFinish=$samplingFinish dripSampleFinish=$dripSampleFinish cuvettePos=$cuvettePos samplePos=$samplePos sampleShelfPos=$sampleShelfPos")
+        //如果是已经不允许加样了，就不加样了，直接检测
         if (!allowDripSample) {
-            i("这排最后一个比色皿，需要去下一个步骤，加试剂")
             val dripSampleCuvetteNum = getDripSampleCuvetteNum()
             if (dripSampleCuvetteNum == 0) {//没有已经加好样的就直接结束
                 testFinishAction()
@@ -2059,26 +2057,25 @@ class HomeViewModel(
             return
         }
         //(刺破结果 && (扫码结束 || 不需要扫码) && (需要取样 && 取样结束 && 加样结束) || 不需要加样)
-        if ((piercedFinish && (scanFinish || lastSamplePos(samplePos)) && (sampleNeedSampling(
+        //满足这些代表可以进行下一步了，而不是正在进行其他步骤
+        if ((piercedFinish && (scanFinish || lastSamplePos(
+                samplePos
+            )) && (sampleNeedSampling(
                 samplePos - 1
             ) && samplingFinish && dripSampleFinish) || (!sampleNeedSampling(
                 samplePos - 1
             ))) || samplePos == 0
         ) {
-            //是否是最后一个比色皿的位置，但是样本又不能是第一个，因为第一个样本代表还没取样
-            if (lastCuvettePos(cuvettePos) && samplePos > 0) {
+            // 最后一个比色皿 && 样本位置大于0 && 比色皿移动完成 && 样本移动完成 && 加样完成 && 这排比色皿需要加试剂（有已经加样的）
+            if (lastCuvettePos(cuvettePos) && samplePos > 0 && cuvetteMoveFinish && sampleMoveFinish && dripSampleFinish && cuvetteShelfNeedDripReagent()) {
                 //这排最后一个比色皿，需要去下一个步骤，加试剂
                 i("这排最后一个比色皿，需要去下一个步骤，加试剂")
                 stepDripReagent()
-//            } else if ((isAuto() && lastSamplePos(samplePos)) || !isAuto() && (lastSamplePos(samplePos) || manualModelSamplingFinish())) {//这排最后一个样本
-            } else if ((isAuto() && lastSamplePos(samplePos)) || (!isAuto() && (lastSamplePos(
-                    samplePos
-                )))
-            ) {//这排最后一个样本
-                if (lastSampleShelf(sampleShelfPos)) {//最后一排
+            } else if (lastSamplePos(samplePos)) {//这排最后一个样本
+                if (lastSampleShelf(sampleShelfPos)) {//最后一排样本架
                     //已经加完了最后一个样本了，加样结束，去下一个步骤，加试剂
                     i("样本加样完成！")
-                    if (shelfNeedDripReagent()) {
+                    if (cuvetteShelfNeedDripReagent()) {
                         stepDripReagent()
                     } else {
                         i("不需要加试剂,检测结束！")
@@ -2111,7 +2108,7 @@ class HomeViewModel(
      * 判断这排比色皿是否需要加样
      * @return Boolean
      */
-    private fun shelfNeedDripReagent(): Boolean {
+    private fun cuvetteShelfNeedDripReagent(): Boolean {
         return mCuvetteStates[cuvetteShelfPos]!!.any { it.state == CuvetteState.DripSample }
     }
 

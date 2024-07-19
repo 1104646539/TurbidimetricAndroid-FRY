@@ -2068,9 +2068,23 @@ class HomeViewModel(
         ) {
             // 最后一个比色皿 && 样本位置大于0 && 比色皿移动完成 && 样本移动完成 && 加样完成 && 这排比色皿需要加试剂（有已经加样的）
             if (lastCuvettePos(cuvettePos) && samplePos > 0 && cuvetteMoveFinish && sampleMoveFinish && dripSampleFinish && cuvetteShelfNeedDripReagent()) {
-                //这排最后一个比色皿，需要去下一个步骤，加试剂
-                i("这排最后一个比色皿，需要去下一个步骤，加试剂")
-                stepDripReagent()
+                //最后一个比色皿也已经加过样了||没加样，但是是最后一个样本了，
+                if (cuvetteStateIs(CuvetteState.DripSample, cuvettePos) || (lastSampleShelf(
+                        sampleShelfPos
+                    ) && lastSamplePos(samplePos))
+                ) {
+                    //这排最后一个比色皿，需要去下一个步骤，加试剂
+                    i("这排最后一个比色皿，需要去下一个步骤，加试剂")
+                    if (cuvetteShelfNeedDripReagent()) {
+                        stepDripReagent()
+                    } else {
+                        i("不需要加试剂,检测结束！")
+                        testFinishAction()
+                    }
+                } else {
+                    i("继续移动采便管，去加样")
+                    moveNextSampleAndCuvette()
+                }
             } else if (lastSamplePos(samplePos)) {//这排最后一个样本
                 if (lastSampleShelf(sampleShelfPos)) {//最后一排样本架
                     //已经加完了最后一个样本了，加样结束，去下一个步骤，加试剂
@@ -2092,6 +2106,17 @@ class HomeViewModel(
                 moveNextSampleAndCuvette()
             }
         }
+    }
+
+    /**
+     * 判断一个比色皿的状态
+     * @param cuvetteState CuvetteState
+     * @param index Int
+     * @return Boolean
+     */
+    private fun cuvetteStateIs(cuvetteState: CuvetteState, index: Int): Boolean {
+        if (cuvetteShelfPos >= mCuvetteStates.size || index >= mCuvetteStates[cuvetteShelfPos]!!.size) return false
+        return mCuvetteStates[cuvetteShelfPos]!![index]!!.state == cuvetteState
     }
 
     /**

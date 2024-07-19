@@ -71,7 +71,7 @@ class SerialPortImpl(
      *
      * 当仪器已经发生电机、传感器、非法参数等错误时，不允许再次发送命令，防止仪器损坏
      */
-    var allowRunning = true
+    private var allowRunning = true
 
     /**
      * 升级mcu的回调，开始
@@ -83,13 +83,21 @@ class SerialPortImpl(
      */
     private var mOnResult: ((UpdateResult) -> Unit)? = null
 
+    /**
+     * 在仪器已经报错的情况下，还能发送的命令
+     */
+    private val runningErrorAllowCMD = arrayOf(
+        SerialGlobal.CMD_GetSetTemp,
+        SerialGlobal.CMD_Shutdown,
+    )
+
     init {
         Log.d("SerialPortImpl", "init: ")
 //        open()
     }
 
-   override fun open(scope: CoroutineScope) {
-       this.scope = scope
+    override fun open(scope: CoroutineScope) {
+        this.scope = scope
         if (isCodeDebug) {
             TestSerialPort.callback = this::dispatchData
         } else {
@@ -152,8 +160,7 @@ class SerialPortImpl(
     override fun removeCallback(call: Callback2) {
         callback?.forEach {
             it.let { w ->
-                it.get()?.let {
-                    c->
+                it.get()?.let { c ->
                     if (c == call) {
                         callback.remove(w)
                     }
@@ -161,6 +168,7 @@ class SerialPortImpl(
             }
         }
     }
+
     override fun close() {
         scope?.cancel()
         serialPort?.close()
@@ -169,6 +177,7 @@ class SerialPortImpl(
         mMcuUpdateCallBack = null
         mOnResult = null
     }
+
     override fun addOriginalCallback(call: OriginalDataCall) {
         originalCallback.add(call)
     }
@@ -577,9 +586,7 @@ class SerialPortImpl(
      */
     private fun isAllowRunning(data: UByteArray): Boolean {
         if (!allowRunning) {
-            if (data[0] != SerialGlobal.CMD_GetSetTemp) {
-                return false
-            }
+            return runningErrorAllowCMD.any { it == data[0] }
         }
         return true
     }
@@ -1029,7 +1036,6 @@ class SerialPortImpl(
             )
         )
     }
-
 
 
     /**

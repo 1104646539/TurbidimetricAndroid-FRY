@@ -11,6 +11,7 @@ import com.wl.turbidimetric.app.UploadState
 import com.wl.turbidimetric.base.BaseViewModel
 import com.wl.turbidimetric.ex.getAppViewModel
 import com.wl.weiqianwllib.upan.StorageState
+import com.wl.wllib.LogToFile.u
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -24,6 +25,7 @@ class MainViewModel(private val appViewModel: WeakReference<AppViewModel>) : Bas
      * 关机命令
      */
     private fun shutdown() {
+        u("点击 关机")
         appViewModel.get()?.serialPort?.shutdown()
     }
 

@@ -32,7 +32,7 @@ android {
         minSdk 24
         targetSdk 32
         versionCode 1
-        versionName "1.0.0.0-53修复比色皿到最后一个，而样本多次不存在后可能的检测错误的问题"
+        versionName "1.0.0.0-54修复检测结束动作未完成前立即开始检测报错的问题"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 

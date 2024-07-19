@@ -504,6 +504,10 @@ class HomeViewModel(
      */
     var allowDripSample = true
 
+    /**
+     * 比色皿舱门正在操作 （现在用作结束检测，将r2试剂转出来）
+     */
+    private var cuvetteDoorFinish = true
 
     /**
      * 测试用的 start
@@ -942,8 +946,27 @@ class HomeViewModel(
      */
     override fun readDataCuvetteDoorModel(reply: ReplyModel<CuvetteDoorModel>) {
         c("接收到 比色皿门状态 reply=$reply")
+        testFinishOn { cuvetteDoorFinish = true }
         if (!runningTest()) return
         if (appViewModel.testState.isNotPrepare()) return
+
+    }
+
+    /**
+     * 统一的判定是否检测动作结束
+     * @param onBefore Function0<Unit>
+     */
+    private fun testFinishOn(onBefore: () -> Unit) {
+        if (appViewModel.testState == TestState.TestFinish && appViewModel.testType.isTest()) {
+            onBefore.invoke()
+            if (isTestFinish()) {
+                if (appViewModel.getLooperTest()) {
+                    clickStart()
+                } else {
+                    showFinishDialog()
+                }
+            }
+        }
     }
 
     /**
@@ -2312,17 +2335,7 @@ class HomeViewModel(
      * 接收到移动比色皿架
      */
     override fun readDataMoveCuvetteShelfModel(reply: ReplyModel<MoveCuvetteShelfModel>) {
-        if (appViewModel.testState == TestState.TestFinish && appViewModel.testType.isTest()) {
-            cuvetteShelfMoveFinish = true
-            if (isTestFinish()) {
-                if (appViewModel.getLooperTest()) {
-                    clickStart()
-                } else {
-                    showFinishDialog()
-                    openAllDoor()
-                }
-            }
-        }
+        testFinishOn { cuvetteShelfMoveFinish = true }
         if (!runningTest()) return
         if (appViewModel.testState.isNotPrepare()) return
         c("接收到 移动比色皿架 reply=$reply cuvetteShelfPos=$cuvetteShelfPos cuvetteStartPos=$cuvetteStartPos")
@@ -2440,7 +2453,7 @@ class HomeViewModel(
     }
 
     private fun isTestFinish(): Boolean {
-        return appViewModel.testState == TestState.TestFinish && appViewModel.testType.isTest() && sampleShelfMoveFinish && cuvetteShelfMoveFinish
+        return appViewModel.testState == TestState.TestFinish && appViewModel.testType.isTest() && sampleShelfMoveFinish && cuvetteShelfMoveFinish && cuvetteDoorFinish
     }
 
 
@@ -2449,17 +2462,7 @@ class HomeViewModel(
      */
     override fun readDataMoveSampleShelfModel(reply: ReplyModel<MoveSampleShelfModel>) {
         c("接收到 移动样本架 reply=$reply sampleShelfPos=$sampleShelfPos ${appViewModel.testState}")
-        if (appViewModel.testState == TestState.TestFinish && appViewModel.testType.isTest()) {
-            sampleShelfMoveFinish = true
-            if (isTestFinish()) {
-                if (appViewModel.getLooperTest()) {
-                    clickStart()
-                } else {
-                    showFinishDialog()
-                    openAllDoor()
-                }
-            }
-        }
+        testFinishOn { sampleShelfMoveFinish = true }
         if (!runningTest()) return
         if (appViewModel.testState.isNotPrepare()) return
         resultModelsForSample.clear()
@@ -2492,6 +2495,7 @@ class HomeViewModel(
     private fun openCuvetteDoor() {
         c("发送 开比色皿仓门")
         appViewModel.serialPort.openCuvetteDoor()
+        cuvetteDoorFinish = false
     }
 
     /**
@@ -2838,6 +2842,7 @@ class HomeViewModel(
         needTestNum = 0
         moveCuvetteShelf(cuvetteShelfPos)
         moveSampleShelf(sampleShelfPos)
+        openAllDoor()
     }
 
 

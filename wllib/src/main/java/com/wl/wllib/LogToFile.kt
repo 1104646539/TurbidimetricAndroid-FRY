@@ -5,6 +5,8 @@ import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.max
+import kotlin.math.min
 
 object LogToFile {
     @JvmStatic
@@ -15,7 +17,7 @@ object LogToFile {
     private var file1: File? = null
     private var file2: File? = null
     private var curFile: File? = null
-    var MaxSize = 100 * 1024 * 1024
+    var MaxSize = 30 * 1024 * 1024
 
     val DateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss SSS")
     var fos: FileOutputStream? = null
@@ -73,21 +75,41 @@ object LogToFile {
         fos = FileOutputStream(curFile, true)
     }
 
-    //1满  2>1/3   删除1 返回2
-    //1不满 但是1>1/3 删除2 返回1
+    /**
+     * 获取这次输出的文件
+     * 如果文件大于最大值并且另一个文件大于1/3最大值，就删除这个文件
+     * 1、如果两个文件有大于最大值的直接删除
+     * 2、返回输出的文件
+     * 2.1、file1Size == 0 && file2Size 不为空 return file2
+     * 2.2、file2Size == 0 && file1Size 不为空 return file1
+     * 2.3、两个都不为空 return 最小的文件
+     * @return File
+     */
     fun getFile(): File {
-        return if (file1!!.length() > MaxSize) {
-            if (file2!!.length() > MaxSize / 3) {
-                file1!!.delete()
-                file1!!.createNewFile()
-            }
+        var file1Size = file1!!.length()
+        var file2Size = file2!!.length()
+
+        if (file1Size > MaxSize && file2Size > MaxSize / 3) {
+            file1!!.delete()
+            file1!!.createNewFile()
+            file1Size = 0
+        } else if (file2Size > MaxSize && file1Size > MaxSize / 3) {
+            file2!!.delete()
+            file2!!.createNewFile()
+            file2Size = 0
+        }
+        return if (file1Size == 0L && file2Size in 1 until MaxSize) {
             file2!!
-        } else {
-            if (file1!!.length() > MaxSize / 3) {
-                file2!!.delete()
-                file2!!.createNewFile()
-            }
+        } else if (file2Size == 0L && file1Size in 1 until MaxSize) {
             file1!!
+        } else {
+            min(file1Size, file2Size).let {
+                if (it == file2Size) {
+                    return file2!!
+                } else {
+                    return file1!!
+                }
+            }
         }
     }
 
@@ -152,10 +174,10 @@ object LogToFile {
     @JvmStatic
     fun write(msg: String) {
         fos?.let {
-            synchronized(it){
-                fos?.write(msg.toByteArray())
-                fos?.flush()
-            }
+//            synchronized(it) {
+            it?.write(msg.toByteArray())
+//            it?.flush()
+//            }
         }
 
     }

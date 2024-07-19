@@ -3,6 +3,7 @@ package com.wl.turbidimetric.app
 import android.app.Activity
 import android.app.Application
 import android.content.Context
+import android.view.inputmethod.InputMethodManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStore
@@ -54,7 +55,10 @@ class App : Application() {
         ThermalPrintUtil(BaseSerialPort())
     }
     val printHelper: PrintHelper by lazy {
-        PrintHelper(LocalData.ReportIntervalTime,this)
+        PrintHelper(LocalData.ReportIntervalTime, this)
+    }
+    val imm: InputMethodManager by lazy {
+        getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
     }
 
     override fun onCreate() {

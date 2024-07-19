@@ -41,7 +41,7 @@ object TestSerialPort {
             SerialGlobal.CMD_GetState -> {
 //                delay(1000)
 //                if (index < 2) {
-                reply = reply.plus(ubyteArrayOf(0x0u, 0x2u, 0x31u, 0xffu))// 0011 0011
+                reply = reply.plus(ubyteArrayOf(0x0u, 0x2u, 0x11u, 0xffu))// 0011 0011
 //                } else {
 //                    reply = reply.plus(ubyteArrayOf(0x0u, 0x2u, 0x01u, 0x00u))//0001 0001
 //                }

@@ -267,6 +267,7 @@ class MatchingConfigDialog(val ct: Context) :
             if (stepData2?.debug != true) {
                 this.cancelText = ""
             }
+            dismissOrHideSoftInput()
         }
         super.show()
     }

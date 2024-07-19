@@ -12,6 +12,7 @@ import com.wl.turbidimetric.repository.if2.LocalDataSource
 import com.wl.turbidimetric.upload.hl7.util.ConnectStatus
 import com.wl.turbidimetric.util.SerialPortIF
 import com.wl.wllib.DateUtil
+import com.wl.wllib.LogToFile.i
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -187,10 +188,11 @@ class AppViewModel(
     }
 
     /**
-     * 更新上传状态
+     * 更新仪器状态
      */
     private fun changeMachineState(state: TestState) {
         serialPort?.testStateChange(state)
+        i("changeMachineState state=$state")
         val s = when (state) {
             TestState.NotGetMachineState -> MachineState.MachineError
             TestState.RunningError -> MachineState.MachineRunningError

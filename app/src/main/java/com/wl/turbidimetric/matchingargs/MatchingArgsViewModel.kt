@@ -1985,7 +1985,9 @@ class MatchingArgsViewModel(
         viewModelScope.launch {
             val hiltText = if (appViewModel.testState.isNotPrepare()) {
                 "请重新自检"
-            } else {
+            }else if(appViewModel.testState != TestState.Normal){
+                "正在检测，请勿操作"
+            }else {
                 ""
             }
             if (hiltText.isNotEmpty()) {

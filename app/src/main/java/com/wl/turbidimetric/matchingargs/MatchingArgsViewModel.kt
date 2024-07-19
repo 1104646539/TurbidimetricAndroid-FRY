@@ -590,7 +590,10 @@ class MatchingArgsViewModel(
     }
 
     private fun initState() {
-        curProject = null
+        //如果每次都添加检测都把项目清空，会导致添加检测后又因为未放置样本架，点击结束后项目为空不显示质控结果，所以只有在一次新的质控中才清空项目以免会显示上一次的质控结果
+        if (abss.isEmpty()){
+            curProject = null
+        }
         sampled = false
         accidentState = ReplyState.SUCCESS
         resultTest1.clear()

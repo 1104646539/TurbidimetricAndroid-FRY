@@ -8,7 +8,7 @@ plugins {
 }
 
 android {
-    signingConfigs {
+//    signingConfigs {
 //        debug {
 //            storeFile file('E:\\platform.keystore')
 //            storePassword '123456'
@@ -24,7 +24,7 @@ android {
 //            keyAlias 'platform'
 //            keyPassword '123456'
 //        }
-    }
+//    }
     compileSdk 33
 
     defaultConfig {
@@ -32,7 +32,7 @@ android {
         minSdk 24
         targetSdk 32
         versionCode 1
-        versionName "1.0.0.0-51修复比色皿和样本数量不同时撞针的问题"
+        versionName "1.0.0.0-52修复质控第二次点击结束检测导致没有质控结果的问题"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 

@@ -5,11 +5,12 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import com.lxj.xpopup.util.KeyboardUtils
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.model.CurveModel
 import com.wl.turbidimetric.model.ProjectModel
-import com.wl.turbidimetric.util.ViewWrapper
 import com.wl.turbidimetric.util.FitterType
+import com.wl.turbidimetric.util.ViewWrapper
 import com.wl.turbidimetric.view.MatchingConfigLayout
 import com.wl.turbidimetric.view.MatchingFinishLayout
 import com.wl.turbidimetric.view.MatchingStateLayout
@@ -267,7 +268,7 @@ class MatchingConfigDialog(val ct: Context) :
             if (stepData2?.debug != true) {
                 this.cancelText = ""
             }
-            dismissOrHideSoftInput()
+            KeyboardUtils.hideSoftInput(this)
         }
         super.show()
     }

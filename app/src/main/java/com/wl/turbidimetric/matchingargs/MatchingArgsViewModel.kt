@@ -735,16 +735,33 @@ class MatchingArgsViewModel(
         i("getInitCuvetteShelfPos cuvetteShelfPos=$cuvetteShelfPos lastCuvetteShelfPos=$lastCuvetteShelfPos")
     }
 
+    private fun isMatchingArgs(): Boolean {
+        return appViewModel.testType.isMatchingArgs()
+    }
+
     /**
      * 接收到移动比色皿架
      * @param reply ReplyModel<MoveCuvetteShelfModel>
      */
     override fun readDataMoveCuvetteShelfModel(reply: ReplyModel<MoveCuvetteShelfModel>) {
-        matchingFinishOn { cuvetteShelfMoveFinish = true }
+        i("接收到 移动比色皿架 reply=$reply accidentStateNeedMatchingFinish=$accidentStateNeedMatchingFinish")
+        //检测错误时需要等待移动完毕再复位
+        if (isMatchingArgs()) {
+            if (accidentStateNeedMatchingFinish) {
+                accidentStateNeedMatchingFinish = false
+                cuvetteShelfMoveFinish = true
+                accidentStateMatchingFinish()
+                return
+            } else {
+                //如果不是需要移动，判定是否是检测结束的动作
+                matchingFinishOn { cuvetteShelfMoveFinish = true }
+            }
+        }
         if (!runningMatching()) return
         if (appViewModel.testState.isNotPrepare()) return
+
         cuvetteShelfMoveFinish = true
-        i("接收到 移动比色皿架 reply=$reply")
+
         cuvettePos = 0
         when (appViewModel.testState) {
             TestState.MoveSample -> {
@@ -960,11 +977,11 @@ class MatchingArgsViewModel(
     }
 
     /**
-     * 统一的判定是否检测动作结束
+     * 统一的判定是否检测动作结束.动作结束时需要显示检测结束对话框
      * @param onBefore Function0<Unit>
      */
     private fun matchingFinishOn(onBefore: () -> Unit) {
-        if (appViewModel.testState == TestState.TestFinish && appViewModel.testType.isMatchingArgs()) {
+        if (appViewModel.testState == TestState.TestFinish && isMatchingArgs()) {
             onBefore.invoke()
             if (isMatchingFinish()) {
                 showMatchingDialog()
@@ -978,7 +995,18 @@ class MatchingArgsViewModel(
      */
     override fun readDataMoveSampleShelfModel(reply: ReplyModel<MoveSampleShelfModel>) {
         i("接收到 移动样本架 reply=$reply testState=${appViewModel.testState}")
-        matchingFinishOn { sampleShelfMoveFinish = true }
+        //检测错误时需要等待移动完毕再复位
+        if (isMatchingArgs()) {
+            if (accidentStateNeedMatchingFinish) {
+                accidentStateNeedMatchingFinish = false
+                cuvetteShelfMoveFinish = true
+                accidentStateMatchingFinish()
+                return
+            } else {
+                //如果不是需要移动，判定是否是检测结束的动作
+                matchingFinishOn { sampleShelfMoveFinish = true }
+            }
+        }
         if (!runningMatching()) return
         if (appViewModel.testState.isNotPrepare()) return
         sampleShelfMoveFinish = true
@@ -1318,7 +1346,7 @@ class MatchingArgsViewModel(
         samplingFinish = true
         if (reply.state == ReplyState.SAMPLING_FAILED) {//取样失败
             accidentState = ReplyState.SAMPLING_FAILED
-            matchingFinish()
+            accidentStateMatchingFinish()
             return
         }
         when (appViewModel.testState) {
@@ -1404,13 +1432,29 @@ class MatchingArgsViewModel(
         takeReagentFinish = true
         if (reply.state == ReplyState.TAKE_REAGENT_FAILED) {//取试剂失败
             accidentState = ReplyState.TAKE_REAGENT_FAILED
-            matchingFinish()
+            accidentStateMatchingFinish()
             return
         }
         //取完试剂判断是否移动比色皿完成，完成就直接取样
         if (cuvetteNeedDripReagent(cuvettePos) && cuvetteMoveFinish && takeReagentFinish) {
             dripReagent()
         }
+    }
+
+    /**
+     * 在错误需要结束检测时样本架或比色皿架未移动完成时，需要等待移动完成在复位
+     */
+    private var accidentStateNeedMatchingFinish = false
+
+    /**
+     * 因某些错误，需要结束检测
+     */
+    private fun accidentStateMatchingFinish() {
+        if (!(cuvetteShelfMoveFinish && sampleShelfMoveFinish)) {
+            accidentStateNeedMatchingFinish = true
+            return
+        }
+        matchingFinish()
     }
 
     /**
@@ -1520,8 +1564,8 @@ class MatchingArgsViewModel(
      * @param reply ReplyModel<CuvetteDoorModel>
      */
     override fun readDataCuvetteDoorModel(reply: ReplyModel<CuvetteDoorModel>) {
-        if (!runningMatching()) return
         matchingFinishOn { cuvetteDoorFinish = true }
+        if (!runningMatching()) return
     }
 
     /**
@@ -1882,7 +1926,7 @@ class MatchingArgsViewModel(
      * 是否正在拟合
      */
     fun runningMatching(): Boolean {
-        return appViewModel.testState.isRunning() && appViewModel.testType.isMatchingArgs()
+        return appViewModel.testState.isRunning() && isMatchingArgs()
     }
 
     fun changeSelectProject(project: CurveModel) {
@@ -1986,9 +2030,9 @@ class MatchingArgsViewModel(
         viewModelScope.launch {
             val hiltText = if (appViewModel.testState.isNotPrepare()) {
                 "请重新自检"
-            }else if(appViewModel.testState != TestState.Normal){
+            } else if (appViewModel.testState != TestState.Normal) {
                 "正在检测，请勿操作"
-            }else {
+            } else {
                 ""
             }
             if (hiltText.isNotEmpty()) {

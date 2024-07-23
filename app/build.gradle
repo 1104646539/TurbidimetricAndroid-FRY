@@ -32,7 +32,7 @@ android {
         minSdk 24
         targetSdk 32
         versionCode 1
-        versionName "1.0.0.0-58修改检测中不允许打开拟合"
+        versionName "1.0.0.0-59修复拟合时第一个取样失败导致比色皿架不复位的问题"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 

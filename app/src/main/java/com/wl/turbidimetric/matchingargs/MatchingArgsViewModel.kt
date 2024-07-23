@@ -171,7 +171,7 @@ class MatchingArgsViewModel(
     /**比色皿架是否移动完毕
      *
      */
-    private var cuvetteShelfMoveFinish = false
+    private var cuvetteShelfMoveFinish = true
 
     /**样本架是否移动完毕
      *
@@ -1448,6 +1448,9 @@ class MatchingArgsViewModel(
 
     /**
      * 因某些错误，需要结束检测
+     * 这里用!(cuvetteShelfMoveFinish && sampleShelfMoveFinish)来判断是否已经移动完比色皿了，
+     * 是因为有可能在正在移动时接收到其他动作的错误状态，在这时如果比色皿架还未移动完成，又去复位会导致没有复位动作。
+     * cuvetteShelfMoveFinish需要默认为true，因为也有可能在第一次移动比色皿架之前就报错复位了，那样就不能正确的结束
      */
     private fun accidentStateMatchingFinish() {
         if (!(cuvetteShelfMoveFinish && sampleShelfMoveFinish)) {
@@ -1464,7 +1467,7 @@ class MatchingArgsViewModel(
     override fun readDataSamplingProbeCleaningModelModel(reply: ReplyModel<SamplingProbeCleaningModel>) {
         if (!runningMatching()) return
         if (appViewModel.testState.isNotPrepare()) return
-        i("接收到 取样针清洗 reply=$reply samplePos=$samplePos sampleStep=$sampleStep")
+        i("接收到 取样针清洗 reply=$reply samplePos=$samplePos sampleStep=$sampleStep autoAttenuation=$autoAttenuation")
         if (cleaningBeforeStartTest) {
             //是开始检测前的清洗，清洗完才开始检测
             cleaningBeforeStartTest = false

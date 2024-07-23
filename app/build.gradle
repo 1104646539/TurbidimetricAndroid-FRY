@@ -32,7 +32,7 @@ android {
         minSdk 24
         targetSdk 32
         versionCode 1
-        versionName "1.0.0.0-60修复拟合时稀释前取样失败导致比色皿架不复位的问题"
+        versionName "1.0.0.0-61修改开始检测时样本和辅料缺失统一提示"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 

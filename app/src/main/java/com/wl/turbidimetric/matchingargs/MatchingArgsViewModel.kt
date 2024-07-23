@@ -23,6 +23,7 @@ import com.wl.turbidimetric.ex.toast
 import com.wl.turbidimetric.global.EventGlobal
 import com.wl.turbidimetric.global.EventMsg
 import com.wl.turbidimetric.global.SystemGlobal
+import com.wl.turbidimetric.home.HomeDialogUiState
 import com.wl.turbidimetric.model.CurveModel
 import com.wl.turbidimetric.model.CuvetteDoorModel
 import com.wl.turbidimetric.model.CuvetteState
@@ -383,6 +384,11 @@ class MatchingArgsViewModel(
      */
     private var cuvetteDoorFinish = true
 
+    private var r1Reagent = false
+    private var r2Reagent = false
+    private var r2Volume = 0
+    private var cleanoutFluid = false
+
     /**
      * 测试用的 start
      */
@@ -649,51 +655,72 @@ class MatchingArgsViewModel(
         i("接收到 获取状态 reply=$reply")
         cuvetteShelfStates = reply.data.cuvetteShelfs
         sampleShelfStates = reply.data.sampleShelfs
-        val r1Reagent = reply.data.r1Reagent
-        val r2Reagent = reply.data.r2Reagent
-        val cleanoutFluid = reply.data.cleanoutFluid
+        r1Reagent = reply.data.r1Reagent
+        r2Reagent = reply.data.r2Reagent
+        r2Volume = reply.data.r2Volume
+        cleanoutFluid = reply.data.cleanoutFluid
 
         getInitialPos()
 
         i("cuvetteShelfPos=${cuvetteShelfPos} sampleShelfPos=${sampleShelfPos}")
-        val errorMsg = if (cuvetteShelfPos == -1) {
+        val discArray = mutableListOf<String>()
+        if (cuvetteShelfPos == -1) {
             i("没有比色皿架")
-            "比色皿不足，请添加"
-        } else if (sampleShelfPos == -1) {
-            i("没有样本架")
-            "样本不足，请添加"
-        } else if (!r1Reagent) {
-            i("没有R1试剂")
-            "R1试剂不足，请添加"
-        } else if (!r2Reagent) {
-            i("没有R2试剂")
-            "R2试剂不足，请添加"
-        } else if (!cleanoutFluid) {
-            i("没有清洗液试剂")
-            "清洗液不足，请添加"
-        } else {
-            ""
+            discArray.add("比色皿")
         }
-        if (errorMsg.isNotEmpty()) {
+        if (sampleShelfPos == -1) {
+            i("没有样本架")
+            discArray.add("样本架")
+        }
+
+        checkTestState(accord = {
+            appViewModel.testState = if (!autoAttenuation) {
+                TestState.MoveSample
+            } else {
+                TestState.DripDiluentVolume
+            }
+            //开始检测
+            cleaningBeforeStartTest = true
+            samplingProbeCleaning()
+        }, discArray = discArray, discrepancy = { str ->
             viewModelScope.launch {
                 _dialogUiState.emit(
-                    MatchingArgsDialogUiState.GetStateNotExistMsg(errorMsg)
+                    MatchingArgsDialogUiState.GetStateNotExistMsg(str)
                 )
             }
+            return@checkTestState
+        })
+    }
+
+    /**
+     * 在开始检测下一排比色皿之前，检查试剂和清洗液的状态
+     * @param accord Function0<Unit> 符合后执行的命令
+     * @param discrepancy Function1<String, Unit> 不符合后执行的命令
+     */
+    private fun checkTestState(
+        accord: () -> Unit,
+        discArray: MutableList<String> = mutableListOf<String>(),
+        discrepancy: (String) -> Unit
+    ) {
+        if (!r1Reagent || !r2Reagent || r2Volume != 0 || !cleanoutFluid) {
+            var temp = ""
+            if (!r1Reagent) {
+                discArray.add("R1试剂")
+                i("没有R1试剂")
+            }
+            if (!r2Reagent || r2Volume == 0) {
+                i("没有R2试剂")
+                discArray.add("R2试剂")
+            }
+            if (!cleanoutFluid) {
+                i("没有清洗液")
+                discArray.add("清洗液")
+            }
+            temp = "请添加" + discArray.joinToString(",")
+            discrepancy.invoke(temp)
             return
         }
-
-        appViewModel.testState = if (!autoAttenuation) {
-            TestState.MoveSample
-        } else {
-            TestState.DripDiluentVolume
-        }
-        //开始检测
-//        moveSampleShelf(sampleShelfPos)
-        cleaningBeforeStartTest = true
-        samplingProbeCleaning()
-
-//        moveCuvetteShelf(cuvetteShelfPos)
+        accord()
     }
 
     /**

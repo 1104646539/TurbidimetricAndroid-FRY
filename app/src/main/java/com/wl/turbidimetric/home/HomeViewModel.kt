@@ -1677,29 +1677,27 @@ class HomeViewModel(
      * @param discrepancy Function1<String, Unit> 不符合后执行的命令
      */
     private fun checkTestState(
-        accord: () -> Unit, discrepancy: (String) -> Unit
+        accord: () -> Unit,
+        discArray: MutableList<String> = mutableListOf<String>(),
+        discrepancy: (String) -> Unit
     ) {
-        if (!appViewModel.getLooperTest()) {
+        if (!appViewModel.getLooperTest() && (!r1Reagent || !r2Reagent || r2Volume != 0 || !cleanoutFluid)) {
+            var temp = ""
             if (!r1Reagent) {
+                discArray.add("R1试剂")
                 i("没有R1试剂")
-                discrepancy.invoke("R1试剂不足，请添加")
-                return
             }
-            if (!r2Reagent) {
+            if (!r2Reagent || r2Volume == 0) {
                 i("没有R2试剂")
-                discrepancy.invoke("R2试剂不足，请添加")
-                return
-            }
-            if (r2Volume == 0) {
-                i("没有R2试剂")
-                discrepancy.invoke("R2试剂不足，请添加")
-                return
+                discArray.add("R2试剂")
             }
             if (!cleanoutFluid) {
                 i("没有清洗液")
-                discrepancy.invoke("清洗液不足，请添加")
-                return
+                discArray.add("清洗液")
             }
+            temp = "请添加" + discArray.joinToString(",")
+            discrepancy.invoke(temp)
+            return
         }
         accord()
     }
@@ -2667,24 +2665,15 @@ class HomeViewModel(
 
         getInitialPos()
         i("cuvetteShelfPos=${cuvetteShelfPos} sampleShelfPos=${sampleShelfPos}")
+        val discArray = mutableListOf<String>()
         if (cuvetteShelfPos == -1) {
             i("没有比色皿架")
-            viewModelScope.launch {
-                _dialogUiState.emit(
-                    HomeDialogUiState.GetStateNotExist("比色皿不足，请添加")
-                )
-            }
-            return
+            discArray.add("比色皿")
         }
         if (!isManualSampling()) {
             if (sampleShelfPos == -1) {
                 i("没有样本架")
-                viewModelScope.launch {
-                    _dialogUiState.emit(
-                        HomeDialogUiState.GetStateNotExist("样本不足，请添加")
-                    )
-                }
-                return
+                discArray.add("样本架")
             }
         }
 
@@ -2692,7 +2681,7 @@ class HomeViewModel(
             //开始检测前先清洗取样针
             cleaningBeforeStartTest = true
             samplingProbeCleaning()
-        }, discrepancy = { str ->
+        }, discArray = discArray, discrepancy = { str ->
             viewModelScope.launch {
                 _dialogUiState.emit(
                     HomeDialogUiState.GetStateNotExist(str)

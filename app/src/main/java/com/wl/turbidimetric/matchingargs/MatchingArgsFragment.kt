@@ -283,6 +283,7 @@ class MatchingArgsFragment :
     private fun listenerData() {
         lifecycleScope.launch {
             vm.dialogUiState.collect { state ->
+                i("state=$state")
                 when (state) {
                     is MatchingArgsDialogUiState.GetStateNotExistMsg -> {//开始检测，确实清洗液等
                         dialog.showPop(requireContext(), isCancelable = false) { dialog ->

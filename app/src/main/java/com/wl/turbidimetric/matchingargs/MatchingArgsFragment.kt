@@ -79,6 +79,7 @@ class MatchingArgsFragment :
     }
 
     private fun listener() {
+        vm.listener()
         listenerData()
         listenerView()
     }

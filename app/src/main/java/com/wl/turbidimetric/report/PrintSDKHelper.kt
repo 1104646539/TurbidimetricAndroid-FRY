@@ -40,8 +40,10 @@ object PrintSDKHelper {
     fun close() {
         mContext = null
         printerStateChange = null
-        printingSdk?.stopService()
-        intentApi?.stopService(intentServiceCallback)
+        if (isInstallApk() && printingSdk!!.isServiceRunning) {
+            printingSdk?.stopService()
+            intentApi?.stopService(intentServiceCallback)
+        }
         printingSdk = null
         intentApi = null
     }
@@ -99,18 +101,19 @@ object PrintSDKHelper {
             printerState = PrinterState.InitSdkFailed
         }
     }
-    private val printingServiceCallback = object : com.dynamixsoftware.printingsdk.IServiceCallback {
-        override fun onServiceConnected() {
-            i("startService onServiceConnected")
-            printingSdkInitSuccess = true
-            initRecentPrinters()
-        }
+    private val printingServiceCallback =
+        object : com.dynamixsoftware.printingsdk.IServiceCallback {
+            override fun onServiceConnected() {
+                i("startService onServiceConnected")
+                printingSdkInitSuccess = true
+                initRecentPrinters()
+            }
 
-        override fun onServiceDisconnected() {
-            i("startService onServiceDisconnected")
-            printingSdkInitSuccess = false
+            override fun onServiceDisconnected() {
+                i("startService onServiceDisconnected")
+                printingSdkInitSuccess = false
+            }
         }
-    }
 
     private fun initSdkService() {
         intentApi?.runService(intentServiceCallback)

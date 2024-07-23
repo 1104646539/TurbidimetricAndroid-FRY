@@ -25,6 +25,7 @@ import com.wl.turbidimetric.report.ExportReportHelper
 import com.wl.turbidimetric.util.FitterType
 import com.wl.turbidimetric.report.PdfCreateUtil
 import com.wl.turbidimetric.report.PrintHelper
+import com.wl.turbidimetric.util.ScanCodeUtil
 import com.wl.turbidimetric.util.SerialPortIF
 import com.wl.turbidimetric.util.SerialPortImpl
 import com.wl.weiqianwllib.serialport.BaseSerialPort
@@ -56,6 +57,9 @@ class App : Application() {
     }
     val printHelper: PrintHelper by lazy {
         PrintHelper(LocalData.ReportIntervalTime, this)
+    }
+    val scanCodeUtil: ScanCodeUtil by lazy {
+        ScanCodeUtil()
     }
     val imm: InputMethodManager by lazy {
         getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -236,6 +240,7 @@ class App : Application() {
                     App.instance!!.serialPort,
                     App.instance!!.thermalPrintUtil,
                     App.instance!!.printHelper,
+                    App.instance!!.scanCodeUtil,
                 ) as T
             }
             throw IllegalArgumentException("Unknown ViewModel class")

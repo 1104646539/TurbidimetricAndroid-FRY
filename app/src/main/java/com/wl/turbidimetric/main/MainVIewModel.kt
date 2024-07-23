@@ -11,6 +11,7 @@ import com.wl.turbidimetric.app.UploadState
 import com.wl.turbidimetric.base.BaseViewModel
 import com.wl.turbidimetric.ex.getAppViewModel
 import com.wl.weiqianwllib.upan.StorageState
+import com.wl.wllib.LogToFile.i
 import com.wl.wllib.LogToFile.u
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,7 +37,8 @@ class MainViewModel(private val appViewModel: WeakReference<AppViewModel>) : Bas
         appViewModel.get()?.serialPort?.allowRunning()
     }
 
-    private var curIndex = 0
+    private var _curIndex = MutableSharedFlow<Int>(1)
+    val curIndex = _curIndex.asSharedFlow()
     private val _uiState = MutableSharedFlow<MainState>()
     val uiState = _uiState.asSharedFlow()
 
@@ -118,9 +120,9 @@ class MainViewModel(private val appViewModel: WeakReference<AppViewModel>) : Bas
     }
 
     private fun changeNavCurIndex(index: Int) {
-        curIndex = index
+//        curIndex = index
         viewModelScope.launch {
-            _uiState.emit(MainState.CurIndex(index))
+            _curIndex.emit(index)
         }
     }
 
@@ -132,7 +134,7 @@ class MainViewModel(private val appViewModel: WeakReference<AppViewModel>) : Bas
 sealed class MainState {
     object None : MainState()
     object ShowOpenDocumentTree : MainState()
-    data class CurIndex(val index: Int) : MainState()
+//    data class CurIndex(val index: Int) : MainState()
     data class ShowPopupViewForUploadState(val uploadState: UploadState) : MainState()
     data class ShowPopupViewForStorageState(val storageState: com.wl.turbidimetric.app.StorageState) :
         MainState()

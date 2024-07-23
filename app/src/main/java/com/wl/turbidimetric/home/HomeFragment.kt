@@ -154,6 +154,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
     private fun listener() {
         listenerView()
         listenerData()
+        vm.listener()
     }
 
     private fun listenerView() {

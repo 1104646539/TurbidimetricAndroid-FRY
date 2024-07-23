@@ -104,7 +104,7 @@ class ScanBarcodeViewModel(private val appViewModel: AppViewModel) : BaseViewMod
 
     fun listener() {
         appViewModel.serialPort.addCallback(this)
-        ScanCodeUtil.onScanResult = this
+        appViewModel.scanCodeUtil.onScanResult = this
         appViewModel.testType = TestType.Debug
         i("appViewModel.serialPort.callback listener")
     }
@@ -244,7 +244,7 @@ class ScanBarcodeViewModel(private val appViewModel: AppViewModel) : BaseViewMod
         }
         viewModelScope.launch {
             scanCount++
-            ScanCodeUtil.startScan()
+            appViewModel.scanCodeUtil.startScan()
         }
 //        if (!reply.data.type.isSample()) {
 //

@@ -10,6 +10,7 @@ import com.wl.turbidimetric.print.ThermalPrintUtil
 import com.wl.turbidimetric.report.PrintHelper
 import com.wl.turbidimetric.repository.if2.LocalDataSource
 import com.wl.turbidimetric.upload.hl7.util.ConnectStatus
+import com.wl.turbidimetric.util.ScanCodeUtil
 import com.wl.turbidimetric.util.SerialPortIF
 import com.wl.wllib.DateUtil
 import com.wl.wllib.LogToFile.i
@@ -29,6 +30,7 @@ class AppViewModel(
     val serialPort: SerialPortIF,
     val thermalPrintUtil: ThermalPrintUtil,
     val printHelper: PrintHelper,
+    val scanCodeUtil: ScanCodeUtil
 ) :
     ViewModel() {
 

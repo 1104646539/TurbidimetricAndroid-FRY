@@ -101,7 +101,7 @@ class HomeViewModel(
 ) : BaseViewModel(), Callback2, OnScanResult {
 
     init {
-        listener()
+//        listener()
     }
 
     /**
@@ -116,14 +116,14 @@ class HomeViewModel(
         appViewModel.serialPort.getVersion()
     }
 
-    private fun listener() {
+    public fun listener() {
         if (appViewModel.serialPort is SerialPortImpl) {
             appViewModel.serialPort.apply {
                 i("listener ${originalCallback} ${callback.size}")
             }
         }
         appViewModel.serialPort.addCallback(this)
-        ScanCodeUtil.onScanResult = this
+        appViewModel.scanCodeUtil.onScanResult = this
         if (appViewModel.serialPort is SerialPortImpl) {
             appViewModel.serialPort.apply {
                 i("listener2 ${originalCallback} ${callback.size}")
@@ -1157,7 +1157,7 @@ class HomeViewModel(
          */
         if (!SystemGlobal.isCodeDebug && (isAuto() && localDataRepository.getScanCode() && sampleType?.isSample() == true)) {
             viewModelScope.launch {
-                ScanCodeUtil.startScan()
+                appViewModel.scanCodeUtil.startScan()
             }
         } else {
             /**

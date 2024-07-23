@@ -10,7 +10,7 @@ import com.wl.wllib.LogToFile.i
  * 扫描条形码类
  * 劳易测 CR100
  */
-object ScanCodeUtil {
+class ScanCodeUtil() {
     private val serialPort: BaseSerialPort = BaseSerialPort()
     /**
      * 开始扫码的命令
@@ -47,7 +47,7 @@ object ScanCodeUtil {
      */
     private var canScanJob: Job? = null
     init {
-        open()
+
     }
     /**
      * 扫码返回的内容是
@@ -55,10 +55,10 @@ object ScanCodeUtil {
      * 关闭扫码返回的内容是固定的
      * 0x02, 0x3F, 0x0D 0x0A
      */
-    fun open() {
+    fun open(scope: CoroutineScope) {
         serialPort.openSerial(WQSerialGlobal.COM3, 9600, 8)
 
-        GlobalScope.launch {
+        scope.launch(Dispatchers.IO) {
             while (true) {
                 delay(100)
                 val size = serialPort.read(temp, temp.size)
@@ -83,7 +83,9 @@ object ScanCodeUtil {
             }
         }
     }
-
+    fun close(){
+        serialPort?.close()
+    }
 
     /**
      * 开始扫码

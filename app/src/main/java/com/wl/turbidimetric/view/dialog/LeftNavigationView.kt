@@ -165,7 +165,8 @@ class LeftNavigationView @JvmOverloads constructor(
         return super.onTouchEvent(event)
     }
 
-    private fun selectIndexChange(index: Int) {
+    fun selectIndexChange(index: Int) {
+        if (curIndex == index) return
         curIndex = index
         postInvalidate()
         onItemChangeListener?.invoke(index)

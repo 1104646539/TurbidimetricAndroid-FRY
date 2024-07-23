@@ -61,6 +61,7 @@ import com.wl.wllib.ktxRunOnBgCache
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.greenrobot.eventbus.EventBus
@@ -97,14 +98,15 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        if (savedInstanceState == null) {
-            App.instance?.serialPort?.open(lifecycleScope)
-            App.instance?.thermalPrintUtil?.open(lifecycleScope)
-            App.instance?.printHelper?.open(lifecycleScope)
-        }
+        i("onCreate savedInstanceState=${savedInstanceState}")
+        App.instance?.serialPort?.open(lifecycleScope)
+        App.instance?.thermalPrintUtil?.open(lifecycleScope)
+        App.instance?.printHelper?.open(lifecycleScope)
+        App.instance?.scanCodeUtil?.open(lifecycleScope)
         setTheme(R.style.Theme_Mvvmdemo) //恢复原有的样式
         super.onCreate(savedInstanceState)
     }
+
 
     private val mHandler = Handler(Looper.getMainLooper()) { msg ->
         when (msg.what) {
@@ -163,12 +165,12 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
 
     override fun onDestroy() {
         super.onDestroy()
-        ScanCodeUtil.onScanResult = null
+//        ScanCodeUtil.onScanResult = null
+        appVm.scanCodeUtil.close()
         App.instance?.serialPort?.close()
-        App.instance?.thermalPrintUtil?.close()
+//        App.instance?.thermalPrintUtil?.close()
         unregisterReceiver(usbFlashDiskReceiver)
         unregisterReceiver(mUsbReceiver)
-        PrintSDKHelper.printerStateChange = null
         appVm.printHelper.onSizeChange = null
         PrintSDKHelper.close()
         HL7Helper.setOnConnectListener2(null)
@@ -205,7 +207,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         initTime()
         initUploadClient()
         initPrintSDK()
-        OrderUtil.showHideNav(this, false)
+//        OrderUtil.showHideNav(this, false)
     }
 
     private fun showAnimStart() {
@@ -363,7 +365,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     }
 
     private fun listenerView() {
-        lifecycleScope.launchWhenCreated {
+        lifecycleScope.launchWhenStarted {
             launch {
                 appVm.nowTimeStr.collectLatest {
                     vd.tnv.setTime(it)
@@ -404,10 +406,6 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
             launch {
                 vm.uiState.collectLatest {
                     when (it) {
-                        is MainState.CurIndex -> {
-                            vd.vp.setCurrentItem(it.index, false)
-                        }
-
                         MainState.None -> {}
                         MainState.ShowOpenDocumentTree -> {
                             showOpenDocumentTree()
@@ -432,6 +430,13 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
                             )
                         }
                     }
+                }
+            }
+            launch {
+                vm.curIndex.collectLatest {
+                    i("curIndex=$it")
+                    vd.vp.setCurrentItem(it, false)
+                    vd.lnv.selectIndexChange(it)
                 }
             }
         }

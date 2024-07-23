@@ -89,10 +89,11 @@ class MatchingArgsViewModel(
 ) : BaseViewModel(), Callback2 {
 
     init {
-        listener()
+
     }
 
-    private fun listener() {
+    public fun listener() {
+
         appViewModel.serialPort.addCallback(this)
         viewModelScope.launch {
             projectRepository.getProjects().collectLatest {

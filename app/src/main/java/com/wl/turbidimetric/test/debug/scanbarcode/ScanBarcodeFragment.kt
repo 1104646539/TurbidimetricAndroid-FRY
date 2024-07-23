@@ -26,14 +26,14 @@ class ScanBarcodeFragment :
 
     override fun onResume() {
         super.onResume()
-        oldOnScanResult = ScanCodeUtil.onScanResult
+        oldOnScanResult = appVm.scanCodeUtil.onScanResult
         vm.listener()
     }
 
     override fun onPause() {
         super.onPause()
         vm.clearListener()
-        ScanCodeUtil.onScanResult = oldOnScanResult
+        appVm.scanCodeUtil.onScanResult = oldOnScanResult
         i("onPause")
     }
 

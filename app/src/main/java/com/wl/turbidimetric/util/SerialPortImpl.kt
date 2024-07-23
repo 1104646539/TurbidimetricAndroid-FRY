@@ -593,6 +593,7 @@ class SerialPortImpl(
 
 
     private fun write(data: UByteArray) {
+        c("write ${data.toHex()}")
         if (isCodeDebug) {
             scope?.launch(Dispatchers.IO) {
                 TestSerialPort.testReply(data)

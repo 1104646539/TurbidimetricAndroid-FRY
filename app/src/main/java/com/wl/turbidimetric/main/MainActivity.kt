@@ -207,7 +207,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         initTime()
         initUploadClient()
         initPrintSDK()
-//        OrderUtil.showHideNav(this, false)
+        OrderUtil.showHideNav(this, false)
     }
 
     private fun showAnimStart() {

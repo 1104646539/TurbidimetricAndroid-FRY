@@ -11,6 +11,7 @@ import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.ItemDatamanagerResultBinding
 import com.wl.turbidimetric.model.ResultState
 import com.wl.turbidimetric.model.TestResultAndCurveModel
+import com.wl.wllib.LogToFile.i
 import com.wl.wllib.toTimeStr
 
 class DataManagerAdapter :
@@ -18,7 +19,7 @@ class DataManagerAdapter :
         diffCallback = MyDiff()
     ) {
     //局部刷新 选择改变
-    val REFRESH_SELECT_CHANGE = 100
+    private val REFRESH_SELECT_CHANGE = 100
 
     class MyDiff : DiffUtil.ItemCallback<TestResultAndCurveModel>() {
         override fun areItemsTheSame(
@@ -37,12 +38,14 @@ class DataManagerAdapter :
     }
 
     var onLongClick: ((pos: Long) -> Unit)? = null
-    var onSelectChange: ((pos: Int, selected: Boolean) -> Unit)? = null
+    private val selectedIds = HashSet<Long>() // 存储选中的 item 的 ID
 
 
-    class DataManagerViewHolder(val binding: ItemDatamanagerResultBinding) :
+    class DataManagerViewHolder(
+        val binding: ItemDatamanagerResultBinding
+    ) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bindData(item: TestResultAndCurveModel?, onLongClick: ((pos: Long) -> Unit)?) {
+        fun bindData(item: TestResultAndCurveModel?) {
 //            binding.setVariable(BR.item, item)
             binding.tvId.text = item?.result?.resultId.toString()
             binding.tvDetectionNum.text = item?.result?.detectionNum ?: "-"
@@ -60,14 +63,6 @@ class DataManagerAdapter :
             binding.tvTestTime.text =
                 if (item?.result?.testTime == 0L) "-" else item?.result?.testTime?.toTimeStr()
                     ?: "-"
-//            binding.tvTestValue1.text =
-//                item?.result?.testValue1?.setScale(5, RoundingMode.HALF_UP).toString()
-//            binding.tvTestValue2.text =
-//                item?.result?.testValue2?.setScale(5, RoundingMode.HALF_UP).toString()
-//            binding.tvTestValue3.text =
-//                item?.result?.testValue3?.setScale(5, RoundingMode.HALF_UP).toString()
-//            binding.tvTestValue4.text =
-//                item?.result?.testValue4?.setScale(5, RoundingMode.HALF_UP).toString()
             binding.tvTestValue1.text =
                 item?.result?.testValue1?.toInt().toString()
             binding.tvTestValue2.text =
@@ -80,17 +75,13 @@ class DataManagerAdapter :
             binding.tvTestOriginalValue2.text = item?.result?.testOriginalValue2?.toString() ?: "-"
             binding.tvTestOriginalValue3.text = item?.result?.testOriginalValue3?.toString() ?: "-"
             binding.tvTestOriginalValue4.text = item?.result?.testOriginalValue4?.toString() ?: "-"
-            if(item?.result?.uploaded == true){
+            if (item?.result?.uploaded == true) {
                 binding.ivStateUpload.setImageResource(R.drawable.icon_state_upload_finish)
-            }else{
+            } else {
                 binding.ivStateUpload.setImageResource(R.drawable.icon_state_upload_wait)
             }
             updateResult(binding, item)
 
-            binding.root.setOnLongClickListener {
-                onLongClick?.invoke(item?.result?.resultId ?: 0)
-                true
-            }
         }
 
         private fun updateResult(
@@ -111,8 +102,9 @@ class DataManagerAdapter :
     fun getSelectedItems(): List<TestResultAndCurveModel> {
         val items = mutableListOf<TestResultAndCurveModel>().apply {
             snapshot().items.forEach {
-                if (it.result.isSelect)
+                if (selectedIds.contains(it.result.resultId)) {
                     add(it)
+                }
             }
         }
         return items
@@ -131,12 +123,14 @@ class DataManagerAdapter :
                 when (tem) {
                     REFRESH_SELECT_CHANGE -> {
                         getItem(position)?.let {
-                            if (it.result.isSelect) {
+                            val itemId = it.result.resultId
+                            if (selectedIds.contains(itemId)) {
                                 holder.binding.root.setBackgroundResource(R.drawable.bg_item_select)
+                                holder.binding.ivSelect.isSelected = true
                             } else {
                                 holder.binding.root.setBackgroundColor(Color.WHITE)
+                                holder.binding.ivSelect.isSelected = false
                             }
-                            holder.binding.ivSelect.isSelected = it.result.isSelect
                         }
                     }
                 }
@@ -147,18 +141,26 @@ class DataManagerAdapter :
     override fun onBindViewHolder(holder: DataManagerViewHolder, position: Int) {
         if (holder is DataManagerViewHolder) {
             val item = getItem(holder.absoluteAdapterPosition)
-            holder.bindData(item, onLongClick)
+            holder.bindData(item)
 
             holder.binding.root.setOnClickListener {
                 item?.result?.let { item ->
-                    item.isSelect = !item.isSelect
-                    snapshot()[holder.absoluteAdapterPosition]?.result?.isSelect = item.isSelect
+                    if (selectedIds.contains(item.resultId)) {
+                        selectedIds.remove(item.resultId)
+                    } else {
+                        selectedIds.add(item.resultId)
+                    }
                     notifyItemChanged(holder.absoluteAdapterPosition, REFRESH_SELECT_CHANGE)
                 }
             }
-            holder.binding.ivSelect.isSelected = item?.result?.isSelect ?: false
+            holder.binding.root.setOnLongClickListener {
+                onLongClick?.invoke(item?.result?.resultId ?: 0)
+                true
+            }
+            holder.binding.ivSelect.isSelected =
+                selectedIds.contains(item?.result?.resultId ?: false)
             item?.result?.let {
-                if (it.isSelect) {
+                if (selectedIds.contains(it.resultId)) {
                     holder.binding.root.setBackgroundResource(R.drawable.bg_item_select)
                 } else {
                     holder.binding.root.setBackgroundColor(Color.WHITE)

@@ -1681,7 +1681,7 @@ class HomeViewModel(
         discArray: MutableList<String> = mutableListOf<String>(),
         discrepancy: (String) -> Unit
     ) {
-        if (!appViewModel.getLooperTest() && (!r1Reagent || !r2Reagent || r2Volume == 0 || !cleanoutFluid)) {
+        if (!appViewModel.getLooperTest() && (!r1Reagent || !r2Reagent || r2Volume == 0 || !cleanoutFluid || discArray.isNotEmpty())) {
             var temp = ""
             if (!r1Reagent) {
                 discArray.add("R1试剂")

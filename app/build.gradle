@@ -8,7 +8,7 @@ plugins {
 }
 
 android {
-    signingConfigs {
+//    signingConfigs {
 //        debug {
 //            storeFile file('E:\\platform.keystore')
 //            storePassword '123456'
@@ -24,7 +24,7 @@ android {
 //            keyAlias 'platform'
 //            keyPassword '123456'
 //        }
-    }
+//    }
     compileSdk 33
 
     defaultConfig {
@@ -32,7 +32,7 @@ android {
         minSdk 24
         targetSdk 32
         versionCode 1
-        versionName "1.0.0.0-63修改热敏打印一次打印多条数据不完整的问题"
+        versionName "1.0.0.0-64修改比色皿架不提示的问题"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 

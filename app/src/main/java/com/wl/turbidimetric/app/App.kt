@@ -103,13 +103,13 @@ class App : Application() {
                 val project = ProjectModel().apply {
                     projectName = "血红蛋白"
                     projectCode = "FOB"
-                    projectUnit = "ug/mL"
+                    projectUnit = "ng/mL"
                     projectLjz = 100
                 }
                 val project2 = ProjectModel().apply {
                     projectName = "转铁蛋白"
                     projectCode = "FT"
-                    projectUnit = "ug/mL"
+                    projectUnit = "ng/mL"
                     projectLjz = 40
                 }
                 projectSource.addProject(project)

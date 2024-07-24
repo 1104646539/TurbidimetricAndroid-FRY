@@ -702,7 +702,7 @@ class MatchingArgsViewModel(
         discArray: MutableList<String> = mutableListOf<String>(),
         discrepancy: (String) -> Unit
     ) {
-        if (!r1Reagent || !r2Reagent || r2Volume != 0 || !cleanoutFluid) {
+        if (!r1Reagent || !r2Reagent || r2Volume == 0 || !cleanoutFluid) {
             var temp = ""
             if (!r1Reagent) {
                 discArray.add("R1试剂")

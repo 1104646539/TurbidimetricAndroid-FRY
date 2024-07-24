@@ -538,6 +538,10 @@ class DataManagerFragment :
      */
     private fun print() {
         val results = getSelectData()
+        i("size=${results.size}")
+        results.forEach {
+            i("$it")
+        }
         vm.processIntent(DataManagerViewModel.DataManagerIntent.PrintSelected(results))
     }
 

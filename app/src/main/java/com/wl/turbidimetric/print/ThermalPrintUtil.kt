@@ -41,7 +41,7 @@ class ThermalPrintUtil(private val serialPort: BaseSerialPort) {
         /**
          * 发送打印信息后的间隔时间
          */
-        private const val INTERVAL_TIME = 100;
+        private const val INTERVAL_TIME = 300;
 
         /**
          * 发送获取打印机状态的超时时长
@@ -63,6 +63,7 @@ class ThermalPrintUtil(private val serialPort: BaseSerialPort) {
                 if (ret == 1) {
                     overtimeTask?.cancel()
                     parse(byteArray[0])
+                    queue.finishedWork()
                 }
             }
         }
@@ -80,6 +81,7 @@ class ThermalPrintUtil(private val serialPort: BaseSerialPort) {
     private var overtimeTask: Job? = null
     private fun printTask() {
         queue.onWorkStart = { t ->
+            queue.working()
             sendAndCheckState(getPrintByte(getTestResultMsg(t)), onPrintListener)
             overtimeTask = scope?.launch(Dispatchers.IO) {
                 //获取检测状态超时,报错并取消所有打印任务
@@ -89,6 +91,7 @@ class ThermalPrintUtil(private val serialPort: BaseSerialPort) {
                     onPrintListener?.onPrinterOvertime()
                 }
                 queue.clear()
+                queue.finishedWork()
             }
         }
     }

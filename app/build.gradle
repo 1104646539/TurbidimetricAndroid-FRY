@@ -32,7 +32,7 @@ android {
         minSdk 24
         targetSdk 32
         versionCode 1
-        versionName "1.0.0.0-65修改数据管理选中的问题"
+        versionName "1.0.0.0-66修改增强导出日志的稳定性"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 

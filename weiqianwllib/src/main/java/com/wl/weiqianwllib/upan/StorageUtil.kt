@@ -10,6 +10,8 @@ import android.os.storage.StorageVolume
 import android.preference.PreferenceManager
 import android.util.Log
 import androidx.documentfile.provider.DocumentFile
+import java.io.BufferedInputStream
+import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStream
@@ -332,25 +334,20 @@ object StorageUtil {
             onFailed("文件创建失败")
             return
         }
-        val targetOs = getOutputStream(targetDoc, context)
-        val sourceIs = FileInputStream(file)
+        val sourceIs = BufferedInputStream(FileInputStream(file))
+        val targetOs = BufferedOutputStream(getOutputStream(targetDoc, context))
 
         try {
             sourceIs.copyTo(targetOs!!)
+            targetOs.flush()
         } catch (e: Exception) {
             onFailed("文件复制失败")
         } finally {
             targetOs?.close()
             sourceIs.close()
         }
-        val m = (file.length() / 1024 / 1024 / 10).let {
-            if (it < 5) {
-                5000
-            } else {
-                it * 1000
-            }
-        }
-        //如果不等待这个时间，那有几率拷贝下一个文件时会失败,每1M的文件等待1s，最小为5s
+        val m = (file.length() / 1024 / 1024 / 10) * 3000
+        //如果不等待这个时间，那有几率拷贝下一个文件时会失败,每10M的文件等待3s
         Thread.sleep(m)
         onSuccess()
     }

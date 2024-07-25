@@ -1,6 +1,7 @@
 package com.wl.wllib
 
 import android.util.Log
+import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
@@ -17,10 +18,10 @@ object LogToFile {
     private var file1: File? = null
     private var file2: File? = null
     private var curFile: File? = null
-    var MaxSize = 30 * 1024 * 1024
+    var MaxSize = 50 * 1024 * 1024
 
     val DateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss SSS")
-    var fos: FileOutputStream? = null
+    private var fos: FileOutputStream? = null
 
     @JvmStatic
     var format: Format? = null
@@ -32,8 +33,8 @@ object LogToFile {
         Error//异常报错
     }
 
-    var isAllowInput = true
-    var tsHashMap = hashMapOf<String, TSModel>()
+    private var isAllowInput = true
+    private var tsHashMap = hashMapOf<String, TSModel>()
 
     @JvmStatic
     fun stopInput() {
@@ -174,14 +175,15 @@ object LogToFile {
     @JvmStatic
     fun write(msg: String) {
         fos?.let {
-//            synchronized(it) {
-            it?.write(msg.toByteArray())
-//            it?.flush()
-//            }
+            synchronized(it) {
+                it.write(msg.toByteArray())
+                //强制内存缓冲区内的数据写入到系统。不保证写入到磁盘
+                it.flush()
+                //强制写入此流的数据到磁盘
+                it.fd.sync()
+            }
         }
-
     }
-
 
     private fun getTag(): String {
         val sts = Throwable().stackTrace

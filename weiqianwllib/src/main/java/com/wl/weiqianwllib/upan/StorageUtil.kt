@@ -334,12 +334,16 @@ object StorageUtil {
             onFailed("文件创建失败")
             return
         }
-        val sourceIs = BufferedInputStream(FileInputStream(file))
-        val targetOs = BufferedOutputStream(getOutputStream(targetDoc, context))
+        val sourceIs = FileInputStream(file)
+        val targetOs = getOutputStream(targetDoc, context)
 
         try {
-            sourceIs.copyTo(targetOs!!)
+            val copySize = sourceIs.copyTo(targetOs!!)
             targetOs.flush()
+            if (copySize != file.length()) {
+                onFailed("文件复制失败,并非所有字节都已复制，请重新尝试")
+                return
+            }
         } catch (e: Exception) {
             onFailed("文件复制失败")
         } finally {

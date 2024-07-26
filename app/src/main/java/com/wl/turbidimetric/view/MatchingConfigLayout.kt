@@ -224,6 +224,7 @@ class MatchingConfigLayout : FrameLayout {
         swQuality?.isChecked = quality
 
         rbAuto?.isChecked = autoAttenuation
+        rbManual?.isChecked = !autoAttenuation
 
         rbGrad5?.isChecked = gradsNum == 5
         rbGrad6?.isChecked = gradsNum == 6

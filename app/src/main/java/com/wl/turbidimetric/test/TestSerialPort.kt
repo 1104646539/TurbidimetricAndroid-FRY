@@ -24,7 +24,7 @@ object TestSerialPort {
     suspend fun testReply(data: UByteArray) {
 //        GlobalScope.launch {
 //            launch {
-
+        delay(2000)
         val state: UByte = 0x00u
         var reply = ubyteArrayOf(data[0], state)
         when (data[0]) {
@@ -39,11 +39,11 @@ object TestSerialPort {
             }
 
             SerialGlobal.CMD_GetState -> {
-//                delay(1000)
+                delay(1000)
 //                if (index < 2) {
-                reply = reply.plus(ubyteArrayOf(0x0u, 0x2u, 0x11u, 0xffu))// 0011 0011
+                    reply = reply.plus(ubyteArrayOf(0x0u, 0x2u, 0x11u, 0xffu))// 0011 0011
 //                } else {
-//                    reply = reply.plus(ubyteArrayOf(0x0u, 0x2u, 0x01u, 0x00u))//0001 0001
+//                reply = reply.plus(ubyteArrayOf(0x0u, 0x2u, 0x11u, 0xffu))//0001 0001
 //                }
 //                index++;
             }
@@ -62,7 +62,7 @@ object TestSerialPort {
             }
 
             SerialGlobal.CMD_MoveCuvetteShelf -> {
-//                delay(5000)
+                delay(3000)
 //                reply = ubyteArrayOf(data[0], 0x01u, 0x0u, 0x0u, 0x0u, 0x0u)
                 reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x0u))
             }
@@ -107,7 +107,7 @@ object TestSerialPort {
             SerialGlobal.CMD_TakeReagent -> {
 //                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x01u, 0x1u))// 存在r1试剂 1，r2试剂量 1
 //                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x00u, 0x0u))// 不存在r1试剂 0，r2试剂量 0
-//                if (index == 1) {
+//                if (index == 0) {
 //                    reply = ubyteArrayOf(data[0], 0x06u, 0x0u, 0x0u, 0x01u, 0x2u)//取试剂失败
 //                } else {
                 reply = ubyteArrayOf(data[0], 0x00u, 0x0u, 0x0u, 0x01u, 0x2u)//取试剂成功
@@ -130,11 +130,11 @@ object TestSerialPort {
             }
 
             SerialGlobal.CMD_Sampling -> {
-                if (index == 9) {
+//                if (index == 3) {
                     reply = ubyteArrayOf(data[0], 0x04u, 0x0u, 0x0u, 0x0u, 0x0u)//取样失败
-                } else {
+//                } else {
                     reply = ubyteArrayOf(data[0], 0x00u, 0x0u, 0x0u, 0x0u, 0x0u)//取样成功
-                }
+//                }
 //                index++
 //                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x0u))//取样成功
 //                reply = ubyteArrayOf(data[0], 0x01u, 0x0u, 0x0u, 0x0u, 0x0u)//取样失败

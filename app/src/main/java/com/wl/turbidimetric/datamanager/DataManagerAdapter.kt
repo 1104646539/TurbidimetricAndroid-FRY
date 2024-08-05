@@ -40,6 +40,12 @@ class DataManagerAdapter :
     var onLongClick: ((pos: Long) -> Unit)? = null
     private val selectedIds = HashSet<Long>() // 存储选中的 item 的 ID
 
+    /**
+     * 清除选中的数据
+     */
+    fun clearSelected() {
+        selectedIds.clear()
+    }
 
     class DataManagerViewHolder(
         val binding: ItemDatamanagerResultBinding

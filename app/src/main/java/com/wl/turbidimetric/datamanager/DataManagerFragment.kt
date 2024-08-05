@@ -515,6 +515,7 @@ class DataManagerFragment :
                                 isCancelable = false
                             ) { dialog ->
                                 dialog.showDialog({ conditionModel ->
+                                    adapter.clearSelected()
                                     vm.processIntent(
                                         DataManagerViewModel.DataManagerIntent.ConditionUpdate(
                                             conditionModel

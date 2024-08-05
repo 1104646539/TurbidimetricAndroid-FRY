@@ -24,7 +24,6 @@ object TestSerialPort {
     suspend fun testReply(data: UByteArray) {
 //        GlobalScope.launch {
 //            launch {
-        delay(2000)
         val state: UByte = 0x00u
         var reply = ubyteArrayOf(data[0], state)
         when (data[0]) {
@@ -39,7 +38,7 @@ object TestSerialPort {
             }
 
             SerialGlobal.CMD_GetState -> {
-                delay(1000)
+//                delay(500)
 //                if (index < 2) {
                     reply = reply.plus(ubyteArrayOf(0x0u, 0x2u, 0x11u, 0xffu))// 0011 0011
 //                } else {

@@ -32,7 +32,7 @@ android {
         minSdk 24
         targetSdk 32
         versionCode 1
-        versionName "1.0.0.0-68修复拟合时自动稀释偶然不能选中的问题"
+        versionName "1.0.0.0-69添加筛选后取消选中"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 

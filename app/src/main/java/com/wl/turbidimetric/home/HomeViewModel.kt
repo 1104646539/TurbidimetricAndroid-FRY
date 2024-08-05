@@ -961,7 +961,10 @@ class HomeViewModel(
             onBefore.invoke()
             if (isTestFinish()) {
                 if (appViewModel.getLooperTest()) {
-                    clickStart()
+                    viewModelScope.launch {
+                        delay(1000)
+                        clickStart()
+                    }
                 } else {
                     showFinishDialog()
                 }

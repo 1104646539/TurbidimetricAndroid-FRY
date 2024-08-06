@@ -549,7 +549,8 @@ fun <T> T.throttle(during: Long = 2000L, combine: Boolean = true): T {
 private fun resolveDefaultReturnValue(method: Method): Any? {
     return when (method.returnType.name.toLowerCase(Locale.US)) {
         Void::class.java.simpleName.toLowerCase(Locale.US) -> null
-        else -> throw IllegalArgumentException("无法正确对返回值不为空的回调进行节流")
+        else -> null
+//        else -> throw IllegalArgumentException("无法正确对返回值不为空的回调进行节流")
     }
 }
 
@@ -610,6 +611,6 @@ fun com.wl.turbidimetric.app.StorageState.toState(): com.wl.weiqianwllib.upan.St
 fun View.getPrintParamsAnim(): MainActivity.PrintAnimParams {
     val xy = IntArray(2)
     getLocationInWindow(xy)
-    return MainActivity.PrintAnimParams(xy[0],xy[1],width)
+    return MainActivity.PrintAnimParams(xy[0], xy[1], width)
 
 }

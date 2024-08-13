@@ -350,8 +350,9 @@ object StorageUtil {
             targetOs?.close()
             sourceIs.close()
         }
-        val m = (file.length() / 1024 / 1024 / 10) * 3000
-        //如果不等待这个时间，那有几率拷贝下一个文件时会失败,每10M的文件等待3s
+        val c = (file.length() / 1024 / 1024 / 10).let { if (it < 5) 5 else it }
+        val m = c * 3000
+        //如果不等待这个时间，那有几率拷贝下一个文件时会失败,每10M的文件等待3s,最小为15s
         Thread.sleep(m)
         onSuccess()
     }

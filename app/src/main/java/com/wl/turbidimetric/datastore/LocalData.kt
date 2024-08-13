@@ -120,6 +120,16 @@ object LocalData {
      */
     var ReportIntervalTime by IntDataStoreProperty(LocalDataGlobal.Default.ReportIntervalTime)
 
+    /**
+     * 可以检测的温度的上限
+     */
+    var TempUpLimit by IntDataStoreProperty(LocalDataGlobal.Default.TempUpLimit)
+
+    /**
+     * 可以检测的温度的下限
+     */
+    var TempLowLimit by IntDataStoreProperty(LocalDataGlobal.Default.TempLowLimit)
+
 
     /**
      * 编号自增并保存

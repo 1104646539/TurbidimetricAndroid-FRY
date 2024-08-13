@@ -614,3 +614,10 @@ fun View.getPrintParamsAnim(): MainActivity.PrintAnimParams {
     return MainActivity.PrintAnimParams(xy[0], xy[1], width)
 
 }
+
+/**
+ * 当前温度是否可以检测
+ */
+fun TempCanBeTest(temp: Int, tempLowLimit: Int,tempUpLimit: Int): Boolean {
+    return temp in tempLowLimit..tempUpLimit
+}

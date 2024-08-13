@@ -9,6 +9,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
 import com.lxj.xpopup.core.BasePopupView
 import com.wl.turbidimetric.R
+import com.wl.turbidimetric.app.AppIntent
 import com.wl.turbidimetric.base.BaseFragment
 import com.wl.turbidimetric.databinding.FragmentHomeBinding
 import com.wl.turbidimetric.ex.throttle
@@ -19,6 +20,7 @@ import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.CurveModel
 import com.wl.turbidimetric.model.Item
 import com.wl.turbidimetric.model.SampleState
+import com.wl.turbidimetric.model.TestState
 import com.wl.turbidimetric.upload.hl7.HL7Helper
 import com.wl.turbidimetric.upload.model.GetPatientCondition
 import com.wl.turbidimetric.upload.model.GetPatientType
@@ -214,33 +216,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         }
         lifecycleScope.launchWhenCreated {
             appVm.obTestState.collectLatest {
-                if (!appVm.testType.isTest() && it.isRunning()) {
-                    vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg)
-                    vd.tvAnalyse.text = "正在运行……"
-                    vm.enableView(false)
-                } else {
-                    if (it.machineStateIng()) {
-                        vd.tvAnalyse.text = "正在自检"
-                        vd.tvAnalyse2.text = "(正在自检，请稍后)"
-                        vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg)
-                        vm.enableView(true)
-                    } else if (it.isNotPrepare()) {
-                        vd.tvAnalyse.text = "重新自检"
-                        vd.tvAnalyse2.text = "(请重新自检)"
-                        vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg)
-                        vm.enableView(true)
-                    } else if (it.isRunning()) {
-                        vd.tvAnalyse.text = "检测中"
-                        vd.tvAnalyse2.text = "(仓门已锁，请勿打开,请等待检测结束)"
-                        vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg)
-                        vm.enableView(false)
-                    } else {
-                        vd.tvAnalyse.text = "开始分析"
-                        vd.tvAnalyse2.text = "(点击分析)"
-                        vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg2)
-                        vm.enableView(true)
-                    }
-                }
+                changeAnalyseState(it)
             }
         }
 
@@ -286,7 +262,52 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 showConfigDialog()
             }
         }
+        lifecycleScope.launchWhenCreated {
+            appVm.obReactionTemp.collectLatest {
+                changeAnalyseState(appVm.testState)
+            }
+        }
 
+    }
+
+    private fun changeAnalyseState(testState: TestState) {
+        if (!appVm.testType.isTest() && testState.isRunning()) {
+            vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg)
+            vd.tvAnalyse.text = "正在运行……"
+            vm.enableView(false)
+        } else {
+            if (testState.machineStateIng()) {
+                vd.tvAnalyse.text = "正在自检"
+                vd.tvAnalyse2.text = "(正在自检，请稍后)"
+                vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg)
+                vm.enableView(true)
+            } else if (testState.isNotPrepare()) {
+                vd.tvAnalyse.text = "重新自检"
+                vd.tvAnalyse2.text = "(请重新自检)"
+                vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg)
+                vm.enableView(true)
+            } else if (testState.isRunning()) {
+                vd.tvAnalyse.text = "检测中"
+                vd.tvAnalyse2.text = "(仓门已锁，请勿打开,请等待检测结束)"
+                vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg)
+                vm.enableView(false)
+            } else {
+                //当温度不够时，只在第一次时更新显示正在预热
+                if (!appVm.getTempCanBeTest()) {
+                    vd.tvAnalyse.text = "正在预热,请稍后"
+                    vd.tvAnalyse2.text = ""
+                    vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg)
+                    vm.enableView(false)
+                } else {
+                    //只要有一次温度达标了就不再检查了
+                    appVm.processIntent(AppIntent.NeedJudgeTempChange(false))
+                    vd.tvAnalyse.text = "开始分析"
+                    vd.tvAnalyse2.text = "(点击分析)"
+                    vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg2)
+                    vm.enableView(true)
+                }
+            }
+        }
     }
 
     override fun onMessageEvent(event: EventMsg<Any>) {
@@ -668,6 +689,9 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             appVm.detectionNum.collectLatest {
                 vd.tvSettingsStartNum.text = "起始编号:   ${it.toString()}"
             }
+        }
+        vm.configViewEnable.observe(this@HomeFragment) {
+            vd.vTest.isEnabled = it
         }
     }
 

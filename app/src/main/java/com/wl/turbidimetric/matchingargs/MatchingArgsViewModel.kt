@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.wl.turbidimetric.app.App
+import com.wl.turbidimetric.app.AppIntent
 import com.wl.turbidimetric.app.AppViewModel
 import com.wl.turbidimetric.base.BaseViewModel
 import com.wl.turbidimetric.datastore.LocalData
@@ -588,7 +589,6 @@ class MatchingArgsViewModel(
             }
             return
         }
-
 
         start()
     }

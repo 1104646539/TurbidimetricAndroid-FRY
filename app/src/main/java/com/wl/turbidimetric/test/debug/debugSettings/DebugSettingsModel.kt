@@ -7,15 +7,27 @@ import com.wl.turbidimetric.app.AppIntent
 import com.wl.turbidimetric.app.AppViewModel
 import com.wl.turbidimetric.base.BaseViewModel
 import com.wl.turbidimetric.datastore.LocalData
+import com.wl.turbidimetric.datastore.LocalDataGlobal
+import com.wl.turbidimetric.db.ServiceLocator
 import com.wl.turbidimetric.ex.getAppViewModel
+import com.wl.turbidimetric.repository.if2.LocalDataSource
 import kotlinx.coroutines.flow.MutableStateFlow
 
-class DebugSettingsViewModel(private val appViewModel: AppViewModel) : BaseViewModel() {
+class DebugSettingsViewModel(
+    private val appViewModel: AppViewModel,
+    private val localDataSource: LocalDataSource,
+) : BaseViewModel() {
     private val testMsg = MutableStateFlow("")
-    val looperTest = MutableLiveData(LocalData.LooperTest)
+    val looperTest = MutableLiveData(appViewModel.getLooperTest())
+    val tempLowLimit = MutableLiveData(localDataSource.getTempLowLimit().toString())
+    val tempUpLimit = MutableLiveData(localDataSource.getTempUpLimit().toString())
 
-    fun changeLooperTest(looperTest: Boolean) {
-        appViewModel.processIntent(AppIntent.LooperTestChange(looperTest))
+    fun saveConfig() {
+        localDataSource.setLooperTest(looperTest.value ?: false)
+        localDataSource.setTempLowLimit(
+            tempLowLimit.value?.toIntOrNull() ?: LocalDataGlobal.Default.TempLowLimit
+        )
+        localDataSource.setTempUpLimit(tempUpLimit.value?.toIntOrNull() ?: LocalDataGlobal.Default.TempUpLimit)
     }
 
 
@@ -23,11 +35,13 @@ class DebugSettingsViewModel(private val appViewModel: AppViewModel) : BaseViewM
 
 class DebugSettingsViewModelFactory(
     private val appViewModel: AppViewModel = getAppViewModel(AppViewModel::class.java),
-) : ViewModelProvider.NewInstanceFactory() {
+    private val localDataDataSource: LocalDataSource = ServiceLocator.provideLocalDataSource(),
+
+    ) : ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(DebugSettingsViewModel::class.java)) {
             return DebugSettingsViewModel(
-                appViewModel
+                appViewModel, localDataDataSource
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")

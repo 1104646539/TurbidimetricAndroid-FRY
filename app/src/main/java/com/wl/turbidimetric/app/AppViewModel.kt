@@ -2,6 +2,7 @@ package com.wl.turbidimetric.app
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.wl.turbidimetric.ex.TempCanBeTest
 import com.wl.turbidimetric.ex.toState
 import com.wl.turbidimetric.model.MachineTestModel
 import com.wl.turbidimetric.model.TestState
@@ -16,6 +17,7 @@ import com.wl.wllib.DateUtil
 import com.wl.wllib.LogToFile.i
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -100,6 +102,36 @@ class AppViewModel(
      */
     private val _detectionNum = MutableStateFlow(localDataSource.getDetectionNum().toLong())
     val detectionNum = _detectionNum.asSharedFlow()
+
+
+    /**
+     * 是否需要判定温度是否合格，现在只要自检完成后有一次温度是合格的就一直是合格的（用来判定是否在温度不满足条件时显示正在预热）
+     */
+    private var needJudgeTemp = true
+
+    /**
+     * 反应槽温度
+     */
+    private var reactionTemp = 0
+
+    /**
+     * 反应槽的温度
+     */
+    private var _reactionTemp = MutableSharedFlow<Int>(1)
+
+    /**
+     * 反应槽的温度
+     */
+    val obReactionTemp = _reactionTemp.asSharedFlow()
+
+    fun getTempCanBeTest(): Boolean {
+        return !needJudgeTemp || (needJudgeTemp && TempCanBeTest(
+            reactionTemp,
+            localDataSource.getTempLowLimit(),
+            localDataSource.getTempUpLimit()
+        ))
+    }
+
 
     fun getLooperTest(): Boolean {
         return localDataSource.getLooperTest()
@@ -206,6 +238,25 @@ class AppViewModel(
         }
     }
 
+    /**
+     * 更新反应槽温度
+     * @param value Int
+     */
+    private fun changeReactionTemp(value: Int) {
+        reactionTemp = value
+        viewModelScope.launch {
+            _reactionTemp.emit(value)
+        }
+    }
+
+    /**
+     * 更新是否是第一次检测
+     * @param value Boolean
+     */
+    private fun changeFirstTest(value: Boolean) {
+        needJudgeTemp = value
+    }
+
     fun processIntent(intent: AppIntent) {
         when (intent) {
             AppIntent.ListenerTime -> {
@@ -243,8 +294,17 @@ class AppViewModel(
             is AppIntent.DetectionNumChange -> {
                 changeDetectionNum(intent.detectionNum)
             }
+
+            is AppIntent.NeedJudgeTempChange -> {
+                changeFirstTest(intent.value)
+            }
+
+            is AppIntent.ReactionTempChange -> {
+                changeReactionTemp(intent.value)
+            }
         }
     }
+
 
 }
 
@@ -260,5 +320,7 @@ sealed class AppIntent {
     data class MachineTestModelChange(val machineTestModel: MachineTestModel) : AppIntent()
     data class LooperTestChange(val looperTest: Boolean) : AppIntent()
     data class DetectionNumChange(val detectionNum: Long) : AppIntent()
+    data class NeedJudgeTempChange(val value: Boolean) : AppIntent()
+    data class ReactionTempChange(val value: Int) : AppIntent()
 
 }

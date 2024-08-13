@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.wl.turbidimetric.app.App
+import com.wl.turbidimetric.app.AppIntent
 import com.wl.turbidimetric.app.AppViewModel
 import com.wl.turbidimetric.base.BaseViewModel
 import com.wl.turbidimetric.db.ServiceLocator
@@ -468,6 +469,7 @@ class HomeViewModel(
             }
         }
 
+
     /**
      * 清洗液量
      */
@@ -508,6 +510,7 @@ class HomeViewModel(
      * 比色皿舱门正在操作 （现在用作结束检测，将r2试剂转出来）
      */
     private var cuvetteDoorFinish = true
+
 
     /**
      * 测试用的 start
@@ -850,6 +853,7 @@ class HomeViewModel(
         SystemGlobal.mcuVersion = reply.data.version
     }
 
+
     /**
      * 接收到 获取设置温度
      * @param reply ReplyModel<TempModel>
@@ -857,6 +861,7 @@ class HomeViewModel(
     override fun readDataTempModel(reply: ReplyModel<TempModel>) {
         c("接收到 获取设置温度 reply=$reply")
 
+        appViewModel.processIntent(AppIntent.ReactionTempChange(reply.data.reactionTemp))
         _testMachineUiState.update {
             it.copy(
                 reactionTemp = reply.data.reactionTemp / 10.0, r1Temp = reply.data.r1Temp / 10.0

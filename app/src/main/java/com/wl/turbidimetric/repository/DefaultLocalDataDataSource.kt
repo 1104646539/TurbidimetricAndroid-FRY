@@ -100,6 +100,14 @@ class DefaultLocalDataDataSource : LocalDataSource {
         return LocalData.ReportIntervalTime
     }
 
+    override fun getTempUpLimit(): Int {
+        return LocalData.TempUpLimit
+    }
+
+    override fun getTempLowLimit(): Int {
+        return LocalData.TempLowLimit
+    }
+
     override fun setLooperTest(looperTest: Boolean) {
         LocalData.LooperTest = looperTest
     }
@@ -194,5 +202,13 @@ class DefaultLocalDataDataSource : LocalDataSource {
 
     override fun setReportIntervalTime(value: Int) {
         LocalData.ReportIntervalTime = value
+    }
+
+    override fun setTempUpLimit(temp: Int) {
+        LocalData.TempUpLimit = temp
+    }
+
+    override fun setTempLowLimit(temp: Int) {
+        LocalData.TempLowLimit = temp
     }
 }

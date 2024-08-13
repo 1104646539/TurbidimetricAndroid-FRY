@@ -172,24 +172,18 @@ class MatchingArgsFragment :
         }
 
         lifecycleScope.launch {
-            appVm.obTestState.collectLatest {
-                if (!appVm.testType.isMatchingArgs() && it.isRunning()) {
-                    vd.vMatching.setBackgroundResource(R.drawable.shape_analyse_test_bg)
-                    vd.tvMatching.setText("正在运行……")
-                    vm.configEnable.postValue(false)
-                } else {
-                    if (it.isRunning()) {
-                        vd.vMatching.setBackgroundResource(R.drawable.shape_analyse_test_bg)
-                        vd.tvMatching.setText("生成曲线中……")
-                        vm.configEnable.postValue(false)
-                    } else {
-                        vd.vMatching.setBackgroundResource(R.drawable.shape_analyse_test_bg2)
-                        vd.tvMatching.setText("开始拟合")
-                        vm.configEnable.postValue(true)
-                    }
+            launch {
+                appVm.obTestState.collectLatest {
+                    changeAnalyseState(it)
+                }
+            }
+            launch {
+                appVm.obReactionTemp.collectLatest {
+                    changeAnalyseState(appVm.testState)
                 }
             }
         }
+
         lifecycleScope.launch {
             vm.curveUiState.collectLatest {
                 vd.tvEquationText.text = it.equationText
@@ -222,8 +216,37 @@ class MatchingArgsFragment :
                 }
             }
         }
+        vm.configEnable.observe(this@MatchingArgsFragment) {
+            enableView(it)
+        }
     }
 
+    private fun enableView(enable: Boolean) {
+        vd.vMatching.isEnabled = enable
+        vd.vConfig.isEnabled = enable
+    }
+
+    private fun changeAnalyseState(testState: TestState) {
+        if (!appVm.testType.isMatchingArgs() && testState.isRunning()) {
+            vd.vMatching.setBackgroundResource(R.drawable.shape_analyse_test_bg)
+            vd.tvMatching.setText("正在运行……")
+            vm.configEnable.postValue(false)
+        } else {
+            if (testState.isRunning()) {
+                vd.vMatching.setBackgroundResource(R.drawable.shape_analyse_test_bg)
+                vd.tvMatching.setText("生成曲线中……")
+                vm.configEnable.postValue(false)
+            } else if (!appVm.getTempCanBeTest()) {
+                vd.vMatching.setBackgroundResource(R.drawable.shape_analyse_test_bg)
+                vd.tvMatching.setText("正在预热")
+                vm.configEnable.postValue(false)
+            } else {
+                vd.vMatching.setBackgroundResource(R.drawable.shape_analyse_test_bg2)
+                vd.tvMatching.setText("开始拟合")
+                vm.configEnable.postValue(true)
+            }
+        }
+    }
 
     private fun startMatching() {
         vm.startMatching()

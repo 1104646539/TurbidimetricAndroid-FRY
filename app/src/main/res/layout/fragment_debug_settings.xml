@@ -3,20 +3,91 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
+
         <variable
             name="vm"
             type="com.wl.turbidimetric.test.debug.debugSettings.DebugSettingsViewModel" />
     </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
         <CheckBox
-            android:layout_width="match_parent"
             android:id="@+id/cb_looper_test"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:checked="@={vm.looperTest}"
             android:text="开启无限检测模式"
-            android:layout_height="wrap_content"/>
+            android:textSize="26sp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_temp"
+            style="@style/TextHilt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="20dp"
+            android:text="检测温度:"
+            android:textSize="26sp"
+            app:layout_constraintLeft_toLeftOf="@id/cb_looper_test"
+            app:layout_constraintTop_toBottomOf="@id/cb_looper_test" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_low_limit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@id/tv_temp"
+            app:layout_constraintLeft_toRightOf="@+id/tv_temp"
+            app:layout_constraintTop_toTopOf="@id/tv_temp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tiet_low_limit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="温度下限(单位：℃*10)"
+                android:inputType="numberSigned"
+                android:maxLength="3"
+                android:minWidth="250dp"
+                android:text="@={vm.tempLowLimit}"
+                android:textSize="20sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_up_limit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            app:layout_constraintBottom_toBottomOf="@id/tv_temp"
+            app:layout_constraintLeft_toRightOf="@+id/til_low_limit"
+            app:layout_constraintTop_toTopOf="@id/tv_temp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tiet_up_limit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="温度上限(单位：℃*10)"
+                android:inputType="numberSigned"
+                android:maxLength="3"
+                android:minWidth="250dp"
+                android:text="@={vm.tempUpLimit}"
+                android:textSize="20sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_save"
+            style="@style/BtnPositive"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="10dp"
+            android:minWidth="200dp"
+            android:text="保存设置"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

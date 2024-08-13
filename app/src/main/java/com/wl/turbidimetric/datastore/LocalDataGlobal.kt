@@ -50,6 +50,8 @@ object LocalDataGlobal {
         val AutoPrintReport = false
         val ReportFileNameBarcode = false
         val ReportIntervalTime = 35
+        val TempUpLimit = 400
+        val TempLowLimit = 360
     }
 
 

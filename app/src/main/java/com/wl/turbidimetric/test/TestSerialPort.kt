@@ -2,6 +2,7 @@ package com.wl.turbidimetric.test
 
 import com.wl.turbidimetric.ex.toHex
 import com.wl.turbidimetric.global.SerialGlobal
+import com.wl.turbidimetric.mcuupdate.UpdateResult
 import com.wl.wllib.CRC.CRC16
 import com.wl.wllib.LogToFile.i
 import kotlinx.coroutines.Dispatchers
@@ -40,7 +41,7 @@ object TestSerialPort {
             SerialGlobal.CMD_GetState -> {
 //                delay(500)
 //                if (index < 2) {
-                    reply = reply.plus(ubyteArrayOf(0x0u, 0x2u, 0x11u, 0xffu))// 0011 0011
+                reply = reply.plus(ubyteArrayOf(0x0u, 0x2u, 0x11u, 0xffu))// 0011 0011
 //                } else {
 //                reply = reply.plus(ubyteArrayOf(0x0u, 0x2u, 0x11u, 0xffu))//0001 0001
 //                }
@@ -100,7 +101,12 @@ object TestSerialPort {
             }
 
             SerialGlobal.CMD_GetSetTemp -> {
-                reply = reply.plus(ubyteArrayOf(0x1u, 0x13u, 0x01u, 0x45u))// 275 325
+//                index++
+//                if (index in 0..3) {
+//                reply = reply.plus(ubyteArrayOf(0x1u, 0x13u, 0x01u, 0x45u))// 275 325
+//                }else{
+                reply = reply.plus(ubyteArrayOf(0x1u, 0x72u, 0x01u, 0x45u))// 370 325
+//                }
             }
 
             SerialGlobal.CMD_TakeReagent -> {
@@ -130,9 +136,9 @@ object TestSerialPort {
 
             SerialGlobal.CMD_Sampling -> {
 //                if (index == 3) {
-                    reply = ubyteArrayOf(data[0], 0x04u, 0x0u, 0x0u, 0x0u, 0x0u)//取样失败
+//                reply = ubyteArrayOf(data[0], 0x02u, 0x0u, 0x0u, 0x0u, 0x0u)//取样失败
 //                } else {
-                    reply = ubyteArrayOf(data[0], 0x00u, 0x0u, 0x0u, 0x0u, 0x0u)//取样成功
+                reply = ubyteArrayOf(data[0], 0x00u, 0x0u, 0x0u, 0x0u, 0x0u)//取样成功
 //                }
 //                index++
 //                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x0u))//取样成功
@@ -141,9 +147,9 @@ object TestSerialPort {
 
             SerialGlobal.CMD_DripSample -> {
 //                delay(4000)//测试实时获取信息时需要
-//                if (index == 3) {
-//                    reply = ubyteArrayOf(data[0], 0x05u, 0x0u, 0x0u, 0x0u, 0x0u)//加样失败
-//                }else{
+//                if (index == 6) {
+//                    reply = ubyteArrayOf(data[0], 0x02u, 0x0u, 0x0u, 0x0u, 0x0u)//加样失败
+//                } else {
                 reply = ubyteArrayOf(data[0], 0x00u, 0x0u, 0x0u, 0x0u, 0x0u)//加样成功
 //                }
 //                index++
@@ -168,6 +174,11 @@ object TestSerialPort {
         i("回复 ${reply.toHex()}")
 //        block(reply)
         results.add(reply)
+    }
+
+    fun mcuUpdateResult(onResult: ((UpdateResult) -> Unit)?) {
+        onResult?.invoke(UpdateResult.Success("成功"))
+//        onResult?.invoke(UpdateResult.Failed("失败"))
     }
 
     //        }

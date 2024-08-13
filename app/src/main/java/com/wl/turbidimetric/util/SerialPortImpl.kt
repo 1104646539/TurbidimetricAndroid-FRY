@@ -151,6 +151,9 @@ class SerialPortImpl(
 
     override fun setOnResult(onResult: ((UpdateResult) -> Unit)?) {
         this.mOnResult = onResult
+        if(isCodeDebug){
+            TestSerialPort.mcuUpdateResult(onResult)
+        }
     }
 
     override fun addCallback(call: Callback2) {

@@ -1,16 +1,19 @@
 package com.wl.turbidimetric.mcuupdate
 
+import android.renderscript.ScriptGroup.Input
 import com.wl.turbidimetric.app.AppViewModel
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.weiqianwllib.upan.StorageUtil
 import com.wl.wllib.LogToFile.i
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
+import java.io.InputStream
 import java.math.BigInteger
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
@@ -65,36 +68,49 @@ class McuUpdateHelper(private val appViewModel: AppViewModel) {
                 coroutineScope.launch(taskDispatcher) {
                     delay(1000)
                     mcuUpdate = true
-                    val tempBytes = ByteArray(256)
-                    val input = curMcuFile.inputStream()
-                    var readLen: Int
-                    //发送文件
-                    while (input.read(tempBytes).also { readLen = it } > 0) {
-                        appViewModel.serialPort.updateWrite(
-                            tempBytes.copyOf(readLen).toUByteArray()
-                        )
-                        delay(100)
-                    }
-                    delay(1000)
-                    //发送md5
-                    val md5 = getMD5(curMcuFile)
-                    md5?.let {
-                        appViewModel.serialPort.updateWrite(it.toByteArray().toUByteArray())
-                    }
-                    //step3 收到发送文件和md5的结果
-                    appViewModel.serialPort.setOnResult { ret ->
-                        coroutineScope.launch(resultDispatcher) {
-                            //step4 提示升级完毕，重启仪器生效
-                            onResult.invoke(ret)
-                            mcuUpdate = false
+                    var input: InputStream? = null
+                    try {
+                        val tempBytes = ByteArray(256)
+                        input = curMcuFile.inputStream()
+                        var readLen: Int
+                        //发送文件
+                        while (input.read(tempBytes).also { readLen = it } > 0) {
+                            appViewModel.serialPort.updateWrite(
+                                tempBytes.copyOf(readLen).toUByteArray()
+                            )
+                            delay(100)
                         }
+                        delay(1000)
+
+                        //发送md5
+                        val md5 = getMD5(curMcuFile)
+                        md5?.let {
+                            appViewModel.serialPort.updateWrite(it.toByteArray().toUByteArray())
+                        }
+                        //step3 收到发送文件和md5的结果
+                        appViewModel.serialPort.setOnResult { ret ->
+                            coroutineScope.launch(resultDispatcher) {
+                                //step4 提示升级完毕，重启仪器生效
+                                onResult.invoke(ret)
+                                mcuUpdate = false
+                            }
+                        }
+                    } catch (e: Exception) {
+                        launch(Dispatchers.Main) {
+                            mcuUpdate = false
+                            onResult.invoke(UpdateResult.Failed("异常停止 ${e.message}"))
+                        }
+                    } finally {
+                        input?.close()
                     }
                 }
             }
 
         } catch (e: Exception) {
-            mcuUpdate = false
-            onResult.invoke(UpdateResult.Failed("异常停止 ${e.message}"))
+            coroutineScope.launch(Dispatchers.Main) {
+                mcuUpdate = false
+                onResult.invoke(UpdateResult.Failed("异常停止 ${e.message}"))
+            }
         }
     }
 

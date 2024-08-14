@@ -95,7 +95,7 @@ class UploadSettingsViewModel(
 
 class UploadSettingsViewModelFactory(
     private val projectSource: ProjectSource = ServiceLocator.provideProjectSource(App.instance!!),
-    private val localDataRepository: LocalDataSource = ServiceLocator.provideLocalDataSource()
+    private val localDataRepository: LocalDataSource = ServiceLocator.provideLocalDataSource(App.instance!!)
 ) : ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(UploadSettingsViewModel::class.java)) {

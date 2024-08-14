@@ -1,9 +1,11 @@
 package com.wl.turbidimetric.app
 
+import android.content.pm.PackageInfo
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.wl.turbidimetric.ex.TempCanBeTest
 import com.wl.turbidimetric.ex.toState
+import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.MachineTestModel
 import com.wl.turbidimetric.model.TestState
 import com.wl.turbidimetric.model.TestType
@@ -11,6 +13,7 @@ import com.wl.turbidimetric.print.ThermalPrintUtil
 import com.wl.turbidimetric.report.PrintHelper
 import com.wl.turbidimetric.repository.if2.LocalDataSource
 import com.wl.turbidimetric.upload.hl7.util.ConnectStatus
+import com.wl.turbidimetric.upload.hl7.util.getLocalConfig
 import com.wl.turbidimetric.util.ScanCodeUtil
 import com.wl.turbidimetric.util.SerialPortIF
 import com.wl.wllib.DateUtil
@@ -152,6 +155,10 @@ class AppViewModel(
 
     fun getAutoPrintReport(): Boolean {
         return localDataSource.getAutoPrintReport()
+    }
+
+    fun getReportIntervalTime(): Int {
+        return localDataSource.getReportIntervalTime()
     }
 
     private fun changeMachineTestModel(machineTestModel: MachineTestModel) {
@@ -305,6 +312,26 @@ class AppViewModel(
         }
     }
 
+
+    fun initDataStore() {
+        SystemGlobal.uploadConfig = getLocalConfig()
+        SystemGlobal.isDebugMode = localDataSource.getDebugMode()
+
+    }
+
+    fun initVersion(packageInfo: PackageInfo) {
+        SystemGlobal.versionName = String(
+            ((packageInfo?.versionName) ?: "").toByteArray(), charset("UTF-8")
+        )
+        SystemGlobal.versionCode = packageInfo?.versionCode
+
+        i("versionName=${SystemGlobal.versionName} versionCode=${SystemGlobal.versionCode}")
+
+        //每次进入软件都会讲当前版本号存入，如果以前的版本号小于当前，说明是第一次打开当前版本
+        if (localDataSource.getCurrentVersion() < packageInfo.versionCode) {
+            localDataSource.setCurrentVersion(packageInfo.versionCode)
+        }
+    }
 
 }
 

@@ -10,21 +10,22 @@ import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import com.lxj.xpopup.XPopup
 import com.wl.turbidimetric.R
-import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.db.ServiceLocator
 import com.wl.turbidimetric.ex.copyForProject
+import com.wl.turbidimetric.ex.getAppViewModel
 import com.wl.turbidimetric.ex.getPackageInfo
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.CurveModel
+import com.wl.turbidimetric.model.GlobalConfig
 import com.wl.turbidimetric.model.ProjectModel
 import com.wl.turbidimetric.print.ThermalPrintUtil
-import com.wl.turbidimetric.repository.if2.LocalDataSource
-import com.wl.turbidimetric.upload.hl7.util.getLocalConfig
-import com.wl.turbidimetric.util.CrashHandler
 import com.wl.turbidimetric.report.ExportReportHelper
-import com.wl.turbidimetric.util.FitterType
 import com.wl.turbidimetric.report.PdfCreateUtil
 import com.wl.turbidimetric.report.PrintHelper
+import com.wl.turbidimetric.repository.DefaultLocalDataDataSource
+import com.wl.turbidimetric.repository.if2.LocalDataSource
+import com.wl.turbidimetric.util.CrashHandler
+import com.wl.turbidimetric.util.FitterType
 import com.wl.turbidimetric.util.ScanCodeUtil
 import com.wl.turbidimetric.util.SerialPortIF
 import com.wl.turbidimetric.util.SerialPortImpl
@@ -43,6 +44,7 @@ import java.util.Date
 class App : Application() {
     private val activityList = mutableListOf<Activity>()
     val mainDao by lazy { ServiceLocator.getDb(this).mainDao() }
+    val globalDao by lazy { ServiceLocator.getDb(this).globalDao() }
     override fun attachBaseContext(base: Context?) {
         super.attachBaseContext(base)
     }
@@ -56,13 +58,16 @@ class App : Application() {
         ThermalPrintUtil(BaseSerialPort())
     }
     val printHelper: PrintHelper by lazy {
-        PrintHelper(LocalData.ReportIntervalTime, this)
+        PrintHelper( this)
     }
     val scanCodeUtil: ScanCodeUtil by lazy {
         ScanCodeUtil()
     }
     val imm: InputMethodManager by lazy {
         getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+    }
+    val appVm: AppViewModel by lazy {
+        getAppViewModel(AppViewModel::class.java)
     }
 
     override fun onCreate() {
@@ -77,24 +82,15 @@ class App : Application() {
             initPop()
 //            没有项目参数的时候，添加一个默认参数
             initDB()
-//            记录当前的版本
-            initVersion()
 //            删除检测报告的缓存
             PdfCreateUtil.deleteCacheFolder(File(ExportReportHelper.defaultReportSavePath))
         }
     }
 
-    private fun initVersion() {
-        SystemGlobal.versionName = String(
-            ((getPackageInfo(this)?.versionName) ?: "").toByteArray(), charset("UTF-8")
-        )
-        SystemGlobal.versionCode = getPackageInfo(this)?.versionCode ?: 0
-
-        LogToFile.i("versionName=${SystemGlobal.versionName} versionCode=${SystemGlobal.versionCode}")
-    }
 
 
     private fun initDB() {
+
         GlobalScope.launch {
             val projectSource = ServiceLocator.provideProjectSource(this@App)
             val ps = mainDao.getProjectModels().first()
@@ -177,17 +173,18 @@ class App : Application() {
 
 
     private fun initData() {
-        //每次进入软件都会讲当前版本号存入，如果以前的版本号小于当前，说明是第一次打开当前版本
-        val packInfo = packageManager.getPackageInfo(packageName, 0)
-        if (LocalData.CurrentVersion < packInfo.versionCode) {
-            LocalData.CurrentVersion = packInfo.versionCode
+        val globalConfigs = globalDao.getAllGlobalConfig()
+        if (globalConfigs.isEmpty()) {//添加两个，第一个是默认参数，第二个才是可以修改的当前参数
+            globalDao.insertGlobalConfig(GlobalConfig(DefaultLocalDataDataSource.backupsId))
+            globalDao.insertGlobalConfig(GlobalConfig(DefaultLocalDataDataSource.defaultId))
         }
-
+        getPackageInfo(this@App)?.let {
+            appVm.initVersion(it)
+        }
     }
 
     private fun initDataStore() {
-        SystemGlobal.uploadConfig = getLocalConfig()
-        SystemGlobal.isDebugMode = LocalData.DebugMode
+        appVm.initDataStore()
     }
 
     companion object {
@@ -231,7 +228,7 @@ class App : Application() {
     }
 
     class AppViewModelFactory(
-        private val localDataDataSource: LocalDataSource = ServiceLocator.provideLocalDataSource(),
+        private val localDataDataSource: LocalDataSource = ServiceLocator.provideLocalDataSource(App.instance!!),
     ) : ViewModelProvider.NewInstanceFactory() {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(AppViewModel::class.java)) {

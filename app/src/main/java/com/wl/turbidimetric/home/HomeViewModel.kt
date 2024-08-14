@@ -3218,7 +3218,7 @@ class HomeViewModelFactory(
     private val projectRepository: ProjectSource = ServiceLocator.provideProjectSource(App.instance!!),
     private val curveRepository: CurveSource = ServiceLocator.provideCurveSource(App.instance!!),
     private val testResultRepository: TestResultSource = ServiceLocator.provideTestResultSource(App.instance!!),
-    private val localDataRepository: LocalDataSource = ServiceLocator.provideLocalDataSource()
+    private val localDataRepository: LocalDataSource = ServiceLocator.provideLocalDataSource(App.instance!!)
 ) : ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(HomeViewModel::class.java)) {

@@ -1,214 +1,308 @@
 package com.wl.turbidimetric.repository
 
-import com.wl.turbidimetric.datastore.LocalData
+import com.wl.turbidimetric.dao.GlobalDao
+import com.wl.turbidimetric.model.GlobalConfig
 import com.wl.turbidimetric.repository.if2.LocalDataSource
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 
-class DefaultLocalDataDataSource : LocalDataSource {
+class DefaultLocalDataDataSource(
+    private val globalDao: GlobalDao,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
+) : LocalDataSource {
+    companion object {
+        val backupsId: Long = 1L
+        val defaultId: Long = 2L
+    }
+
+    fun global(): GlobalConfig {
+        return globalDao.getGlobalConfig(defaultId)
+    }
+
+    fun backupsGlobal(): GlobalConfig {
+        return globalDao.getGlobalConfig(backupsId)
+    }
+
+    /**
+     * 恢复默认参数
+     */
+    override fun resetGlobal() {
+        update {
+            backupsGlobal()
+        }
+    }
+
     override fun getDetectionNum(): String {
-        return LocalData.DetectionNum
+        return global().DetectionNum
     }
 
     override fun getTakeReagentR1(): Int {
-        return LocalData.TakeReagentR1
+        return global().TakeReagentR1
     }
 
     override fun getTakeReagentR2(): Int {
-        return LocalData.TakeReagentR2
+        return global().TakeReagentR2
     }
 
     override fun getSamplingVolume(): Int {
-        return LocalData.SamplingVolume
+        return global().SamplingVolume
     }
 
     override fun getCurrentVersion(): Int {
-        return LocalData.CurrentVersion
+        return global().CurrentVersion
     }
 
     override fun getStirDuration(): Int {
-        return LocalData.StirDuration
+        return global().StirDuration
     }
 
     override fun getStirProbeCleaningDuration(): Int {
-        return LocalData.StirProbeCleaningDuration
+        return global().StirProbeCleaningDuration
     }
 
     override fun getSamplingProbeCleaningDuration(): Int {
-        return LocalData.SamplingProbeCleaningDuration
+        return global().SamplingProbeCleaningDuration
     }
 
     override fun getCurMachineTestModel(): String {
-        return LocalData.CurMachineTestModel
+        return global().CurMachineTestModel
     }
 
     override fun getSampleExist(): Boolean {
-        return LocalData.SampleExist
+        return global().SampleExist
     }
 
     override fun getScanCode(): Boolean {
-        return LocalData.ScanCode
+        return global().ScanCode
     }
 
     override fun getSelectProjectID(): Long {
-        return LocalData.SelectProjectID
+        return global().SelectProjectID
     }
 
     override fun getDebugMode(): Boolean {
-        return LocalData.DebugMode
+        return global().DebugMode
     }
 
     override fun getTest1DelayTime(): Long {
-        return LocalData.Test1DelayTime
+        return global().Test1DelayTime
     }
 
     override fun getTest2DelayTime(): Long {
-        return LocalData.Test2DelayTime
+        return global().Test2DelayTime
     }
 
     override fun getTest3DelayTime(): Long {
-        return LocalData.Test3DelayTime
+        return global().Test3DelayTime
     }
 
     override fun getTest4DelayTime(): Long {
-        return LocalData.Test4DelayTime
+        return global().Test4DelayTime
     }
 
+    /**
+     * 编号自增并保存
+     * @param num String
+     * @return String
+     */
     override fun getDetectionNumInc(num: String): String {
-        return LocalData.getDetectionNumInc(getDetectionNum())
+        if (num.isNullOrEmpty()) return "1"
+        val newNum = java.lang.String.format("%0" + num.length + "d", num.toLong() + 1)
+        setDetectionNum(newNum)
+        return num
     }
 
     override fun getAutoPrintReceipt(): Boolean {
-        return LocalData.AutoPrintReceipt
+        return global().AutoPrintReceipt
     }
 
     override fun getHospitalName(): String {
-        return LocalData.HospitalName
+        return global().HospitalName
     }
 
     override fun getLooperTest(): Boolean {
-        return LocalData.LooperTest
+        return global().LooperTest
     }
 
     override fun getAutoPrintReport(): Boolean {
-        return LocalData.AutoPrintReport
+        return global().AutoPrintReport
     }
 
     override fun getReportFileNameBarcode(): Boolean {
-        return LocalData.ReportFileNameBarcode
+        return global().ReportFileNameBarcode
     }
 
     override fun getReportIntervalTime(): Int {
-        return LocalData.ReportIntervalTime
+        return global().ReportIntervalTime
     }
 
     override fun getTempUpLimit(): Int {
-        return LocalData.TempUpLimit
+        return global().TempUpLimit
     }
 
     override fun getTempLowLimit(): Int {
-        return LocalData.TempLowLimit
+        return global().TempLowLimit
     }
 
     override fun setLooperTest(looperTest: Boolean) {
-        LocalData.LooperTest = looperTest
+        update {
+            it.copy(LooperTest = looperTest)
+        }
+    }
+
+    fun update(mod: (old: GlobalConfig) -> GlobalConfig) {
+        val oldM = global()
+        val newM = mod.invoke(oldM)
+        globalDao.updateGlobalConfig(newM)
     }
 
     override fun setHospitalName(name: String) {
-        LocalData.HospitalName = name
+        update {
+            it.copy(HospitalName = name)
+        }
     }
 
     override fun setAutoPrintReceipt(auto: Boolean) {
-        LocalData.AutoPrintReceipt = auto
+        update {
+            it.copy(AutoPrintReceipt = auto)
+        }
     }
 
     override fun setDetectionNum(num: String) {
-        LocalData.DetectionNum = num
+        update {
+            it.copy(DetectionNum = num)
+        }
     }
 
     override fun setTakeReagentR1(value: Int) {
-        LocalData.TakeReagentR1 = value
+        update {
+            it.copy(TakeReagentR1 = value)
+        }
     }
 
     override fun setTakeReagentR2(value: Int) {
-        LocalData.TakeReagentR2 = value
+        update {
+            it.copy(TakeReagentR2 = value)
+        }
     }
 
     override fun setSamplingVolume(value: Int) {
-        LocalData.SamplingVolume = value
+        update {
+            it.copy(SamplingVolume = value)
+        }
     }
 
     override fun setCurrentVersion(value: Int) {
-        LocalData.CurrentVersion = value
+        update {
+            it.copy(CurrentVersion = value)
+        }
     }
 
     override fun setStirDuration(value: Int) {
-        LocalData.StirDuration = value
+        update {
+            it.copy(StirDuration = value)
+        }
     }
 
     override fun setStirProbeCleaningDuration(value: Int) {
-        LocalData.StirProbeCleaningDuration = value
+        update {
+            it.copy(StirProbeCleaningDuration = value)
+        }
     }
 
     override fun setSamplingProbeCleaningDuration(value: Int) {
-        LocalData.SamplingProbeCleaningDuration = value
+        update {
+            it.copy(SamplingProbeCleaningDuration = value)
+        }
     }
 
     override fun setCurMachineTestModel(value: String) {
-        LocalData.CurMachineTestModel = value
+        update {
+            it.copy(CurMachineTestModel = value)
+        }
     }
 
     override fun setSampleExist(value: Boolean) {
-        LocalData.SampleExist = value
+        update {
+            it.copy(SampleExist = value)
+        }
     }
 
     override fun setScanCode(value: Boolean) {
-        LocalData.ScanCode = value
+        update {
+            it.copy(ScanCode = value)
+        }
     }
 
     override fun setSelectProjectID(value: Long) {
-        LocalData.SelectProjectID = value
+        update {
+            it.copy(SelectProjectID = value)
+        }
     }
 
     override fun setDebugMode(value: Boolean) {
-        LocalData.DebugMode = value
+        update {
+            it.copy(DebugMode = value)
+        }
     }
 
     override fun setTest1DelayTime(value: Long) {
-        LocalData.Test1DelayTime = value
+        update {
+            it.copy(Test1DelayTime = value)
+        }
     }
 
     override fun setTest2DelayTime(value: Long) {
-        LocalData.Test2DelayTime = value
+        update {
+            it.copy(Test2DelayTime = value)
+        }
     }
 
     override fun setTest3DelayTime(value: Long) {
-        LocalData.Test3DelayTime = value
+        update {
+            it.copy(Test3DelayTime = value)
+        }
     }
 
     override fun setTest4DelayTime(value: Long) {
-        LocalData.Test4DelayTime = value
+        update {
+            it.copy(Test4DelayTime = value)
+        }
     }
 
     override fun setDetectionNumInc(num: String) {
-        LocalData.DetectionNum = num
+        update {
+            it.copy(DetectionNum = num)
+        }
     }
 
     override fun setAutoPrintReport(value: Boolean) {
-        LocalData.AutoPrintReport = value
+        update {
+            it.copy(AutoPrintReport = value)
+        }
     }
 
     override fun setReportFileNameBarcode(value: Boolean) {
-        LocalData.ReportFileNameBarcode = value
+        update {
+            it.copy(ReportFileNameBarcode = value)
+        }
     }
 
     override fun setReportIntervalTime(value: Int) {
-        LocalData.ReportIntervalTime = value
+        update {
+            it.copy(ReportIntervalTime = value)
+        }
     }
 
     override fun setTempUpLimit(temp: Int) {
-        LocalData.TempUpLimit = temp
+        update {
+            it.copy(TempUpLimit = temp)
+        }
     }
 
     override fun setTempLowLimit(temp: Int) {
-        LocalData.TempLowLimit = temp
+        update {
+            it.copy(TempLowLimit = temp)
+        }
     }
 }

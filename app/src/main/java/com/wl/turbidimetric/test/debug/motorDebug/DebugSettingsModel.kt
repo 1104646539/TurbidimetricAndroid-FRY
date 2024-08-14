@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.app.AppViewModel
 import com.wl.turbidimetric.base.BaseViewModel
-import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.ex.getAppViewModel
 import com.wl.turbidimetric.model.CuvetteDoorModel
 import com.wl.turbidimetric.model.DripReagentModel
@@ -39,7 +38,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 
 class MotorDebugViewModel(private val appViewModel: AppViewModel) : BaseViewModel(), Callback2 {
     private val testMsg = MutableStateFlow("")
-    val looperTest = MutableLiveData(LocalData.LooperTest)
+    val looperTest = MutableLiveData(appViewModel.getLooperTest())
     val params = MutableLiveData("")
     val enable = MutableLiveData(true)
     val chekckID = MutableLiveData(R.id.cb_forward)

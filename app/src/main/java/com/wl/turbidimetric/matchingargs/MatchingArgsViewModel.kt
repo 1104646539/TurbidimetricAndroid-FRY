@@ -9,7 +9,6 @@ import com.wl.turbidimetric.app.App
 import com.wl.turbidimetric.app.AppIntent
 import com.wl.turbidimetric.app.AppViewModel
 import com.wl.turbidimetric.base.BaseViewModel
-import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.db.ServiceLocator
 import com.wl.turbidimetric.ex.calcAbsorbance
 import com.wl.turbidimetric.ex.calcAbsorbanceDifferences
@@ -931,7 +930,7 @@ class MatchingArgsViewModel(
      */
     private fun goDripSample() {
         if (cuvetteShelfMoveFinish && cuvetteMoveFinish && samplingFinish) {
-            dripSample(autoBlending = false, inplace = false, LocalData.SamplingVolume)
+            dripSample(autoBlending = false, inplace = false, localDataRepository.getSamplingVolume())
         }
     }
 
@@ -2088,7 +2087,7 @@ class MatchingArgsViewModelFactory(
     private val appViewModel: AppViewModel = getAppViewModel(AppViewModel::class.java),
     private val projectRepository: ProjectSource = ServiceLocator.provideProjectSource(App.instance!!),
     private val curveRepository: CurveSource = ServiceLocator.provideCurveSource(App.instance!!),
-    private val localDataRepository: LocalDataSource = ServiceLocator.provideLocalDataSource()
+    private val localDataRepository: LocalDataSource = ServiceLocator.provideLocalDataSource(App.instance!!)
 ) : ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MatchingArgsViewModel::class.java)) {

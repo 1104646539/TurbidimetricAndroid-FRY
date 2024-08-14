@@ -30,6 +30,7 @@ object LocalDataGlobal {
         val TakeReagentR1 = 300
         val TakeReagentR2 = 60
         val SamplingVolume = 25
+        val CurrentVersion = 0
         val FirstOpen = true
         val DetectionNum = "1"
         val StirDuration = 1000

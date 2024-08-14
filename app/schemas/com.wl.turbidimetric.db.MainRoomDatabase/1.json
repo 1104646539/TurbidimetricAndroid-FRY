@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "7e5e3d9e36436428d6bb1fac8425e769",
+    "identityHash": "bbb9f1a9d191f954b7f5cb7541dffaeb",
     "entities": [
       {
         "tableName": "TestResultModel",
@@ -369,12 +369,182 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "GlobalConfig",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `DetectionNum` TEXT NOT NULL, `TakeReagentR1` INTEGER NOT NULL, `TakeReagentR2` INTEGER NOT NULL, `SamplingVolume` INTEGER NOT NULL, `CurrentVersion` INTEGER NOT NULL, `StirDuration` INTEGER NOT NULL, `StirProbeCleaningDuration` INTEGER NOT NULL, `SamplingProbeCleaningDuration` INTEGER NOT NULL, `CurMachineTestModel` TEXT NOT NULL, `SampleExist` INTEGER NOT NULL, `ScanCode` INTEGER NOT NULL, `SelectProjectID` INTEGER NOT NULL, `DebugMode` INTEGER NOT NULL, `Test1DelayTime` INTEGER NOT NULL, `Test2DelayTime` INTEGER NOT NULL, `Test3DelayTime` INTEGER NOT NULL, `Test4DelayTime` INTEGER NOT NULL, `LooperTest` INTEGER NOT NULL, `HospitalName` TEXT NOT NULL, `AutoPrintReceipt` INTEGER NOT NULL, `AutoPrintReport` INTEGER NOT NULL, `ReportFileNameBarcode` INTEGER NOT NULL, `ReportIntervalTime` INTEGER NOT NULL, `TempUpLimit` INTEGER NOT NULL, `TempLowLimit` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "DetectionNum",
+            "columnName": "DetectionNum",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "TakeReagentR1",
+            "columnName": "TakeReagentR1",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "TakeReagentR2",
+            "columnName": "TakeReagentR2",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "SamplingVolume",
+            "columnName": "SamplingVolume",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "CurrentVersion",
+            "columnName": "CurrentVersion",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "StirDuration",
+            "columnName": "StirDuration",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "StirProbeCleaningDuration",
+            "columnName": "StirProbeCleaningDuration",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "SamplingProbeCleaningDuration",
+            "columnName": "SamplingProbeCleaningDuration",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "CurMachineTestModel",
+            "columnName": "CurMachineTestModel",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "SampleExist",
+            "columnName": "SampleExist",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ScanCode",
+            "columnName": "ScanCode",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "SelectProjectID",
+            "columnName": "SelectProjectID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "DebugMode",
+            "columnName": "DebugMode",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "Test1DelayTime",
+            "columnName": "Test1DelayTime",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "Test2DelayTime",
+            "columnName": "Test2DelayTime",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "Test3DelayTime",
+            "columnName": "Test3DelayTime",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "Test4DelayTime",
+            "columnName": "Test4DelayTime",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "LooperTest",
+            "columnName": "LooperTest",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "HospitalName",
+            "columnName": "HospitalName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "AutoPrintReceipt",
+            "columnName": "AutoPrintReceipt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "AutoPrintReport",
+            "columnName": "AutoPrintReport",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ReportFileNameBarcode",
+            "columnName": "ReportFileNameBarcode",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ReportIntervalTime",
+            "columnName": "ReportIntervalTime",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "TempUpLimit",
+            "columnName": "TempUpLimit",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "TempLowLimit",
+            "columnName": "TempLowLimit",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7e5e3d9e36436428d6bb1fac8425e769')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'bbb9f1a9d191f954b7f5cb7541dffaeb')"
     ]
   }
 }

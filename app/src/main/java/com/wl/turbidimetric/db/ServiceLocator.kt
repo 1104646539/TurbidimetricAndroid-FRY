@@ -3,9 +3,9 @@ package com.wl.turbidimetric.db
 import android.content.Context
 import androidx.room.Room
 import com.wl.turbidimetric.repository.DefaultCurveDataSource
-import com.wl.turbidimetric.repository.DefaultLocalDataDataSource
 import com.wl.turbidimetric.repository.DefaultProjectDataSource
 import com.wl.turbidimetric.repository.DefaultTestResultDataSource
+import com.wl.turbidimetric.repository.DefaultLocalDataDataSource
 import com.wl.turbidimetric.repository.if2.CurveSource
 import com.wl.turbidimetric.repository.if2.LocalDataSource
 import com.wl.turbidimetric.repository.if2.ProjectSource
@@ -20,17 +20,25 @@ object ServiceLocator {
     var testResultSource: TestResultSource? = null
 
 
-     fun getDb(context: Context,isMemory: Boolean = false) :MainRoomDatabase{
-        return database ?: createDataBase(context,isMemory).apply {
+    fun getDb(context: Context, isMemory: Boolean = false): MainRoomDatabase {
+        return database ?: createDataBase(context, isMemory).apply {
             database = this
         }
     }
 
-    fun provideLocalDataSource(): LocalDataSource {
+    //    fun provideLocalDataSource(): LocalDataSource {
+//        synchronized(this) {
+//            return localDataSource ?: DefaultLocalDataDataSource().apply {
+//                localDataSource = this
+//            }
+//        }
+//    }
+    fun provideLocalDataSource(context: Context): LocalDataSource {
         synchronized(this) {
-            return localDataSource ?: DefaultLocalDataDataSource().apply {
-                localDataSource = this
-            }
+            return localDataSource
+                ?: DefaultLocalDataDataSource(globalDao = getDb(context).globalDao()).apply {
+                    localDataSource = this
+                }
         }
     }
 
@@ -44,17 +52,19 @@ object ServiceLocator {
 
     fun provideTestResultSource(context: Context): TestResultSource {
         synchronized(this) {
-            return testResultSource ?: DefaultTestResultDataSource(dao = getDb(context).mainDao()).apply {
-                testResultSource = this
-            }
+            return testResultSource
+                ?: DefaultTestResultDataSource(dao = getDb(context).mainDao()).apply {
+                    testResultSource = this
+                }
         }
     }
 
     fun provideProjectSource(context: Context): ProjectSource {
         synchronized(this) {
-            return projectDataSource ?: DefaultProjectDataSource(dao = getDb(context).mainDao()).apply {
-                projectDataSource = this
-            }
+            return projectDataSource
+                ?: DefaultProjectDataSource(dao = getDb(context).mainDao()).apply {
+                    projectDataSource = this
+                }
         }
     }
 

@@ -54,4 +54,6 @@ interface LocalDataSource {
     fun setReportIntervalTime(value: Int)
     fun setTempUpLimit(temp: Int)
     fun setTempLowLimit(temp: Int)
+
+    fun resetGlobal()
 }

@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.wl.turbidimetric.app.App
 import com.wl.turbidimetric.app.AppViewModel
 import com.wl.turbidimetric.base.BaseViewModel
-import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.db.ServiceLocator
 import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.SystemGlobal
@@ -337,7 +336,7 @@ class RepeatabilityViewModel(
             result.forEachIndexed { index, item ->
                 testResultRepository.addTestResult(
                     TestResultModel(
-                        detectionNum = LocalData.getDetectionNumInc(),
+                        detectionNum = localDataRepository.getDetectionNumInc(),
                         concentration = cons[index],
                         absorbances = item,
                         testTime = Date().time,
@@ -384,10 +383,10 @@ class RepeatabilityViewModel(
             testShelfInterval3 = testS
             testShelfInterval4 = testS
         } else {
-            testShelfInterval1 = LocalData.Test1DelayTime
-            testShelfInterval2 = LocalData.Test2DelayTime
-            testShelfInterval3 = LocalData.Test3DelayTime
-            testShelfInterval4 = LocalData.Test4DelayTime
+            testShelfInterval1 = localDataRepository.getTest1DelayTime()
+            testShelfInterval2 = localDataRepository.getTest2DelayTime()
+            testShelfInterval3 = localDataRepository.getTest3DelayTime()
+            testShelfInterval4 = localDataRepository.getTest4DelayTime()
         }
     }
 
@@ -598,7 +597,7 @@ class RepeatabilityViewModel(
                     moveSample(1)
                 } else if (samplePos == 1) {
                     sampleStep++
-                    sampling(LocalData.SamplingVolume)
+                    sampling(localDataRepository.getSamplingVolume())
                 }
             }
 
@@ -629,7 +628,7 @@ class RepeatabilityViewModel(
      */
     private fun goDripSample() {
         if (cuvetteMoveFinish && samplingFinish) {
-            dripSample(autoBlending = false, inplace = false, LocalData.SamplingVolume)
+            dripSample(autoBlending = false, inplace = false, localDataRepository.getSamplingVolume())
         }
     }
 
@@ -1090,7 +1089,7 @@ class RepeatabilityViewModel(
                     takeReagent()
                 } else {//去清洗
                     sampleStep++
-                    sampling(LocalData.SamplingVolume)
+                    sampling(localDataRepository.getSamplingVolume())
                     moveCuvetteDripSample()
                 }
             }
@@ -1410,7 +1409,7 @@ class RepeatabilityViewModelFactory(
     private val appViewModel: AppViewModel = getAppViewModel(AppViewModel::class.java),
     private val curveRepository: CurveSource = ServiceLocator.provideCurveSource(App.instance!!),
     private val testResultRepository: TestResultSource = ServiceLocator.provideTestResultSource(App.instance!!),
-    private val localDataRepository: LocalDataSource = ServiceLocator.provideLocalDataSource()
+    private val localDataRepository: LocalDataSource = ServiceLocator.provideLocalDataSource(App.instance!!)
 ) :
     ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

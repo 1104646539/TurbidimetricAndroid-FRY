@@ -1,6 +1,5 @@
 package com.wl.turbidimetric.util
 
-import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.SerialGlobal
 import com.wl.turbidimetric.global.SystemGlobal

@@ -3,10 +3,9 @@ package com.wl.turbidimetric.test.debug.debugSettings
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.wl.turbidimetric.app.AppIntent
+import com.wl.turbidimetric.app.App
 import com.wl.turbidimetric.app.AppViewModel
 import com.wl.turbidimetric.base.BaseViewModel
-import com.wl.turbidimetric.datastore.LocalData
 import com.wl.turbidimetric.datastore.LocalDataGlobal
 import com.wl.turbidimetric.db.ServiceLocator
 import com.wl.turbidimetric.ex.getAppViewModel
@@ -35,7 +34,7 @@ class DebugSettingsViewModel(
 
 class DebugSettingsViewModelFactory(
     private val appViewModel: AppViewModel = getAppViewModel(AppViewModel::class.java),
-    private val localDataDataSource: LocalDataSource = ServiceLocator.provideLocalDataSource(),
+    private val localDataDataSource: LocalDataSource = ServiceLocator.provideLocalDataSource(App.instance!!),
 
     ) : ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

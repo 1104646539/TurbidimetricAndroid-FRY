@@ -18,7 +18,7 @@ import com.wl.wllib.LogToFile.i
 import kotlinx.coroutines.CoroutineScope
 import java.io.File
 
-class PrintHelper(private val intervalTime: Int, private val context: Context) {
+class PrintHelper(private val context: Context) {
 
     private lateinit var queue: WorkQueue<PrintReport>
     var onSizeChange: ((num: Int) -> Unit)? = null
@@ -27,7 +27,7 @@ class PrintHelper(private val intervalTime: Int, private val context: Context) {
             field = value
             onSizeChange?.invoke(value)
         }
-    fun open(scope: CoroutineScope) {
+    fun open(scope: CoroutineScope,intervalTime: Int) {
         queue = WorkQueue((intervalTime * 1000).toLong(), scope)
         queue.onWorkStart = { result ->
             printReport(result.result, result.hospitalName, result.barcode)

@@ -280,7 +280,12 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 vd.tvAnalyse.text = "正在自检"
                 vd.tvAnalyse2.text = "(正在自检，请稍后)"
                 vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg)
-                vm.enableView(true)
+                vm.enableView(false)
+            } else if (testState.isRunningError()) {
+                vd.tvAnalyse.text = "运行错误"
+                vd.tvAnalyse2.text = "(请联系维护人员)"
+                vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg)
+                vm.enableView(false)
             } else if (testState.isNotPrepare()) {
                 vd.tvAnalyse.text = "重新自检"
                 vd.tvAnalyse2.text = "(请重新自检)"

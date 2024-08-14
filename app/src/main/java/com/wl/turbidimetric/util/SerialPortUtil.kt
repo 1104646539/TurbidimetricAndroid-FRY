@@ -1,22 +1,31 @@
 package com.wl.turbidimetric.util
 
-import com.wl.turbidimetric.ex.*
-import com.wl.turbidimetric.global.SerialGlobal
-import com.wl.turbidimetric.global.SystemGlobal
-import com.wl.turbidimetric.mcuupdate.UpdateResult
-import com.wl.turbidimetric.model.*
-import com.wl.turbidimetric.test.TestSerialPort
-import com.wl.weiqianwllib.serialport.BaseSerialPort
-import com.wl.weiqianwllib.serialport.WQSerialGlobal
-import com.wl.wllib.CRC.CRC16
-import com.wl.wllib.CRC.VerifyCrc16
-import com.wl.wllib.LogToFile.c
-import com.wl.wllib.LogToFile.e
-import kotlinx.coroutines.*
-import java.util.*
-import java.util.concurrent.BlockingQueue
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.LinkedBlockingQueue
+import com.wl.turbidimetric.model.CuvetteDoorModel
+import com.wl.turbidimetric.model.DripReagentModel
+import com.wl.turbidimetric.model.DripSampleModel
+import com.wl.turbidimetric.model.GetMachineStateModel
+import com.wl.turbidimetric.model.GetStateModel
+import com.wl.turbidimetric.model.GetVersionModel
+import com.wl.turbidimetric.model.McuUpdateModel
+import com.wl.turbidimetric.model.MotorModel
+import com.wl.turbidimetric.model.MoveCuvetteDripReagentModel
+import com.wl.turbidimetric.model.MoveCuvetteDripSampleModel
+import com.wl.turbidimetric.model.MoveCuvetteShelfModel
+import com.wl.turbidimetric.model.MoveCuvetteTestModel
+import com.wl.turbidimetric.model.MoveSampleModel
+import com.wl.turbidimetric.model.MoveSampleShelfModel
+import com.wl.turbidimetric.model.OverloadParamsModel
+import com.wl.turbidimetric.model.PiercedModel
+import com.wl.turbidimetric.model.ReplyModel
+import com.wl.turbidimetric.model.SampleDoorModel
+import com.wl.turbidimetric.model.SamplingModel
+import com.wl.turbidimetric.model.SamplingProbeCleaningModel
+import com.wl.turbidimetric.model.SqueezingModel
+import com.wl.turbidimetric.model.StirModel
+import com.wl.turbidimetric.model.StirProbeCleaningModel
+import com.wl.turbidimetric.model.TakeReagentModel
+import com.wl.turbidimetric.model.TempModel
+import com.wl.turbidimetric.model.TestModel
 
 interface Callback2 {
     fun readDataGetMachineStateModel(reply: ReplyModel<GetMachineStateModel>)
@@ -43,6 +52,7 @@ interface Callback2 {
     fun stateSuccess(cmd: Int, state: Int): Boolean
     fun readDataSqueezing(reply: ReplyModel<SqueezingModel>)
     fun readDataMotor(reply: ReplyModel<MotorModel>)
+    fun readDataOverloadParamsModel(reply: ReplyModel<OverloadParamsModel>)
 }
 
 fun interface McuUpdateCallBack {

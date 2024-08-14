@@ -151,7 +151,7 @@ class SerialPortImpl(
 
     override fun setOnResult(onResult: ((UpdateResult) -> Unit)?) {
         this.mOnResult = onResult
-        if(isCodeDebug){
+        if (isCodeDebug) {
             TestSerialPort.mcuUpdateResult(onResult)
         }
     }
@@ -219,12 +219,17 @@ class SerialPortImpl(
                 }
             }
         }
+        var stateSuccess = true
         //状态错误的(不为0)
         if (state.toInt() != 0) {
             callback {
                 if (!it.stateSuccess(cmd.toInt(), state.toInt())) {
+                    stateSuccess = false
                     return@callback
                 }
+            }
+            if(!stateSuccess){
+                return@runBlocking
             }
         }
         i("dispatchData cmd=$cmd")
@@ -381,6 +386,13 @@ class SerialPortImpl(
             SerialGlobal.CMD_Motor -> {
                 callback {
                     it.readDataMotor(transitionMotorModel(ready))
+                }
+
+            }
+
+            SerialGlobal.CMD_OverloadParams -> {
+                callback {
+                    it.readDataOverloadParamsModel(transitionOverloadParamsModel(ready))
                 }
 
             }
@@ -1037,6 +1049,17 @@ class SerialPortImpl(
                 data2 = direction.toUByte(),
                 data3 = (params shr 8).toUByte(),
                 data4 = params.toUByte(),
+            )
+        )
+    }
+
+    /**
+     * 重载参数
+     */
+    override fun overloadParams() {
+        writeAsync(
+            createCmd(
+                SerialGlobal.CMD_OverloadParams,
             )
         )
     }

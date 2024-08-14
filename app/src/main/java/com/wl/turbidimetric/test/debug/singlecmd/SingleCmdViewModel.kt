@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.wl.turbidimetric.app.AppViewModel
 import com.wl.turbidimetric.base.BaseViewModel
 import com.wl.turbidimetric.ex.getAppViewModel
+import com.wl.turbidimetric.global.SerialGlobal
 import com.wl.turbidimetric.model.CuvetteDoorModel
 import com.wl.turbidimetric.model.DripReagentModel
 import com.wl.turbidimetric.model.DripSampleModel
@@ -19,8 +20,10 @@ import com.wl.turbidimetric.model.MoveCuvetteShelfModel
 import com.wl.turbidimetric.model.MoveCuvetteTestModel
 import com.wl.turbidimetric.model.MoveSampleModel
 import com.wl.turbidimetric.model.MoveSampleShelfModel
+import com.wl.turbidimetric.model.OverloadParamsModel
 import com.wl.turbidimetric.model.PiercedModel
 import com.wl.turbidimetric.model.ReplyModel
+import com.wl.turbidimetric.model.ReplyState
 import com.wl.turbidimetric.model.SampleDoorModel
 import com.wl.turbidimetric.model.SampleType
 import com.wl.turbidimetric.model.SamplingModel
@@ -32,6 +35,7 @@ import com.wl.turbidimetric.model.TakeReagentModel
 import com.wl.turbidimetric.model.TempModel
 import com.wl.turbidimetric.model.TestModel
 import com.wl.turbidimetric.model.TestType
+import com.wl.turbidimetric.model.convertReplyState
 import com.wl.turbidimetric.util.Callback2
 import com.wl.wllib.LogToFile.i
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -172,7 +176,21 @@ class SingleCmdViewModel(private val appViewModel: AppViewModel) : BaseViewModel
 //        changeResult(msg)
 //    }
     override fun stateSuccess(cmd: Int, state: Int): Boolean {
-        return true
+        val overloadParams = cmd == SerialGlobal.CMD_OverloadParams.toInt()
+        i("stateSuccess cmd=$cmd state=$state")
+        var stateFailedText = when (convertReplyState(state)) {
+            ReplyState.INVALID_PARAMETER ->   if (overloadParams) "重载参数失败" else "非法数据 命令号:${cmd}"
+            ReplyState.MOTOR_ERR -> "电机错误 命令号:${cmd}"
+            ReplyState.SENSOR_ERR -> "传感器错误 命令号:${cmd}"
+            ReplyState.ORDER -> "意外的命令号"
+            else -> {
+                ""
+            }
+        }
+        if (stateFailedText.isNotEmpty()) {
+            changeResult(stateFailedText)
+        }
+        return stateFailedText.isEmpty()
     }
 
     override fun readDataSqueezing(reply: ReplyModel<SqueezingModel>) {
@@ -182,6 +200,11 @@ class SingleCmdViewModel(private val appViewModel: AppViewModel) : BaseViewModel
 
     override fun readDataMotor(reply: ReplyModel<MotorModel>) {
 
+    }
+
+    override fun readDataOverloadParamsModel(reply: ReplyModel<OverloadParamsModel>) {
+        var msg = "重载参数成功"
+        changeResult(msg)
     }
 
     /**
@@ -501,6 +524,14 @@ class SingleCmdViewModel(private val appViewModel: AppViewModel) : BaseViewModel
     fun shutdown() {
         enable.postValue(false)
         appViewModel.serialPort.shutdown()
+    }
+
+    /**
+     * 重载参数
+     */
+    fun overloadParams() {
+        enable.postValue(false)
+        appViewModel.serialPort.overloadParams()
     }
 
     /**

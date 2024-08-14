@@ -20,6 +20,7 @@ import com.wl.turbidimetric.model.MoveCuvetteShelfModel
 import com.wl.turbidimetric.model.MoveCuvetteTestModel
 import com.wl.turbidimetric.model.MoveSampleModel
 import com.wl.turbidimetric.model.MoveSampleShelfModel
+import com.wl.turbidimetric.model.OverloadParamsModel
 import com.wl.turbidimetric.model.PiercedModel
 import com.wl.turbidimetric.model.ReplyModel
 import com.wl.turbidimetric.model.SampleDoorModel
@@ -167,6 +168,11 @@ class MotorDebugViewModel(private val appViewModel: AppViewModel) : BaseViewMode
     override fun readDataMotor(reply: ReplyModel<MotorModel>) {
         enable.postValue(true)
         i("接收到 控制电机")
+    }
+
+    override fun readDataOverloadParamsModel(reply: ReplyModel<OverloadParamsModel>) {
+
+
     }
 
     fun listener() {

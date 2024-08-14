@@ -41,6 +41,7 @@ import com.wl.turbidimetric.model.MoveCuvetteShelfModel
 import com.wl.turbidimetric.model.MoveCuvetteTestModel
 import com.wl.turbidimetric.model.MoveSampleModel
 import com.wl.turbidimetric.model.MoveSampleShelfModel
+import com.wl.turbidimetric.model.OverloadParamsModel
 import com.wl.turbidimetric.model.PiercedModel
 import com.wl.turbidimetric.model.ReplyModel
 import com.wl.turbidimetric.model.ReplyState
@@ -886,27 +887,24 @@ class HomeViewModel(
      * @param state 状态
      */
     override fun stateSuccess(cmd: Int, state: Int): Boolean {
-        val isSuccess = cmd == ReplyState.SUCCESS.ordinal
-        var stateFailedText = ""
-        if (!isSuccess) {//状态失败、
-            stateFailedText = when (convertReplyState(state)) {
-                ReplyState.INVALID_PARAMETER -> "非法数据 命令号:${cmd}"
-                ReplyState.MOTOR_ERR -> "电机错误 命令号:${cmd}"
-                ReplyState.SENSOR_ERR -> "传感器错误 命令号:${cmd}"
-                ReplyState.ORDER -> "意外的命令号"
-                else -> {
-                    ""
-                }
+        if (!runningTest()) return true
+        var stateFailedText = when (convertReplyState(state)) {
+            ReplyState.INVALID_PARAMETER -> "非法数据 命令号:${cmd}"
+            ReplyState.MOTOR_ERR -> "电机错误 命令号:${cmd}"
+            ReplyState.SENSOR_ERR -> "传感器错误 命令号:${cmd}"
+            ReplyState.ORDER -> "意外的命令号"
+            else -> {
+                ""
             }
-            if (stateFailedText.isNotEmpty()) {
-                stateErrorStopRunning()
-                viewModelScope.launch {
-                    _dialogUiState.emit(
-                        HomeDialogUiState.StateFailed(
-                            stateFailedText.plus("，请停止使用仪器并联系供应商维修")
-                        )
+        }
+        if (stateFailedText.isNotEmpty()) {
+            stateErrorStopRunning()
+            viewModelScope.launch {
+                _dialogUiState.emit(
+                    HomeDialogUiState.StateFailed(
+                        stateFailedText.plus("，请停止使用仪器并联系供应商维修")
                     )
-                }
+                )
             }
         }
         return stateFailedText.isEmpty()
@@ -931,6 +929,10 @@ class HomeViewModel(
     }
 
     override fun readDataMotor(reply: ReplyModel<MotorModel>) {
+
+    }
+
+    override fun readDataOverloadParamsModel(reply: ReplyModel<OverloadParamsModel>) {
 
     }
 

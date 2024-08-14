@@ -104,23 +104,32 @@ object SerialGlobal {
     /**
      * 获取设置温度
      */
-    const val CMD_GetSetTemp:UByte = 0x15u
+    const val CMD_GetSetTemp: UByte = 0x15u
+
     /**
      * 关机
      */
-    const val CMD_Shutdown:UByte = 0x16u
+    const val CMD_Shutdown: UByte = 0x16u
+
     /**
      * 挤压
      */
-    const val CMD_Squeezing:UByte = 0x17u
+    const val CMD_Squeezing: UByte = 0x17u
+
     /**
      * 升级mcu
      */
-    const val CMD_McuUpdate:UByte = 0x18u
+    const val CMD_McuUpdate: UByte = 0x18u
+
     /**
      * 控制电机
      */
-    const val CMD_Motor:UByte = 0x19u
+    const val CMD_Motor: UByte = 0x19u
+
+    /**
+     * 重载参数
+     */
+    const val CMD_OverloadParams: UByte = 0x1Au
 
     /**
      * 响应

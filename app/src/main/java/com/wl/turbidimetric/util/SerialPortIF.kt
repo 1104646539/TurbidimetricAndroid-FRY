@@ -28,6 +28,7 @@ interface SerialPortIF {
      * 打开
      */
     fun open(scope: CoroutineScope)
+
     /**
      * 关闭
      */
@@ -220,6 +221,10 @@ interface SerialPortIF {
      */
     fun motor(motorNum: Int, direction: Int, params: Int)
 
+    /**
+     * 重载参数
+     */
+    fun overloadParams()
 
     /**
      * 创建一个完整的命令

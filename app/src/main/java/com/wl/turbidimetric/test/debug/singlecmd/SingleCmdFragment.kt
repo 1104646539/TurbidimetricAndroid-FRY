@@ -60,6 +60,7 @@ class SingleCmdFragment :
                 vd.btnTemp.isEnabled = it
                 vd.btnGetState.isEnabled = it
                 vd.btnMoveSampleShelfReset.isEnabled = it
+                vd.btnOverloadParams.isEnabled = it
             }
         }
     }
@@ -151,6 +152,9 @@ class SingleCmdFragment :
         }
         vd.btnMoveCuvetteShelfReset.setOnClickListener {
             vm.moveCuvetteShelf("0")
+        }
+        vd.btnOverloadParams.setOnClickListener {
+            vm.overloadParams()
         }
     }
 

@@ -244,3 +244,10 @@ data class McuUpdateModel(val ready: Boolean = false)
  * 控制电机
  */
 data class MotorModel(val resetState: Int = 0)
+
+/**
+ * 重载参数
+ * @property v Int
+ * @constructor
+ */
+data class OverloadParamsModel(val v: Int = 0)

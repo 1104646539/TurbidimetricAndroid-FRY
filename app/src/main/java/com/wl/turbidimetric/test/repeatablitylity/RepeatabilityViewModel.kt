@@ -412,6 +412,10 @@ class RepeatabilityViewModel(
 
     }
 
+    override fun readDataOverloadParamsModel(reply: ReplyModel<OverloadParamsModel>) {
+
+    }
+
     /**
      * 接收到获取状态
      * @param reply ReplyModel<GetStateModel>

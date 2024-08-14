@@ -340,3 +340,15 @@ fun transitionMotorModel(data: UByteArray): ReplyModel<MotorModel> {
         )
     )
 }
+/**
+ * 重载参数
+ * @param data UByteArray
+ * @return ReplyModel<SqueezingModel>
+ */
+fun transitionOverloadParamsModel(data: UByteArray): ReplyModel<OverloadParamsModel> {
+    return ReplyModel(
+        SerialGlobal.CMD_OverloadParams, convertReplyState(data[1].toInt()), OverloadParamsModel(
+            data[3].toInt(),
+        )
+    )
+}

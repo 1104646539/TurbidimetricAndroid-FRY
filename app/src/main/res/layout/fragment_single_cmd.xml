@@ -124,6 +124,7 @@
                     android:text="关机"
                     app:layout_constraintBottom_toBottomOf="@+id/btn_get_machine_state"
                     app:layout_constraintStart_toEndOf="@+id/btn_temp" />
+
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/btn_overload_params"
                     style="@style/BtnPositive"
@@ -136,6 +137,55 @@
                     app:layout_constraintBottom_toBottomOf="@+id/btn_get_machine_state"
                     app:layout_constraintStart_toEndOf="@+id/btn_shutdown" />
 
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btn_correction_temp"
+                    style="@style/BtnPositive"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:minWidth="150dp"
+                    android:text="温度校正"
+                    app:layout_constraintStart_toStartOf="@+id/btn_get_machine_state"
+                    app:layout_constraintTop_toBottomOf="@+id/btn_get_machine_state" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_correction_temp_reaction"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintLeft_toRightOf="@+id/btn_move_sample_shelf"
+                    app:layout_constraintTop_toTopOf="@+id/btn_correction_temp">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/tet_correction_temp_reaction"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:hint="反应槽温度偏移"
+                        android:inputType="numberSigned"
+                        android:maxLength="4"
+                        android:minWidth="200dp"
+                        android:text="1"
+                        android:textSize="24sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_correction_temp_r1"
+                    android:layout_width="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintLeft_toRightOf="@+id/til_correction_temp_reaction"
+                    app:layout_constraintTop_toTopOf="@+id/btn_correction_temp">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/tet_correction_temp_r1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:hint="R1温度偏移"
+                        android:inputType="numberSigned"
+                        android:maxLength="4"
+                        android:minWidth="200dp"
+                        android:text="1"
+                        android:textSize="24sp" />
+                </com.google.android.material.textfield.TextInputLayout>
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/btn_move_sample_shelf"
@@ -146,7 +196,7 @@
                     android:minWidth="150dp"
                     android:text="移动样本架"
                     app:layout_constraintStart_toStartOf="@+id/btn_get_machine_state"
-                    app:layout_constraintTop_toBottomOf="@+id/btn_get_machine_state" />
+                    app:layout_constraintTop_toBottomOf="@+id/btn_correction_temp" />
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/textInputLayout"
@@ -581,10 +631,10 @@
                     app:layout_constraintTop_toTopOf="@+id/textInputLayout8" />
 
                 <RadioGroup
+                    android:id="@+id/rg_blending"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:id="@+id/rg_blending"
                     app:layout_constraintBottom_toBottomOf="@+id/textView"
                     app:layout_constraintLeft_toRightOf="@+id/textView"
                     app:layout_constraintTop_toTopOf="@+id/textView">
@@ -609,7 +659,7 @@
                         android:checked="true"
                         android:paddingLeft="20dp"
                         android:text="不混匀"
-                        android:textSize="26sp"/>
+                        android:textSize="26sp" />
                 </RadioGroup>
 
                 <TextView
@@ -627,35 +677,35 @@
                 <RadioGroup
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:orientation="horizontal"
                     app:layout_constraintBottom_toBottomOf="@+id/textView2"
                     app:layout_constraintLeft_toRightOf="@+id/textView2"
-                    app:layout_constraintTop_toTopOf="@+id/textView2"
-                    android:orientation="horizontal">
+                    app:layout_constraintTop_toTopOf="@+id/textView2">
 
 
-                <RadioButton
-                    android:id="@+id/rb_drip_sample_inplace_y"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginLeft="10dp"
-                    android:paddingLeft="20dp"
-                    android:text="原地加样"
-                    android:textSize="26sp" />
+                    <RadioButton
+                        android:id="@+id/rb_drip_sample_inplace_y"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginLeft="10dp"
+                        android:paddingLeft="20dp"
+                        android:text="原地加样"
+                        android:textSize="26sp" />
 
-                <RadioButton
-                    android:id="@+id/rb_drip_sample_inplace_n"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginLeft="20dp"
-                    android:checked="true"
-                    android:paddingLeft="20dp"
-                    android:text="去比色皿"
-                    android:textSize="26sp"
-                    app:layout_constraintBottom_toBottomOf="@+id/rb_drip_sample_inplace_y"
-                    app:layout_constraintLeft_toRightOf="@+id/rb_drip_sample_inplace_y"
-                    app:layout_constraintTop_toTopOf="@+id/rb_drip_sample_inplace_y" />
+                    <RadioButton
+                        android:id="@+id/rb_drip_sample_inplace_n"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginLeft="20dp"
+                        android:checked="true"
+                        android:paddingLeft="20dp"
+                        android:text="去比色皿"
+                        android:textSize="26sp"
+                        app:layout_constraintBottom_toBottomOf="@+id/rb_drip_sample_inplace_y"
+                        app:layout_constraintLeft_toRightOf="@+id/rb_drip_sample_inplace_y"
+                        app:layout_constraintTop_toTopOf="@+id/rb_drip_sample_inplace_y" />
 
                 </RadioGroup>
 

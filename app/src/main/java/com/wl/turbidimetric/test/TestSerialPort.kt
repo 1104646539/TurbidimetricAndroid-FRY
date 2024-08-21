@@ -101,6 +101,12 @@ object TestSerialPort {
             }
 
             SerialGlobal.CMD_GetSetTemp -> {
+
+                val symbolReaction = data[1]
+                val reaction = data[2]
+                val symbolR1 = data[3]
+                val r1 = data[4]
+                i("symbolReaction$symbolReaction reaction=$reaction symbolR1=$symbolR1 r1=$r1")
 //                index++
 //                if (index in 0..3) {
 //                reply = reply.plus(ubyteArrayOf(0x1u, 0x13u, 0x01u, 0x45u))// 275 325
@@ -164,6 +170,7 @@ object TestSerialPort {
             SerialGlobal.CMD_Motor -> {
                 reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, data[3]))//
             }
+
             SerialGlobal.CMD_OverloadParams -> {
                 reply = ubyteArrayOf(data[0], 0x00u, 0x0u, 0x0u, 0x0u, 0x0u)//成功
 //                reply = ubyteArrayOf(data[0], 0x01u, 0x0u, 0x0u, 0x0u, 0x0u)//失败

@@ -19,6 +19,7 @@ import java.util.*
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.LinkedBlockingQueue
+import kotlin.math.absoluteValue
 
 /**
  * 串口操作类
@@ -228,7 +229,7 @@ class SerialPortImpl(
                     return@callback
                 }
             }
-            if(!stateSuccess){
+            if (!stateSuccess) {
                 return@runBlocking
             }
         }
@@ -984,13 +985,15 @@ class SerialPortImpl(
      * 设置温度
      */
     override fun setTemp(reactionTemp: Int, r1Temp: Int) {
+        val symbolReaction = if (reactionTemp >= 0) 0 else 1
+        val symbolR1 = if (r1Temp >= 0) 0 else 1
         writeAsync(
             createCmd(
                 SerialGlobal.CMD_GetSetTemp,
-                (reactionTemp shr 8).toUByte(),
-                (reactionTemp).toUByte(),
-                (r1Temp shr 8).toUByte(),
-                (r1Temp).toUByte()
+                symbolReaction.toUByte(),
+                (reactionTemp.absoluteValue).toUByte(),
+                symbolR1.toUByte(),
+                (r1Temp.absoluteValue).toUByte()
             )
         )
     }

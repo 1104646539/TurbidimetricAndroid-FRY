@@ -167,7 +167,7 @@ class SingleCmdViewModel(private val appViewModel: AppViewModel) : BaseViewModel
     }
 
     override fun readDataTempModel(reply: ReplyModel<TempModel>) {
-        var msg = "获取温度完成\n r1温度：${reply.data.r1Temp} 反应槽温度：${reply.data.reactionTemp}"
+        var msg = "获取设置温度完成\n r1温度：${reply.data.r1Temp} 反应槽温度：${reply.data.reactionTemp}"
         changeResult(msg)
     }
 
@@ -550,6 +550,16 @@ class SingleCmdViewModel(private val appViewModel: AppViewModel) : BaseViewModel
     private fun changeResult(msg: String) {
         enable.postValue(true)
         resultMsg.value = msg
+    }
+
+    /**
+     * 温度校正
+     * @param tempReaction String 反应槽温度
+     * @param tempR1 String R1温度
+     */
+    fun correctionTemp(tempReaction: String, tempR1: String) {
+        enable.postValue(false)
+        appViewModel.serialPort.setTemp(tempReaction.toInt(),tempR1.toInt())
     }
 }
 

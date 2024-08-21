@@ -61,6 +61,7 @@ class SingleCmdFragment :
                 vd.btnGetState.isEnabled = it
                 vd.btnMoveSampleShelfReset.isEnabled = it
                 vd.btnOverloadParams.isEnabled = it
+                vd.btnCorrectionTemp.isEnabled = it
             }
         }
     }
@@ -155,6 +156,9 @@ class SingleCmdFragment :
         }
         vd.btnOverloadParams.setOnClickListener {
             vm.overloadParams()
+        }
+        vd.btnCorrectionTemp.setOnClickListener {
+            vm.correctionTemp(vd.tetCorrectionTempReaction.text.toString(),vd.tetCorrectionTempR1.text.toString())
         }
     }
 

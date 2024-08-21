@@ -14,7 +14,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/white"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        tools:layout_marginLeft="335dp"
+        tools:layout_marginTop="103dp"
+        tools:layout_width="match_parent">
 
 
         <ImageView
@@ -78,17 +81,19 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="40dp"
-            android:layout_marginBottom="10dp"
             android:layout_marginTop="50dp"
             android:layout_marginRight="40dp"
-            android:text="asldjflsadjfkasldfjas;ldfasljdxzn,cnv,1321354653213465sadfsadfjlskdfj2131313546"
-            android:textColor="@color/themePositiveColor"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/bg_frame"
             android:gravity="left|center_vertical"
+            android:text="asldjflsadjfkasldfjas"
+            android:textColor="@color/themePositiveColor"
+            android:visibility="gone"
             app:layout_constrainedWidth="true"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@id/tv_fitgoodness_text"
+            app:layout_constraintLeft_toRightOf="@id/gl_center"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintLeft_toRightOf="@id/gl_center" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/tv_fitgoodness_text"
@@ -96,12 +101,20 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="40dp"
-            android:layout_marginBottom="20dp"
             android:layout_marginRight="40dp"
+            android:layout_marginBottom="20dp"
             android:textColor="@color/themePositiveColor"
+            android:visibility="gone"
             app:layout_constraintBottom_toTopOf="@id/lc_curve"
             app:layout_constraintLeft_toRightOf="@id/gl_center" />
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@id/rv_params"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="40dp"
+            app:layout_constraintLeft_toRightOf="@id/gl_center"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content" />
 
         <com.github.mikephil.charting.charts.LineChart
             android:id="@+id/lc_curve"

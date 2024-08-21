@@ -32,10 +32,10 @@ class MatchingArgsAdapter :
         RecyclerView.ViewHolder(binding.root) {
         fun bindData(item: CurveModel?) {
             binding.tvId.text = (item?.reagentNO ?: "-").toString()
-            binding.tvF0.text = (item?.f0 ?: 0.0).scaleStr(8).toString()
-            binding.tvF1.text = (item?.f1 ?: 0.0).scaleStr(8).toString()
-            binding.tvF2.text = (item?.f2 ?: 0.0).scaleStr(8).toString()
-            binding.tvF3.text = (item?.f3 ?: 0.0).scaleStr(8).toString()
+//            binding.tvF0.text = (item?.f0 ?: 0.0).scaleStr(8).toString()
+//            binding.tvF1.text = (item?.f1 ?: 0.0).scaleStr(8).toString()
+//            binding.tvF2.text = (item?.f2 ?: 0.0).scaleStr(8).toString()
+//            binding.tvF3.text = (item?.f3 ?: 0.0).scaleStr(8).toString()
             binding.tvTestTime.text =
                 if (item?.createTime.isNullOrEmpty()) "-" else item?.createTime
             binding.tvFitgoodness.text = (item?.fitGoodness ?: 0.0).toBigDecimal().setScale(7, RoundingMode.DOWN).toPlainString()

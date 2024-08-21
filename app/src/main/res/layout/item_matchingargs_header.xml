@@ -27,7 +27,7 @@
         <TextView
             android:id="@+id/tv_id"
             style="@style/TextItem"
-            android:layout_width="80dp"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:text="序号" />
@@ -35,7 +35,7 @@
         <TextView
             android:id="@+id/tv_project_name"
             style="@style/TextItem"
-            android:layout_width="80dp"
+            android:layout_width="120dp"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:text="项目名" />
@@ -45,6 +45,7 @@
             android:id="@+id/tv_f0"
             style="@style/TextItem"
             android:layout_width="120dp"
+            android:visibility="gone"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:text="f0" />
@@ -53,6 +54,7 @@
             android:id="@+id/tv_f1"
             style="@style/TextItem"
             android:layout_width="100dp"
+            android:visibility="gone"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:text="f1" />
@@ -61,6 +63,7 @@
             android:id="@+id/tv_f2"
             style="@style/TextItem"
             android:layout_width="120dp"
+            android:visibility="gone"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:text="f2" />
@@ -69,6 +72,7 @@
             android:id="@+id/tv_f3"
             style="@style/TextItem"
             android:layout_width="120dp"
+            android:visibility="gone"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:text="f3" />

@@ -434,6 +434,27 @@ fun getEquation(
 }
 
 /**
+ * 根据参数和拟合类型，返回公式
+ */
+fun getEquation2(
+    fitterType: FitterType
+): String {
+    return when (fitterType) {
+        FitterType.Three -> {
+            "Y = a + bx + cx² + dx³"
+        }
+
+        FitterType.Linear -> {
+            "Y = b + ax"
+        }
+
+        FitterType.Four -> {
+            "Y = (((d - a) / (d - x) - 1) ^ (1/b)) * c"
+        }
+    }
+}
+
+/**
  * 根据参数和拟合类型，返回拟合度
  */
 fun getFitGoodness(fitterType: FitterType, fitGoodness: Double): String {
@@ -618,6 +639,6 @@ fun View.getPrintParamsAnim(): MainActivity.PrintAnimParams {
 /**
  * 当前温度是否可以检测
  */
-fun TempCanBeTest(temp: Int, tempLowLimit: Int,tempUpLimit: Int): Boolean {
+fun TempCanBeTest(temp: Int, tempLowLimit: Int, tempUpLimit: Int): Boolean {
     return temp in tempLowLimit..tempUpLimit
 }

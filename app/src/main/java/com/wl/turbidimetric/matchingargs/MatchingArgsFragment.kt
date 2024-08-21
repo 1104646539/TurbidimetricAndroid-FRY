@@ -4,7 +4,10 @@ import android.os.Bundle
 import android.view.Gravity
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView.ItemDecoration
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
@@ -151,6 +154,15 @@ class MatchingArgsFragment :
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         vd.rv.adapter = adapter
 
+        val gm = GridLayoutManager(requireContext(), 1, LinearLayoutManager.VERTICAL, false)
+//        gm.spanSizeLookup = object : SpanSizeLookup() {
+//            override fun getSpanSize(position: Int): Int {
+//                return if (position == 0) 1 else 2
+//            }
+//        }
+        vd.rvParams.layoutManager = gm
+//        vd.rvParams.addItemDecoration(ItemDecoration())
+
         lifecycleScope.launch {
             vm.datas.collectLatest {
                 it.filterIndexed { index, _ ->
@@ -236,7 +248,7 @@ class MatchingArgsFragment :
                 vd.vMatching.setBackgroundResource(R.drawable.shape_analyse_test_bg)
                 vd.tvMatching.setText("生成曲线中……")
                 vm.configEnable.postValue(false)
-            }else if (testState.isRunningError()) {
+            } else if (testState.isRunningError()) {
                 vd.vMatching.setBackgroundResource(R.drawable.shape_analyse_test_bg)
                 vd.tvMatching.setText("运行错误")
                 vm.configEnable.postValue(false)

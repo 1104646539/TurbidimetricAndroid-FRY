@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:minWidth="960dp"
+    android:orientation="horizontal">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/TextTitle"
+                android:layout_width="180dp"
+                android:layout_height="wrap_content"
+                android:gravity="left|center_vertical"
+                android:text="选择质控曲线:" />
+
+            <Spinner
+                android:id="@+id/spn_fitter_project"
+                android:layout_width="300dp"
+                android:layout_height="50dp"
+                android:layout_marginLeft="10dp"
+                android:minHeight="50dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/TextTitle"
+                android:layout_width="180dp"
+                android:layout_height="wrap_content"
+                android:gravity="left|center_vertical"
+                android:text="设置质控浓度:" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    style="@style/TextTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="100dp"
+                    android:gravity="left"
+                    android:text="低值:" />
+
+                <EditText
+                    android:id="@+id/et_quality_low_1"
+                    android:layout_width="100dp"
+                    android:layout_height="48dp"
+                    android:layout_marginLeft="14dp"
+                    android:background="@drawable/bg_et_gray"
+                    android:inputType="number"
+                    android:paddingLeft="10dp"
+                    android:text=""
+                    android:textColor="@color/textColor"
+                    android:textSize="18sp" />
+
+                <TextView
+                    style="@style/TextTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="left"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
+                    android:text="-" />
+
+                <EditText
+                    android:id="@+id/et_quality_low_2"
+                    android:layout_width="100dp"
+                    android:layout_height="48dp"
+                    android:layout_marginLeft="14dp"
+                    android:background="@drawable/bg_et_gray"
+                    android:inputType="number"
+                    android:paddingLeft="10dp"
+                    android:text=""
+                    android:textColor="@color/textColor"
+                    android:textSize="18sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    style="@style/TextTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="100dp"
+                    android:gravity="left"
+                    android:text="高值:" />
+
+                <EditText
+                    android:id="@+id/et_quality_high_1"
+                    android:layout_width="100dp"
+                    android:layout_height="48dp"
+                    android:layout_marginLeft="14dp"
+                    android:background="@drawable/bg_et_gray"
+                    android:inputType="number"
+                    android:paddingLeft="10dp"
+                    android:text=""
+                    android:textColor="@color/textColor"
+                    android:textSize="18sp" />
+
+                <TextView
+                    style="@style/TextTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="left"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
+                    android:text="-" />
+
+                <EditText
+                    android:id="@+id/et_quality_high_2"
+                    android:layout_width="100dp"
+                    android:layout_height="48dp"
+                    android:layout_marginLeft="14dp"
+                    android:background="@drawable/bg_et_gray"
+                    android:inputType="number"
+                    android:paddingLeft="10dp"
+                    android:text=""
+                    android:textColor="@color/textColor"
+                    android:textSize="18sp" />
+
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <com.wl.turbidimetric.view.CurveDetailsView
+        android:id="@+id/cdv_details"
+        android:layout_width="450dp"
+        android:layout_height="wrap_content" />
+</LinearLayout>
+

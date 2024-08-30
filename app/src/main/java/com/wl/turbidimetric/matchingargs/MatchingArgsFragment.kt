@@ -4,14 +4,7 @@ import android.os.Bundle
 import android.view.Gravity
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView.ItemDecoration
-import com.github.mikephil.charting.components.XAxis
-import com.github.mikephil.charting.data.Entry
-import com.github.mikephil.charting.data.LineData
-import com.github.mikephil.charting.data.LineDataSet
 import com.lxj.xpopup.XPopup
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.FragmentMatchingArgsBinding
@@ -22,11 +15,12 @@ import com.wl.turbidimetric.model.TestState
 import com.wl.turbidimetric.util.FitterType
 import com.wl.turbidimetric.view.dialog.CoverProjectDialog
 import com.wl.turbidimetric.view.dialog.HiltDialog
-import com.wl.turbidimetric.view.dialog.MatchingConfigDialog
 import com.wl.turbidimetric.view.dialog.showPop
 import com.wl.wllib.LogToFile.i
 import com.wl.turbidimetric.base.BaseFragment
 import com.wl.turbidimetric.global.SystemGlobal
+import com.wl.turbidimetric.view.MatchingConfigLayout
+import com.wl.turbidimetric.view.dialog.MatchingConfigDialog
 import com.wl.wllib.LogToFile.u
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -88,62 +82,9 @@ class MatchingArgsFragment :
     }
 
     private fun initView() {
-        initCurveView()
         test()
     }
 
-    private fun initCurveView() {
-        val set1 = LineDataSet(arrayListOf(), null)
-        set1.setDrawValues(false)//不绘制值在点上
-        set1.setDrawIcons(false)//不绘制值icon在点上
-        set1.color = lineColor
-        set1.label = ""
-        set1.enableDashedLine(10f, 0f, 0f)//线连成虚线
-        set1.circleColors = listOf(lineColor)
-        set1.circleRadius = 1f //点的半径
-        set1.setDrawCircleHole(false)
-
-        //数据集,一个数据集一条线
-        val data = LineData(set1)
-
-        //横向的轴
-        val xAxis = vd.lcCurve.xAxis
-        xAxis.position = XAxis.XAxisPosition.BOTTOM //数字显示在下方
-        xAxis.gridColor = bgGray
-        xAxis.axisLineColor = bgGray
-        xAxis.textColor = textColor
-
-        //竖轴 L是左边的，R是右边的
-        val yAxisL = vd.lcCurve.axisLeft
-        val yAxisR = vd.lcCurve.axisRight
-        yAxisL.gridColor = bgGray
-        yAxisR.gridColor = bgGray
-
-        yAxisL.zeroLineColor = bgGray
-        yAxisR.zeroLineColor = bgGray
-
-        yAxisL.axisLineColor = bgGray
-        yAxisR.axisLineColor = bgGray
-
-        yAxisL.textColor = textColor
-        yAxisR.textColor = textColor
-
-        yAxisL.setDrawZeroLine(false)
-        yAxisR.setDrawZeroLine(false)
-        //右边的轴不显示值
-        yAxisR.setValueFormatter { value, axis -> "" }
-
-        vd.lcCurve.animateXY(1000, 1000)
-
-        //数据集的文字不显示，不启用
-        vd.lcCurve.description.isEnabled = false
-        //数据集的色块不显示，不启用
-        vd.lcCurve.legend.isEnabled = false
-        //空数据显示文字
-        vd.lcCurve.setNoDataText("无数据")
-        //设置数据，更新
-        vd.lcCurve.data = data
-    }
 
     private fun test() {
 
@@ -154,14 +95,24 @@ class MatchingArgsFragment :
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         vd.rv.adapter = adapter
 
-        val gm = GridLayoutManager(requireContext(), 1, LinearLayoutManager.VERTICAL, false)
+//        val gm = GridLayoutManager(requireContext(), 1, LinearLayoutManager.VERTICAL, false)
 //        gm.spanSizeLookup = object : SpanSizeLookup() {
 //            override fun getSpanSize(position: Int): Int {
 //                return if (position == 0) 1 else 2
 //            }
 //        }
-        vd.rvParams.layoutManager = gm
-//        vd.rvParams.addItemDecoration(ItemDecoration())
+//        vd.rvParams.layoutManager =
+//            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+//        vd.rvParams.adapter = matchingArgsInfoAdapter
+//        vd.rvParams.addItemDecoration(
+//            requireContext().dividerBuilder()
+//                .apply {
+//                    color(resources.getColor(R.color.black2))
+//                    size(1)
+//                }
+//                .build()
+//        )
+
 
         lifecycleScope.launch {
             vm.datas.collectLatest {
@@ -173,6 +124,9 @@ class MatchingArgsFragment :
                     if (ret.isNotEmpty()) {
                         adapter.setSelectIndex(ret.lastIndex)
                         adapter.notifyItemChanged(ret.lastIndex)
+                    }
+                    projects?.let { ps ->
+                        vm.updateCurves(ps)
                     }
                 }
             }
@@ -299,24 +253,7 @@ class MatchingArgsFragment :
      * @param project ProjectModel
      */
     private fun changeCurve(project: CurveModel) {
-        val values = ArrayList<Entry>()
-
-        if (project.reactionValues != null && project.reactionValues.isNotEmpty()) {
-            values.addAll(getChartEntry(project))
-        } else {
-            return
-        }
-
-        vm.changeSelectProject(project)
-
-        if (vd.lcCurve.data != null && vd.lcCurve.data.dataSetCount > 0) {
-            val set1 = vd.lcCurve.data.getDataSetByIndex(0) as LineDataSet
-            set1.values = values
-            vd.lcCurve.data.notifyDataChanged()
-            vd.lcCurve.notifyDataSetChanged()
-
-            vd.lcCurve.animateXY(300, 300)
-        }
+        vd.cdvDetails.update(project)
     }
 
     private fun listenerData() {
@@ -342,17 +279,21 @@ class MatchingArgsFragment :
                         }
                     }
 
-                    is MatchingArgsDialogUiState.MatchingFinishMsg -> {//检测结束，提示是否保存
-                        showMatchingFinishDialog(
-                            state.reagnetNo,
-                            state.gradsNum,
-                            state.abss,
-                            state.targets,
-                            state.means,
-                            state.selectFitterType,
-                            state.curProject,
-                            state.isQuality
-                        )
+                    is MatchingArgsDialogUiState.HiltNotSaveDialog -> {//二次提示是否不保存已经拟合的结果
+                        dialog.showPop(requireContext(), isCancelable = false) { dialog ->
+                            dialog.showDialog(
+                                msg = "${state.msg}",
+                                confirmText = "确定",
+                                confirmClick = {
+                                    dialog.dismiss()
+                                    vm.clearMatchingState()
+                                },
+                                cancelText = "取消",
+                                cancelClick = {
+                                    dialog.dismiss()
+                                }
+                            )
+                        }
                     }
 
                     is MatchingArgsDialogUiState.Accident -> {//意外的检测结束等
@@ -375,6 +316,11 @@ class MatchingArgsFragment :
 
                     is MatchingArgsDialogUiState.MatchingSettings -> {//拟合配置
                         showMatchingConfigDialog(
+                            state.curves,
+                            state.qualityLow1,
+                            state.qualityLow2,
+                            state.qualityHigh1,
+                            state.qualityHigh2,
                             state.reagentNo,
                             state.quality,
                             state.projects,
@@ -388,6 +334,12 @@ class MatchingArgsFragment :
 
                     is MatchingArgsDialogUiState.MatchingState -> {//拟合中状态
                         showMatchingStateDialog(
+                            state.isError,
+                            state.matchingType,
+                            state.qualityLow1,
+                            state.qualityLow2,
+                            state.qualityHigh1,
+                            state.qualityHigh2,
                             state.gradsNum,
                             state.abss,
                             state.targets,
@@ -473,6 +425,11 @@ class MatchingArgsFragment :
      * 显示拟合设置对话框
      */
     private fun showMatchingConfigDialog(
+        curves: MutableList<CurveModel>,
+        qualityLow1: Int,
+        qualityLow2: Int,
+        qualityHigh1: Int,
+        qualityHigh2: Int,
         reagentNo: String,
         quality: Boolean,
         projects: List<ProjectModel>,
@@ -483,6 +440,11 @@ class MatchingArgsFragment :
         targetCons: List<Double> = mutableListOf(),
     ) {
         matchingConfigDialog.showDialogStep1(
+            curves,
+            qualityLow1,
+            qualityLow2,
+            qualityHigh1,
+            qualityHigh2,
             reagentNo,
             quality,
             projects,
@@ -491,9 +453,15 @@ class MatchingArgsFragment :
             selectProject,
             selectFitterType,
             targetCons,
-            { reagentNo: String,
+            { matchingType: MatchingConfigLayout.MatchingType, selectCurve: CurveModel?, qualityLow1: Int, qualityLow2: Int, qualityHigh1: Int, qualityHigh2: Int, reagentNo: String,
               quality: Boolean, matchingNum: Int, autoAttenuation: Boolean, selectProject: ProjectModel?, selectFitterType: FitterType, cons: List<Double> ->
                 vm.matchingConfigFinish(
+                    matchingType,
+                    selectCurve,
+                    qualityLow1,
+                    qualityLow2,
+                    qualityHigh1,
+                    qualityHigh2,
                     reagentNo,
                     quality,
                     matchingNum,
@@ -512,20 +480,35 @@ class MatchingArgsFragment :
      * 显示拟合中状态对话框
      */
     private fun showMatchingStateDialog(
+        isError: Boolean,
+        matchingType: MatchingConfigLayout.MatchingType,
+        qualityLow1: Int,
+        qualityLow2: Int,
+        qualityHigh1: Int,
+        qualityHigh2: Int,
         gradsNum: Int,
-        abss: MutableList<MutableList<Double>>,
+        abss: MutableList<Double>,
         targets: List<Double>,
         quality: Boolean,
         means: List<Double>,
         selectFitterType: FitterType,
         curProject: CurveModel?
     ) {
-        matchingConfigDialog.showDialogStep2(
-            gradsNum, abss, targets, means, selectFitterType, curProject, quality, {//开始
+        matchingConfigDialog.showDialogStep2(isError,
+            matchingType, qualityLow1, qualityLow2, qualityHigh1, qualityHigh2,
+            gradsNum, abss, targets, means, selectFitterType, curProject, quality, {
+                //开始
                 vm.clickStart()
-//                vm.showMatchingSettingsDialog()
-            }, {//拟合结束
+            },
+            {//拟合完成、保存
                 vm.showSaveMatchingDialog()
+            },
+            {//打印质控结果
+                    result ->
+                vm.printQuality(result)
+            },
+            {//放弃拟合、不保存
+                vm.notSaveProject()
             },
             {
                 vm.changeFitterType(it)
@@ -542,40 +525,6 @@ class MatchingArgsFragment :
                 }
             }
         )
-    }
-
-    /**
-     * 显示拟合结果对话框
-     */
-    private fun showMatchingFinishDialog(
-        reagnetNo: String,
-        gradsNum: Int,
-        abss: MutableList<MutableList<Double>>,
-        targets: List<Double>,
-        means: List<Double>,
-        selectFitterType: FitterType,
-        curProject: CurveModel?,
-        isQuality: Boolean,
-    ) {
-        matchingConfigDialog.showDialogStep3(
-            reagnetNo,
-            gradsNum,
-            abss,
-            targets,
-            means,
-            selectFitterType,
-            curProject,
-            isQuality,
-            {
-                vm.showMatchingStateDialog()
-            }, {
-                vm.saveProject()
-                it.dismiss()
-            },
-            {
-                vm.notSaveProject()
-                it.dismiss()
-            })
     }
 
 

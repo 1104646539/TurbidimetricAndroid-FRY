@@ -137,7 +137,7 @@ class ThermalPrintUtil(private val serialPort: BaseSerialPort) {
 
         sb.append("\n")
         sb.append("\n")
-        sb.append("粪便隐血定量检测报告".fixMin(25))
+        sb.append("粪便隐血定量检测报告".fixMinAfter(25))
         sb.append("\n")
         sb.append("\n")
 
@@ -166,7 +166,7 @@ class ThermalPrintUtil(private val serialPort: BaseSerialPort) {
 
     private var printByte: ByteArray? = null
     private fun sendAndCheckState(byte: ByteArray, onPrintListener: OnPrintListener?) {
-        i("sendAndCheckState")
+        i("sendAndCheckState\n${String(byte, Charset.forName("GB2312"))}")
         this.printByte = byte
         this.onPrintListener = onPrintListener
         sendGetState()
@@ -279,18 +279,116 @@ class ThermalPrintUtil(private val serialPort: BaseSerialPort) {
         }
     }
 
-    private fun String.fixMin(length: Int): String {
+    private fun String.fixMin(length: Int, after: Boolean): String {
         return if (this.length > length) {
             this
         } else {
             val sb = StringBuilder()
-            repeat((length - this.length) / 2) {
+            if (after) {
+                sb.append(this)
+            }
+            repeat(length - this.length) {
                 sb.append(" ")
             }
-            sb.append(this)
+            if (!after) {
+                sb.append(this)
+            }
             sb.toString()
         }
     }
+
+    private fun String.fixMinBefore(length: Int): String {
+        return this.fixMin(length, false)
+    }
+
+    private fun String.fixMinAfter(length: Int): String {
+        return this.fixMin(length, true)
+    }
+
+    /**
+     * 打印质控结果
+     */
+    fun printQualityResult(
+        createTime: String,
+        projectName: String,
+        reagentNo: String,
+        params: MutableList<Double>,
+        qualityLow1: Int,
+        qualityLow2: Int,
+        qualityHigh1: Int,
+        qualityHigh2: Int,
+        qualityLowCon: Int,
+        qualityHighCon: Int,
+        qualityLowAbs: Double,
+        qualityHighAbs: Double,
+        result: String
+    ) {
+        val msg = getQualityResultMsg(
+            createTime,
+            projectName,
+            reagentNo,
+            params,
+            qualityLow1,
+            qualityLow2,
+            qualityHigh1,
+            qualityHigh2,
+            qualityLowCon,
+            qualityHighCon,
+            qualityLowAbs,
+            qualityHighAbs,
+            result
+        )
+        sendAndCheckState(getPrintByte(msg), onPrintListener)
+    }
+
+    private fun getQualityResultMsg(
+        createTime: String,
+        projectName: String,
+        reagentNo: String,
+        params: MutableList<Double>,
+        qualityLow1: Int,
+        qualityLow2: Int,
+        qualityHigh1: Int,
+        qualityHigh2: Int,
+        qualityLowCon: Int,
+        qualityHighCon: Int,
+        qualityLowAbs: Double,
+        qualityHighAbs: Double,
+        result:String,
+    ): String {
+        val sb = StringBuilder()
+        sb.append("\n\n")
+        sb.append("序号:$reagentNo\n")
+        sb.append("项目名:$projectName\n")
+        sb.append("质控时间:$createTime\n")
+
+        sb.append(
+            "$qualityLow1-$qualityLow2".fixMinAfter(10) + "$qualityLowCon".fixMinAfter(8) + "$qualityLowAbs".fixMinAfter(
+                8
+            ) + "\n"
+        )
+        sb.append(
+            "$qualityHigh1-$qualityHigh2".fixMinAfter(10) + "$qualityHighCon".fixMinAfter(8) + "$qualityHighAbs".fixMinAfter(
+                8
+            ) + "\n"
+        )
+
+        sb.append("F(0)=${params[0].scale(10)}")
+        sb.append("\n")
+        sb.append("F(1)=${params[1].scale(10)}")
+        sb.append("\n")
+        sb.append("F(2)=${params[2].scale(10)}")
+        sb.append("\n")
+        sb.append("F(3)=${params[3].scale(10)}")
+        sb.append("\n")
+        sb.append("结论:$result")
+        sb.append("\n")
+        sb.append("\n")
+        sb.append("\n")
+
+        return sb.toString()
+    }
+
 
     interface OnPrintListener {
         /**

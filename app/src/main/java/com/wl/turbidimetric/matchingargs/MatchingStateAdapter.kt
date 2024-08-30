@@ -4,65 +4,97 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.wl.turbidimetric.R
-import com.wl.turbidimetric.databinding.ItemMatchingStateResultBinding
-import com.wl.turbidimetric.ex.getIndexOrNullDefault
-import com.wl.turbidimetric.view.dialog.isShow
+import com.wl.turbidimetric.databinding.ItemMatchingStateType1Binding
+import com.wl.turbidimetric.databinding.ItemMatchingStateType2Binding
 
 class MatchingStateAdapter(
-    private val matchingNum: Int,
-    private val items: List<List<Double>>,
-    private val isQuality: Boolean
+    private val items: MutableList<Data>,
+    private var result: String
 ) :
-    RecyclerView.Adapter<MatchingStateAdapter.MatchingStateViewHolder>() {
-    class MatchingStateViewHolder(
-        private val matchingNum: Int,
-        private val isQuality: Boolean,
-        val binding: ItemMatchingStateResultBinding
+    RecyclerView.Adapter<ViewHolder>() {
+    class MatchingStateViewHolderType1(
+        val binding: ItemMatchingStateType1Binding
     ) :
-        RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: List<Double>) {
-            binding.tvResult1.text = getIndexOrNullDefault(item, 0, "-")
-            binding.tvResult2.text = getIndexOrNullDefault(item, 1, "-")
-            binding.tvResult3.text = getIndexOrNullDefault(item, 2, "-")
-            binding.tvResult4.text = getIndexOrNullDefault(item, 3, "-")
-            binding.tvResult5.text = getIndexOrNullDefault(item, 4, "-")
-            binding.tvResult6.text = getIndexOrNullDefault(item, 5, "-")
-            binding.tvResult7.text = getIndexOrNullDefault(item, 6, "-")
-            binding.tvResult8.text = getIndexOrNullDefault(item, 7, "-")
-            if (isQuality) {
-                binding.tvQualityL.text = getIndexOrNullDefault(item, matchingNum, "-")
-                binding.tvQualityH.text = getIndexOrNullDefault(item, matchingNum + 1, "-")
+        ViewHolder(binding.root) {
+        fun bind(data: Data?, index: Int) {
+            if (index == 0) {
+                binding.tvTitle.text = "序号"
+                binding.tvTargetCon.text = "理论浓度"
+                binding.tvResultCon.text = "测量浓度"
+                binding.tvReactionValue.text = "反应度"
+            } else {
+                binding.tvTitle.text = "$index"
+                binding.tvTargetCon.text = "${data?.targetCon}"
+                binding.tvResultCon.text = "${data?.testCon}"
+                binding.tvReactionValue.text = "${data?.reactionValue}"
             }
-
         }
-
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MatchingStateViewHolder {
-        return MatchingStateViewHolder(
-            matchingNum,
-            isQuality,
-            DataBindingUtil.inflate(
-                LayoutInflater.from(parent.context),
-                R.layout.item_matching_state_result, parent, false
+    class MatchingStateViewHolderType2(
+        val binding: ItemMatchingStateType2Binding
+    ) :
+        ViewHolder(binding.root) {
+        fun bind(result: String) {
+            binding.tvTitle.text = "结论"
+            binding.tvResult.text = result
+        }
+    }
+
+    companion object {
+        const val Type_Value = 1
+        const val Type_Result = 2
+    }
+
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): ViewHolder {
+        if (viewType == Type_Value) {
+            return MatchingStateViewHolderType1(
+                DataBindingUtil.inflate(
+                    LayoutInflater.from(parent.context),
+                    R.layout.item_matching_state_type_1, parent, false
+                )
             )
-        )
+        } else {
+            return MatchingStateViewHolderType2(
+                DataBindingUtil.inflate(
+                    LayoutInflater.from(parent.context),
+                    R.layout.item_matching_state_type_2, parent, false
+                )
+            )
+        }
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return if (position == itemCount - 1) {
+            Type_Result
+        } else {
+            Type_Value
+        }
     }
 
     override fun getItemCount(): Int {
-        return if (items.size < 3) 3 else items.size
+        return items.size + 2
     }
 
-    override fun onBindViewHolder(holder: MatchingStateViewHolder, position: Int) {
-        holder.binding.tvResult6.visibility = (matchingNum > 5).isShow()
-        holder.binding.tvResult7.visibility = (matchingNum > 6).isShow()
-        holder.binding.tvResult8.visibility = (matchingNum > 7).isShow()
-        holder.binding.tvQualityL.visibility = isQuality.isShow()
-        holder.binding.tvQualityH.visibility = isQuality.isShow()
-        holder.binding.tvResultHeader.text = "${position + 1}"
-        items.getOrNull(position)?.let {
-            holder.bind(it)
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        if (holder is MatchingStateViewHolderType1) {
+            holder.bind(items.getOrNull(position - 1), position)
+        } else if (holder is MatchingStateViewHolderType2) {
+            holder.bind(result)
         }
     }
+
+    fun update(data: List<Data>, result: String) {
+        this.result = result
+        this.items.clear()
+        this.items.addAll(data)
+        notifyDataSetChanged()
+    }
+
+    data class Data(val targetCon: String, val testCon: String, val reactionValue: String)
 }

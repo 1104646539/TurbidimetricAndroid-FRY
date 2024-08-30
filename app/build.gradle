@@ -32,7 +32,7 @@ android {
         minSdk 24
         targetSdk 32
         versionCode 1
-        versionName "1.0.0.0-76修改运行错误后不能继续自检"
+        versionName "1.0.0.0-78修改拟合质控流程"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 
@@ -235,6 +235,7 @@ dependencies {
     implementation 'com.dynamixsoftware.printingsdk:printingSDK:12'
     //内存泄露检测
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.10'
+    implementation 'com.github.fondesa:recycler-view-divider:3.6.0'
 
 
 }

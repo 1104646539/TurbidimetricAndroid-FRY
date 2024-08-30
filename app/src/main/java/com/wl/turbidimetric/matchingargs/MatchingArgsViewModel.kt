@@ -6,24 +6,22 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.wl.turbidimetric.app.App
-import com.wl.turbidimetric.app.AppIntent
 import com.wl.turbidimetric.app.AppViewModel
 import com.wl.turbidimetric.base.BaseViewModel
 import com.wl.turbidimetric.db.ServiceLocator
 import com.wl.turbidimetric.ex.calcAbsorbance
 import com.wl.turbidimetric.ex.calcAbsorbanceDifferences
+import com.wl.turbidimetric.ex.calcCon
 import com.wl.turbidimetric.ex.copyForProject
 import com.wl.turbidimetric.ex.getAppViewModel
 import com.wl.turbidimetric.ex.getEquation
 import com.wl.turbidimetric.ex.getFitGoodness
 import com.wl.turbidimetric.ex.isSample
 import com.wl.turbidimetric.ex.matchingArg
-import com.wl.turbidimetric.ex.scale
 import com.wl.turbidimetric.ex.toast
 import com.wl.turbidimetric.global.EventGlobal
 import com.wl.turbidimetric.global.EventMsg
 import com.wl.turbidimetric.global.SystemGlobal
-import com.wl.turbidimetric.home.HomeDialogUiState
 import com.wl.turbidimetric.model.CurveModel
 import com.wl.turbidimetric.model.CuvetteDoorModel
 import com.wl.turbidimetric.model.CuvetteState
@@ -63,6 +61,7 @@ import com.wl.turbidimetric.repository.if2.LocalDataSource
 import com.wl.turbidimetric.repository.if2.ProjectSource
 import com.wl.turbidimetric.util.Callback2
 import com.wl.turbidimetric.util.FitterType
+import com.wl.turbidimetric.view.MatchingConfigLayout
 import com.wl.wllib.LogToFile.i
 import com.wl.wllib.toTimeStr
 import kotlinx.coroutines.delay
@@ -348,22 +347,22 @@ class MatchingArgsViewModel(
     /**
      * 是否自动稀释
      */
-    var autoAttenuation = true
+    var autoAttenuation = false
 
     /**
      * 拟合梯度数量
      */
     var gradsNum = 5
 
-    /**
-     * 平均值
-     */
-    var means: MutableList<Double> = mutableListOf()
+//    /**
+//     * 平均值
+//     */
+//    var means: MutableList<Double> = mutableListOf()
 
     /**
      * 全部吸光度
      */
-    var abss: MutableList<MutableList<Double>> = mutableListOf()
+    var abss: MutableList<Double> = mutableListOf()
 
     /**
      * 选择用来拟合的项目
@@ -379,6 +378,26 @@ class MatchingArgsViewModel(
      * 拟合梯度对应的浓度
      */
     var targetCons = mutableListOf<Double>()
+
+    /**
+     * 选择用来质控的曲线
+     */
+    var selectQualityCurve: CurveModel? = null
+
+    /**
+     * 拟合类型  拟合/质控
+     */
+    var matchingType: MatchingConfigLayout.MatchingType = MatchingConfigLayout.MatchingType.Matching
+
+    /**
+     * 可选择用来质控的曲线
+     */
+    var curves = mutableListOf<CurveModel>()
+
+    var qualityLow1 = 100
+    var qualityLow2 = 120
+    var qualityHigh1 = 400
+    var qualityHigh2 = 440
 
     /**
      * 比色皿舱门正在操作 （现在用作结束检测，将r2试剂转出来）
@@ -428,6 +447,11 @@ class MatchingArgsViewModel(
 
     val datas = curveRepository.listenerCurve()
 
+
+    fun updateCurves(curves: List<CurveModel>) {
+        this.curves.clear()
+        this.curves.addAll(curves)
+    }
 
     /**
      * 更新比色皿状态
@@ -522,6 +546,11 @@ class MatchingArgsViewModel(
         viewModelScope.launch {
             _dialogUiState.emit(
                 MatchingArgsDialogUiState.MatchingSettings(
+                    curves,
+                    qualityLow1,
+                    qualityLow2,
+                    qualityHigh1,
+                    qualityHigh2,
                     reagentNOStr,
                     quality,
                     projects,
@@ -537,17 +566,24 @@ class MatchingArgsViewModel(
 
     /**
      * 显示拟合状态对话框
+     * @param isError 是否是拟合过程中出错时更新的
      */
-    fun showMatchingStateDialog() {
+    fun showMatchingStateDialog(isError: Boolean = false) {
         viewModelScope.launch {
             _dialogUiState.emit(
                 MatchingArgsDialogUiState.MatchingState(
+                    isError,
+                    matchingType,
+                    qualityLow1,
+                    qualityLow2,
+                    qualityHigh1,
+                    qualityHigh2,
                     gradsNum,
                     abss,
                     targetCons,
-                    means,
+                    abss,
                     selectFitterType,
-                    curProject,
+                    curProject ?: selectQualityCurve,
                     quality
                 )
             )
@@ -581,11 +617,22 @@ class MatchingArgsViewModel(
             }
             return
         }
-
-        if (reagentNOStr.isNullOrEmpty()) {
+        var hiltStr = ""
+        if (matchingType == MatchingConfigLayout.MatchingType.Matching) {
+            if (reagentNOStr.isNullOrEmpty()) {
+                hiltStr = "请输入试剂序号"
+            } else if (quality && qualityLow1 <= 0 || qualityLow2 <= 0 || qualityHigh1 <= 0 || qualityHigh2 <= 0) {
+                hiltStr = "请输入质控浓度"
+            }
+        } else {
+            if (qualityLow1 <= 0 || qualityLow2 <= 0 || qualityHigh1 <= 0 || qualityHigh2 <= 0) {
+                hiltStr = "请输入质控浓度"
+            }
+        }
+        if (hiltStr.isNotEmpty()) {
             viewModelScope.launch {
                 _dialogUiState.emit(
-                    MatchingArgsDialogUiState.Accident("请输入试剂序号")
+                    MatchingArgsDialogUiState.Accident(hiltStr)
                 )
             }
             return
@@ -596,7 +643,11 @@ class MatchingArgsViewModel(
 
     fun start() {
         initState()
-        appViewModel.testState = TestState.GetState
+        if (matchingType == MatchingConfigLayout.MatchingType.Matching) {
+            appViewModel.testState = TestState.GetState
+        } else {
+            appViewModel.testState = TestState.MoveSample
+        }
         appViewModel.testType = TestType.MatchingArgs
         getState()
     }
@@ -605,6 +656,7 @@ class MatchingArgsViewModel(
         //如果每次都添加检测都把项目清空，会导致添加检测后又因为未放置样本架，点击结束后项目为空不显示质控结果，所以只有在一次新的质控中才清空项目以免会显示上一次的质控结果
         if (abss.isEmpty()) {
             curProject = null
+            selectProject = null
         }
         sampled = false
         accidentState = ReplyState.SUCCESS
@@ -973,6 +1025,8 @@ class MatchingArgsViewModel(
                 delay(testInterval)
                 test()
             }
+        } else if (matchingType == MatchingConfigLayout.MatchingType.Quality) {
+            dripReagentAndStirAndTestFinish()
         }
     }
 
@@ -994,7 +1048,9 @@ class MatchingArgsViewModel(
             return
         }
 
-        if ((cuvettePos == (gradsNum + 6) && quality) || (cuvettePos == (gradsNum + 4) && !quality)) {
+        if ((matchingType == MatchingConfigLayout.MatchingType.Matching && (cuvettePos == (gradsNum + 6) && quality) || (cuvettePos == (gradsNum + 4) && !quality))
+            || (matchingType == MatchingConfigLayout.MatchingType.Quality && cuvettePos == 6)
+        ) {
             //最后一个也检测结束了
             appViewModel.testState = TestState.Test2
             cuvettePos = -1
@@ -1080,7 +1136,7 @@ class MatchingArgsViewModel(
                 resultOriginalTest2.add(value)
                 updateResult()
                 //检测结束,开始检测第三次
-                if ((cuvettePos == (gradsNum - 1) && !quality) || (cuvettePos == (gradsNum + 1) && quality)) {
+                if (testStepIsFinish()) {
                     appViewModel.testState = TestState.Test3
 
                     moveCuvetteTest(-cuvettePos)
@@ -1096,7 +1152,7 @@ class MatchingArgsViewModel(
                 resultOriginalTest3.add(value)
                 updateResult()
                 //检测结束,开始检测第四次
-                if ((cuvettePos == (gradsNum - 1) && !quality) || (cuvettePos == (gradsNum + 1) && quality)) {
+                if (testStepIsFinish()) {
                     appViewModel.testState = TestState.Test4
 
                     moveCuvetteTest(-cuvettePos)
@@ -1112,7 +1168,8 @@ class MatchingArgsViewModel(
                 resultOriginalTest4.add(value)
                 updateResult()
                 //检测结束,计算拟合参数
-                if ((cuvettePos == (gradsNum - 1) && !quality) || (cuvettePos == (gradsNum + 1) && quality)) {
+                if (testStepIsFinish()
+                ) {
                     matchingFinish()
                     calcMatchingArg()
                 } else {
@@ -1124,6 +1181,15 @@ class MatchingArgsViewModel(
         }
 
 
+    }
+
+    /**
+     * 检测步骤是否结束，只在检测第二次，第三次，第四次有效
+     * @return Boolean
+     */
+    fun testStepIsFinish(): Boolean {
+        return (matchingType == MatchingConfigLayout.MatchingType.Matching && (cuvettePos == (gradsNum - 1) && !quality) || (cuvettePos == (gradsNum + 1) && quality))
+                || (matchingType == MatchingConfigLayout.MatchingType.Quality && cuvettePos == 1)
     }
 
     /**
@@ -1166,7 +1232,11 @@ class MatchingArgsViewModel(
             resultOriginalTest2.clear()
             resultOriginalTest3.clear()
             resultOriginalTest4.clear()
-            val size = if (quality) gradsNum + 2 else gradsNum
+            val size = if (matchingType == MatchingConfigLayout.MatchingType.Quality) {
+                2
+            } else {
+                if (quality) gradsNum + 2 else gradsNum
+            }
             repeat(size) {
                 resultTest1.add(testValues1[it].toBigDecimal())
                 resultTest2.add(testValues2[it].toBigDecimal())
@@ -1187,31 +1257,31 @@ class MatchingArgsViewModel(
         absorbancys = result.map { it.toDouble() }
 
         //更新拟合参数
-        abss.add(absorbancys.toMutableList())
-        calcMean()
+        abss.clear()
+        abss.addAll(absorbancys)
         matchingArg()
     }
 
-    /**
-     * 计算多组反应度的平均值
-     */
-    private fun calcMean() {
-        means.clear()
-        repeat(if (quality) gradsNum + 2 else gradsNum) {
-            means.add(getMean(it).scale(2))
-        }
-    }
-
-    private fun getMean(index: Int): Double {
-        return abss.map {
-            it[index]
-        }.sum() / abss.size
-    }
 
     fun matchingArg() {
-        if (means.isEmpty()) return
-        var cf = matchingArg(selectFitterType, means, targetCons.toDoubleArray())
-        yzs = cf.yss.toList()
+        if (abss.isEmpty()) return
+        if (matchingType == MatchingConfigLayout.MatchingType.Quality) {
+            val calcCon = mutableListOf<Int>()
+            selectQualityCurve?.let { project ->
+                abss.forEach { abs ->
+                    calcCon.add(com.wl.turbidimetric.ex.calcCon(abs.toBigDecimal(), project))
+                }
+            }
+            var msg: StringBuilder = StringBuilder(
+                "质控曲线:${selectQualityCurve} \n第一次原始:$resultOriginalTest1 \n" + "第一次:$resultTest1 \n" + "第二次原始:$resultOriginalTest2 \n" + "第二次:$resultTest2 \n" + "第三次原始:$resultOriginalTest3 \n" + "第三次:$resultTest3 \n" + "第四次原始:$resultOriginalTest4 \n" + "第四次:$resultTest4 \n" +
+                        "参数：f0=${selectQualityCurve?.f0} f1=${selectQualityCurve?.f1} f2=${selectQualityCurve?.f2} f3=${selectQualityCurve?.f3} \n " +
+                        "吸光度:$abss\n 浓度:${calcCon.joinToString()}"
+            )
+            testMsg.postValue(msg.toString())
+            showMatchingStateDialog()
+        } else {
+            var cf = matchingArg(selectFitterType, abss, targetCons.toDoubleArray())
+            yzs = cf.yss.toList()
 //        if (autoAttenuation && selectFitterType == FitterType.Three) {
 //            //**修正start**
 //            var dif50 = 50 - yzs[1]
@@ -1229,33 +1299,34 @@ class MatchingArgsViewModel(
 //            means[0] = dif0
 //            cf = matchingArg(selectFitterType, means, targetCons.toDoubleArray())
 //        }
-        //**修正end**
-        var msg: StringBuilder = StringBuilder(
-            "拟合类型:${selectFitterType.showName} \n第一次原始:$resultOriginalTest1 \n" + "第一次:$resultTest1 \n" + "第二次原始:$resultOriginalTest2 \n" + "第二次:$resultTest2 \n" + "第三次原始:$resultOriginalTest3 \n" + "第三次:$resultTest3 \n" + "第四次原始:$resultOriginalTest4 \n" + "第四次:$resultTest4 \n" +
+            //**修正end**
+            var msg: StringBuilder = StringBuilder(
+                "拟合类型:${selectFitterType.showName} \n第一次原始:$resultOriginalTest1 \n" + "第一次:$resultTest1 \n" + "第二次原始:$resultOriginalTest2 \n" + "第二次:$resultTest2 \n" + "第三次原始:$resultOriginalTest3 \n" + "第三次:$resultTest3 \n" + "第四次原始:$resultOriginalTest4 \n" + "第四次:$resultTest4 \n" +
 //                    "吸光度:$result \n" +
 //                    "拟合度：${cf.fitGoodness} \n" +
 //                    "四参数：f0=${f0} f1=${f1} f2=${f2} f3=${f3} \n " +
 //                    "验算 ${yzs}\n" +
-                    "吸光度:$means \n" + "拟合度:${cf.fitGoodness} \n" + "参数:${cf.params.joinToString()} \n" + "验算:${cf.yss.joinToString()}\n"
-        )
-        curProject = CurveModel().apply {
-            this.f0 = cf.params.getOrNull(0) ?: 0.0
-            this.f1 = cf.params.getOrNull(1) ?: 0.0
-            this.f2 = cf.params.getOrNull(2) ?: 0.0
-            this.f3 = cf.params.getOrNull(3) ?: 0.0
-            this.fitterType = selectFitterType.ordinal
-            this.fitGoodness = cf.fitGoodness
-            this.createTime = Date().toTimeStr()
-            this.reagentNO = reagentNOStr
-            this.gradsNum = gradsNum
-            this.targets = targetCons.toDoubleArray()
-            this.reactionValues =
-                means.subList(0, gradsNum).map { it.toInt() }.toIntArray()
-            this.yzs = cf.yss.map { it.toInt() }.toIntArray()
-        }.copyForProject(selectMatchingProject!!)
+                        "吸光度:$abss \n" + "拟合度:${cf.fitGoodness} \n" + "参数:${cf.params.joinToString()} \n" + "验算:${cf.yss.joinToString()}\n"
+            )
+            curProject = CurveModel().apply {
+                this.f0 = cf.params.getOrNull(0) ?: 0.0
+                this.f1 = cf.params.getOrNull(1) ?: 0.0
+                this.f2 = cf.params.getOrNull(2) ?: 0.0
+                this.f3 = cf.params.getOrNull(3) ?: 0.0
+                this.fitterType = selectFitterType.ordinal
+                this.fitGoodness = cf.fitGoodness
+                this.createTime = Date().toTimeStr()
+                this.reagentNO = reagentNOStr
+                this.gradsNum = gradsNum
+                this.targets = targetCons.toDoubleArray()
+                this.reactionValues =
+                    abss.subList(0, gradsNum).map { it.toInt() }.toIntArray()
+                this.yzs = cf.yss.map { it.toInt() }.toIntArray()
+            }.copyForProject(selectMatchingProject!!)
 //        print()
-        testMsg.postValue(msg.toString())
-        showMatchingStateDialog()
+            testMsg.postValue(msg.toString())
+            showMatchingStateDialog()
+        }
     }
 
     /**
@@ -1504,7 +1575,7 @@ class MatchingArgsViewModel(
             //是开始检测前的清洗，清洗完才开始检测
             cleaningBeforeStartTest = false
             moveSampleShelf(sampleShelfPos)
-            if (!autoAttenuation) {
+            if (!autoAttenuation || matchingType == MatchingConfigLayout.MatchingType.Quality) {
                 moveCuvetteShelf(cuvetteShelfPos)
             }
             return
@@ -1525,7 +1596,9 @@ class MatchingArgsViewModel(
                 moveSample(0)
             }
         } else if (appViewModel.testState == TestState.MoveSample) {//加已混匀的样本的清洗
-            if ((sampleStep == gradsNum && !quality) || (sampleStep == gradsNum + 2 && quality)) {
+            if ((matchingType == MatchingConfigLayout.MatchingType.Matching && (sampleStep == gradsNum && !quality) || (sampleStep == gradsNum + 2 && quality))
+                || (matchingType == MatchingConfigLayout.MatchingType.Quality && sampleStep == 2)
+            ) {
                 //开始加试剂的步骤
                 appViewModel.testState = TestState.DripReagent
                 sampleStep = 0
@@ -1536,10 +1609,15 @@ class MatchingArgsViewModel(
                 takeReagent()
             } else {//继续移动已混匀的样本
                 i("sampleStep=$sampleStep")
-                val targetIndex = if (autoAttenuation) {
-                    moveBlendingPos[sampleStep] - samplePos
+                var targetIndex = 1
+                if (matchingType == MatchingConfigLayout.MatchingType.Matching) {
+                    targetIndex = if (autoAttenuation) {
+                        moveBlendingPos[sampleStep] - samplePos
+                    } else {
+                        1
+                    }
                 } else {
-                    1
+                    targetIndex = 1
                 }
                 moveSample(targetIndex)
                 moveCuvetteDripSample()
@@ -1613,7 +1691,7 @@ class MatchingArgsViewModel(
                     MatchingArgsDialogUiState.Accident(getAccidentFinishDialog())
                 )
             }
-
+            showMatchingStateDialog(true)
         } else {
 //            viewModelScope.launch {
 //                _dialogUiState.emit(
@@ -1638,50 +1716,32 @@ class MatchingArgsViewModel(
             }
             return
         }
-        //没有开始质控就点击结束就直接结束
-        if (abss.isEmpty() || means.isEmpty()) {
-            viewModelScope.launch {
-                _dialogUiState.emit(
-                    MatchingArgsDialogUiState.CloseMatchingStateDialog("")
-                )
-            }
-            reagentNOStr = ""
-            changeConfig(
-                reagentNOStr,
-                quality,
-                gradsNum,
-                autoAttenuation,
-                selectMatchingProject,
-                selectFitterType,
-                targetCons
-            )
 
-            viewModelScope.launch {
-                _dialogUiState.emit(
-                    MatchingArgsDialogUiState.Accident("拟合质控结束")
-                )
-            }
-            return
-        }
-//        abss.clear()
-//        means.clear()
-
-        viewModelScope.launch {
-            _dialogUiState.emit(
-                MatchingArgsDialogUiState.MatchingFinishMsg(
-                    reagentNOStr,
-                    gradsNum,
-                    abss,
-                    targetCons,
-                    means,
-                    selectFitterType,
-                    curProject,
-                    quality
-                )
-            )
-        }
         appViewModel.testState = TestState.Normal
+        saveProject()
     }
+
+//    /**
+//     * 手动点击放弃拟合
+//     */
+//    fun notSaveMatching() {
+//        if (appViewModel.testState.isRunning()) {
+//            viewModelScope.launch {
+//                _dialogUiState.emit(
+//                    MatchingArgsDialogUiState.Accident("正在检测，请稍后")
+//                )
+//            }
+//            return
+//        }
+//        appViewModel.testState = TestState.Normal
+//
+//        initQualityData()
+//        viewModelScope.launch {
+//            _dialogUiState.emit(
+//                MatchingArgsDialogUiState.CloseMatchingStateDialog("")
+//            )
+//        }
+//    }
 
     /**
      * 当发生意外导致拟合结束时的提示信息
@@ -1747,29 +1807,37 @@ class MatchingArgsViewModel(
                 EventBus.getDefault().post(EventMsg<String>(EventGlobal.WHAT_PROJECT_ADD))
             }
         }
-        reagentNOStr = ""
-        changeConfig(
-            reagentNOStr,
-            quality,
-            gradsNum,
-            autoAttenuation,
-            selectMatchingProject,
-            selectFitterType,
-            targetCons
-        )
-        initQualityData()
+        clearMatchingState()
     }
 
     private fun initQualityData() {
         abss.clear()
-        means.clear()
         curProject = null
+        matchingType = MatchingConfigLayout.MatchingType.Matching
+
     }
 
     /**
      * 不保存标曲记录
      */
     fun notSaveProject() {
+        if (abss.isNotEmpty() && matchingType == MatchingConfigLayout.MatchingType.Matching) {
+            //已拟合，不保存
+            viewModelScope.launch {
+                _dialogUiState.emit(MatchingArgsDialogUiState.HiltNotSaveDialog("确定不保存已经拟合的结果吗？"))
+            }
+            return
+        }
+
+        //未拟合，不保存
+        clearMatchingState()
+
+    }
+
+    /**
+     * 初始化拟合状态 关闭拟合对话框
+     */
+    fun clearMatchingState() {
         viewModelScope.launch {
 //            curProject =
             coverCurveModel = null
@@ -1785,6 +1853,13 @@ class MatchingArgsViewModel(
             targetCons
         )
         initQualityData()
+        //未拟合，不保存
+        viewModelScope.launch {
+            _dialogUiState.emit(
+                MatchingArgsDialogUiState.CloseMatchingStateDialog("")
+            )
+        }
+
     }
 
     /**
@@ -1986,6 +2061,12 @@ class MatchingArgsViewModel(
      * 拟合配置完毕
      */
     fun matchingConfigFinish(
+        matchingType: MatchingConfigLayout.MatchingType,
+        selectCurve: CurveModel?,
+        qualityLow1: Int,
+        qualityLow2: Int,
+        qualityHigh1: Int,
+        qualityHigh2: Int,
         reagentNo: String,
         quality: Boolean,
         gradsNum: Int,
@@ -1994,6 +2075,12 @@ class MatchingArgsViewModel(
         selectFitterType: FitterType,
         cons: List<Double>
     ) {
+        this.matchingType = matchingType
+        this.selectQualityCurve = selectCurve
+        this.qualityLow1 = qualityLow1
+        this.qualityLow2 = qualityLow2
+        this.qualityHigh1 = qualityHigh1
+        this.qualityHigh2 = qualityHigh2
         this.reagentNOStr = reagentNo
         this.quality = quality
         this.gradsNum = gradsNum
@@ -2003,12 +2090,23 @@ class MatchingArgsViewModel(
         this.targetCons.clear()
         this.targetCons.addAll(cons)
 
-        val hilt = if (selectMatchingProject == null) {
-            "没有选择项目"
-        } else if (reagentNOStr.isNullOrEmpty()) {
-            "请输入序号"
+        var hilt = "";
+        if (matchingType == MatchingConfigLayout.MatchingType.Matching) {
+            //拟合
+            if (reagentNOStr.isNullOrEmpty()) {
+                hilt = "请输入试剂序号"
+            } else if (quality && qualityLow1 <= 0 || qualityLow2 <= 0 || qualityHigh1 <= 0 || qualityHigh2 <= 0) {
+                hilt = "请输入质控浓度"
+            } else if (selectMatchingProject == null) {
+                hilt = "请选择拟合项目"
+            }
         } else {
-            ""
+            //质控
+            if (qualityLow1 <= 0 || qualityLow2 <= 0 || qualityHigh1 <= 0 || qualityHigh2 <= 0) {
+                hilt = "请输入质控浓度"
+            } else if (selectQualityCurve == null) {
+                hilt = "请选择质控曲线"
+            }
         }
         if (hilt.isNullOrEmpty()) {
             showMatchingStateDialog()
@@ -2076,16 +2174,39 @@ class MatchingArgsViewModel(
             } else if (curveRepository.getCurveModels().size >= SystemGlobal.showCurveSize) {
                 //显示选择覆盖标曲对话框
                 _dialogUiState.emit(MatchingArgsDialogUiState.MatchingCoverCurve(""))
-            } else if (reagentNOStr.isNullOrEmpty() || selectMatchingProject == null) {
+            } else {
                 //显示配置对话框
                 saveCoverCurve(null)
                 showMatchingSettingsDialog()
-            } else {
-                //开始拟合
-                showMatchingStateDialog()
             }
-
         }
+    }
+
+    /**
+     * 打印
+     */
+    fun printQuality(result: String) {
+        i("打印质控结果")
+        if (abss.size > 1) {
+            selectQualityCurve?.let { curve ->
+                appViewModel.thermalPrintUtil.printQualityResult(
+                    Date().toTimeStr(),
+                    curve.projectName,
+                    curve.reagentNO,
+                    mutableListOf(curve.f0, curve.f1, curve.f2, curve.f3),
+                    qualityLow1,
+                    qualityLow2,
+                    qualityHigh1,
+                    qualityHigh2,
+                    calcCon(abss[0].toBigDecimal(), curve),
+                    calcCon(abss[1].toBigDecimal(), curve),
+                    abss[0],
+                    abss[1],
+                    result
+                )
+            }
+        }
+
     }
 }
 

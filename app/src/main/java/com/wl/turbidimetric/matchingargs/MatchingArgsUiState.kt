@@ -3,6 +3,7 @@ package com.wl.turbidimetric.matchingargs
 import com.wl.turbidimetric.model.CurveModel
 import com.wl.turbidimetric.model.ProjectModel
 import com.wl.turbidimetric.util.FitterType
+import com.wl.turbidimetric.view.MatchingConfigLayout
 
 sealed class MatchingArgsDialogUiState {
     /**
@@ -43,6 +44,11 @@ sealed class MatchingArgsDialogUiState {
      * 拟合配置
      */
     class MatchingSettings(
+        val curves: MutableList<CurveModel>,
+        val qualityLow1: Int,
+        val qualityLow2: Int,
+        val qualityHigh1: Int,
+        val qualityHigh2: Int,
         val reagentNo: String,
         val quality: Boolean,
         val projects: List<ProjectModel>,
@@ -57,8 +63,14 @@ sealed class MatchingArgsDialogUiState {
      * 拟合状态对话框
      */
     class MatchingState(
+        val isError: Boolean,
+        val matchingType: MatchingConfigLayout.MatchingType,
+        val qualityLow1: Int,
+        val qualityLow2: Int,
+        val qualityHigh1: Int,
+        val qualityHigh2: Int,
         val gradsNum: Int,
-        val abss: MutableList<MutableList<Double>>,
+        val abss: MutableList<Double>,
         val targets: List<Double>,
         val means: List<Double>,
         val selectFitterType: FitterType,
@@ -75,6 +87,11 @@ sealed class MatchingArgsDialogUiState {
      * 关闭拟合中的对话框，在未拟合就点击结束的时候用
      */
     class CloseMatchingStateDialog(val msg: String) : MatchingArgsDialogUiState()
+
+    /**
+     * 二次提示是否不保存结果，当已经拟合完成了点击不保存时使用
+     */
+    class HiltNotSaveDialog(val msg: String) : MatchingArgsDialogUiState()
 
 }
 

@@ -6,6 +6,23 @@
     android:animateLayoutChanges="true"
     android:orientation="vertical">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingLeft="40dp"
+        android:paddingTop="40dp"
+        android:paddingRight="40dp">
+
+        <TextView
+            android:id="@+id/tv_title"
+            style="@style/TextTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Step1 拟合参数"
+            android:textColor="@color/themePositivePressColor" />
+
+    </LinearLayout>
 
     <RelativeLayout
         android:layout_width="wrap_content"
@@ -29,6 +46,12 @@
 
         <com.wl.turbidimetric.view.MatchingStateLayout
             android:id="@+id/msl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+
+        <com.wl.turbidimetric.view.MatchingFinishLayout
+            android:id="@+id/mfl"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="gone" />

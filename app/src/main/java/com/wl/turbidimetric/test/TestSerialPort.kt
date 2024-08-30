@@ -63,7 +63,7 @@ object TestSerialPort {
             }
 
             SerialGlobal.CMD_MoveCuvetteShelf -> {
-                delay(3000)
+                delay(100)
 //                reply = ubyteArrayOf(data[0], 0x01u, 0x0u, 0x0u, 0x0u, 0x0u)
                 reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x0u))
             }
@@ -142,12 +142,12 @@ object TestSerialPort {
             }
 
             SerialGlobal.CMD_Sampling -> {
-//                if (index == 3) {
-//                reply = ubyteArrayOf(data[0], 0x04u, 0x0u, 0x0u, 0x0u, 0x0u)//取样失败
-//                } else {
-                reply = ubyteArrayOf(data[0], 0x00u, 0x0u, 0x0u, 0x0u, 0x0u)//取样成功
-//                }
-//                index++
+                if (index == 3) {
+                    reply = ubyteArrayOf(data[0], 0x04u, 0x0u, 0x0u, 0x0u, 0x0u)//取样失败
+                } else {
+                    reply = ubyteArrayOf(data[0], 0x00u, 0x0u, 0x0u, 0x0u, 0x0u)//取样成功
+                }
+                index++
 //                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x0u))//取样成功
 //                reply = ubyteArrayOf(data[0], 0x01u, 0x0u, 0x0u, 0x0u, 0x0u)//取样失败
             }

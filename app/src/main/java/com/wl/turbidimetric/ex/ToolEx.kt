@@ -460,15 +460,15 @@ fun getEquation2(
 fun getFitGoodness(fitterType: FitterType, fitGoodness: Double): String {
     return when (fitterType) {
         FitterType.Three -> {
-            "R²=${fitGoodness.toBigDecimal().setScale(6, RoundingMode.DOWN)}"
+            "${fitGoodness.toBigDecimal().setScale(6, RoundingMode.DOWN)}"
         }
 
         FitterType.Linear -> {
-            "R²=${fitGoodness.toBigDecimal().setScale(6, RoundingMode.DOWN)}"
+            "${fitGoodness.toBigDecimal().setScale(6, RoundingMode.DOWN)}"
         }
 
         FitterType.Four -> {
-            "R²=${fitGoodness.toBigDecimal().setScale(6, RoundingMode.DOWN)}"
+            "${fitGoodness.toBigDecimal().setScale(6, RoundingMode.DOWN)}"
         }
     }
 }

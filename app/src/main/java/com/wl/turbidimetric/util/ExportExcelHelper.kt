@@ -1,6 +1,7 @@
 package com.wl.turbidimetric.util
 
 import android.content.Context
+import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.TestResultAndCurveModel
 import com.wl.turbidimetric.model.TestResultModel
 import com.wl.weiqianwllib.upan.StorageUtil
@@ -23,6 +24,18 @@ object ExportExcelHelper {
         "浓度",
         "检测结果",
         "反应度",
+        "检测时间",
+    )
+    val titlesDebug = mutableListOf(
+        "姓名",
+        "性别",
+        "年龄",
+        "项目",
+        "条码",
+        "编号",
+        "浓度",
+        "检测结果",
+        "反应度",
         "原始1",
         "原始2",
         "原始3",
@@ -36,6 +49,7 @@ object ExportExcelHelper {
 
     @JvmStatic
     fun export(
+        debug: Boolean,
         context: Context,
         datas: List<TestResultAndCurveModel>,
         onSuccess: (String) -> Unit,
@@ -65,8 +79,8 @@ object ExportExcelHelper {
             //输出
             val isSuccess =
                 ExcelUtils.writeObjListToExcel(
-                    titles,
-                    getExportArray(datas),
+                    if (debug) titlesDebug else titles,
+                    getExportArray(debug, datas),
                     excelOutputStream
                 )
             if (isSuccess) {
@@ -100,7 +114,10 @@ object ExportExcelHelper {
      * @param datas List<TestResultModel>
      * @return List<List<String>>
      */
-    private fun getExportArray(datas: List<TestResultAndCurveModel>): List<List<String>> {
+    private fun getExportArray(
+        debug: Boolean,
+        datas: List<TestResultAndCurveModel>
+    ): List<List<String>> {
         return datas.map { it ->
             mutableListOf<String>().apply {
                 add("${it.result.name}")
@@ -113,18 +130,16 @@ object ExportExcelHelper {
                 add("${it.result.testResult}")
 //                add("${it.result.absorbances.setScale(5, RoundingMode.HALF_UP)}")
                 add(it.result.absorbances.toInt().toString())
-                add("${it.result.testOriginalValue1}")
-                add("${it.result.testOriginalValue2}")
-                add("${it.result.testOriginalValue3}")
-                add("${it.result.testOriginalValue4}")
-                add(it.result.testValue1.toInt().toString())
-                add(it.result.testValue2.toInt().toString())
-                add(it.result.testValue3.toInt().toString())
-                add(it.result.testValue4.toInt().toString())
-//                add("${it.result.testValue1.setScale(5, RoundingMode.HALF_UP)}")
-//                add("${it.result.testValue2.setScale(5, RoundingMode.HALF_UP)}")
-//                add("${it.result.testValue3.setScale(5, RoundingMode.HALF_UP)}")
-//                add("${it.result.testValue4.setScale(5, RoundingMode.HALF_UP)}")
+                if (debug) {
+                    add("${it.result.testOriginalValue1}")
+                    add("${it.result.testOriginalValue2}")
+                    add("${it.result.testOriginalValue3}")
+                    add("${it.result.testOriginalValue4}")
+                    add(it.result.testValue1.toInt().toString())
+                    add(it.result.testValue2.toInt().toString())
+                    add(it.result.testValue3.toInt().toString())
+                    add(it.result.testValue4.toInt().toString())
+                }
                 add("${it.result.testTime.toTimeStr()}")
 
             }

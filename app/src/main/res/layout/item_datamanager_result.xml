@@ -65,28 +65,25 @@
         <TextView
             android:id="@+id/tv_name"
             style="@style/TextHilt"
-            android:layout_width="60dp"
+            android:layout_width="120dp"
             android:layout_height="wrap_content"
-            android:text="姓名"
-            android:visibility="gone" />
+            android:text="姓名"/>
 
 
         <TextView
             android:id="@+id/tv_gender"
             style="@style/TextHilt"
-            android:layout_width="60dp"
+            android:layout_width="80dp"
             android:layout_height="wrap_content"
-            android:text="性别"
-            android:visibility="gone" />
+            android:text="性别"/>
 
 
         <TextView
             android:id="@+id/tv_age"
             style="@style/TextHilt"
-            android:layout_width="60dp"
+            android:layout_width="80dp"
             android:layout_height="wrap_content"
-            android:text="年龄"
-            android:visibility="gone" />
+            android:text="年龄" />
 
 
         <TextView

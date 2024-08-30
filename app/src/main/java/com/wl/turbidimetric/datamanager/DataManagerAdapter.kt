@@ -11,6 +11,7 @@ import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.ItemDatamanagerResultBinding
 import com.wl.turbidimetric.model.ResultState
 import com.wl.turbidimetric.model.TestResultAndCurveModel
+import com.wl.turbidimetric.view.dialog.isShow
 import com.wl.wllib.LogToFile.i
 import com.wl.wllib.toTimeStr
 
@@ -47,11 +48,17 @@ class DataManagerAdapter :
         selectedIds.clear()
     }
 
+    private var debug: Boolean = false
+    fun changeDebug(debug: Boolean) {
+        this.debug = debug;
+        notifyDataSetChanged()
+    }
+
     class DataManagerViewHolder(
         val binding: ItemDatamanagerResultBinding
     ) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bindData(item: TestResultAndCurveModel?) {
+        fun bindData(debug: Boolean,item: TestResultAndCurveModel?) {
 //            binding.setVariable(BR.item, item)
             binding.tvId.text = item?.result?.resultId.toString()
             binding.tvDetectionNum.text = item?.result?.detectionNum ?: "-"
@@ -88,6 +95,22 @@ class DataManagerAdapter :
             }
             updateResult(binding, item)
 
+            showHideView(debug);
+        }
+
+        private fun showHideView(debug: Boolean) {
+            binding.tvName.visibility = debug.not().isShow()
+            binding.tvGender.visibility = debug.not().isShow()
+            binding.tvAge.visibility = debug.not().isShow()
+
+            binding.tvTestValue1.visibility = debug.isShow()
+            binding.tvTestValue2.visibility = debug.isShow()
+            binding.tvTestValue3.visibility = debug.isShow()
+//                binding.tvTestValue4.visibility = it.isShow()
+            binding.tvTestOriginalValue1.visibility = debug.isShow()
+            binding.tvTestOriginalValue2.visibility = debug.isShow()
+            binding.tvTestOriginalValue3.visibility = debug.isShow()
+//                binding.tvTestOriginalValue4.visibility = it.isShow()
         }
 
         private fun updateResult(
@@ -147,7 +170,7 @@ class DataManagerAdapter :
     override fun onBindViewHolder(holder: DataManagerViewHolder, position: Int) {
         if (holder is DataManagerViewHolder) {
             val item = getItem(holder.absoluteAdapterPosition)
-            holder.bindData(item)
+            holder.bindData(debug,item)
 
             holder.binding.root.setOnClickListener {
                 item?.result?.let { item ->

@@ -263,7 +263,22 @@ class DataManagerFragment :
         }
         lifecycleScope.launchWhenCreated {
             SystemGlobal.obDebugMode.collectLatest {
+                adapter?.changeDebug(it)
                 vd.btnDelete.visibility = it.isShow()
+
+                vd.header.tvName.visibility = it.not().isShow()
+                vd.header.tvGender.visibility = it.not().isShow()
+                vd.header.tvAge.visibility = it.not().isShow()
+
+                vd.header.tvTestValue1.visibility = it.isShow()
+                vd.header.tvTestValue2.visibility = it.isShow()
+                vd.header.tvTestValue3.visibility = it.isShow()
+//                vd.header.tvTestValue4.visibility = it.isShow()
+                vd.header.tvTestOriginalValue1.visibility = it.isShow()
+                vd.header.tvTestOriginalValue2.visibility = it.isShow()
+                vd.header.tvTestOriginalValue3.visibility = it.isShow()
+//                vd.header.tvTestOriginalValue4.visibility = it.isShow()
+
             }
         }
 
@@ -287,7 +302,7 @@ class DataManagerFragment :
                                     confirmClick = {})
                             }
                             launch(Dispatchers.IO) {
-                                ExportExcelHelper.export(requireContext(), it.item, onSuccess = {
+                                ExportExcelHelper.export(SystemGlobal.isDebugMode,requireContext(), it.item, onSuccess = {
                                     vm.exportExcelSuccess("导出成功,文件保存在 $it")
                                 }, onFailed = {
                                     vm.exportExcelFailed("导出失败,$it")

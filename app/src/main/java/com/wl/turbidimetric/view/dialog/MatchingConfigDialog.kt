@@ -234,6 +234,7 @@ class MatchingConfigDialog(val ct: Context) :
                 onConfirm
 //                }
             }
+        val cancelText = if (debug) "调试框" else ""
         if (matchingType == MatchingConfigLayout.MatchingType.Quality && abss.isNotEmpty()) {
             //打印结果
             showDialog(
@@ -243,7 +244,7 @@ class MatchingConfigDialog(val ct: Context) :
                 },
                 "结束",
                 onNotSaveConfirm,
-                "调试框",
+                cancelText,
                 onClickDebug
             )
         } else {
@@ -252,7 +253,7 @@ class MatchingConfigDialog(val ct: Context) :
                 confirmBtnClick,
                 "结束",
                 onNotSaveConfirm,
-                "调试框",
+                cancelText,
                 onClickDebug
             )
         }

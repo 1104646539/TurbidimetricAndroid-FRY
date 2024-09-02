@@ -15,6 +15,7 @@ import java.util.*
 object ExportExcelHelper {
 
     val titles = mutableListOf(
+        "ID",
         "姓名",
         "性别",
         "年龄",
@@ -27,6 +28,7 @@ object ExportExcelHelper {
         "检测时间",
     )
     val titlesDebug = mutableListOf(
+        "ID",
         "姓名",
         "性别",
         "年龄",
@@ -120,6 +122,7 @@ object ExportExcelHelper {
     ): List<List<String>> {
         return datas.map { it ->
             mutableListOf<String>().apply {
+                add("${it.result.resultId}")
                 add("${it.result.name}")
                 add("${it.result.gender}")
                 add("${it.result.age}")

@@ -8,8 +8,6 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.view.View
 import android.widget.EditText
-import androidx.core.app.ActivityOptionsCompat
-import androidx.core.util.Pair
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
@@ -18,7 +16,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.github.mikephil.charting.data.Entry
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.app.App
-import com.wl.turbidimetric.app.StorageState
 import com.wl.turbidimetric.main.MainActivity
 import com.wl.turbidimetric.model.CurveModel
 import com.wl.turbidimetric.model.MachineTestModel
@@ -27,7 +24,6 @@ import com.wl.turbidimetric.model.SampleType
 import com.wl.turbidimetric.util.Fitter
 import com.wl.turbidimetric.util.FitterFactory
 import com.wl.turbidimetric.util.FitterType
-import com.wl.turbidimetric.util.FourFun
 import com.wl.wllib.LogToFile.i
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -641,4 +637,16 @@ fun View.getPrintParamsAnim(): MainActivity.PrintAnimParams {
  */
 fun TempCanBeTest(temp: Int, tempLowLimit: Int, tempUpLimit: Int): Boolean {
     return temp in tempLowLimit..tempUpLimit
+}
+
+fun dpToPx(context: Context, dp: Int): Int {
+    val density = context.resources.displayMetrics.density
+    return Math.round(dp * density)
+}
+
+fun Fragment.dpToPx(dp: Int): Int {
+    return dpToPx(this.requireContext(),dp)
+}
+fun Activity.dpToPx(dp: Int): Int {
+    return dpToPx(this,dp)
 }

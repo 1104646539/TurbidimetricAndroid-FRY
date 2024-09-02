@@ -69,7 +69,7 @@
             style="@style/TextHilt"
             android:layout_width="80dp"
             android:layout_height="wrap_content"
-            android:text="性别"/>
+            android:text="性别" />
 
 
         <TextView
@@ -87,6 +87,12 @@
             android:layout_height="wrap_content"
             android:text="浓度" />
 
+        <TextView
+            android:id="@+id/tv_absorbances"
+            style="@style/TextHilt"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="反应度" />
 
         <TextView
             android:id="@+id/tv_result"
@@ -103,12 +109,6 @@
             android:layout_height="wrap_content"
             android:text="检测时间" />
 
-        <TextView
-            android:id="@+id/tv_absorbances"
-            style="@style/TextHilt"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:text="反应度" />
 
         <TextView
             android:id="@+id/tv_test_value1"

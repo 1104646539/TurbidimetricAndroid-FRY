@@ -1,7 +1,9 @@
 package com.wl.turbidimetric.datamanager
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
@@ -14,6 +16,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.base.BaseFragment
 import com.wl.turbidimetric.databinding.FragmentDataManagerBinding
+import com.wl.turbidimetric.ex.DisplayUtil
+import com.wl.turbidimetric.ex.dpToPx
 import com.wl.turbidimetric.ex.getPrintParamsAnim
 import com.wl.turbidimetric.ex.toast
 import com.wl.turbidimetric.global.EventGlobal
@@ -242,6 +246,11 @@ class DataManagerFragment :
         )
     }
 
+    private fun updateLayoutParams(context: Context, v: View, dpValue: Int) {
+        v.layoutParams.apply {
+            this.width = DisplayUtil.dpToPx(context, dpValue)
+        }
+    }
 
     private fun listenerData() {
 
@@ -261,24 +270,43 @@ class DataManagerFragment :
                 queryData(it)
             }
         }
-        lifecycleScope.launchWhenCreated {
-            SystemGlobal.obDebugMode.collectLatest {
-                adapter?.changeDebug(it)
-                vd.btnDelete.visibility = it.isShow()
+        lifecycleScope.launchWhenStarted {
+            SystemGlobal.obDebugMode.collectLatest { isDebug ->
+                adapter?.changeDebug(isDebug)
+                vd.btnDelete.visibility = isDebug.isShow()
 
-                vd.header.tvName.visibility = it.not().isShow()
-                vd.header.tvGender.visibility = it.not().isShow()
-                vd.header.tvAge.visibility = it.not().isShow()
+                vd.header.tvName.visibility = isDebug.not().isShow()
+                vd.header.tvGender.visibility = isDebug.not().isShow()
+                vd.header.tvAge.visibility = isDebug.not().isShow()
 
-                vd.header.tvTestValue1.visibility = it.isShow()
-                vd.header.tvTestValue2.visibility = it.isShow()
-                vd.header.tvTestValue3.visibility = it.isShow()
-//                vd.header.tvTestValue4.visibility = it.isShow()
-                vd.header.tvTestOriginalValue1.visibility = it.isShow()
-                vd.header.tvTestOriginalValue2.visibility = it.isShow()
-                vd.header.tvTestOriginalValue3.visibility = it.isShow()
-//                vd.header.tvTestOriginalValue4.visibility = it.isShow()
+                vd.header.tvTestValue1.visibility = isDebug.isShow()
+                vd.header.tvTestValue2.visibility = isDebug.isShow()
+                vd.header.tvTestValue3.visibility = isDebug.isShow()
+//                vd.header.tvTestValue4.visibility = isDebug.isShow()
+                vd.header.tvTestOriginalValue1.visibility = isDebug.isShow()
+                vd.header.tvTestOriginalValue2.visibility = isDebug.isShow()
+                vd.header.tvTestOriginalValue3.visibility = isDebug.isShow()
+//                vd.header.tvTestOriginalValue4.visibility = isDebug.isShow()
 
+                if (isDebug) {
+                    updateLayoutParams(requireContext(), vd.header.tvId, 80)
+                    updateLayoutParams(requireContext(), vd.header.tvBarcode, 100)
+                    updateLayoutParams(requireContext(), vd.header.tvDetectionNum, 100)
+                    updateLayoutParams(requireContext(), vd.header.tvProjectName, 115)
+                    updateLayoutParams(requireContext(), vd.header.tvTestTime, 220)
+                    updateLayoutParams(requireContext(), vd.header.tvResult, 100)
+                    updateLayoutParams(requireContext(), vd.header.tvConcentration, 80)
+                    updateLayoutParams(requireContext(), vd.header.tvAbsorbances, 100)
+                } else {
+                    updateLayoutParams(requireContext(), vd.header.tvId, 110)
+                    updateLayoutParams(requireContext(), vd.header.tvBarcode, 120)
+                    updateLayoutParams(requireContext(), vd.header.tvDetectionNum, 120)
+                    updateLayoutParams(requireContext(), vd.header.tvProjectName, 135)
+                    updateLayoutParams(requireContext(), vd.header.tvTestTime, 240)
+                    updateLayoutParams(requireContext(), vd.header.tvResult, 130)
+                    updateLayoutParams(requireContext(), vd.header.tvConcentration, 100)
+                    updateLayoutParams(requireContext(), vd.header.tvAbsorbances, 120)
+                }
             }
         }
 
@@ -302,11 +330,16 @@ class DataManagerFragment :
                                     confirmClick = {})
                             }
                             launch(Dispatchers.IO) {
-                                ExportExcelHelper.export(SystemGlobal.isDebugMode,requireContext(), it.item, onSuccess = {
-                                    vm.exportExcelSuccess("导出成功,文件保存在 $it")
-                                }, onFailed = {
-                                    vm.exportExcelFailed("导出失败,$it")
-                                })
+                                ExportExcelHelper.export(
+                                    SystemGlobal.isDebugMode,
+                                    requireContext(),
+                                    it.item,
+                                    onSuccess = {
+                                        vm.exportExcelSuccess("导出成功,文件保存在 $it")
+                                    },
+                                    onFailed = {
+                                        vm.exportExcelFailed("导出失败,$it")
+                                    })
                             }
                         }
 

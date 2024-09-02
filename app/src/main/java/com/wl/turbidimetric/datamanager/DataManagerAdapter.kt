@@ -1,7 +1,9 @@
 package com.wl.turbidimetric.datamanager
 
+import android.content.Context
 import android.graphics.Color
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.paging.PagingDataAdapter
@@ -9,6 +11,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.ItemDatamanagerResultBinding
+import com.wl.turbidimetric.ex.DisplayUtil
 import com.wl.turbidimetric.model.ResultState
 import com.wl.turbidimetric.model.TestResultAndCurveModel
 import com.wl.turbidimetric.view.dialog.isShow
@@ -96,8 +99,32 @@ class DataManagerAdapter :
             updateResult(binding, item)
 
             showHideView(debug);
-        }
 
+            if (debug) {
+                updateLayoutParams(binding.root.context, binding.tvId, 80)
+                updateLayoutParams(binding.root.context, binding.tvBarcode, 100)
+                updateLayoutParams(binding.root.context, binding.tvDetectionNum, 100)
+                updateLayoutParams(binding.root.context, binding.tvProjectName, 115)
+                updateLayoutParams(binding.root.context, binding.tvTestTime, 220)
+                updateLayoutParams(binding.root.context, binding.tvResult, 100)
+                updateLayoutParams(binding.root.context, binding.tvConcentration, 80)
+                updateLayoutParams(binding.root.context, binding.tvAbsorbances, 100)
+            } else {
+                updateLayoutParams(binding.root.context, binding.tvId, 110)
+                updateLayoutParams(binding.root.context, binding.tvBarcode, 120)
+                updateLayoutParams(binding.root.context, binding.tvDetectionNum, 120)
+                updateLayoutParams(binding.root.context, binding.tvProjectName, 135)
+                updateLayoutParams(binding.root.context, binding.tvTestTime, 240)
+                updateLayoutParams(binding.root.context, binding.tvResult, 130)
+                updateLayoutParams(binding.root.context, binding.tvConcentration, 100)
+                updateLayoutParams(binding.root.context, binding.tvAbsorbances, 120)
+            }
+        }
+        private fun updateLayoutParams(context: Context, v: View, dpValue: Int) {
+            v.layoutParams.apply {
+                this.width = DisplayUtil.dpToPx(context, dpValue)
+            }
+        }
         private fun showHideView(debug: Boolean) {
             binding.tvName.visibility = debug.not().isShow()
             binding.tvGender.visibility = debug.not().isShow()

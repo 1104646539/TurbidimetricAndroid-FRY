@@ -199,7 +199,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     }
 
     override fun init() {
-        initShutDown()
+//        initShutDown()
         showSplash()
         listener()
         initNavigation()

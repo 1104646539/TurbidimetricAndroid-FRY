@@ -29,16 +29,29 @@ object EventGlobal {
      * 上传配置发生变化
      */
     const val WHAT_UPLOAD_CHANGE = 140
+
     /**
      * 编号发生变化
      */
     const val WHAT_DETECTION_NUM_CHANGE = 150
+
     /**
      * HomeFragment首屏加载完毕
      */
     const val WHAT_HOME_INIT_FINISH = 160
+
     /**
      * 执行打印添加到队列动画
      */
     const val WHAT_HOME_ADD_PRINT_ANIM = 170
+
+    /**
+     * 项目列表，添加项目
+     */
+    const val WHAT_PROJECT_LIST_TO_DETAILS = 180
+
+    /**
+     * 项目详情，关闭
+     */
+    const val WHAT_PROJECT_DETAILS_FINISH = 190
 }

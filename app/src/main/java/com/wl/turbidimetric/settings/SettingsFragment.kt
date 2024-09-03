@@ -11,11 +11,15 @@ import com.wl.turbidimetric.R
 import com.wl.turbidimetric.base.BaseFragment
 import com.wl.turbidimetric.databinding.FragmentSettingsBinding
 import com.wl.turbidimetric.ex.*
+import com.wl.turbidimetric.global.EventGlobal
+import com.wl.turbidimetric.global.EventMsg
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.mcuupdate.McuUpdateHelper
 import com.wl.turbidimetric.mcuupdate.UpdateResult
 import com.wl.turbidimetric.model.TestState
+import com.wl.turbidimetric.project.details.ProjectDetailsFragment
 import com.wl.turbidimetric.project.list.ProjectListActivity
+import com.wl.turbidimetric.project.list.ProjectListFragment
 import com.wl.turbidimetric.settings.detectionnum.DetectionNumFragment
 import com.wl.turbidimetric.settings.network.NetworkFragment
 import com.wl.turbidimetric.settings.params.ParamsFragment
@@ -165,8 +169,9 @@ class SettingsFragment constructor() :
         }
         vd.sivProjectList.setOnClickListener {
             u("项目设置")
-            projectList()
-//            vd.wgpSelectable.setSelected(it.id)
+//            projectList()
+            changeContent(ProjectListFragment::class.java)
+            vd.wgpSelectable.setSelected(it.id)
         }
         vd.tvSoftVersionMcu.setOnClickListener {
             u("MCU升级")
@@ -221,7 +226,7 @@ class SettingsFragment constructor() :
     }
 
     var curFragment: Fragment? = null
-    private  fun <T:Fragment> changeContent (classFragment: Class<T>) {
+    private fun <T : Fragment> changeContent(classFragment: Class<T>, bundle: Bundle? = null) {
 
         val bt = childFragmentManager.beginTransaction()
         bt.setCustomAnimations(
@@ -237,13 +242,15 @@ class SettingsFragment constructor() :
         var fragment: Fragment? = null
         childFragmentManager.findFragmentByTag(classFragment.name).let { it ->
             fragment = it
-            if(fragment == null){
+            if (fragment == null) {
                 fragment = classFragment.newInstance()
+                fragment?.arguments = bundle
                 bt.add(R.id.fl_content, fragment!!, classFragment.name).show(fragment!!)
-            }else{
+            } else {
                 if (curFragment != null && fragment == curFragment) {
                     return
                 }
+                fragment?.arguments = bundle
                 bt.show(fragment!!)
             }
         }
@@ -325,7 +332,12 @@ class SettingsFragment constructor() :
     }
 
     private fun startUpload() {
-        requireActivity().startActivity(Intent(requireContext(), UploadSettingsActivity::class.java))
+        requireActivity().startActivity(
+            Intent(
+                requireContext(),
+                UploadSettingsActivity::class.java
+            )
+        )
     }
 
     private fun showLauncher() {
@@ -347,6 +359,22 @@ class SettingsFragment constructor() :
         }
     }
 
+    override fun onMessageEvent(event: EventMsg<Any>) {
+        super.onMessageEvent(event)
+        when (event.what) {
+            EventGlobal.WHAT_PROJECT_LIST_TO_DETAILS -> {
+                changeContent(ProjectDetailsFragment::class.java, bundle = Bundle().apply {
+                    if (event.data != null && event.data is Long) {
+                        putLong(ProjectDetailsFragment.ID, event.data)
+                    }
+                })
+            }
+
+            EventGlobal.WHAT_PROJECT_DETAILS_FINISH -> {
+                changeContent(ProjectListFragment::class.java)
+            }
+        }
+    }
 
     /**
      * 进入重复性测试

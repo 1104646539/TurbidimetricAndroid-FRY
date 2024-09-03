@@ -52,7 +52,6 @@ class ProjectListActivity : BaseActivity<ProjectListViewModel, ActivityProjectLi
     }
     private fun initView() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = "测试页面"
 
         vd.rv.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         vd.rv.adapter = adapter
@@ -67,12 +66,4 @@ class ProjectListActivity : BaseActivity<ProjectListViewModel, ActivityProjectLi
         }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home) {
-//            finishAfterTransition()
-            finish()
-            return true
-        }
-        return super.onOptionsItemSelected(item)
-    }
 }

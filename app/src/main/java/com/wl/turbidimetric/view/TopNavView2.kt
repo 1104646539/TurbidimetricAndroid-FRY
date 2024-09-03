@@ -19,6 +19,7 @@ class TopNavView2 @JvmOverloads constructor(
     private var tvTitle: TextView? = null
     private var llBack: View? = null
     private var tvRight1: TextView? = null
+    private var ivBack: View? = null
 
     init {
         root = LayoutInflater.from(context).inflate(R.layout.layout_main_top_nav2, this, true)
@@ -29,6 +30,17 @@ class TopNavView2 @JvmOverloads constructor(
 
     private fun listenerView() {
 
+
+    }
+
+    fun setBackTitle(imgHide: Boolean, titleHide: Boolean) {
+        if (imgHide && titleHide) {
+            llBack?.visibility = View.GONE
+        } else if (imgHide) {
+            ivBack?.visibility = View.GONE
+        } else if (titleHide) {
+            tvTitle?.visibility = View.GONE
+        }
 
     }
 
@@ -53,6 +65,7 @@ class TopNavView2 @JvmOverloads constructor(
             tvTitle = findViewById(R.id.tv_title)
             llBack = findViewById(R.id.ll_back)
             tvRight1 = findViewById(R.id.tv_right1)
+            ivBack = findViewById(R.id.iv_back)
         }
     }
 

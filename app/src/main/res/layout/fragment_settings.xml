@@ -75,7 +75,7 @@
                     android:layout_height="50dp"
                     android:layout_marginTop="5dp"
                     app:bg="@drawable/bg_item_settings"
-                    app:selectable="false"
+                    app:selectable="true"
                     app:text="项目设置"
                     app:textColor="@color/text_item_settings" />
 

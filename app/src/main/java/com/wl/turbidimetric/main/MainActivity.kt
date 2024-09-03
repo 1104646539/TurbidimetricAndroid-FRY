@@ -101,7 +101,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         i("onCreate savedInstanceState=${savedInstanceState}")
         App.instance?.serialPort?.open(lifecycleScope)
         App.instance?.thermalPrintUtil?.open(lifecycleScope)
-        App.instance?.printHelper?.open(lifecycleScope,appVm.getReportIntervalTime())
+        App.instance?.printHelper?.open(lifecycleScope, appVm.getReportIntervalTime())
         App.instance?.scanCodeUtil?.open(lifecycleScope)
         setTheme(R.style.Theme_Mvvmdemo) //恢复原有的样式
         super.onCreate(savedInstanceState)
@@ -215,7 +215,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
             vd.ivStart,
             -100,
             -100,
-            (vd.rlRoot.width * 1.5).toFloat(),
+            (vd.rlRoot.width * 1.2).toFloat(),
             0.0.toFloat()
         )
         vd.ivStart.visibility = View.VISIBLE
@@ -227,7 +227,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
                 vd.ivStart.visibility = View.GONE
             }
         })
-
+        anim.startDelay = 1000
         anim.start()
     }
 

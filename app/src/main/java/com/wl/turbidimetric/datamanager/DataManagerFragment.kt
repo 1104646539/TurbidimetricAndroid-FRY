@@ -632,7 +632,7 @@ class DataManagerFragment :
         datasJob?.cancelAndJoin()
         datasJob = lifecycleScope.launch {
             vm.item(condition).collectLatest {
-                i("---监听到了变化---condition=$condition")
+//                i("---监听到了变化-collectLatest-")
                 vm.conditionChange(condition)
                 adapter.submitData(lifecycle, it)
                 //刷新后移动到顶部，只在没有移动的时候移动

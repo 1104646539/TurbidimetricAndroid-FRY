@@ -439,6 +439,10 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
                     vd.lnv.selectIndexChange(it)
                 }
             }
+            launch {
+
+
+            }
         }
 
         vd.tnv.getStateUpload()?.setOnClickListener {

@@ -26,7 +26,7 @@
         <item>女</item>
     </string-array>
     <string-array name="network_mode">
-<!--        <item>动态IP</item>-->
+        <!--        <item>动态IP</item>-->
         <item>静态IP</item>
     </string-array>
     <string-array name="getMachineStateErrors">
@@ -55,4 +55,5 @@
         <item>不能向前移动</item>
         <item>管架X轴错误</item>
     </string-array>
+
 </resources>

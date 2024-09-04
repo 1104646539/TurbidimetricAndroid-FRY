@@ -23,6 +23,7 @@ import com.wl.turbidimetric.ex.print
 import com.wl.turbidimetric.global.EventGlobal
 import com.wl.turbidimetric.global.EventMsg
 import com.wl.turbidimetric.global.SystemGlobal
+import com.wl.turbidimetric.log.DbLogUtil
 import com.wl.turbidimetric.model.CurveModel
 import com.wl.turbidimetric.model.CuvetteDoorModel
 import com.wl.turbidimetric.model.CuvetteState
@@ -63,8 +64,10 @@ import com.wl.turbidimetric.model.TestState
 import com.wl.turbidimetric.model.TestType
 import com.wl.turbidimetric.model.convertReplyState
 import com.wl.turbidimetric.report.PrintSDKHelper
+import com.wl.turbidimetric.repository.DefaultLogListDataSource
 import com.wl.turbidimetric.repository.if2.CurveSource
 import com.wl.turbidimetric.repository.if2.LocalDataSource
+import com.wl.turbidimetric.repository.if2.LogListDataSource
 import com.wl.turbidimetric.repository.if2.ProjectSource
 import com.wl.turbidimetric.repository.if2.TestResultSource
 import com.wl.turbidimetric.upload.hl7.HL7Helper
@@ -99,7 +102,8 @@ class HomeViewModel(
     private val projectRepository: ProjectSource,
     private val curveRepository: CurveSource,
     private val testResultRepository: TestResultSource,
-    private val localDataRepository: LocalDataSource
+    private val localDataRepository: LocalDataSource,
+    private val logListDataSource: LogListDataSource
 ) : BaseViewModel(), Callback2, OnScanResult {
 
     init {
@@ -719,6 +723,8 @@ class HomeViewModel(
             updateResultState(
                 cuvettePos, ResultState.TakeReagentFailed
             )
+
+            DbLogUtil.err(TestType.Test, "取试剂失败:比色皿位置:${cuvetteShelfPos + 1}-$cuvettePos")
             if (cuvetteMoveFinish) {//已经移动到位了，取试剂失败后不应该再取，只检测已经加完试剂的样本
                 val takeReagentCuvetteNum = getTakeReagentCuvetteNum()
                 if (takeReagentCuvetteNum == 0) {//第一个就失败，直接结束检测
@@ -906,6 +912,8 @@ class HomeViewModel(
                     )
                 )
             }
+            DbLogUtil.err(TestType.Test,"意外错误：${stateFailedText}")
+
         }
         return stateFailedText.isEmpty()
     }
@@ -2008,6 +2016,10 @@ class HomeViewModel(
                     null,
                     "${sampleShelfPos + 1}- $samplePos"
                 )
+                DbLogUtil.err(
+                    TestType.Test,
+                    "比色皿非空:比色皿位置:${cuvetteShelfPos + 1}-$cuvettePos \n样本位置${sampleShelfPos + 1}- $samplePos"
+                )
             } else {//正常加样，继续
                 updateCuvetteState(
                     cuvettePos, CuvetteState.DripSample, null, "${sampleShelfPos + 1}- $samplePos"
@@ -2211,6 +2223,7 @@ class HomeViewModel(
             )
             samplingProbeCleaning()
             nextStepDripReagent()
+            DbLogUtil.warring(TestType.Test, "取样失败:样本位置:${sampleShelfPos + 1}-${samplePos - 1}")
 
         } else {//取样成功
             updateSampleState(samplePos - 1, SampleState.Sampling)
@@ -2597,6 +2610,8 @@ class HomeViewModel(
             viewModelScope.launch(Dispatchers.IO) {
                 _dialogUiState.emit(HomeDialogUiState.GetMachineDismiss)
             }
+            DbLogUtil.warring(TestType.Test,"自检失败：${sb.toString()}")
+
         }
     }
 
@@ -3220,7 +3235,8 @@ class HomeViewModelFactory(
     private val projectRepository: ProjectSource = ServiceLocator.provideProjectSource(App.instance!!),
     private val curveRepository: CurveSource = ServiceLocator.provideCurveSource(App.instance!!),
     private val testResultRepository: TestResultSource = ServiceLocator.provideTestResultSource(App.instance!!),
-    private val localDataRepository: LocalDataSource = ServiceLocator.provideLocalDataSource(App.instance!!)
+    private val localDataRepository: LocalDataSource = ServiceLocator.provideLocalDataSource(App.instance!!),
+    private val logListDataSource: LogListDataSource = ServiceLocator.providerLogListDataSource(App.instance!!)
 ) : ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(HomeViewModel::class.java)) {
@@ -3229,7 +3245,8 @@ class HomeViewModelFactory(
                 projectRepository,
                 curveRepository,
                 testResultRepository,
-                localDataRepository
+                localDataRepository,
+                logListDataSource
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")

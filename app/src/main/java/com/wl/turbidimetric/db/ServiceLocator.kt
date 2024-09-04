@@ -2,27 +2,40 @@ package com.wl.turbidimetric.db
 
 import android.content.Context
 import androidx.room.Room
+import com.wl.turbidimetric.log.DbLogUtil
 import com.wl.turbidimetric.repository.DefaultCurveDataSource
 import com.wl.turbidimetric.repository.DefaultProjectDataSource
 import com.wl.turbidimetric.repository.DefaultTestResultDataSource
 import com.wl.turbidimetric.repository.DefaultLocalDataDataSource
+import com.wl.turbidimetric.repository.DefaultLogListDataSource
 import com.wl.turbidimetric.repository.if2.CurveSource
 import com.wl.turbidimetric.repository.if2.LocalDataSource
+import com.wl.turbidimetric.repository.if2.LogListDataSource
 import com.wl.turbidimetric.repository.if2.ProjectSource
 import com.wl.turbidimetric.repository.if2.TestResultSource
 
 object ServiceLocator {
     @Volatile
     var database: MainRoomDatabase? = null
+
+    @Volatile
+    var logDatabase: MainRoomDatabase? = null
     var projectDataSource: ProjectSource? = null
     var curveSource: CurveSource? = null
     var localDataSource: LocalDataSource? = null
     var testResultSource: TestResultSource? = null
-
+    var logListDataSource: LogListDataSource? = null
+    val path = "word_database"
 
     fun getDb(context: Context, isMemory: Boolean = false): MainRoomDatabase {
-        return database ?: createDataBase(context, isMemory).apply {
+        return database ?: createDataBase(context, isMemory, path).apply {
             database = this
+        }
+    }
+
+    fun getLogDb(context: Context, isMemory: Boolean = false, path: String): MainRoomDatabase {
+        return logDatabase ?: createDataBase(context, isMemory, path).apply {
+            logDatabase = this
         }
     }
 
@@ -39,6 +52,20 @@ object ServiceLocator {
                 ?: DefaultLocalDataDataSource(globalDao = getDb(context).globalDao()).apply {
                     localDataSource = this
                 }
+        }
+    }
+
+    fun providerLogListDataSource(context: Context): LogListDataSource {
+        synchronized(this) {
+            return logListDataSource ?: DefaultLogListDataSource(
+                logDao = getLogDb(
+                    context,
+                    false,
+                    DbLogUtil.path
+                ).logDao()
+            ).apply {
+                logListDataSource = this
+            }
         }
     }
 
@@ -74,8 +101,12 @@ object ServiceLocator {
      * @param isMemory Boolean
      * @return MainRoomDatabase
      */
-    fun createDataBase(context: Context, isMemory: Boolean = false): MainRoomDatabase {
-        return database ?: synchronized(this) {
+    fun createDataBase(
+        context: Context,
+        isMemory: Boolean = false,
+        path: String
+    ): MainRoomDatabase {
+        return synchronized(this) {
             val instance = if (isMemory) {
                 Room.inMemoryDatabaseBuilder(
                     context.applicationContext,
@@ -87,20 +118,23 @@ object ServiceLocator {
                 Room.databaseBuilder(
                     context.applicationContext,
                     MainRoomDatabase::class.java,
-                    "word_database"
+                    path
                 )
                     .allowMainThreadQueries()
 //                    .createFromFile(File("sdcard/bf/word_database"))
 //                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
                     .build()
             }
-            database = instance
             instance
         }
     }
 
     fun resetDataSource() {
         database?.apply {
+            clearAllTables()
+            close()
+        }
+        logDatabase?.apply {
             clearAllTables()
             close()
         }

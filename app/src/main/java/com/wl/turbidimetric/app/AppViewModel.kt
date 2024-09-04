@@ -12,6 +12,7 @@ import com.wl.turbidimetric.model.TestType
 import com.wl.turbidimetric.print.ThermalPrintUtil
 import com.wl.turbidimetric.report.PrintHelper
 import com.wl.turbidimetric.repository.if2.LocalDataSource
+import com.wl.turbidimetric.repository.if2.LogListDataSource
 import com.wl.turbidimetric.upload.hl7.util.ConnectStatus
 import com.wl.turbidimetric.upload.hl7.util.getLocalConfig
 import com.wl.turbidimetric.util.ScanCodeUtil

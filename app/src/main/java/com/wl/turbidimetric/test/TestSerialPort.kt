@@ -142,12 +142,15 @@ object TestSerialPort {
             }
 
             SerialGlobal.CMD_Sampling -> {
-                if (index == 3) {
-                    reply = ubyteArrayOf(data[0], 0x04u, 0x0u, 0x0u, 0x0u, 0x0u)//取样失败
-                } else {
-                    reply = ubyteArrayOf(data[0], 0x00u, 0x0u, 0x0u, 0x0u, 0x0u)//取样成功
-                }
-                index++
+//                if (index == 3) {
+//                    reply = ubyteArrayOf(data[0], 0x04u, 0x0u, 0x0u, 0x0u, 0x0u)//取样失败
+//                } else {
+                reply = ubyteArrayOf(data[0], 0x00u, 0x0u, 0x0u, 0x0u, 0x0u)//取样成功
+//                }
+//                index++
+//                if (index == 10) {
+//                    index = 0
+//                }
 //                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x0u))//取样成功
 //                reply = ubyteArrayOf(data[0], 0x01u, 0x0u, 0x0u, 0x0u, 0x0u)//取样失败
             }

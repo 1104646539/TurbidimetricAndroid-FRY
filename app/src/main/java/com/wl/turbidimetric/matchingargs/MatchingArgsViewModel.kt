@@ -22,6 +22,7 @@ import com.wl.turbidimetric.ex.toast
 import com.wl.turbidimetric.global.EventGlobal
 import com.wl.turbidimetric.global.EventMsg
 import com.wl.turbidimetric.global.SystemGlobal
+import com.wl.turbidimetric.log.DbLogUtil
 import com.wl.turbidimetric.model.CurveModel
 import com.wl.turbidimetric.model.CuvetteDoorModel
 import com.wl.turbidimetric.model.CuvetteState
@@ -510,6 +511,8 @@ class MatchingArgsViewModel(
                     )
                 )
             }
+            DbLogUtil.err(TestType.MatchingArgs,"意外错误：${stateFailedText}")
+
         }
         return stateFailedText.isEmpty()
     }
@@ -1409,6 +1412,10 @@ class MatchingArgsViewModel(
         samplingFinish = false
         if (reply.state == ReplyState.CUVETTE_NOT_EMPTY) {//比色皿非空
             accidentState = ReplyState.CUVETTE_NOT_EMPTY
+            DbLogUtil.err(
+                TestType.MatchingArgs,
+                "比色皿非空:比色皿位置:${cuvetteShelfPos + 1}-$cuvettePos \n样本位置${sampleShelfPos + 1}- $samplePos"
+            )
             matchingFinish()
             return
         }
@@ -1449,6 +1456,7 @@ class MatchingArgsViewModel(
         samplingFinish = true
         if (reply.state == ReplyState.SAMPLING_FAILED) {//取样失败
             accidentState = ReplyState.SAMPLING_FAILED
+            DbLogUtil.warring(TestType.MatchingArgs, "取样失败:样本位置:${sampleShelfPos + 1}-${samplePos - 1}")
             accidentStateMatchingFinish()
             return
         }
@@ -1535,6 +1543,7 @@ class MatchingArgsViewModel(
         takeReagentFinish = true
         if (reply.state == ReplyState.TAKE_REAGENT_FAILED) {//取试剂失败
             accidentState = ReplyState.TAKE_REAGENT_FAILED
+            DbLogUtil.err(TestType.MatchingArgs, "取试剂失败:比色皿位置:${cuvetteShelfPos + 1}-$cuvettePos")
             accidentStateMatchingFinish()
             return
         }

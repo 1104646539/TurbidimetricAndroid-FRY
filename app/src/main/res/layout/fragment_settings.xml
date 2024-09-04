@@ -15,16 +15,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginLeft="5dp"
-                android:animateLayoutChanges="true"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
+                android:animateLayoutChanges="true"
                 android:orientation="vertical">
 
                 <com.wl.turbidimetric.view.WlGroup
                     android:id="@+id/wgp_selectable"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
-                    app:ids="siv_params_setting,siv_detection_num_setting,siv_machine_test_mode,siv_project_list,siv_machine_network,siv_report_settings" />
+                    app:ids="siv_params_setting,siv_detection_num_setting,siv_machine_test_mode,siv_project_list,siv_machine_network,siv_report_settings,siv_log_list" />
 
                 <com.wl.turbidimetric.view.SettingItemView
                     android:id="@+id/siv_order_settings"
@@ -77,6 +77,16 @@
                     app:bg="@drawable/bg_item_settings"
                     app:selectable="true"
                     app:text="项目设置"
+                    app:textColor="@color/text_item_settings" />
+
+                <com.wl.turbidimetric.view.SettingItemView
+                    android:id="@+id/siv_log_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="5dp"
+                    app:bg="@drawable/bg_item_settings"
+                    app:selectable="true"
+                    app:text="日志记录"
                     app:textColor="@color/text_item_settings" />
 
                 <com.wl.turbidimetric.view.SettingItemView

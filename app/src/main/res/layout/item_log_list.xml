@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/ll_root"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="8dp">
+
+        <TextView
+            android:id="@+id/tv_level"
+            style="@style/TextItem"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="类型" />
+
+        <TextView
+            android:id="@+id/tv_tag"
+            style="@style/TextItem"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="模块" />
+
+        <TextView
+            android:id="@+id/tv_content"
+            style="@style/TextItem"
+            android:layout_width="800dp"
+            android:layout_height="wrap_content"
+            android:text="内容" />
+
+        <TextView
+            android:id="@+id/tv_time"
+            style="@style/TextItem"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:text="发生时间" />
+    </LinearLayout>
+</layout>

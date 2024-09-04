@@ -9,6 +9,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
 import com.lxj.xpopup.core.BasePopupView
 import com.wl.turbidimetric.R
+import com.wl.turbidimetric.app.App
+import com.wl.turbidimetric.app.App.Companion
 import com.wl.turbidimetric.app.AppIntent
 import com.wl.turbidimetric.base.BaseFragment
 import com.wl.turbidimetric.databinding.FragmentHomeBinding
@@ -17,10 +19,14 @@ import com.wl.turbidimetric.ex.toast
 import com.wl.turbidimetric.global.EventGlobal
 import com.wl.turbidimetric.global.EventMsg
 import com.wl.turbidimetric.global.SystemGlobal
+import com.wl.turbidimetric.log.DbLogUtil
+import com.wl.turbidimetric.log.LogLevel
+import com.wl.turbidimetric.log.LogModel
 import com.wl.turbidimetric.model.CurveModel
 import com.wl.turbidimetric.model.Item
 import com.wl.turbidimetric.model.SampleState
 import com.wl.turbidimetric.model.TestState
+import com.wl.turbidimetric.model.TestType
 import com.wl.turbidimetric.upload.hl7.HL7Helper
 import com.wl.turbidimetric.upload.model.GetPatientCondition
 import com.wl.turbidimetric.upload.model.GetPatientType

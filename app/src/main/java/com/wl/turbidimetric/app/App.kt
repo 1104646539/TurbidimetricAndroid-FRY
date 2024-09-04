@@ -15,6 +15,9 @@ import com.wl.turbidimetric.ex.copyForProject
 import com.wl.turbidimetric.ex.getAppViewModel
 import com.wl.turbidimetric.ex.getPackageInfo
 import com.wl.turbidimetric.global.SystemGlobal
+import com.wl.turbidimetric.log.DbLogUtil
+import com.wl.turbidimetric.log.LogLevel
+import com.wl.turbidimetric.log.LogModel
 import com.wl.turbidimetric.model.CurveModel
 import com.wl.turbidimetric.model.GlobalConfig
 import com.wl.turbidimetric.model.ProjectModel
@@ -24,6 +27,7 @@ import com.wl.turbidimetric.report.PdfCreateUtil
 import com.wl.turbidimetric.report.PrintHelper
 import com.wl.turbidimetric.repository.DefaultLocalDataDataSource
 import com.wl.turbidimetric.repository.if2.LocalDataSource
+import com.wl.turbidimetric.repository.if2.LogListDataSource
 import com.wl.turbidimetric.util.CrashHandler
 import com.wl.turbidimetric.util.FitterType
 import com.wl.turbidimetric.util.ScanCodeUtil
@@ -31,20 +35,24 @@ import com.wl.turbidimetric.util.SerialPortIF
 import com.wl.turbidimetric.util.SerialPortImpl
 import com.wl.weiqianwllib.serialport.BaseSerialPort
 import com.wl.wllib.LogToFile
+import com.wl.wllib.LogToFile.i
 import com.wl.wllib.ToastUtil
 import com.wl.wllib.ktxRunOnBgCache
 import com.wl.wllib.toTimeStr
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.io.File
 import java.util.Date
+import kotlin.math.log
 
 
 class App : Application() {
     private val activityList = mutableListOf<Activity>()
     val mainDao by lazy { ServiceLocator.getDb(this).mainDao() }
     val globalDao by lazy { ServiceLocator.getDb(this).globalDao() }
+    val logDao by lazy { ServiceLocator.getLogDb(this, path = DbLogUtil.path).logDao() }
     override fun attachBaseContext(base: Context?) {
         super.attachBaseContext(base)
     }
@@ -58,13 +66,10 @@ class App : Application() {
         ThermalPrintUtil(BaseSerialPort())
     }
     val printHelper: PrintHelper by lazy {
-        PrintHelper( this)
+        PrintHelper(this)
     }
     val scanCodeUtil: ScanCodeUtil by lazy {
         ScanCodeUtil()
-    }
-    val imm: InputMethodManager by lazy {
-        getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
     }
     val appVm: AppViewModel by lazy {
         getAppViewModel(AppViewModel::class.java)
@@ -85,12 +90,12 @@ class App : Application() {
 //            删除检测报告的缓存
             PdfCreateUtil.deleteCacheFolder(File(ExportReportHelper.defaultReportSavePath))
         }
+        DbLogUtil.init(logDao)
+
     }
 
 
-
     private fun initDB() {
-
         GlobalScope.launch {
             val projectSource = ServiceLocator.provideProjectSource(this@App)
             val ps = mainDao.getProjectModels().first()

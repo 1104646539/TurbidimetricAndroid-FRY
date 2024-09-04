@@ -21,6 +21,7 @@ import com.wl.turbidimetric.project.details.ProjectDetailsFragment
 import com.wl.turbidimetric.project.list.ProjectListActivity
 import com.wl.turbidimetric.project.list.ProjectListFragment
 import com.wl.turbidimetric.settings.detectionnum.DetectionNumFragment
+import com.wl.turbidimetric.settings.log.LogListFragment
 import com.wl.turbidimetric.settings.network.NetworkFragment
 import com.wl.turbidimetric.settings.params.ParamsFragment
 import com.wl.turbidimetric.settings.report.ReportFragment
@@ -139,6 +140,11 @@ class SettingsFragment constructor() :
         vd.sivReportSettings.setOnClickListener {
             u("报告设置")
             changeContent(ReportFragment::class.java)
+            vd.wgpSelectable.setSelected(it.id)
+        }
+        vd.sivLogList.setOnClickListener {
+            u("日志记录")
+            changeContent(LogListFragment::class.java)
             vd.wgpSelectable.setSelected(it.id)
         }
 

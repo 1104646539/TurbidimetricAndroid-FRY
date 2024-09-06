@@ -32,16 +32,20 @@ import java.util.*
  */
 open class ConditionDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_condition) {
     var spnResults: Spinner? = null
+    var spnProjects: Spinner? = null
     var etName: EditText? = null
     var etQRCode: EditText? = null
     var etConMin: EditText? = null
     var etConMax: EditText? = null
     var tvResults: TextView? = null
+    var tvProjects: TextView? = null
     var tvTestTimeMin: TextView? = null
     var tvTestTimeMax: TextView? = null
     var cbToday: CheckBox? = null
     var resultAdapter: SelectQueryAdapter? = null
+    var projectAdapter: SelectQueryAdapter? = null
     var results = getResource().getStringArray(R.array.results)
+    var projects: List<String> = mutableListOf()
     var testTimeMin = ""
     var testTimeMax = ""
     var today = false
@@ -94,9 +98,16 @@ open class ConditionDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
             resultAdapter = SelectQueryAdapter(context, results)
             spnResults?.adapter = resultAdapter
         }
+        if (projectAdapter == null) {
+            projectAdapter = SelectQueryAdapter(context, projects.toTypedArray())
+            spnProjects?.adapter = projectAdapter
+        }
 
         resultAdapter?.onItemSelectChange = { index, _ ->
             tvResults?.text = resultAdapter?.getSelectText()
+        }
+        projectAdapter?.onItemSelectChange = { index, _ ->
+            tvProjects?.text = projectAdapter?.getSelectText()
         }
 
         tvTestTimeMin?.setOnClickListener {
@@ -161,8 +172,10 @@ open class ConditionDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
     }
 
     fun showDialog(
+        projectNames: List<String>,
         onConfirm: (ConditionModel) -> Unit?, onCancel: onClick?
     ) {
+        this.projects = projectNames
         this.confirmText = "确定"
         this.confirmClick = {
             if (verify()) {
@@ -175,6 +188,7 @@ open class ConditionDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
         }
         this.cancelText = "取消"
         this.cancelClick = onCancel
+
         if (isCreated) {
             setContent()
         }
@@ -204,7 +218,9 @@ open class ConditionDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
         etConMin?.setText("")
         etConMax?.setText("")
         tvResults?.text = "请选择"
+        tvProjects?.text = "请选择"
         resultAdapter?.clearSelectedInfo()
+        projectAdapter?.clearSelectedInfo()
         tvTestTimeMin?.text = ""
         tvTestTimeMax?.text = ""
         testTimeMin = ""
@@ -226,6 +242,7 @@ open class ConditionDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
             results = if (resultAdapter?.getSelectItemsValue() == null) arrayOf() else resultAdapter?.getSelectItemsValue()!!,
             testTimeMin = testTimeMin,
             testTimeMax = testTimeMax,
+            selectProjects = if (projectAdapter?.getSelectItemsValue() == null) arrayOf() else projectAdapter?.getSelectItemsValue()!!
         )
     }
 
@@ -235,7 +252,9 @@ open class ConditionDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialo
         etConMin = findViewById(R.id.et_con_min)
         etConMax = findViewById(R.id.et_con_max)
         spnResults = findViewById(R.id.spn_results)
+        spnProjects = findViewById(R.id.spn_projects)
         tvResults = findViewById(R.id.tv_spn_results)
+        tvProjects = findViewById(R.id.tv_spn_projects)
         tvTestTimeMin = findViewById(R.id.tv_test_time_min)
         tvTestTimeMax = findViewById(R.id.tv_test_time_max)
         cbToday = findViewById(R.id.cb_today)

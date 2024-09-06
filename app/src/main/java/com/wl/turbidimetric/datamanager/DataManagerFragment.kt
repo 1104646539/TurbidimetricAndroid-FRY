@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -271,7 +272,7 @@ class DataManagerFragment :
             }
         }
         lifecycleScope.launchWhenStarted {
-            SystemGlobal.obDebugMode.collectLatest { isDebug ->
+            appVm.obDebugMode.collectLatest { isDebug ->
                 adapter?.changeDebug(isDebug)
                 vd.btnDelete.visibility = isDebug.isShow()
 
@@ -331,7 +332,7 @@ class DataManagerFragment :
                             }
                             launch(Dispatchers.IO) {
                                 ExportExcelHelper.export(
-                                    SystemGlobal.isDebugMode,
+                                    appVm.isDebugMode,
                                     requireContext(),
                                     it.item,
                                     onSuccess = {
@@ -535,10 +536,10 @@ class DataManagerFragment :
 
                         is DataManagerViewModel.ResultDetailsUIState.ShowDialog -> {
                             resultDialog.showPop(requireContext(), isCancelable = false) { dialog ->
-                                dialog.showDialog(it.item, SystemGlobal.isDebugMode) { result ->
+                                dialog.showDialog(it.item, appVm.isDebugMode) { result ->
                                     vm.processIntent(
                                         DataManagerViewModel.DataManagerIntent.ResultDetailsUpdate(
-                                            SystemGlobal.isDebugMode,
+                                            appVm.isDebugMode,
                                             result
                                         )
                                     )
@@ -562,18 +563,21 @@ class DataManagerFragment :
                                 requireContext(),
                                 isCancelable = false
                             ) { dialog ->
-                                dialog.showDialog({ conditionModel ->
-                                    adapter.clearSelected()
-                                    vm.processIntent(
-                                        DataManagerViewModel.DataManagerIntent.ConditionUpdate(
-                                            conditionModel
+                                dialog.showDialog(
+                                    projectNames = it.projects.map { p -> p.projectName },
+                                    { conditionModel ->
+                                        adapter.clearSelected()
+                                        vm.processIntent(
+                                            DataManagerViewModel.DataManagerIntent.ConditionUpdate(
+                                                conditionModel
+                                            )
                                         )
-                                    )
-                                    dialog.dismiss()
-                                    i("conditionModel=$conditionModel")
-                                }, {
-                                    dialog.dismiss()
-                                })
+                                        dialog.dismiss()
+                                        i("conditionModel=$conditionModel")
+                                    },
+                                    {
+                                        dialog.dismiss()
+                                    })
                             }
                         }
                     }
@@ -633,7 +637,7 @@ class DataManagerFragment :
         datasJob = lifecycleScope.launch {
             vm.item(condition).collectLatest {
 //                i("---监听到了变化-collectLatest-")
-                vm.conditionChange(condition)
+                vm.sizeChange()
                 adapter.submitData(lifecycle, it)
                 //刷新后移动到顶部，只在没有移动的时候移动
                 withContext(Dispatchers.Main) {
@@ -678,6 +682,7 @@ class DataManagerFragment :
     }
 
     override fun initViewModel() {
+        vm.listener()
     }
 
 

@@ -10,7 +10,7 @@
         style="@style/TextTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="试剂序号" />
+        android:text="曲线序号" />
 
     <TextView
         android:id="@+id/tv_project_name"

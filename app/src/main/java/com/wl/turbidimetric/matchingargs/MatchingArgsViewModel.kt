@@ -1,6 +1,7 @@
 package com.wl.turbidimetric.matchingargs
 
 import android.widget.Toast
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -304,7 +305,7 @@ class MatchingArgsViewModel(
 
 
     /**
-     * 试剂序号
+     * 曲线序号
      */
     var reagentNOStr = ""
 
@@ -395,10 +396,10 @@ class MatchingArgsViewModel(
      */
     var curves = mutableListOf<CurveModel>()
 
-    var qualityLow1 = 100
-    var qualityLow2 = 120
-    var qualityHigh1 = 400
-    var qualityHigh2 = 440
+    var qualityLow1 = 0
+    var qualityLow2 = 0
+    var qualityHigh1 = 0
+    var qualityHigh2 = 0
 
     /**
      * 比色皿舱门正在操作 （现在用作结束检测，将r2试剂转出来）
@@ -511,7 +512,7 @@ class MatchingArgsViewModel(
                     )
                 )
             }
-            DbLogUtil.err(TestType.MatchingArgs,"意外错误：${stateFailedText}")
+            DbLogUtil.err(TestType.MatchingArgs, "意外错误：${stateFailedText}")
 
         }
         return stateFailedText.isEmpty()
@@ -620,26 +621,26 @@ class MatchingArgsViewModel(
             }
             return
         }
-        var hiltStr = ""
-        if (matchingType == MatchingConfigLayout.MatchingType.Matching) {
-            if (reagentNOStr.isNullOrEmpty()) {
-                hiltStr = "请输入试剂序号"
-            } else if (quality && qualityLow1 <= 0 || qualityLow2 <= 0 || qualityHigh1 <= 0 || qualityHigh2 <= 0) {
-                hiltStr = "请输入质控浓度"
-            }
-        } else {
-            if (qualityLow1 <= 0 || qualityLow2 <= 0 || qualityHigh1 <= 0 || qualityHigh2 <= 0) {
-                hiltStr = "请输入质控浓度"
-            }
-        }
-        if (hiltStr.isNotEmpty()) {
-            viewModelScope.launch {
-                _dialogUiState.emit(
-                    MatchingArgsDialogUiState.Accident(hiltStr)
-                )
-            }
-            return
-        }
+//        var hiltStr = ""
+//        if (matchingType == MatchingConfigLayout.MatchingType.Matching) {
+//            if (reagentNOStr.isNullOrEmpty()) {
+//                hiltStr = "请输入曲线序号"
+//            } else if (quality && (qualityLow1 <= 0 || qualityLow2 <= 0 || qualityHigh1 <= 0 || qualityHigh2 <= 0)) {
+//                hiltStr = "请输入质控浓度"
+//            }
+//        } else {
+//            if (qualityLow1 <= 0 || qualityLow2 <= 0 || qualityHigh1 <= 0 || qualityHigh2 <= 0) {
+//                hiltStr = "请输入质控浓度"
+//            }
+//        }
+//        if (hiltStr.isNotEmpty()) {
+//            viewModelScope.launch {
+//                _dialogUiState.emit(
+//                    MatchingArgsDialogUiState.Accident(hiltStr)
+//                )
+//            }
+//            return
+//        }
 
         start()
     }
@@ -1456,7 +1457,10 @@ class MatchingArgsViewModel(
         samplingFinish = true
         if (reply.state == ReplyState.SAMPLING_FAILED) {//取样失败
             accidentState = ReplyState.SAMPLING_FAILED
-            DbLogUtil.warring(TestType.MatchingArgs, "取样失败:样本位置:${sampleShelfPos + 1}-${samplePos - 1}")
+            DbLogUtil.warring(
+                TestType.MatchingArgs,
+                "取样失败:样本位置:${sampleShelfPos + 1}-${samplePos - 1}"
+            )
             accidentStateMatchingFinish()
             return
         }
@@ -1543,7 +1547,10 @@ class MatchingArgsViewModel(
         takeReagentFinish = true
         if (reply.state == ReplyState.TAKE_REAGENT_FAILED) {//取试剂失败
             accidentState = ReplyState.TAKE_REAGENT_FAILED
-            DbLogUtil.err(TestType.MatchingArgs, "取试剂失败:比色皿位置:${cuvetteShelfPos + 1}-$cuvettePos")
+            DbLogUtil.err(
+                TestType.MatchingArgs,
+                "取试剂失败:比色皿位置:${cuvetteShelfPos + 1}-$cuvettePos"
+            )
             accidentStateMatchingFinish()
             return
         }
@@ -2103,11 +2110,23 @@ class MatchingArgsViewModel(
         if (matchingType == MatchingConfigLayout.MatchingType.Matching) {
             //拟合
             if (reagentNOStr.isNullOrEmpty()) {
-                hilt = "请输入试剂序号"
-            } else if (quality && qualityLow1 <= 0 || qualityLow2 <= 0 || qualityHigh1 <= 0 || qualityHigh2 <= 0) {
+                hilt = "请输入曲线序号"
+            } else if (quality && (qualityLow1 <= 0 || qualityLow2 <= 0 || qualityHigh1 <= 0 || qualityHigh2 <= 0)) {
                 hilt = "请输入质控浓度"
             } else if (selectMatchingProject == null) {
                 hilt = "请选择拟合项目"
+            } else {
+                var isInput = false
+                for (i in cons) {
+                    if (i.compareTo(0.0) > 0.001) {
+                        isInput = true
+                        break
+                    }
+                }
+                i("isInput=$isInput")
+                if (!isInput) {
+                    hilt = "请输入目标浓度"
+                }
             }
         } else {
             //质控
@@ -2157,6 +2176,15 @@ class MatchingArgsViewModel(
                     reagentNOStr,
                 )
             )
+        }
+        selectProject?.let {
+            //如果项目参数输入了和以前不一样的，就更新项目参数
+            if (it.grads.size != gradsNum || !it.grads.contentEquals(cons.toDoubleArray())) {
+                it.grads = cons.toDoubleArray()
+                viewModelScope.launch {
+                    projectRepository.updateProject(it)
+                }
+            }
         }
     }
 

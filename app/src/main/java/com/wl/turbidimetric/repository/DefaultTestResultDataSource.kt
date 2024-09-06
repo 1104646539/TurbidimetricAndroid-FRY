@@ -29,7 +29,9 @@ class DefaultTestResultDataSource constructor(
                 condition.testTimeMin,
                 condition.testTimeMax,
                 condition.results.toList(),
-                condition.results.size
+                condition.results.size,
+                condition.selectProjects.toList(),
+                condition.selectProjects.size
             )
         }.flow
     }
@@ -48,7 +50,9 @@ class DefaultTestResultDataSource constructor(
             condition.testTimeMin,
             condition.testTimeMax,
             condition.results.toList(),
-            condition.results.size
+            condition.results.size,
+            condition.selectProjects.toList(),
+            condition.selectProjects.size
         )
     }
 
@@ -82,7 +86,9 @@ class DefaultTestResultDataSource constructor(
             condition.testTimeMin,
             condition.testTimeMax,
             condition.results.toList(),
-            condition.results.size
+            condition.results.size,
+            condition.selectProjects.toList(),
+            condition.selectProjects.size
         )
     }
 }

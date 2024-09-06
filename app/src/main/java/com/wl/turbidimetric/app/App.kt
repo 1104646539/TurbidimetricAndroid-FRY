@@ -106,6 +106,7 @@ class App : Application() {
                     projectCode = "FOB"
                     projectUnit = "ng/mL"
                     projectLjz = 100
+                    grads = doubleArrayOf(0.0, 50.0, 200.0, 500.0, 1000.0)
                 }
                 val project2 = ProjectModel().apply {
                     projectName = "转铁蛋白"

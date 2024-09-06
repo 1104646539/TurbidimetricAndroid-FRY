@@ -49,18 +49,6 @@
             app:autoSizeStepGranularity="1sp"
             app:autoSizeTextType="uniform" />
 
-        <TextView
-            android:id="@+id/tv_detection_num"
-            style="@style/TextHilt"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:maxLines="2"
-            android:text="编号"
-            app:autoSizeMaxTextSize="28sp"
-            app:autoSizeMinTextSize="10sp"
-            app:autoSizeStepGranularity="1sp"
-            app:autoSizeTextType="uniform" />
-
 
         <TextView
             android:id="@+id/tv_name"
@@ -87,11 +75,16 @@
 
 
         <TextView
-            android:id="@+id/tv_concentration"
+            android:id="@+id/tv_detection_num"
             style="@style/TextHilt"
-            android:layout_width="80dp"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:text="浓度" />
+            android:maxLines="2"
+            android:text="编号"
+            app:autoSizeMaxTextSize="28sp"
+            app:autoSizeMinTextSize="10sp"
+            app:autoSizeStepGranularity="1sp"
+            app:autoSizeTextType="uniform" />
 
         <TextView
             android:id="@+id/tv_absorbances"
@@ -99,6 +92,14 @@
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:text="反应度" />
+
+        <TextView
+            android:id="@+id/tv_concentration"
+            style="@style/TextHilt"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:text="浓度" />
+
 
         <TextView
             android:id="@+id/tv_result"

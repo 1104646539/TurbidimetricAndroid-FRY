@@ -101,6 +101,39 @@
             android:layout_height="wrap_content"
             android:gravity="left|center_vertical"
             android:minWidth="100dp"
+            android:text="检测项目:" />
+
+        <RelativeLayout
+            android:layout_width="550dp"
+            android:layout_height="match_parent">
+
+            <Spinner
+                android:id="@+id/spn_projects"
+                style="@style/EtDefault"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <TextView
+                android:id="@+id/tv_spn_projects"
+                style="@style/TextHilt"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:text="请选择"
+                android:textColor="@color/textGray" />
+        </RelativeLayout>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal">
+
+        <TextView
+            style="@style/TextHilt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="left|center_vertical"
+            android:minWidth="100dp"
             android:text="检测结果:" />
 
         <RelativeLayout

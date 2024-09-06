@@ -100,6 +100,10 @@ class DefaultLocalDataDataSource(
         return global().Test4DelayTime
     }
 
+    override fun getReactionTime(): Long {
+        return global().ReactionTime
+    }
+
     /**
      * 编号自增并保存
      * @param num String
@@ -268,6 +272,12 @@ class DefaultLocalDataDataSource(
         update {
             it.copy(Test4DelayTime = value)
         }
+    }
+
+    override fun setReactionTime(value: Long) {
+       update {
+           it.copy(ReactionTime = value)
+       }
     }
 
     override fun setDetectionNumInc(num: String) {

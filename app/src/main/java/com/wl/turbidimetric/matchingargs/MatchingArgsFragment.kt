@@ -34,9 +34,6 @@ class MatchingArgsFragment :
     override val vm: MatchingArgsViewModel by viewModels {
         MatchingArgsViewModelFactory()
     }
-    private val bgGray = getResource().getColor(R.color.bg_gray)
-    private val textColor = getResource().getColor(R.color.textColor)
-    private val lineColor = getResource().getColor(R.color.themePositiveColor)
     var projects: List<CurveModel>? = null
 
     companion object {
@@ -49,9 +46,6 @@ class MatchingArgsFragment :
     }
 
     private val dialog: HiltDialog by lazy {
-        HiltDialog(requireContext())
-    }
-    private val finishCoverDialog: HiltDialog by lazy {
         HiltDialog(requireContext())
     }
 
@@ -513,7 +507,7 @@ class MatchingArgsFragment :
             {
                 vm.changeFitterType(it)
             },
-            SystemGlobal.isDebugMode,
+            appVm.isDebugMode,
             {
                 u("调试框")
                 debugShowDetailsDialog.showPop(requireContext(), width = 1500) {

@@ -61,7 +61,7 @@ class DataManagerAdapter :
         val binding: ItemDatamanagerResultBinding
     ) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bindData(debug: Boolean,item: TestResultAndCurveModel?) {
+        fun bindData(debug: Boolean, item: TestResultAndCurveModel?) {
 //            binding.setVariable(BR.item, item)
             binding.tvId.text = item?.result?.resultId.toString()
             binding.tvDetectionNum.text = item?.result?.detectionNum ?: "-"
@@ -96,7 +96,7 @@ class DataManagerAdapter :
             } else {
                 binding.ivStateUpload.setImageResource(R.drawable.icon_state_upload_wait)
             }
-            updateResult(binding, item)
+            binding.tvResult.text = item?.result?.getShowResult()
 
             showHideView(debug);
 
@@ -120,11 +120,13 @@ class DataManagerAdapter :
                 updateLayoutParams(binding.root.context, binding.tvAbsorbances, 120)
             }
         }
+
         private fun updateLayoutParams(context: Context, v: View, dpValue: Int) {
             v.layoutParams.apply {
                 this.width = DisplayUtil.dpToPx(context, dpValue)
             }
         }
+
         private fun showHideView(debug: Boolean) {
             binding.tvName.visibility = debug.not().isShow()
             binding.tvGender.visibility = debug.not().isShow()
@@ -140,18 +142,6 @@ class DataManagerAdapter :
 //                binding.tvTestOriginalValue4.visibility = it.isShow()
         }
 
-        private fun updateResult(
-            binding: ItemDatamanagerResultBinding,
-            item: TestResultAndCurveModel?
-        ) {
-
-            if (item?.result?.resultState == ResultState.SamplingFailed.ordinal || item?.result?.resultState == ResultState.TakeReagentFailed.ordinal) {//取样失败提示
-                val ori: Int = item?.result?.resultState ?: 0
-                binding.tvResult.text = ResultState.values()[ori].state
-            } else {
-                binding.tvResult.text = item?.result?.testResult ?: "-"
-            }
-        }
     }
 
 
@@ -197,7 +187,7 @@ class DataManagerAdapter :
     override fun onBindViewHolder(holder: DataManagerViewHolder, position: Int) {
         if (holder is DataManagerViewHolder) {
             val item = getItem(holder.absoluteAdapterPosition)
-            holder.bindData(debug,item)
+            holder.bindData(debug, item)
 
             holder.binding.root.setOnClickListener {
                 item?.result?.let { item ->

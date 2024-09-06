@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "41d6d3847008ca79bc8b8ba593ba4ec6",
+    "identityHash": "126d588dcfab6e1933696555217fecac",
     "entities": [
       {
         "tableName": "TestResultModel",
@@ -188,7 +188,7 @@
       },
       {
         "tableName": "ProjectModel",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`projectId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `projectName` TEXT NOT NULL, `projectCode` TEXT NOT NULL, `projectLjz` INTEGER NOT NULL, `projectUnit` TEXT NOT NULL, `createTime` TEXT NOT NULL, `isSelect` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`projectId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `projectName` TEXT NOT NULL, `projectCode` TEXT NOT NULL, `projectLjz` INTEGER NOT NULL, `projectUnit` TEXT NOT NULL, `createTime` TEXT NOT NULL, `isSelect` INTEGER NOT NULL, `grads` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "projectId",
@@ -230,6 +230,12 @@
             "fieldPath": "isSelect",
             "columnName": "isSelect",
             "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "grads",
+            "columnName": "grads",
+            "affinity": "TEXT",
             "notNull": true
           }
         ],
@@ -372,7 +378,7 @@
       },
       {
         "tableName": "GlobalConfig",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `DetectionNum` TEXT NOT NULL, `TakeReagentR1` INTEGER NOT NULL, `TakeReagentR2` INTEGER NOT NULL, `SamplingVolume` INTEGER NOT NULL, `CurrentVersion` INTEGER NOT NULL, `StirDuration` INTEGER NOT NULL, `StirProbeCleaningDuration` INTEGER NOT NULL, `SamplingProbeCleaningDuration` INTEGER NOT NULL, `CurMachineTestModel` TEXT NOT NULL, `SampleExist` INTEGER NOT NULL, `ScanCode` INTEGER NOT NULL, `SelectProjectID` INTEGER NOT NULL, `DebugMode` INTEGER NOT NULL, `Test1DelayTime` INTEGER NOT NULL, `Test2DelayTime` INTEGER NOT NULL, `Test3DelayTime` INTEGER NOT NULL, `Test4DelayTime` INTEGER NOT NULL, `LooperTest` INTEGER NOT NULL, `HospitalName` TEXT NOT NULL, `AutoPrintReceipt` INTEGER NOT NULL, `AutoPrintReport` INTEGER NOT NULL, `ReportFileNameBarcode` INTEGER NOT NULL, `ReportIntervalTime` INTEGER NOT NULL, `TempUpLimit` INTEGER NOT NULL, `TempLowLimit` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `DetectionNum` TEXT NOT NULL, `TakeReagentR1` INTEGER NOT NULL, `TakeReagentR2` INTEGER NOT NULL, `SamplingVolume` INTEGER NOT NULL, `CurrentVersion` INTEGER NOT NULL, `StirDuration` INTEGER NOT NULL, `StirProbeCleaningDuration` INTEGER NOT NULL, `SamplingProbeCleaningDuration` INTEGER NOT NULL, `CurMachineTestModel` TEXT NOT NULL, `SampleExist` INTEGER NOT NULL, `ScanCode` INTEGER NOT NULL, `SelectProjectID` INTEGER NOT NULL, `DebugMode` INTEGER NOT NULL, `Test1DelayTime` INTEGER NOT NULL, `Test2DelayTime` INTEGER NOT NULL, `Test3DelayTime` INTEGER NOT NULL, `Test4DelayTime` INTEGER NOT NULL, `ReactionTime` INTEGER NOT NULL, `LooperTest` INTEGER NOT NULL, `HospitalName` TEXT NOT NULL, `AutoPrintReceipt` INTEGER NOT NULL, `AutoPrintReport` INTEGER NOT NULL, `ReportFileNameBarcode` INTEGER NOT NULL, `ReportIntervalTime` INTEGER NOT NULL, `TempUpLimit` INTEGER NOT NULL, `TempLowLimit` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -483,6 +489,12 @@
             "notNull": true
           },
           {
+            "fieldPath": "ReactionTime",
+            "columnName": "ReactionTime",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
             "fieldPath": "LooperTest",
             "columnName": "LooperTest",
             "affinity": "INTEGER",
@@ -588,7 +600,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '41d6d3847008ca79bc8b8ba593ba4ec6')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '126d588dcfab6e1933696555217fecac')"
     ]
   }
 }

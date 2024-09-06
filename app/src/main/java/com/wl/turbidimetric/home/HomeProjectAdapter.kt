@@ -39,7 +39,7 @@ class HomeProjectAdapter @JvmOverloads constructor(
 
             tvTime?.text = "时间:" + items?.get(position)?.createTime
             tvNO?.text =
-                "序号:" + if (items?.get(position)?.reagentNO.isNullOrEmpty()) "-" else items?.get(
+                "曲线序号:" + if (items?.get(position)?.reagentNO.isNullOrEmpty()) "-" else items?.get(
                     position
                 )?.reagentNO
         }

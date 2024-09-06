@@ -45,6 +45,7 @@ object LocalDataGlobal {
         val Test2DelayTime = 220 * 1000L
         val Test3DelayTime = 0 * 1000L
         val Test4DelayTime = 0 * 1000L
+        val ReactionTime = Test2DelayTime - Test1DelayTime
         val LooperTest = false
         val HospitalName = ""
         val AutoPrintReceipt = false

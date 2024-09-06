@@ -26,17 +26,6 @@ object SystemGlobal {
      */
     var isCodeDebug = true
 
-    /**
-     * 是否是调试模式
-     */
-    var isDebugMode = false
-        set(value) {
-            field = value
-            _obDebugMode.value = value
-        }
-
-    private val _obDebugMode = MutableStateFlow(false)
-    val obDebugMode = _obDebugMode.asStateFlow()
 
     /**
      * 是否是在升级中

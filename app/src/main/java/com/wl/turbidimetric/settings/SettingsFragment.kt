@@ -96,7 +96,7 @@ class SettingsFragment constructor() :
 
     private fun listenerOb() {
         lifecycleScope.launch {
-            SystemGlobal.obDebugMode.collectLatest {
+            appVm.obDebugMode.collectLatest {
                 i("obDebugMode $it")
                 it.isShow()?.let {
                     vd.sivDebug.visibility = it
@@ -143,7 +143,7 @@ class SettingsFragment constructor() :
             vd.wgpSelectable.setSelected(it.id)
         }
         vd.sivLogList.setOnClickListener {
-            u("日志记录")
+            u("运行日志")
             changeContent(LogListFragment::class.java)
             vd.wgpSelectable.setSelected(it.id)
         }
@@ -332,7 +332,7 @@ class SettingsFragment constructor() :
         handler.postDelayed(runnable_order, 5000)
         if (clickOrder >= clickOrderCount) {
             vm.setTestModel(!vm.getTestModel())
-            SystemGlobal.isDebugMode = vm.getTestModel()
+            appVm.isDebugMode = vm.getTestModel()
             clickOrder = 0
         }
     }

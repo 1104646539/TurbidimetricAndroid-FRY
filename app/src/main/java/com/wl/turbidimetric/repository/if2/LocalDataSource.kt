@@ -18,6 +18,7 @@ interface LocalDataSource {
     fun getTest2DelayTime(): Long
     fun getTest3DelayTime(): Long
     fun getTest4DelayTime(): Long
+    fun getReactionTime(): Long
     fun getDetectionNumInc(num: String = getDetectionNum()): String
     fun getAutoPrintReceipt(): Boolean
     fun getHospitalName(): String
@@ -48,6 +49,7 @@ interface LocalDataSource {
     fun setTest2DelayTime(value: Long)
     fun setTest3DelayTime(value: Long)
     fun setTest4DelayTime(value: Long)
+    fun setReactionTime(value: Long)
     fun setDetectionNumInc(num: String)
     fun setAutoPrintReport(value: Boolean)
     fun setReportFileNameBarcode(value: Boolean)

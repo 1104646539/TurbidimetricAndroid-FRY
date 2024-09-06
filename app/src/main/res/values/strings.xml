@@ -3,7 +3,7 @@
     <string name="nav_analyse">样本分析</string>
     <string name="nav_datamanager">数据管理</string>
     <string name="nav_matching">曲线拟合</string>
-    <string name="nav_settings">参数设置</string>
+    <string name="nav_settings">功能设置</string>
     <string name="nav_repeatability">重复性</string>
     <string name="nav_shutdown">关机</string>
     <string name="result_negative">阴性</string>

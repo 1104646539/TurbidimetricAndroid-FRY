@@ -195,4 +195,18 @@ data class TestResultModel(
         return "TestResultModel(resultId=$resultId, isSelect=$isSelect, name='$name', sampleType='$sampleType', resultState='$resultState',gender='$gender', age='$age', sampleBarcode='$sampleBarcode', detectionNum='$detectionNum', testState=$testState, testResult='$testResult', absorbances=$absorbances, concentration=$concentration, testValue1=$testValue1, testValue2=$testValue2, testValue3=$testValue3, testValue4=$testValue4, testOriginalValue1=$testOriginalValue1, testOriginalValue2=$testOriginalValue2, testOriginalValue3=$testOriginalValue3, testOriginalValue4=$testOriginalValue4, createTime='$createTime', testTime='$testTime', uploaded='$uploaded',)"
     }
 
+    /**
+     * 显示结果
+     * 包括取样失败，取试剂失败等
+     * @return String
+     */
+    fun getShowResult(): String {
+        return if (resultState == ResultState.SamplingFailed.ordinal || resultState == ResultState.TakeReagentFailed.ordinal) {//取样失败提示
+            val ori: Int = resultState ?: 0
+            ResultState.values()[ori].state
+        } else {
+            testResult ?: "-"
+        }
+    }
+
 }

@@ -5,6 +5,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/bg_dialog_hint"
+        android:id="@+id/cl_root"
         android:orientation="vertical"
         android:padding="10dp">
 
@@ -227,7 +228,29 @@
                 android:textSize="26dp" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_reaction_time"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:hint="反应时间"
+            android:textSize="18sp"
+            app:counterEnabled="true"
+            app:counterMaxLength="3"
+            app:layout_constraintLeft_toLeftOf="@id/til_test2_delay_time"
+            app:layout_constraintTop_toBottomOf="@id/til_test1_delay_time"
+            app:suffixText="s">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tiet_reaction_time"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="numberSigned"
+                android:text="153"
+                android:textSize="26dp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
         <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_change"
             style="@style/BtnPositive"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -236,7 +259,6 @@
             android:text="修改"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            android:id="@+id/btn_change"
             app:layout_constraintTop_toBottomOf="@id/til_test4_delay_time" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

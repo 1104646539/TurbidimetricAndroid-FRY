@@ -34,7 +34,7 @@
                     android:src="@drawable/settings_settings"
                     app:bg="@drawable/bg_item_settings_title"
                     app:selectable="false"
-                    app:text="其他设置"
+                    app:text="基本设置"
                     app:textColor="@color/white" />
 
                 <com.wl.turbidimetric.view.SettingItemView
@@ -65,7 +65,7 @@
                     android:layout_marginTop="5dp"
                     app:bg="@drawable/bg_item_settings"
                     app:selectable="true"
-                    app:text="检测模式设置"
+                    app:text="检测设置"
                     app:textColor="@color/text_item_settings" />
 
 
@@ -86,7 +86,7 @@
                     android:layout_marginTop="5dp"
                     app:bg="@drawable/bg_item_settings"
                     app:selectable="true"
-                    app:text="日志记录"
+                    app:text="运行日志"
                     app:textColor="@color/text_item_settings" />
 
                 <com.wl.turbidimetric.view.SettingItemView
@@ -96,7 +96,7 @@
                     android:layout_marginTop="5dp"
                     app:bg="@drawable/bg_item_settings"
                     app:selectable="false"
-                    app:text="报告和打印"
+                    app:text="报告打印"
                     app:textColor="@color/text_item_settings" />
 
                 <com.wl.turbidimetric.view.SettingItemView

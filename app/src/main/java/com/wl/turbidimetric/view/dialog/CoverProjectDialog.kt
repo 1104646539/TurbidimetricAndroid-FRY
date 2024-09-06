@@ -17,18 +17,6 @@ class CoverProjectDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_
     var projectAdapter: HomeProjectAdapter? = null
     val items: MutableList<CurveModel> = mutableListOf()
 
-    fun projectStr(curveModel: CurveModel): String {
-        return String.format(
-            "序号:%9s  检测时间:%s\n%-1.3f  %-1.3f  %-1.3f  %-1.3f  ",
-            curveModel.reagentNO,
-            curveModel.createTime,
-            curveModel.f0,
-            curveModel.f1,
-            curveModel.f2,
-            curveModel.f3
-        )
-    }
-
     override fun setContent() {
         super.setContent()
         if (projectAdapter == null) {

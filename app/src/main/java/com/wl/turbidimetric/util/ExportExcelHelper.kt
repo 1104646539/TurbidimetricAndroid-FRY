@@ -130,7 +130,7 @@ object ExportExcelHelper {
                 add("${it.result.sampleBarcode}")
                 add("${it.result.detectionNum}")
                 add("${it.result.concentration}")
-                add("${it.result.testResult}")
+                add("${it.result.getShowResult()}")
 //                add("${it.result.absorbances.setScale(5, RoundingMode.HALF_UP)}")
                 add(it.result.absorbances.toInt().toString())
                 if (debug) {

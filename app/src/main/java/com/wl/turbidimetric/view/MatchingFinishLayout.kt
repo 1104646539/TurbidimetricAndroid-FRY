@@ -79,7 +79,7 @@ class MatchingFinishLayout : FrameLayout {
     private fun setContent() {
         if (tvReagentNo == null) return
 
-        tvReagentNo?.text = "试剂序号:$reagnetNo"
+        tvReagentNo?.text = "曲线序号:$reagnetNo"
         tvProjectName?.text = "拟合项目:${curProject?.projectName ?: ""}"
         tvFitterType?.text = "拟合方程:${selectFitterType?.showName ?: ""}"
 

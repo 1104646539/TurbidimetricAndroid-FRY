@@ -122,7 +122,7 @@ class MatchingConfigQualityLayout : FrameLayout {
         this.curves.clear()
         this.curves.addAll(curves)
         this.projectNames.clear()
-        this.projectNames.addAll(this.curves.map { "序号:${it.reagentNO}" })
+        this.projectNames.addAll(this.curves.map { "曲线序号:${it.reagentNO}" })
 
         if (selectCurve == null && curves.isNotEmpty()) {
             this.selectCurve = curves.first()

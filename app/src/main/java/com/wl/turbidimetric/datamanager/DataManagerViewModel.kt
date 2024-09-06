@@ -15,6 +15,7 @@ import com.wl.turbidimetric.ex.getAppViewModel
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.main.MainActivity.PrintAnimParams
 import com.wl.turbidimetric.model.ConditionModel
+import com.wl.turbidimetric.model.ProjectModel
 import com.wl.turbidimetric.model.TestResultAndCurveModel
 import com.wl.turbidimetric.model.TestResultModel
 import com.wl.turbidimetric.repository.if2.ProjectSource
@@ -27,6 +28,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 
@@ -76,6 +78,16 @@ class DataManagerViewModel(
         return testResultRepository.listenerTestResult(condition).cachedIn(viewModelScope)
     }
 
+    var projects: MutableList<ProjectModel> = mutableListOf()
+    fun listener() {
+        viewModelScope.launch {
+            projectRepository.getProjects().collectLatest {
+                projects.clear()
+                projects.addAll(it)
+            }
+        }
+    }
+
     suspend fun update(testResult: TestResultModel): Int {
         return testResultRepository.updateTestResult(testResult)
     }
@@ -111,10 +123,15 @@ class DataManagerViewModel(
     fun conditionChange(conditionModel: ConditionModel) {
         viewModelScope.launch {
             _conditionModel.value = conditionModel
-            _resultSize.value = testResultRepository.countTestResultAndCurveModels(conditionModel)
+            sizeChange()
         }
     }
 
+    fun sizeChange() {
+        viewModelScope.launch {
+            _resultSize.value = testResultRepository.countTestResultAndCurveModels(_conditionModel.value)
+        }
+    }
 
     fun deleteResult() {
         viewModelScope.launch {
@@ -161,7 +178,7 @@ class DataManagerViewModel(
 
     fun showConditionDialog() {
         viewModelScope.launch {
-            _conditionUIState.emit(ConditionUIState.ShowDialog(_conditionModel.value))
+            _conditionUIState.emit(ConditionUIState.ShowDialog(projects, _conditionModel.value))
         }
     }
 
@@ -473,7 +490,10 @@ class DataManagerViewModel(
     }
 
     sealed class ConditionUIState {
-        data class ShowDialog(val condition: ConditionModel) : ConditionUIState()
+        data class ShowDialog(
+            val projects: List<ProjectModel> = mutableListOf(),
+            val condition: ConditionModel
+        ) : ConditionUIState()
     }
 
     sealed class DataManagerIntent {

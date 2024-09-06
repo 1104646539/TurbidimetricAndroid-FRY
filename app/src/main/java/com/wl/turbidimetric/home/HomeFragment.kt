@@ -243,7 +243,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             }
         }
         lifecycleScope.launchWhenCreated {
-            SystemGlobal.obDebugMode.collectLatest {
+            appVm.obDebugMode.collectLatest {
                 vd.btnDebugDialog.visibility = it.isShow()
             }
         }

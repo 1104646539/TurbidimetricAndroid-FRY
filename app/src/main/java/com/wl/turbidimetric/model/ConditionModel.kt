@@ -6,6 +6,7 @@ data class ConditionModel(
     val conMin: Int = 0,
     val conMax: Int = 0,
     val results: Array<String> = arrayOf(),
+    val selectProjects: Array<String> = arrayOf(),
     val testTimeMin: Long = 0,
     val testTimeMax: Long = 0,
 )

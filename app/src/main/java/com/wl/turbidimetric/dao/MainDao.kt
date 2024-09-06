@@ -5,6 +5,8 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.RewriteQueriesToDropUnusedColumns
+import androidx.room.RoomWarnings
 import androidx.room.Transaction
 import androidx.room.Update
 import com.wl.turbidimetric.model.CurveModel
@@ -15,9 +17,19 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface MainDao {
-    //and (case when (array_length(:results) != 0) then (testResult in (:results)) else 1 = 1 end)
     @Transaction
-    @Query("select * from TestResultModel where (case when length(:name) > 0 then name = :name else 1 = 1 end) and (case when length(:qrcode) > 0 then sampleBarcode = :qrcode else 1 = 1 end) and (case when (:conMin != 0) then concentration >= :conMin else 1 = 1 end) and (case when (:conMax != 0) then concentration <= :conMax else 1 = 1 end) and (case when (:testTimeMin != 0) then testTime >= :testTimeMin else 1 = 1 end) and (case when (:testTimeMax != 0) then testTime <= :testTimeMax else 1 = 1 end) and (case when (:resultsSize > 0) then (testResult in (:results)) else 1 = 1 end) order by resultId desc")
+    @Query(
+        "select * from TestResultModel inner join CurveModel on TestResultModel.curveOwnerId = CurveModel.curveId " +
+                "where (case when length(:name) > 0 then TestResultModel.name = :name else 1 = 1 end) " +
+                "and (case when length(:qrcode) > 0 then TestResultModel.sampleBarcode = :qrcode else 1 = 1 end) " +
+                "and (case when (:conMin != 0) then TestResultModel.concentration >= :conMin else 1 = 1 end) " +
+                "and (case when (:conMax != 0) then TestResultModel.concentration <= :conMax else 1 = 1 end) " +
+                "and (case when (:testTimeMin != 0) then TestResultModel.testTime >= :testTimeMin else 1 = 1 end) " +
+                "and (case when (:testTimeMax != 0) then TestResultModel.testTime <= :testTimeMax else 1 = 1 end) " +
+                "and (case when (:resultsSize > 0) then (TestResultModel.testResult in (:results)) else 1 = 1 end) " +
+                "and (case when (:projectsSize > 0) then (CurveModel.projectName in (:projects)) else 1 = 1 end) " +
+                "order by resultId desc"
+    )
     fun listenerTestResultAndCurveModels(
         name: String,
         qrcode: String,
@@ -26,10 +38,22 @@ interface MainDao {
         testTimeMin: Long,
         testTimeMax: Long,
         results: List<String>,
-        resultsSize: Int
+        resultsSize: Int,
+        projects: List<String>,
+        projectsSize: Int,
     ): PagingSource<Int, TestResultAndCurveModel>
 
-    @Query("select count(resultId) from TestResultModel where (case when length(:name) > 0 then name = :name else 1 = 1 end) and (case when length(:qrcode) > 0 then sampleBarcode = :qrcode else 1 = 1 end) and (case when (:conMin != 0) then concentration >= :conMin else 1 = 1 end) and (case when (:conMax != 0) then concentration <= :conMax else 1 = 1 end) and (case when (:testTimeMin != 0) then testTime >= :testTimeMin else 1 = 1 end) and (case when (:testTimeMax != 0) then testTime <= :testTimeMax else 1 = 1 end) and (case when (:resultsSize > 0) then (testResult in (:results)) else 1 = 1 end) ")
+    @Query(
+        "select count(resultId) from TestResultModel inner join CurveModel on TestResultModel.curveOwnerId = CurveModel.curveId " +
+                "where (case when length(:name) > 0 then TestResultModel.name = :name else 1 = 1 end) " +
+                "and (case when length(:qrcode) > 0 then TestResultModel.sampleBarcode = :qrcode else 1 = 1 end) " +
+                "and (case when (:conMin != 0) then TestResultModel.concentration >= :conMin else 1 = 1 end) " +
+                "and (case when (:conMax != 0) then TestResultModel.concentration <= :conMax else 1 = 1 end) " +
+                "and (case when (:testTimeMin != 0) then TestResultModel.testTime >= :testTimeMin else 1 = 1 end) " +
+                "and (case when (:testTimeMax != 0) then TestResultModel.testTime <= :testTimeMax else 1 = 1 end) " +
+                "and (case when (:resultsSize > 0) then (TestResultModel.testResult in (:results)) else 1 = 1 end) " +
+                "and (case when (:projectsSize > 0) then (CurveModel.projectName in (:projects)) else 1 = 1 end) "
+    )
     suspend fun countTestResultAndCurveModels(
         name: String,
         qrcode: String,
@@ -38,11 +62,25 @@ interface MainDao {
         testTimeMin: Long,
         testTimeMax: Long,
         results: List<String>,
-        resultsSize: Int
+        resultsSize: Int,
+        projects: List<String>,
+        projectsSize: Int,
     ): Long
 
+
     @Transaction
-    @Query("select * from TestResultModel where (case when length(:name) > 0 then name = :name else 1 = 1 end) and (case when length(:qrcode) > 0 then sampleBarcode = :qrcode else 1 = 1 end) and (case when (:conMin != 0) then concentration >= :conMin else 1 = 1 end) and (case when (:conMax != 0) then concentration <= :conMax else 1 = 1 end) and (case when (:testTimeMin != 0) then testTime >= :testTimeMin else 1 = 1 end) and (case when (:testTimeMax != 0) then testTime <= :testTimeMax else 1 = 1 end) and (case when (:resultsSize > 0) then (testResult in (:results)) else 1 = 1 end) order by resultId desc")
+    @Query(
+        "select * from TestResultModel inner join CurveModel on TestResultModel.curveOwnerId = CurveModel.curveId " +
+                "where (case when length(:name) > 0 then TestResultModel.name = :name else 1 = 1 end) " +
+                "and (case when length(:qrcode) > 0 then TestResultModel.sampleBarcode = :qrcode else 1 = 1 end) " +
+                "and (case when (:conMin != 0) then TestResultModel.concentration >= :conMin else 1 = 1 end) " +
+                "and (case when (:conMax != 0) then TestResultModel.concentration <= :conMax else 1 = 1 end) " +
+                "and (case when (:testTimeMin != 0) then TestResultModel.testTime >= :testTimeMin else 1 = 1 end) " +
+                "and (case when (:testTimeMax != 0) then TestResultModel.testTime <= :testTimeMax else 1 = 1 end) " +
+                "and (case when (:resultsSize > 0) then (TestResultModel.testResult in (:results)) else 1 = 1 end) " +
+                "and (case when (:projectsSize > 0) then (CurveModel.projectName in (:projects)) else 1 = 1 end) " +
+                "order by resultId desc"
+    )
     suspend fun getTestResultAndCurveModels(
         name: String,
         qrcode: String,
@@ -51,7 +89,9 @@ interface MainDao {
         testTimeMin: Long,
         testTimeMax: Long,
         results: List<String>,
-        resultsSize: Int
+        resultsSize: Int,
+        projects: List<String>,
+        projectsSize: Int,
     ): List<TestResultAndCurveModel>
 
     @Transaction

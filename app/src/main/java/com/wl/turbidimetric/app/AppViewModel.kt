@@ -94,6 +94,7 @@ class AppViewModel(
     private val _obTestState = MutableStateFlow(TestState.None)
     val obTestState = _obTestState.asStateFlow()
 
+
     /**
      * 仪器检测模式
      */
@@ -127,6 +128,18 @@ class AppViewModel(
      * 反应槽的温度
      */
     val obReactionTemp = _reactionTemp.asSharedFlow()
+
+    /**
+     * 是否是调试模式
+     */
+    var isDebugMode = false
+        set(value) {
+            field = value
+            _obDebugMode.value = value
+        }
+
+    private val _obDebugMode = MutableStateFlow(false)
+    val obDebugMode = _obDebugMode.asStateFlow()
 
     fun getTempCanBeTest(): Boolean {
         return !needJudgeTemp || (needJudgeTemp && TempCanBeTest(
@@ -316,7 +329,7 @@ class AppViewModel(
 
     fun initDataStore() {
         SystemGlobal.uploadConfig = getLocalConfig()
-        SystemGlobal.isDebugMode = localDataSource.getDebugMode()
+        isDebugMode = localDataSource.getDebugMode()
 
     }
 

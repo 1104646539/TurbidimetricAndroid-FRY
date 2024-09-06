@@ -22,13 +22,13 @@ import com.wl.turbidimetric.view.dialog.isShow
 class MatchingConfigMatchingLayout : FrameLayout {
     private var root: View? = null
 
-    constructor(context: Context) : this(context,null)
-    constructor(context: Context, attributeSet: AttributeSet?) : this(context, attributeSet,-1)
+    constructor(context: Context) : this(context, null)
+    constructor(context: Context, attributeSet: AttributeSet?) : this(context, attributeSet, -1)
     constructor(context: Context, attributeSet: AttributeSet?, defStyleAttr: Int) : super(
         context,
         attributeSet,
         defStyleAttr
-    ){
+    ) {
         initView()
     }
 
@@ -62,8 +62,8 @@ class MatchingConfigMatchingLayout : FrameLayout {
     var gradsNum = 5
     var selectProject: ProjectModel? = null
     var selectFitterType: FitterType = FitterType.Three
-    val defaultCon5 = arrayListOf(0.0, 50.0, 200.0, 500.0, 1000.0)
-    val defaultCon6 = arrayListOf(0.0, 25.0, 50.0, 200.0, 500.0, 1000.0)
+    val defaultCon5 = arrayListOf(0.0, 0.0, 0.0, 0.0, 0.0)
+    val defaultCon6 = arrayListOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
     var cons = mutableListOf<Double>()
 
 
@@ -297,6 +297,7 @@ class MatchingConfigMatchingLayout : FrameLayout {
                 parent: AdapterView<*>?, view: View?, position: Int, id: Long
             ) {
                 selectProject = projects[position]
+                projectChange()
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -316,6 +317,28 @@ class MatchingConfigMatchingLayout : FrameLayout {
         }
     }
 
+    /**
+     * 选择的项目变更
+     */
+    private fun projectChange() {
+        selectProject?.let {
+            if (it.grads.size != gradsNum) {
+                gradsNum = it.grads.size
+                if (gradsNum == 5) {  //5可以选择自动或人工稀释
+                    rbAuto?.isEnabled = true
+                } else {
+                    rbAuto?.isEnabled = false
+                }
+                rbManual?.isEnabled = true
+
+                etTargetCon6?.visibility = (gradsNum == 6).isShow()
+                rbGrad5?.isChecked = gradsNum == 5
+                rbGrad6?.isChecked = gradsNum != 5
+            }
+        }
+        changeCon()
+    }
+
     private fun changeQualityState(quality: Boolean) {
         etQualityLow1?.isEnabled = quality
         etQualityLow2?.isEnabled = quality
@@ -323,15 +346,32 @@ class MatchingConfigMatchingLayout : FrameLayout {
         etQualityHigh2?.isEnabled = quality
     }
 
+    /**
+     * 浓度需要变更
+     * 选择项目后，变更浓度梯度为项目默认的，如果项目没有，默认为5，并且都为0
+     */
     private fun changeCon() {
-        if (gradsNum == 5) {
-            cons.clear()
-            cons.addAll(defaultCon5)
-        } else if (gradsNum == 6) {
-            cons.clear()
-            cons.addAll(defaultCon6)
+        cons.clear()
+        if (selectProject == null || selectProject?.grads?.isEmpty() == true) {
+            if (gradsNum == 5) {
+                cons.addAll(defaultCon5)
+            } else if (gradsNum == 6) {
+                cons.addAll(defaultCon6)
+            }
+        } else {
+            selectProject?.let { project ->
+                val projectGrads = project.grads
+                if (projectGrads.size == gradsNum) {
+                    cons.addAll(projectGrads.toMutableList())
+                } else {
+                    if (gradsNum == 5) {
+                        cons.addAll(defaultCon5)
+                    } else {
+                        cons.addAll(defaultCon6)
+                    }
+                }
+            }
         }
-
         etTargetCon1?.setText(cons[0].toString())
         etTargetCon2?.setText(cons[1].toString())
         etTargetCon3?.setText(cons[2].toString())

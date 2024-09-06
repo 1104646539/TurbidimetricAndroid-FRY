@@ -33,6 +33,7 @@ class ParamsViewModel constructor(
                     localDataSource.getTest2DelayTime(),
                     localDataSource.getTest3DelayTime(),
                     localDataSource.getTest4DelayTime(),
+                    localDataSource.getReactionTime(),
                 )
             )
         }
@@ -48,7 +49,8 @@ class ParamsViewModel constructor(
         test1DelayTime: Long,
         test2DelayTime: Long,
         test3DelayTime: Long,
-        test4DelayTime: Long
+        test4DelayTime: Long,
+        reactionTime: Long,
     ) {
         val verRet = verify(
             r1Volume,
@@ -60,7 +62,8 @@ class ParamsViewModel constructor(
             test1DelayTime,
             test2DelayTime,
             test3DelayTime,
-            test4DelayTime
+            test4DelayTime,
+            reactionTime
         )
         if (verRet.isNotEmpty()) {
             viewModelScope.launch {
@@ -78,6 +81,7 @@ class ParamsViewModel constructor(
         localDataSource.setTest2DelayTime(test2DelayTime)
         localDataSource.setTest3DelayTime(test3DelayTime)
         localDataSource.setTest4DelayTime(test4DelayTime)
+        localDataSource.setReactionTime(reactionTime)
 
         viewModelScope.launch {
             _hiltText.emit("修改成功")
@@ -94,7 +98,8 @@ class ParamsViewModel constructor(
         test1DelayTime: Long,
         test2DelayTime: Long,
         test3DelayTime: Long,
-        test4DelayTime: Long
+        test4DelayTime: Long,
+        reactionTime: Long,
     ): String {
         if (r1Volume !in 0..500) {
             return "R1量必须小于500"
@@ -114,8 +119,17 @@ class ParamsViewModel constructor(
         if (stirDuration !in 0..5000) {
             return "搅拌时长必须小于5000"
         }
-        if (test1DelayTime !in 30000..50000) {
+        if (test1DelayTime < 30000) {
             return "第一次检测时间必须大于30s"
+        }
+        if (test2DelayTime < 100000) {
+            return "第二次检测时间必须大于100s"
+        }
+        if (test2DelayTime < test1DelayTime) {
+            return "第二次检测时间必须大于第一次检测时间"
+        }
+        if (reactionTime < 0) {
+            return "反应时间不能小于0s"
         }
 //        if (test2DelayTime < 130000) {
 //            return "第二次检测时间必须大于130s"
@@ -150,4 +164,5 @@ data class ParamsUiState(
     val test2DelayTime: Long,
     val test3DelayTime: Long,
     val test4DelayTime: Long,
+    val reactionTime: Long,
 )

@@ -13,9 +13,10 @@ data class ProjectModel(
     var projectUnit: String = "ng/mL",
     var createTime: String = "",
     var isSelect: Boolean = false,
-)  {
+    var grads: DoubleArray = doubleArrayOf(0.0, 0.0, 0.0, 0.0, 0.0),
+) {
     override fun toString(): String {
-        return "ProjectModel(id=$projectId,projectName=$projectName,projectCode=$projectCode,projectLjz=$projectLjz,projectUnit=$projectUnit,createTime=$createTime)"
+        return "ProjectModel(id=$projectId,projectName=$projectName,projectCode=$projectCode,projectLjz=$projectLjz,projectUnit=$projectUnit,createTime=$createTime,grads=$grads)"
     }
 
     override fun equals(other: Any?): Boolean {
@@ -28,6 +29,7 @@ data class ProjectModel(
         if (projectLjz != other.projectLjz) return false
         if (projectUnit != other.projectUnit) return false
         if (createTime != other.createTime) return false
+        if (grads != other.grads) return false
         return isSelect == other.isSelect
     }
 
@@ -39,6 +41,7 @@ data class ProjectModel(
         result = 31 * result + projectUnit.hashCode()
         result = 31 * result + createTime.hashCode()
         result = 31 * result + isSelect.hashCode()
+        result = 31 * result + grads.hashCode()
         return result
     }
 }

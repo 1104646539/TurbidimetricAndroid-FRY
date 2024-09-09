@@ -276,6 +276,7 @@ class DataManagerFragment :
                 adapter?.changeDebug(isDebug)
                 vd.btnDelete.visibility = isDebug.isShow()
 
+                vd.header.tvAbsorbances.visibility = isDebug.isShow()
                 vd.header.tvName.visibility = isDebug.not().isShow()
                 vd.header.tvGender.visibility = isDebug.not().isShow()
                 vd.header.tvAge.visibility = isDebug.not().isShow()
@@ -297,7 +298,7 @@ class DataManagerFragment :
                     updateLayoutParams(requireContext(), vd.header.tvTestTime, 220)
                     updateLayoutParams(requireContext(), vd.header.tvResult, 100)
                     updateLayoutParams(requireContext(), vd.header.tvConcentration, 80)
-                    updateLayoutParams(requireContext(), vd.header.tvAbsorbances, 100)
+//                    updateLayoutParams(requireContext(), vd.header.tvAbsorbances, 100)
                 } else {
                     updateLayoutParams(requireContext(), vd.header.tvId, 110)
                     updateLayoutParams(requireContext(), vd.header.tvBarcode, 120)
@@ -306,7 +307,7 @@ class DataManagerFragment :
                     updateLayoutParams(requireContext(), vd.header.tvTestTime, 240)
                     updateLayoutParams(requireContext(), vd.header.tvResult, 130)
                     updateLayoutParams(requireContext(), vd.header.tvConcentration, 100)
-                    updateLayoutParams(requireContext(), vd.header.tvAbsorbances, 120)
+//                    updateLayoutParams(requireContext(), vd.header.tvAbsorbances, 120)
                 }
             }
         }

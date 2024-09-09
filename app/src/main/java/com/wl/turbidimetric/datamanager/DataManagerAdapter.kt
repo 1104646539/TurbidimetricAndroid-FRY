@@ -131,6 +131,7 @@ class DataManagerAdapter :
             binding.tvName.visibility = debug.not().isShow()
             binding.tvGender.visibility = debug.not().isShow()
             binding.tvAge.visibility = debug.not().isShow()
+            binding.tvAbsorbances.visibility = debug.isShow()
 
             binding.tvTestValue1.visibility = debug.isShow()
             binding.tvTestValue2.visibility = debug.isShow()

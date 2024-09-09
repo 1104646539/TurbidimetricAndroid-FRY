@@ -22,14 +22,14 @@
 
             <TextView
                 style="@style/TextTitle"
-                android:layout_width="180dp"
+                android:layout_width="140dp"
                 android:layout_height="wrap_content"
                 android:gravity="left|center_vertical"
-                android:text="选择质控曲线:" />
+                android:text="选择曲线:" />
 
             <Spinner
                 android:id="@+id/spn_fitter_project"
-                android:layout_width="300dp"
+                android:layout_width="340dp"
                 android:layout_height="50dp"
                 android:layout_marginLeft="10dp"
                 android:minHeight="50dp" />
@@ -42,10 +42,10 @@
 
             <TextView
                 style="@style/TextTitle"
-                android:layout_width="180dp"
+                android:layout_width="140dp"
                 android:layout_height="wrap_content"
                 android:gravity="left|center_vertical"
-                android:text="设置质控浓度:" />
+                android:text="质控浓度:" />
 
             <LinearLayout
                 android:layout_width="wrap_content"

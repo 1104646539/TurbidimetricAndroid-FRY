@@ -17,6 +17,8 @@ import com.wl.turbidimetric.util.FitterType
 
 class MatchingArgsInfoAdapter(private var curveModel: CurveModel? = null) :
     RecyclerView.Adapter<ViewHolder>() {
+    var type1Size: Float = 28.0f
+    var type2Size: Float = 28.0f
 
     companion object {
         const val ViewType_Title = 1;
@@ -28,6 +30,12 @@ class MatchingArgsInfoAdapter(private var curveModel: CurveModel? = null) :
         notifyDataSetChanged()
     }
 
+    fun updateTextSize(type1Size: Float, type2Size: Float) {
+        this.type1Size = type1Size
+        this.type2Size = type2Size
+        notifyDataSetChanged()
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         if (viewType == ViewType_Params) {
             return MatchingArgsType2ViewHolder(
@@ -36,7 +44,7 @@ class MatchingArgsInfoAdapter(private var curveModel: CurveModel? = null) :
                     R.layout.item_params_type_2,
                     parent,
                     false
-                )
+                ), type2Size
             );
         } else {
             return MatchingArgsType1ViewHolder(
@@ -45,7 +53,7 @@ class MatchingArgsInfoAdapter(private var curveModel: CurveModel? = null) :
                     R.layout.item_params_type_1,
                     parent,
                     false
-                )
+                ), type1Size
             );
         }
     }
@@ -70,9 +78,13 @@ class MatchingArgsInfoAdapter(private var curveModel: CurveModel? = null) :
     }
 }
 
-class MatchingArgsType1ViewHolder(private val viewBinding: ItemParamsType1Binding) :
+class MatchingArgsType1ViewHolder(
+    private val viewBinding: ItemParamsType1Binding,
+    private val size: Float,
+) :
     ViewHolder(viewBinding.root) {
     fun bind(curveModel: CurveModel?) {
+        viewBinding.tvValue.textSize = size;
         if (curveModel == null) {
             viewBinding.tvValue.text = ""
         } else {
@@ -82,9 +94,14 @@ class MatchingArgsType1ViewHolder(private val viewBinding: ItemParamsType1Bindin
     }
 }
 
-class MatchingArgsType2ViewHolder(private val viewBinding: ItemParamsType2Binding) :
+class MatchingArgsType2ViewHolder(
+    private val viewBinding: ItemParamsType2Binding,
+    private val size: Float,
+) :
     ViewHolder(viewBinding.root) {
     fun bind(curveModel: CurveModel?, pos: Int) {
+        viewBinding.tvTitle.textSize = size;
+        viewBinding.tvValue.textSize = size;
         if (pos == 1) {
             viewBinding.tvTitle.text = "a"
             viewBinding.tvValue.text = "${curveModel?.f0?.scale(8) ?: ""}"

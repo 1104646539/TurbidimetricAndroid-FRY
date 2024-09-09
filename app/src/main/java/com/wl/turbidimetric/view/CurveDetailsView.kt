@@ -65,6 +65,9 @@ class CurveDetailsView @JvmOverloads constructor(
             view.layoutParams = FrameLayout.LayoutParams(view.layoutParams.width, height)
         }
     }
+    fun updateTextSize(type1Size: Float, type2Size: Float) {
+        matchingArgsInfoAdapter.updateTextSize(type1Size,type2Size)
+    }
 
     fun update(curve: CurveModel?) {
         updateChart(curve)

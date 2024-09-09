@@ -101,7 +101,8 @@ class MatchingConfigQualityLayout : FrameLayout {
         }
         cdvDetails?.update(selectCurve)
 
-        cdvDetails?.setChartHeight(300)
+        cdvDetails?.setChartHeight(260)
+        cdvDetails?.updateTextSize(22f,22f)
     }
 
 

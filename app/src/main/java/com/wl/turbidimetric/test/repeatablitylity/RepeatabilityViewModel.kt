@@ -10,6 +10,7 @@ import com.wl.turbidimetric.base.BaseViewModel
 import com.wl.turbidimetric.db.ServiceLocator
 import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.SystemGlobal
+import com.wl.turbidimetric.log.DbLogUtil
 import com.wl.turbidimetric.model.*
 import com.wl.turbidimetric.repository.if2.CurveSource
 import com.wl.turbidimetric.repository.if2.LocalDataSource
@@ -238,6 +239,11 @@ class RepeatabilityViewModel(
     val stirTimes = longArrayOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
     /**
+     * 结束时的异常提示信息
+     */
+    var finishErrorMsg = "";
+
+    /**
      * 测试用的 start
      */
     //检测的值
@@ -265,7 +271,6 @@ class RepeatabilityViewModel(
 
     //测试用 每个比色皿之间的检测间隔
     val testP: Long = 1000
-
 
     /**
      * 更新比色皿状态
@@ -360,6 +365,7 @@ class RepeatabilityViewModel(
     }
 
     private fun initState() {
+        finishErrorMsg = ""
         isDetectedSample = false
         resultTest1.clear()
         resultTest2.clear()
@@ -632,7 +638,11 @@ class RepeatabilityViewModel(
      */
     private fun goDripSample() {
         if (cuvetteMoveFinish && samplingFinish) {
-            dripSample(autoBlending = false, inplace = false, localDataRepository.getSamplingVolume())
+            dripSample(
+                autoBlending = false,
+                inplace = false,
+                localDataRepository.getSamplingVolume()
+            )
         }
     }
 
@@ -967,7 +977,13 @@ class RepeatabilityViewModel(
 
         dripSamplingFinish = true
 
-        samplingProbeCleaning()
+        if (reply.state == ReplyState.CUVETTE_NOT_EMPTY) {
+            //比色皿非空
+            finishErrorMsg = "比色皿非空"
+            matchingFinish();
+        } else {
+            samplingProbeCleaning()
+        }
 
 
     }
@@ -982,13 +998,19 @@ class RepeatabilityViewModel(
         i("接收到 取样 reply=$reply testState=${appViewModel.testState} sampleStep=$sampleStep samplePos=$samplePos")
 
         samplingFinish = true
+        if (reply.state == ReplyState.SAMPLING_FAILED) {//取样失败
+            //取样失败
+            finishErrorMsg = "取样失败"
+            matchingFinish();
+        } else {
+            when (appViewModel.testState) {
+                TestState.MoveSample -> {//去加已混匀的样本
+                    goDripSample()
+                }
 
-        when (appViewModel.testState) {
-            TestState.MoveSample -> {//去加已混匀的样本
-                goDripSample()
+                else -> {}
             }
-
-            else -> {}
+//        }
         }
     }
 
@@ -1059,9 +1081,15 @@ class RepeatabilityViewModel(
         i("接收到 取试剂 reply=$reply")
         takeReagentFinish = true
 
-        //取完试剂判断是否移动比色皿完成，完成就直接取样
-        if (cuvetteNeedDripReagent(cuvettePos) && cuvetteMoveFinish && takeReagentFinish) {
-            dripReagent()
+        if (reply.state == ReplyState.TAKE_REAGENT_FAILED) {
+            //取试剂失败
+            finishErrorMsg = "取试剂失败"
+            matchingFinish();
+        } else {
+            //取完试剂判断是否移动比色皿完成，完成就直接取样
+            if (cuvetteNeedDripReagent(cuvettePos) && cuvetteMoveFinish && takeReagentFinish) {
+                dripReagent()
+            }
         }
     }
 
@@ -1223,12 +1251,16 @@ class RepeatabilityViewModel(
                 )
             }
         } else {
+            var msg = "重复性检测结束"
+            if (finishErrorMsg.isNotEmpty()) {
+                msg += ",$finishErrorMsg"
+            }
             appViewModel.testState = TestState.Normal
             viewModelScope.launch {
                 _dialogUiState.emit(
                     RepeatabilityUiState(
                         DialogState.TestFinish,
-                        "重复性检测结束"
+                        "$msg"
                     )
                 )
             }
@@ -1320,7 +1352,10 @@ class RepeatabilityViewModel(
         i("发送 取试剂")
         takeReagentFinish = false
         dripReagentFinish = false
-        appViewModel.serialPort.takeReagent(localDataRepository.getTakeReagentR1(),localDataRepository.getTakeReagentR2())
+        appViewModel.serialPort.takeReagent(
+            localDataRepository.getTakeReagentR1(),
+            localDataRepository.getTakeReagentR2()
+        )
     }
 
     /**
@@ -1353,7 +1388,11 @@ class RepeatabilityViewModel(
     /**
      * 加样
      */
-    private fun dripSample(autoBlending: Boolean = false, inplace: Boolean = true, volume: Int) {
+    private fun dripSample(
+        autoBlending: Boolean = false,
+        inplace: Boolean = true,
+        volume: Int
+    ) {
         i("发送 加样 volume=$volume")
         dripSamplingFinish = false
         appViewModel.serialPort.dripSample(
@@ -1369,7 +1408,10 @@ class RepeatabilityViewModel(
     private fun dripReagent() {
         i("发送 加试剂 cuvettePos=$cuvettePos")
         dripReagentFinish = false
-        appViewModel.serialPort.dripReagent(localDataRepository.getTakeReagentR1(),localDataRepository.getTakeReagentR2())
+        appViewModel.serialPort.dripReagent(
+            localDataRepository.getTakeReagentR1(),
+            localDataRepository.getTakeReagentR2()
+        )
     }
 
     /**
@@ -1412,7 +1454,9 @@ class RepeatabilityViewModel(
 class RepeatabilityViewModelFactory(
     private val appViewModel: AppViewModel = getAppViewModel(AppViewModel::class.java),
     private val curveRepository: CurveSource = ServiceLocator.provideCurveSource(App.instance!!),
-    private val testResultRepository: TestResultSource = ServiceLocator.provideTestResultSource(App.instance!!),
+    private val testResultRepository: TestResultSource = ServiceLocator.provideTestResultSource(
+        App.instance!!
+    ),
     private val localDataRepository: LocalDataSource = ServiceLocator.provideLocalDataSource(App.instance!!)
 ) :
     ViewModelProvider.NewInstanceFactory() {

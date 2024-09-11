@@ -2138,20 +2138,21 @@ class MatchingArgsViewModel(
         }
         if (hilt.isNullOrEmpty()) {
             showMatchingStateDialog()
+            changeConfig(
+                reagentNOStr,
+                quality,
+                gradsNum,
+                autoAttenuation,
+                selectProject,
+                selectFitterType,
+                cons
+            )
         } else {
             viewModelScope.launch {
                 _dialogUiState.emit(MatchingArgsDialogUiState.Accident(hilt))
             }
         }
-        changeConfig(
-            reagentNOStr,
-            quality,
-            gradsNum,
-            autoAttenuation,
-            selectProject,
-            selectFitterType,
-            cons
-        )
+
 
     }
 

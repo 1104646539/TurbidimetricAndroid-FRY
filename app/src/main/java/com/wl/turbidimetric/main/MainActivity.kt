@@ -268,7 +268,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
      * @param content String
      * @param duration Long
      */
-    private fun showPopupView(attachView: View?, content: String, duration: Long = 3000) {
+    private fun showPopupView(attachView: View?, content: String, duration: Long = 5000) {
         if (attachView == null) return
         val contentView = CustomBubbleAttachPopup(this, content)
         XPopup.Builder(this)

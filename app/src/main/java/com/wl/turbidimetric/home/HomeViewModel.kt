@@ -643,7 +643,7 @@ class HomeViewModel(
         i("检测模式:${getTestMode()} \n跳过比色皿:$cuvetteStartPos \n输入检测数量:$needTestNum \n选择标曲:$selectProject \n起始编号:${getDetectionNum()}")
 
         if (SystemGlobal.isCodeDebug) {
-            testShelfInterval1 = testS
+            testShelfInterval1 = 10 * 1000
             testShelfInterval2 = testS
             testShelfInterval3 = testS
             testShelfInterval4 = testS
@@ -912,7 +912,7 @@ class HomeViewModel(
                     )
                 )
             }
-            DbLogUtil.err(TestType.Test,"意外错误：${stateFailedText}")
+            DbLogUtil.err(TestType.Test, "意外错误：${stateFailedText}")
 
         }
         return stateFailedText.isEmpty()
@@ -1645,6 +1645,7 @@ class HomeViewModel(
             appViewModel.printHelper.addPrintWork(
                 testResultModel,
                 appViewModel.getHospitalName(),
+                appViewModel.getDetectionDoctor(),
                 appViewModel.getReportFileNameBarcode()
             )
         }
@@ -2223,7 +2224,10 @@ class HomeViewModel(
             )
             samplingProbeCleaning()
             nextStepDripReagent()
-            DbLogUtil.warring(TestType.Test, "取样失败:样本位置:${sampleShelfPos + 1}-${samplePos - 1}")
+            DbLogUtil.warring(
+                TestType.Test,
+                "取样失败:样本位置:${sampleShelfPos + 1}-${samplePos - 1}"
+            )
 
         } else {//取样成功
             updateSampleState(samplePos - 1, SampleState.Sampling)
@@ -2294,7 +2298,8 @@ class HomeViewModel(
             var testInterval = 0L
             //倒数第二个需要检测的
             val stirTime = stirTimes[cuvettePos - 5]
-            testInterval = testShelfInterval1 - (Date().time - stirTime)
+            val offsetTime = (Date().time - stirTime)
+            testInterval = testShelfInterval1 - offsetTime
             i("goTest testInterval=$testInterval cuvettePos=$cuvettePos")
             viewModelScope.launch {
                 delay(testInterval)
@@ -2610,7 +2615,7 @@ class HomeViewModel(
             viewModelScope.launch(Dispatchers.IO) {
                 _dialogUiState.emit(HomeDialogUiState.GetMachineDismiss)
             }
-            DbLogUtil.warring(TestType.Test,"自检失败：${sb.toString()}")
+            DbLogUtil.warring(TestType.Test, "自检失败：${sb.toString()}")
 
         }
     }

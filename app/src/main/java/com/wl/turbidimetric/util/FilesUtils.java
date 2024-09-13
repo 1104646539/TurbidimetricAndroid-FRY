@@ -89,7 +89,7 @@ public class FilesUtils {
                     canvas.drawColor(Color.WHITE);
                     canvas.drawBitmap(bitmap, 0, 0, null);
                     Rect r = new Rect(0, 0, width, height);
-                    page.render(bitmap, r, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
+                    page.render(bitmap, r, null, PdfRenderer.Page.RENDER_MODE_FOR_PRINT);
                     bitmaps.add(bitmap);
                     // close the page
                     page.close();

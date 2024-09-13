@@ -49,4 +49,5 @@
     <color name="text_details_state">#b0d7fa</color>
     <color name="bg_item_settings">#80c5d5e0</color>
     <color name="text_item_settings">#414775</color>
+    <color name="ljz_red">#F44336</color>
 </resources>

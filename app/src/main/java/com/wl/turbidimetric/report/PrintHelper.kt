@@ -30,7 +30,7 @@ class PrintHelper(private val context: Context) {
     fun open(scope: CoroutineScope,intervalTime: Int) {
         queue = WorkQueue((intervalTime * 1000).toLong(), scope)
         queue.onWorkStart = { result ->
-            printReport(result.result, result.hospitalName, result.barcode)
+            printReport(result.result, result.hospitalName,result.detectionDoctor, result.barcode)
             size = queue.queue.size
         }
     }
@@ -45,9 +45,10 @@ class PrintHelper(private val context: Context) {
     fun printReport(
         result: TestResultAndCurveModel,
         hospitalName: String,
+        detectionDoctor: String,
         barcode: Boolean
     ) {
-        val ret = ExportReportHelper.create(result, hospitalName, barcode)
+        val ret = ExportReportHelper.create(result, hospitalName,detectionDoctor, barcode)
         if (ret != null) {
             print(ret)
         }
@@ -56,19 +57,21 @@ class PrintHelper(private val context: Context) {
     fun addPrintWork(
         result: TestResultAndCurveModel,
         hospitalName: String,
+        detectionDoctor: String,
         barcode: Boolean
     ) {
-        queue.addWork(PrintReport(result, hospitalName, barcode))
+        queue.addWork(PrintReport(result, hospitalName,detectionDoctor, barcode))
         size = queue.queue.size
     }
 
     fun addPrintWork(
         result: List<TestResultAndCurveModel>,
         hospitalName: String,
+        detectionDoctor: String,
         barcode: Boolean
     ) {
         result?.forEach {
-            addPrintWork(it, hospitalName, barcode)
+            addPrintWork(it, hospitalName,detectionDoctor, barcode)
         }
     }
 
@@ -169,6 +172,7 @@ class PrintHelper(private val context: Context) {
     data class PrintReport(
         val result: TestResultAndCurveModel,
         val hospitalName: String,
+        val detectionDoctor: String,
         val barcode: Boolean
     )
 

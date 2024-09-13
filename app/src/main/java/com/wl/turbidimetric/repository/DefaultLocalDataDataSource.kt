@@ -124,6 +124,10 @@ class DefaultLocalDataDataSource(
         return global().HospitalName
     }
 
+    override fun getDetectionDoctor(): String {
+        return global().DetectionDoctor
+    }
+
     override fun getLooperTest(): Boolean {
         return global().LooperTest
     }
@@ -163,6 +167,12 @@ class DefaultLocalDataDataSource(
     override fun setHospitalName(name: String) {
         update {
             it.copy(HospitalName = name)
+        }
+    }
+
+    override fun setDetectionDoctor(name: String) {
+        update {
+            it.copy(DetectionDoctor = name)
         }
     }
 

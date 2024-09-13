@@ -47,6 +47,7 @@ class ReportFragment :
             vm.reportViewModelState.collectLatest { state ->
                 hiltDialog.showPop(requireContext()) { dialog ->
                     vd.tietHospitalName.setText(state.hospitalName)
+                    vd.tietDetectionDoctor.setText(state.detectionDoctor)
                     vd.cbAutoPrintReceipt.isChecked = state.autoPrintReceipt
                     vd.cbAutoPrintReport.isChecked = state.autoPrintReport
                     if (state.reportFileNameBarcode) {
@@ -109,6 +110,7 @@ class ReportFragment :
         }
         vm.change(
             vd.tietHospitalName.text?.toString() ?: "",
+            vd.tietDetectionDoctor.text?.toString() ?: "",
             vd.cbAutoPrintReceipt.isChecked,
             vd.cbAutoPrintReport.isChecked,
             vd.rbFileNameBarcode.isChecked,

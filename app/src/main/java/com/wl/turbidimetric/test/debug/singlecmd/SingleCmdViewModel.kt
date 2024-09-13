@@ -377,17 +377,17 @@ class SingleCmdViewModel(private val appViewModel: AppViewModel) : BaseViewModel
             return
         }
         val volumeR1 = msg1.toIntOrNull() ?: 0
-        if (volumeR1 !in 1..100) {
-            changeHilt("R1取试剂量错误,必须为1-100")
+        if (volumeR1 !in 1..500) {
+            changeHilt("R1取试剂量错误,必须为1-500")
             return
         }
         if (msg2.isNullOrEmpty()) {
             changeHilt("R2取试剂量错误")
             return
         }
-        val volumeR2 = msg1.toIntOrNull() ?: 0
-        if (volumeR2 !in 1..100) {
-            changeHilt("R2取试剂量错误,必须为1-100")
+        val volumeR2 = msg2.toIntOrNull() ?: 0
+        if (volumeR2 !in 1..200) {
+            changeHilt("R2取试剂量错误,必须为1-200")
             return
         }
         enable.postValue(false)
@@ -413,7 +413,7 @@ class SingleCmdViewModel(private val appViewModel: AppViewModel) : BaseViewModel
             changeHilt("R2加试剂量错误")
             return
         }
-        val volumeR2 = msg1.toIntOrNull() ?: 0
+        val volumeR2 = msg2.toIntOrNull() ?: 0
         if (volumeR2 !in 1..200) {
             changeHilt("R2加试剂量错误,必须为1-200")
             return

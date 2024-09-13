@@ -91,6 +91,10 @@ data class GlobalConfig(
      */
     val HospitalName: String = LocalDataGlobal.Default.HospitalName,
     /**
+     * 报告 检测医生
+     */
+    val DetectionDoctor: String = LocalDataGlobal.Default.DetectionDoctor,
+    /**
      * 是否自动打印小票
      */
     val AutoPrintReceipt: Boolean = LocalDataGlobal.Default.AutoPrintReceipt,

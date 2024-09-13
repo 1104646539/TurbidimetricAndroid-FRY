@@ -22,6 +22,7 @@ interface LocalDataSource {
     fun getDetectionNumInc(num: String = getDetectionNum()): String
     fun getAutoPrintReceipt(): Boolean
     fun getHospitalName(): String
+    fun getDetectionDoctor(): String
     fun getLooperTest(): Boolean
     fun getAutoPrintReport(): Boolean
     fun getReportFileNameBarcode(): Boolean
@@ -31,6 +32,7 @@ interface LocalDataSource {
 
     fun setLooperTest(looperTest: Boolean)
     fun setHospitalName(name: String)
+    fun setDetectionDoctor(name: String)
     fun setAutoPrintReceipt(auto: Boolean)
     fun setDetectionNum(num: String)
     fun setTakeReagentR1(value: Int)

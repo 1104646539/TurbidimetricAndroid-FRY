@@ -34,6 +34,7 @@ object ExportReportHelper {
         context: Context,
         datas: List<TestResultAndCurveModel>,
         hospitalName: String,
+        detectionDoctor: String,
         scope: CoroutineScope,
         barcode: Boolean,
         onSuccess: (count: Int, successCount: Int, failedCount: Int) -> Unit,
@@ -43,6 +44,7 @@ object ExportReportHelper {
             context,
             datas,
             hospitalName,
+            detectionDoctor,
             scope,
             barcode,
             onSuccess,
@@ -56,6 +58,7 @@ object ExportReportHelper {
         context: Context,
         datas: List<TestResultAndCurveModel>,
         hospitalName: String,
+        detectionDoctor: String,
         scope: CoroutineScope,
         barcode: Boolean,
         onSuccess: (count: Int, successCount: Int, failedCount: Int) -> Unit,
@@ -85,7 +88,7 @@ object ExportReportHelper {
         scope.launch {
             withContext(Dispatchers.IO) {
                 datas.forEach {
-                    val ret = create(it, hospitalName, barcode)
+                    val ret = create(it, hospitalName,detectionDoctor, barcode)
                     if (ret.isNullOrEmpty()) {
                         failedCount++
                     } else {
@@ -117,13 +120,13 @@ object ExportReportHelper {
     }
 
     @JvmStatic
-    fun create(result: TestResultAndCurveModel, hospitalName: String, barcode: Boolean): String? {
+    fun create(result: TestResultAndCurveModel, hospitalName: String,detectionDoctor: String, barcode: Boolean): String? {
         var fileName = getSaveFileName(result, barcode)
         val localFile = File(root, "$fileName")
         if (localFile.isFile && localFile.exists()) {
             localFile.delete()
         }
-        return PdfCreateUtil.create(result, localFile, hospitalName)
+        return PdfCreateUtil.create(result, localFile, hospitalName,detectionDoctor)
     }
 
 }

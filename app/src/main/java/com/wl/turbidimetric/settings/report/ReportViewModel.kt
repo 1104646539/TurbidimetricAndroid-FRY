@@ -29,6 +29,7 @@ class ReportViewModel(
             _reportViewModelState.emit(
                 ReportViewModelState(
                     localDataDataSource.getHospitalName(),
+                    localDataDataSource.getDetectionDoctor(),
                     localDataDataSource.getAutoPrintReceipt(),
                     localDataDataSource.getAutoPrintReport(),
                     localDataDataSource.getReportFileNameBarcode(),
@@ -42,12 +43,14 @@ class ReportViewModel(
 
     fun change(
         hospitalName: String,
+        detectionDoctor: String,
         autoPrintReceipt: Boolean,
         autoPrintReport: Boolean,
         reportFileNameBarcode: Boolean,
         reportIntervalTime: Int,
     ) {
         localDataDataSource.setHospitalName(hospitalName)
+        localDataDataSource.setDetectionDoctor(detectionDoctor)
         localDataDataSource.setAutoPrintReceipt(autoPrintReceipt)
         localDataDataSource.setAutoPrintReport(autoPrintReport)
         localDataDataSource.setReportFileNameBarcode(reportFileNameBarcode)
@@ -76,6 +79,7 @@ class ReportViewModelFactory(
 
 data class ReportViewModelState(
     val hospitalName: String,
+    val detectionDoctor: String,
     val autoPrintReceipt: Boolean,
     val autoPrintReport: Boolean,
     val reportFileNameBarcode: Boolean,

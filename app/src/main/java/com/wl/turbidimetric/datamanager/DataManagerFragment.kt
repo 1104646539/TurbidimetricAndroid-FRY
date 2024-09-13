@@ -406,6 +406,7 @@ class DataManagerFragment :
                             appVm.printHelper.addPrintWork(
                                 it.items,
                                 appVm.getHospitalName(),
+                                appVm.getDetectionDoctor(),
                                 appVm.getReportFileNameBarcode()
                             )
                             EventBus.getDefault()
@@ -445,6 +446,7 @@ class DataManagerFragment :
                                     requireContext(),
                                     it.item,
                                     appVm.getHospitalName(),
+                                    appVm.getDetectionDoctor(),
                                     lifecycleScope,
                                     appVm.getReportFileNameBarcode(),
                                     { count, successCount, failedCount ->

@@ -162,6 +162,9 @@ class AppViewModel(
     fun getHospitalName(): String {
         return localDataSource.getHospitalName()
     }
+    fun getDetectionDoctor(): String {
+        return localDataSource.getDetectionDoctor()
+    }
 
     fun getReportFileNameBarcode(): Boolean {
         return localDataSource.getReportFileNameBarcode()

@@ -37,7 +37,24 @@
                 android:text="153"
                 android:textSize="26dp" />
         </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_detection_doctor"
+            android:layout_width="500dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="50dp"
+            android:hint="检测医生"
+            android:textSize="28sp"
+            app:layout_constraintLeft_toRightOf="@id/til_hospital_name"
+            app:layout_constraintTop_toTopOf="@id/til_hospital_name">
 
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tiet_detection_doctor"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="text"
+                android:text=""
+                android:textSize="26dp" />
+        </com.google.android.material.textfield.TextInputLayout>
         <TextView
             android:id="@+id/tv_report_fileName"
             style="@style/TextTitle"

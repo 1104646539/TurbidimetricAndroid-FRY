@@ -32,7 +32,7 @@ android {
         minSdk 24
         targetSdk 32
         versionCode 1
-        versionName "1.0.0.0-84修改打印模板"
+        versionName "1.0.0.0-85修改234检测在移动比色皿前等待"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 

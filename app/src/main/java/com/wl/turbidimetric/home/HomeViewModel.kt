@@ -643,10 +643,10 @@ class HomeViewModel(
         i("检测模式:${getTestMode()} \n跳过比色皿:$cuvetteStartPos \n输入检测数量:$needTestNum \n选择标曲:$selectProject \n起始编号:${getDetectionNum()}")
 
         if (SystemGlobal.isCodeDebug) {
-            testShelfInterval1 = 10 * 1000
-            testShelfInterval2 = testS
-            testShelfInterval3 = testS
-            testShelfInterval4 = testS
+            testShelfInterval1 = testS
+            testShelfInterval2 = 20 * 1000
+            testShelfInterval3 = 60 * 1000
+            testShelfInterval4 = 100 * 1000
         } else {
             testShelfInterval1 = localDataRepository.getTest1DelayTime()
             testShelfInterval2 = localDataRepository.getTest2DelayTime()
@@ -1430,7 +1430,16 @@ class HomeViewModel(
                     stepTest(TestState.Test3)
                 } else {
                     //继续检测
-                    moveCuvetteTest()
+//                    moveCuvetteTest()
+                    val targetTime =
+                        if (appViewModel.testState == TestState.Test2) testShelfInterval2 else if (appViewModel.testState == TestState.Test3) testShelfInterval3 else testShelfInterval4
+                    val stirTime = stirTimes[cuvettePos]
+                    val intervalTemp = targetTime - (Date().time - stirTime) - 3
+                    i("intervalTemp=$intervalTemp stirTime=$stirTime targetTime=$targetTime")
+                    viewModelScope.launch {
+                        delay(intervalTemp)
+                        moveCuvetteTest()
+                    }
                 }
             }
 
@@ -1447,7 +1456,16 @@ class HomeViewModel(
                     stepTest(TestState.Test4)
                 } else {
                     //继续检测
-                    moveCuvetteTest()
+//                    moveCuvetteTest()
+                    val targetTime =
+                        if (appViewModel.testState == TestState.Test2) testShelfInterval2 else if (appViewModel.testState == TestState.Test3) testShelfInterval3 else testShelfInterval4
+                    val stirTime = stirTimes[cuvettePos]
+                    val intervalTemp = targetTime - (Date().time - stirTime) - 3
+                    i("intervalTemp=$intervalTemp stirTime=$stirTime targetTime=$targetTime")
+                    viewModelScope.launch {
+                        delay(intervalTemp)
+                        moveCuvetteTest()
+                    }
                 }
             }
 
@@ -1463,7 +1481,16 @@ class HomeViewModel(
                     //检测结束，下一个步骤，计算值
                     showResultFinishAndNext()
                 } else {
-                    moveCuvetteTest()
+//                    moveCuvetteTest()
+                    val targetTime =
+                        if (appViewModel.testState == TestState.Test2) testShelfInterval2 else if (appViewModel.testState == TestState.Test3) testShelfInterval3 else testShelfInterval4
+                    val stirTime = stirTimes[cuvettePos]
+                    val intervalTemp = targetTime - (Date().time - stirTime) - 3
+                    i("intervalTemp=$intervalTemp stirTime=$stirTime targetTime=$targetTime")
+                    viewModelScope.launch {
+                        delay(intervalTemp)
+                        moveCuvetteTest()
+                    }
                 }
             }
 
@@ -2252,17 +2279,17 @@ class HomeViewModel(
 
         cuvetteMoveFinish = true
 
-        if (cuvettePos in 0 until 10) {
-            val targetTime =
-                if (appViewModel.testState == TestState.Test2) testShelfInterval2 else if (appViewModel.testState == TestState.Test3) testShelfInterval3 else testShelfInterval4
-            val stirTime = stirTimes[cuvettePos]
-            val intervalTemp = targetTime - (Date().time - stirTime) - 3
-            i("intervalTemp=$intervalTemp stirTime=$stirTime targetTime=$targetTime")
-            viewModelScope.launch {
-                delay(intervalTemp)
+//        if (cuvettePos in 0 until 10) {
+//            val targetTime =
+//                if (appViewModel.testState == TestState.Test2) testShelfInterval2 else if (appViewModel.testState == TestState.Test3) testShelfInterval3 else testShelfInterval4
+//            val stirTime = stirTimes[cuvettePos]
+//            val intervalTemp = targetTime - (Date().time - stirTime) - 3
+//            i("intervalTemp=$intervalTemp stirTime=$stirTime targetTime=$targetTime")
+//            viewModelScope.launch {
+//                delay(intervalTemp)
                 test()
-            }
-        }
+//            }
+//        }
     }
 
     /**

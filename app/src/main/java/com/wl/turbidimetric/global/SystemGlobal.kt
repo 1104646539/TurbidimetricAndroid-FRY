@@ -43,7 +43,7 @@ object SystemGlobal {
     private val _obUploadConfig = MutableStateFlow(uploadConfig)
 
     //显示的曲线数量
-    val showCurveSize = 10;
+    const val showCurveSize = 10;
 
     /**
      * 上传连接状态

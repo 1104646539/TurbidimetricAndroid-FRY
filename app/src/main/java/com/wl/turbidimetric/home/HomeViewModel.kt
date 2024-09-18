@@ -644,9 +644,9 @@ class HomeViewModel(
 
         if (SystemGlobal.isCodeDebug) {
             testShelfInterval1 = testS
-            testShelfInterval2 = 20 * 1000
-            testShelfInterval3 = 60 * 1000
-            testShelfInterval4 = 100 * 1000
+            testShelfInterval2 = testS
+            testShelfInterval3 = testS
+            testShelfInterval4 = testS
         } else {
             testShelfInterval1 = localDataRepository.getTest1DelayTime()
             testShelfInterval2 = localDataRepository.getTest2DelayTime()

@@ -40,9 +40,13 @@ class ReportChartView(
     //浓度柱子的宽度
     private val valueWidth = 50 * amplificationFactor
 
-    //右上角示例中 矩形的宽高
+    //右上角示例中 矩形的最大宽高
     private val hiltRectWidth = 20 * amplificationFactor
     private val hiltRectHeight = 10 * amplificationFactor
+
+    //右上角示例中 矩形的宽高
+    private val hilt1RectWidth = 10 * amplificationFactor
+    private val hilt2RectHeight = 5 * amplificationFactor
 
     private val innerWidth = width - innerHoriPadding * 2
     private val chartWidth = innerWidth - chartHoriPadding * 2
@@ -190,8 +194,8 @@ class ReportChartView(
             style = Paint.Style.STROKE
         })
         //7.2 框里左边的矩形
-        val hiltRectLeft = hiltFrameLeft + innerVerPadding
-        val hiltRectRight = hiltRectLeft + hiltRectWidth
+        val hiltRectLeft = hiltFrameLeft + innerVerPadding + (hiltRectWidth - hilt1RectWidth) / 2
+        val hiltRectRight = hiltRectLeft + hilt1RectWidth
         val hiltRectTop = hiltFrameTop + hiltFrameSpc
         val hiltRectBottom = hiltRectTop + hiltRectHeight
         val hiltRect1 = RectF(
@@ -205,12 +209,15 @@ class ReportChartView(
             strokeWidth = this@ReportChartView.strokeWidth
             style = Paint.Style.FILL
         })
-        val hiltRectTop2 = hiltRectTop + hiltRectHeight + hiltFrameSpc
-        val hiltRectBottom2 = hiltRectBottom + hiltFrameSpc + hiltRectHeight
+        val hiltRectLeft2 = hiltFrameLeft + innerVerPadding
+        val hiltRectRight2 = hiltRectLeft2 + hiltRectWidth
+        val hiltRectTop2 =
+            hiltFrameTop + hiltFrameSpc + hiltRect1.height() + hiltFrameSpc + (hiltRectHeight - hilt2RectHeight) / 2
+        val hiltRectBottom2 = hiltRectTop2 + hilt2RectHeight
         val hiltRect2 = RectF(
-            hiltRectLeft,
+            hiltRectLeft2,
             hiltRectTop2,
-            hiltRectRight,
+            hiltRectRight2,
             hiltRectBottom2
         )
         canvas.drawRect(hiltRect2, paint.apply {
@@ -219,10 +226,12 @@ class ReportChartView(
             style = Paint.Style.FILL
         })
         //7.3 框里右边的提示文字
+        val hiltLeftBase = hiltRectRight2 + innerVerPadding
+        val hiltTopBase = hiltRectTop + hiltFrameSpc
         canvas.drawText(
             "检测结果",
-            hiltRectRight + innerVerPadding,
-            hiltRectTop  + hiltFrameSpc,
+            hiltLeftBase + innerVerPadding,
+            hiltTopBase,
             paint.apply {
                 color = textColor
                 strokeWidth = this@ReportChartView.strokeWidth
@@ -231,8 +240,8 @@ class ReportChartView(
             });
         canvas.drawText(
             "临界值",
-            hiltRectRight + innerVerPadding,
-            hiltRectTop2  + hiltFrameSpc,
+            hiltLeftBase + innerVerPadding,
+            hiltTopBase + hiltRect1.height()  + hiltFrameSpc,
             paint.apply {
                 color = textColor
                 strokeWidth = this@ReportChartView.strokeWidth

@@ -59,8 +59,8 @@ class UploadSettingsViewModel(
 
     fun verifySave(): String {
         if (twoway.value) {
-            if (getPatientType.value == GetPatientType.BC
-                && (MachineTestModel.valueOf(localDataSource.getCurMachineTestModel()) != MachineTestModel.Auto || !localDataSource.getScanCode())
+            if (getPatientType.value == GetPatientType.BC && getPatient.value
+                &&(MachineTestModel.valueOf(localDataSource.getCurMachineTestModel()) != MachineTestModel.Auto || !localDataSource.getScanCode())
             ) {
                 return "当按条码匹配时，请先更改检测模式为自动模式并开启扫码功能"
             }

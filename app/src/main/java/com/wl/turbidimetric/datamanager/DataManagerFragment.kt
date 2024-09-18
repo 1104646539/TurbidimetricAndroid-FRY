@@ -453,7 +453,7 @@ class DataManagerFragment :
                                         vm.exportReportSuccess("导出报告完成，本次导出总数${count}条,成功${successCount}条,失败${failedCount}条")
                                     }, { err ->
                                         vm.exportReportFailed("导出报告失败 $err")
-                                    }
+                                    },
                                 )
                             }
                         }

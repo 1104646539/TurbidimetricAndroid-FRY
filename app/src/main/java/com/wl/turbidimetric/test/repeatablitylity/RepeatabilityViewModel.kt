@@ -27,6 +27,7 @@ import java.math.BigDecimal
 import java.text.NumberFormat
 import java.util.*
 import kotlin.math.absoluteValue
+import kotlin.math.roundToInt
 
 /**
  * 重复性测试
@@ -607,7 +608,7 @@ class RepeatabilityViewModel(
                     moveSample(1)
                 } else if (samplePos == 1) {
                     sampleStep++
-                    sampling(localDataRepository.getSamplingVolume())
+                    sampling(localDataRepository.getSamplingVolume().roundToInt())
                 }
             }
 
@@ -641,7 +642,7 @@ class RepeatabilityViewModel(
             dripSample(
                 autoBlending = false,
                 inplace = false,
-                localDataRepository.getSamplingVolume()
+                localDataRepository.getSamplingVolume().roundToInt()
             )
         }
     }
@@ -1121,7 +1122,7 @@ class RepeatabilityViewModel(
                     takeReagent()
                 } else {//去清洗
                     sampleStep++
-                    sampling(localDataRepository.getSamplingVolume())
+                    sampling(localDataRepository.getSamplingVolume().roundToInt())
                     moveCuvetteDripSample()
                 }
             }

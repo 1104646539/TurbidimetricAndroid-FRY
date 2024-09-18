@@ -44,7 +44,7 @@ class DefaultLocalDataDataSource(
         return global().TakeReagentR2
     }
 
-    override fun getSamplingVolume(): Int {
+    override fun getSamplingVolume(): Double {
         return global().SamplingVolume
     }
 
@@ -200,7 +200,7 @@ class DefaultLocalDataDataSource(
         }
     }
 
-    override fun setSamplingVolume(value: Int) {
+    override fun setSamplingVolume(value: Double) {
         update {
             it.copy(SamplingVolume = value)
         }

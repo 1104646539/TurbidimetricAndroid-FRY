@@ -77,6 +77,7 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import java.util.Date
 import kotlin.math.absoluteValue
+import kotlin.math.roundToInt
 import kotlin.random.Random
 
 /**
@@ -945,7 +946,7 @@ class MatchingArgsViewModel(
 
             TestState.MoveSample -> {//去取需要移动的已混匀的样本
                 sampleStep++
-                sampling(localDataRepository.getSamplingVolume())
+                sampling(localDataRepository.getSamplingVolume().roundToInt())
             }
 
             else -> {
@@ -991,7 +992,7 @@ class MatchingArgsViewModel(
             dripSample(
                 autoBlending = false,
                 inplace = false,
-                localDataRepository.getSamplingVolume()
+                localDataRepository.getSamplingVolume().roundToInt()
             )
         }
     }

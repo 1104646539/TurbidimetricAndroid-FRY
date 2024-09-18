@@ -23,7 +23,7 @@ data class GlobalConfig(
     /**
      * 取样量
      */
-    val SamplingVolume: Int = LocalDataGlobal.Default.SamplingVolume,
+    val SamplingVolume: Double = LocalDataGlobal.Default.SamplingVolume,
     /**
      * 最后一次进入的版本号
      */

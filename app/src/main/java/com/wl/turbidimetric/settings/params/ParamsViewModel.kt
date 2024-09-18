@@ -42,7 +42,7 @@ class ParamsViewModel constructor(
     fun change(
         r1Volume: Int,
         r2Volume: Int,
-        samplingVolume: Int,
+        samplingVolume: Double,
         samplingProbeCleaningDuration: Int,
         stirProbeCleaningDuration: Int,
         stirDuration: Int,
@@ -91,7 +91,7 @@ class ParamsViewModel constructor(
     private fun verify(
         r1Volume: Int,
         r2Volume: Int,
-        samplingVolume: Int,
+        samplingVolume: Double,
         samplingProbeCleaningDuration: Int,
         stirProbeCleaningDuration: Int,
         stirDuration: Int,
@@ -107,8 +107,8 @@ class ParamsViewModel constructor(
         if (r2Volume !in 0..200) {
             return "R1量必须小于200"
         }
-        if (samplingVolume !in 0..500) {
-            return "取样量必须小于500"
+        if (samplingVolume < 0 || samplingVolume > 500) {
+            return "取样量必须小于50"
         }
         if (samplingProbeCleaningDuration !in 0..5000) {
             return "取样针清洗时长必须小于5000"
@@ -156,7 +156,7 @@ class ParamsViewModelFactory(
 data class ParamsUiState(
     val r1Volume: Int,
     val r2Volume: Int,
-    val samplingVolume: Int,
+    val samplingVolume: Double,
     val samplingProbeCleaningDuration: Int,
     val stirProbeCleaningDuration: Int,
     val stirDuration: Int,

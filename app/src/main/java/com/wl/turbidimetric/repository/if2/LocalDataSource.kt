@@ -4,7 +4,7 @@ interface LocalDataSource {
     fun getDetectionNum(): String
     fun getTakeReagentR1(): Int
     fun getTakeReagentR2(): Int
-    fun getSamplingVolume(): Int
+    fun getSamplingVolume(): Double
     fun getCurrentVersion(): Int
     fun getStirDuration(): Int
     fun getStirProbeCleaningDuration(): Int
@@ -37,7 +37,7 @@ interface LocalDataSource {
     fun setDetectionNum(num: String)
     fun setTakeReagentR1(value: Int)
     fun setTakeReagentR2(value: Int)
-    fun setSamplingVolume(value: Int)
+    fun setSamplingVolume(value: Double)
     fun setCurrentVersion(value: Int)
     fun setStirDuration(value: Int)
     fun setStirProbeCleaningDuration(value: Int)

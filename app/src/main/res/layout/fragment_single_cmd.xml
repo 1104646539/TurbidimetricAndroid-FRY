@@ -552,7 +552,7 @@
                         android:layout_height="wrap_content"
                         android:hint="取样量"
                         android:inputType="numberSigned"
-                        android:maxLength="3"
+                        android:maxLength="4"
                         android:minWidth="200dp"
                         android:text="25"
                         android:textSize="24sp" />
@@ -612,7 +612,7 @@
                         android:layout_height="wrap_content"
                         android:hint="加样量"
                         android:inputType="numberSigned"
-                        android:maxLength="3"
+                        android:maxLength="4"
                         android:minWidth="200dp"
                         android:text="25"
                         android:textSize="24sp" />

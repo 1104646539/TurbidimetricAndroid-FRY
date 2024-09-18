@@ -63,7 +63,7 @@
             android:hint="取样量"
             android:textSize="18sp"
             app:counterEnabled="true"
-            app:counterMaxLength="3"
+            app:counterMaxLength="4"
             app:layout_constraintLeft_toRightOf="@id/til_r2"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="@id/til_r1"

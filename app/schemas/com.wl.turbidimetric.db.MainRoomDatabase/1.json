@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "69e27be3cca586ba3b15d2c696eb2b02",
+    "identityHash": "04797e715d2bfbac4fdbfdba615fac57",
     "entities": [
       {
         "tableName": "TestResultModel",
@@ -378,7 +378,7 @@
       },
       {
         "tableName": "GlobalConfig",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `DetectionNum` TEXT NOT NULL, `TakeReagentR1` INTEGER NOT NULL, `TakeReagentR2` INTEGER NOT NULL, `SamplingVolume` INTEGER NOT NULL, `CurrentVersion` INTEGER NOT NULL, `StirDuration` INTEGER NOT NULL, `StirProbeCleaningDuration` INTEGER NOT NULL, `SamplingProbeCleaningDuration` INTEGER NOT NULL, `CurMachineTestModel` TEXT NOT NULL, `SampleExist` INTEGER NOT NULL, `ScanCode` INTEGER NOT NULL, `SelectProjectID` INTEGER NOT NULL, `DebugMode` INTEGER NOT NULL, `Test1DelayTime` INTEGER NOT NULL, `Test2DelayTime` INTEGER NOT NULL, `Test3DelayTime` INTEGER NOT NULL, `Test4DelayTime` INTEGER NOT NULL, `ReactionTime` INTEGER NOT NULL, `LooperTest` INTEGER NOT NULL, `HospitalName` TEXT NOT NULL, `DetectionDoctor` TEXT NOT NULL, `AutoPrintReceipt` INTEGER NOT NULL, `AutoPrintReport` INTEGER NOT NULL, `ReportFileNameBarcode` INTEGER NOT NULL, `ReportIntervalTime` INTEGER NOT NULL, `TempUpLimit` INTEGER NOT NULL, `TempLowLimit` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `DetectionNum` TEXT NOT NULL, `TakeReagentR1` INTEGER NOT NULL, `TakeReagentR2` INTEGER NOT NULL, `SamplingVolume` REAL NOT NULL, `CurrentVersion` INTEGER NOT NULL, `StirDuration` INTEGER NOT NULL, `StirProbeCleaningDuration` INTEGER NOT NULL, `SamplingProbeCleaningDuration` INTEGER NOT NULL, `CurMachineTestModel` TEXT NOT NULL, `SampleExist` INTEGER NOT NULL, `ScanCode` INTEGER NOT NULL, `SelectProjectID` INTEGER NOT NULL, `DebugMode` INTEGER NOT NULL, `Test1DelayTime` INTEGER NOT NULL, `Test2DelayTime` INTEGER NOT NULL, `Test3DelayTime` INTEGER NOT NULL, `Test4DelayTime` INTEGER NOT NULL, `ReactionTime` INTEGER NOT NULL, `LooperTest` INTEGER NOT NULL, `HospitalName` TEXT NOT NULL, `DetectionDoctor` TEXT NOT NULL, `AutoPrintReceipt` INTEGER NOT NULL, `AutoPrintReport` INTEGER NOT NULL, `ReportFileNameBarcode` INTEGER NOT NULL, `ReportIntervalTime` INTEGER NOT NULL, `TempUpLimit` INTEGER NOT NULL, `TempLowLimit` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -407,7 +407,7 @@
           {
             "fieldPath": "SamplingVolume",
             "columnName": "SamplingVolume",
-            "affinity": "INTEGER",
+            "affinity": "REAL",
             "notNull": true
           },
           {
@@ -606,7 +606,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '69e27be3cca586ba3b15d2c696eb2b02')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '04797e715d2bfbac4fdbfdba615fac57')"
     ]
   }
 }

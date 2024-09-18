@@ -96,6 +96,7 @@ import org.greenrobot.eventbus.EventBus
 import java.math.BigDecimal
 import java.util.Date
 import kotlin.math.absoluteValue
+import kotlin.math.roundToInt
 
 class HomeViewModel(
     private val appViewModel: AppViewModel,
@@ -3046,7 +3047,7 @@ class HomeViewModel(
         c("发送 取样 type=$type")
         samplingFinish = false
         dripSampleFinish = false
-        appViewModel.serialPort.sampling(localDataRepository.getSamplingVolume(), sampleType = type)
+        appViewModel.serialPort.sampling(localDataRepository.getSamplingVolume().roundToInt(), sampleType = type)
     }
 
     /**
@@ -3105,7 +3106,7 @@ class HomeViewModel(
     private fun dripSample() {
         c("发送 加样")
         dripSampleFinish = false
-        appViewModel.serialPort.dripSample(false, false, localDataRepository.getSamplingVolume())
+        appViewModel.serialPort.dripSample(false, false, localDataRepository.getSamplingVolume().roundToInt())
     }
 
     /**

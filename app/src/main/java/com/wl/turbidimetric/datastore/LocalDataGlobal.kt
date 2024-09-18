@@ -29,7 +29,7 @@ object LocalDataGlobal {
     object Default {
         val TakeReagentR1 = 300
         val TakeReagentR2 = 60
-        val SamplingVolume = 25
+        val SamplingVolume = 25.0
         val CurrentVersion = 0
         val FirstOpen = true
         val DetectionNum = "1"

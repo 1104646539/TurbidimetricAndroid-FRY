@@ -180,7 +180,7 @@ class ParamsFragment :
             vm.change(
                 vd.tietR1.text.toString().toIntOrNull() ?: 0,
                 vd.tietR2.text.toString().toIntOrNull() ?: 0,
-                vd.tietSampling.text.toString().toIntOrNull() ?: 0,
+                vd.tietSampling.text.toString().toDoubleOrNull() ?: 0.0,
                 vd.tietSamplingProbeCleaningTime.text.toString().toIntOrNull() ?: 0,
                 vd.tietStirProbeCleaningTime.text.toString().toIntOrNull() ?: 0,
                 vd.tietStirTime.text.toString().toIntOrNull() ?: 0,

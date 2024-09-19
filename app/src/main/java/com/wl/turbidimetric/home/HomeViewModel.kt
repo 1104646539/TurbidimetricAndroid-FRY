@@ -644,10 +644,10 @@ class HomeViewModel(
         i("检测模式:${getTestMode()} \n跳过比色皿:$cuvetteStartPos \n输入检测数量:$needTestNum \n选择标曲:$selectProject \n起始编号:${getDetectionNum()}")
 
         if (SystemGlobal.isCodeDebug) {
-            testShelfInterval1 = testS
-            testShelfInterval2 = testS
-            testShelfInterval3 = testS
-            testShelfInterval4 = testS
+            testShelfInterval1 = 10 * 1000
+            testShelfInterval2 = 50 * 1000
+            testShelfInterval3 = 110 * 1000
+            testShelfInterval4 = 170 * 1000
         } else {
             testShelfInterval1 = localDataRepository.getTest1DelayTime()
             testShelfInterval2 = localDataRepository.getTest2DelayTime()
@@ -1408,9 +1408,14 @@ class HomeViewModel(
 //        * cuvetteCorrPos 比色皿的下标【cuvettePos】，用来找到当前位置对应的结果
 //        * 在有跳过比色皿时，cuvetteCorrPos不包含跳过的比色皿数量
         var cuvetteCorrPos = cuvettePos
+        val tempCuvettePos = cuvettePos - 1
         if (cuvetteStartPos > 0 && isFirstCuvetteShelf()) {
             cuvetteCorrPos -= cuvetteStartPos
         }
+        if (appViewModel.testState != TestState.DripReagent) {
+            cuvetteCorrPos -= 1
+        }
+
         when (appViewModel.testState) {
             TestState.DripReagent -> {
                 updateCuvetteState(cuvettePos - 5, CuvetteState.Test1)
@@ -1419,85 +1424,77 @@ class HomeViewModel(
             }
 
             TestState.Test2 -> {
-                updateCuvetteState(cuvettePos, CuvetteState.Test2)
-                updateTestResultModel(value, cuvettePos, cuvetteCorrPos, CuvetteState.Test2)
+                updateCuvetteState(tempCuvettePos, CuvetteState.Test2)
+                updateTestResultModel(value, tempCuvettePos, cuvetteCorrPos, CuvetteState.Test2)
                 selectFocChange(
                     cuvetteShelfPos,
-                    cuvettePos,
-                    _cuvetteStates.value[cuvetteShelfPos]?.get(cuvettePos)!!
+                    tempCuvettePos,
+                    _cuvetteStates.value[cuvetteShelfPos]?.get(tempCuvettePos)!!
                 )
-                if (lastNeed(cuvettePos, CuvetteState.Test1)) {
+                if (lastNeed(tempCuvettePos, CuvetteState.Test1)) {
                     //检测结束，下一个步骤，检测第三次
                     stepTest(TestState.Test3)
                 } else {
                     //继续检测
 //                    moveCuvetteTest()
-                    val targetTime =
-                        if (appViewModel.testState == TestState.Test2) testShelfInterval2 else if (appViewModel.testState == TestState.Test3) testShelfInterval3 else testShelfInterval4
-                    val stirTime = stirTimes[cuvettePos]
-                    val intervalTemp = targetTime - (Date().time - stirTime) - 3
-                    i("intervalTemp=$intervalTemp stirTime=$stirTime targetTime=$targetTime")
-                    viewModelScope.launch {
-                        delay(intervalTemp)
-                        moveCuvetteTest()
-                    }
+                    delayMoveCuvetteTest(tempCuvettePos)
                 }
             }
 
             TestState.Test3 -> {
-                updateCuvetteState(cuvettePos, CuvetteState.Test3)
-                updateTestResultModel(value, cuvettePos, cuvetteCorrPos, CuvetteState.Test3)
+                updateCuvetteState(tempCuvettePos, CuvetteState.Test3)
+                updateTestResultModel(value, tempCuvettePos, cuvetteCorrPos, CuvetteState.Test3)
                 selectFocChange(
                     cuvetteShelfPos,
-                    cuvettePos,
-                    _cuvetteStates.value[cuvetteShelfPos]?.get(cuvettePos)!!
+                    tempCuvettePos,
+                    _cuvetteStates.value[cuvetteShelfPos]?.get(tempCuvettePos)!!
                 )
-                if (lastNeed(cuvettePos, CuvetteState.Test2)) {
+                if (lastNeed(tempCuvettePos, CuvetteState.Test2)) {
                     //检测结束，下一个步骤，检测第四次
                     stepTest(TestState.Test4)
                 } else {
                     //继续检测
 //                    moveCuvetteTest()
-                    val targetTime =
-                        if (appViewModel.testState == TestState.Test2) testShelfInterval2 else if (appViewModel.testState == TestState.Test3) testShelfInterval3 else testShelfInterval4
-                    val stirTime = stirTimes[cuvettePos]
-                    val intervalTemp = targetTime - (Date().time - stirTime) - 3
-                    i("intervalTemp=$intervalTemp stirTime=$stirTime targetTime=$targetTime")
-                    viewModelScope.launch {
-                        delay(intervalTemp)
-                        moveCuvetteTest()
-                    }
+                    delayMoveCuvetteTest(tempCuvettePos)
                 }
             }
 
             TestState.Test4 -> {
-                updateCuvetteState(cuvettePos, CuvetteState.Test4)
-                updateTestResultModel(value, cuvettePos, cuvetteCorrPos, CuvetteState.Test4)
+                updateCuvetteState(tempCuvettePos, CuvetteState.Test4)
+                updateTestResultModel(value, tempCuvettePos, cuvetteCorrPos, CuvetteState.Test4)
                 selectFocChange(
                     cuvetteShelfPos,
-                    cuvettePos,
-                    _cuvetteStates.value[cuvetteShelfPos]?.get(cuvettePos)!!
+                    tempCuvettePos,
+                    _cuvetteStates.value[cuvetteShelfPos]?.get(tempCuvettePos)!!
                 )
-                if (lastNeed(cuvettePos, CuvetteState.Test3)) {
+                if (lastNeed(tempCuvettePos, CuvetteState.Test3)) {
                     //检测结束，下一个步骤，计算值
                     showResultFinishAndNext()
                 } else {
 //                    moveCuvetteTest()
-                    val targetTime =
-                        if (appViewModel.testState == TestState.Test2) testShelfInterval2 else if (appViewModel.testState == TestState.Test3) testShelfInterval3 else testShelfInterval4
-                    val stirTime = stirTimes[cuvettePos]
-                    val intervalTemp = targetTime - (Date().time - stirTime) - 3
-                    i("intervalTemp=$intervalTemp stirTime=$stirTime targetTime=$targetTime")
-                    viewModelScope.launch {
-                        delay(intervalTemp)
-                        moveCuvetteTest()
-                    }
+                    delayMoveCuvetteTest(tempCuvettePos)
                 }
             }
 
             else -> {}
         }
 
+    }
+
+    /**
+     * 根据检测次数 和 比色皿的位置计算还有多久才移动到下一个检测位
+     * @param cuvettePos Int
+     */
+    private fun delayMoveCuvetteTest(cuvettePos: Int) {
+        val targetTime =
+            if (appViewModel.testState == TestState.Test2) testShelfInterval2 else if (appViewModel.testState == TestState.Test3) testShelfInterval3 else testShelfInterval4
+        val stirTime = stirTimes[cuvettePos]
+        val intervalTemp = targetTime - (Date().time - stirTime)
+        i("intervalTemp=$intervalTemp stirTime=$stirTime targetTime=$targetTime")
+        viewModelScope.launch {
+            delay(intervalTemp)
+            moveCuvetteTest()
+        }
     }
 
     /**
@@ -2276,21 +2273,33 @@ class HomeViewModel(
     override fun readDataMoveCuvetteTestModel(reply: ReplyModel<MoveCuvetteTestModel>) {
         if (!runningTest()) return
         if (appViewModel.testState.isNotPrepare()) return
-        c("接收到 移动比色皿 检测位 reply=$reply")
+        c("接收到 移动比色皿 检测位 reply=$reply cuvettePos=$cuvettePos")
 
         cuvetteMoveFinish = true
 
-//        if (cuvettePos in 0 until 10) {
-//            val targetTime =
-//                if (appViewModel.testState == TestState.Test2) testShelfInterval2 else if (appViewModel.testState == TestState.Test3) testShelfInterval3 else testShelfInterval4
-//            val stirTime = stirTimes[cuvettePos]
-//            val intervalTemp = targetTime - (Date().time - stirTime) - 3
-//            i("intervalTemp=$intervalTemp stirTime=$stirTime targetTime=$targetTime")
-//            viewModelScope.launch {
-//                delay(intervalTemp)
-                test()
-//            }
-//        }
+        if (cuvettePos == 0) {
+            //当前位置为等待检测的位置，到时间时才移动到第一个检测位置
+            val firstTime = getFirstDelayTime()
+            viewModelScope.launch {
+                delay(firstTime)
+                moveCuvetteTest()
+            }
+        } else {
+            test()
+        }
+    }
+
+    /**
+     * 获取这次检测的第一个要检测的比色皿的间隔时间
+     * @return Long
+     */
+    private fun getFirstDelayTime(): Long {
+        val targetTime =
+            if (appViewModel.testState == TestState.Test2) testShelfInterval2 else if (appViewModel.testState == TestState.Test3) testShelfInterval3 else testShelfInterval4
+        val stirTime = stirTimes.first { it.toInt() != 0 }
+        val intervalTemp = targetTime - (Date().time - stirTime) - 1000
+        i("getFirstDelayTime intervalTemp=$intervalTemp stirTime=$stirTime targetTime=$targetTime")
+        return intervalTemp
     }
 
     /**
@@ -3047,7 +3056,10 @@ class HomeViewModel(
         c("发送 取样 type=$type")
         samplingFinish = false
         dripSampleFinish = false
-        appViewModel.serialPort.sampling(localDataRepository.getSamplingVolume().roundToInt(), sampleType = type)
+        appViewModel.serialPort.sampling(
+            localDataRepository.getSamplingVolume().roundToInt(),
+            sampleType = type
+        )
     }
 
     /**
@@ -3106,7 +3118,11 @@ class HomeViewModel(
     private fun dripSample() {
         c("发送 加样")
         dripSampleFinish = false
-        appViewModel.serialPort.dripSample(false, false, localDataRepository.getSamplingVolume().roundToInt())
+        appViewModel.serialPort.dripSample(
+            false,
+            false,
+            localDataRepository.getSamplingVolume().roundToInt()
+        )
     }
 
     /**

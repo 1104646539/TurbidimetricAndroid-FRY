@@ -18,6 +18,7 @@ import com.wl.turbidimetric.matchingargs.MatchingStateAdapter
 import com.wl.turbidimetric.matchingargs.SpnSampleAdapter
 import com.wl.turbidimetric.model.CurveModel
 import com.wl.turbidimetric.util.FitterType
+import kotlin.math.absoluteValue
 
 class MatchingStateLayout : FrameLayout {
     private var root: View? = null
@@ -109,7 +110,12 @@ class MatchingStateLayout : FrameLayout {
                 val targets = d.targetCon.split("-").map { it.toDouble() }
                 var low = if (targets.size > 1) targets[0] else targets[0] * 0.9
                 var high = if (targets.size > 1) targets[1] else targets[0] * 1.1
-                d.testCon.toDouble() < low || d.testCon.toDouble() > high
+                if (d.testCon.toDouble().compareTo(0).absoluteValue > 0.001) {
+                    d.testCon.toDouble() < low || d.testCon.toDouble() > high
+                } else {
+                    //如果目标值是0就不判断
+                    true
+                }
             }.let { ret ->
                 val fit = curProject?.fitGoodness ?: 0.0
                 if (ret == null && fit >= 0.99) {

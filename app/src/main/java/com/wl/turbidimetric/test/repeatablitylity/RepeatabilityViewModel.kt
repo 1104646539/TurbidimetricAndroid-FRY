@@ -773,7 +773,7 @@ class RepeatabilityViewModel(
 
                     moveCuvetteTest(-cuvettePos)
                 } else {
-                    delayMoveCuvetteTest(tempCuvettePos)
+                    delayMoveCuvetteTest(cuvettePos)
                 }
 
             }
@@ -789,7 +789,7 @@ class RepeatabilityViewModel(
 
                     moveCuvetteTest(-cuvettePos)
                 } else {
-                    delayMoveCuvetteTest(tempCuvettePos)
+                    delayMoveCuvetteTest(cuvettePos)
                 }
             }
 
@@ -803,7 +803,7 @@ class RepeatabilityViewModel(
                     matchingFinish()
                     calcMatchingArg()
                 } else {
-                    delayMoveCuvetteTest(tempCuvettePos)
+                    delayMoveCuvetteTest(cuvettePos)
 
                 }
             }

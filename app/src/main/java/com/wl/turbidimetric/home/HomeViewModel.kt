@@ -644,10 +644,10 @@ class HomeViewModel(
         i("检测模式:${getTestMode()} \n跳过比色皿:$cuvetteStartPos \n输入检测数量:$needTestNum \n选择标曲:$selectProject \n起始编号:${getDetectionNum()}")
 
         if (SystemGlobal.isCodeDebug) {
-            testShelfInterval1 = 10 * 1000
-            testShelfInterval2 = 50 * 1000
-            testShelfInterval3 = 110 * 1000
-            testShelfInterval4 = 170 * 1000
+            testShelfInterval1 = 30 * 1000
+            testShelfInterval2 = 150 * 1000
+            testShelfInterval3 = 0 * 1000
+            testShelfInterval4 = 0 * 1000
         } else {
             testShelfInterval1 = localDataRepository.getTest1DelayTime()
             testShelfInterval2 = localDataRepository.getTest2DelayTime()
@@ -1437,7 +1437,7 @@ class HomeViewModel(
                 } else {
                     //继续检测
 //                    moveCuvetteTest()
-                    delayMoveCuvetteTest(tempCuvettePos)
+                    delayMoveCuvetteTest(cuvettePos)
                 }
             }
 
@@ -1455,7 +1455,7 @@ class HomeViewModel(
                 } else {
                     //继续检测
 //                    moveCuvetteTest()
-                    delayMoveCuvetteTest(tempCuvettePos)
+                    delayMoveCuvetteTest(cuvettePos)
                 }
             }
 
@@ -1472,7 +1472,7 @@ class HomeViewModel(
                     showResultFinishAndNext()
                 } else {
 //                    moveCuvetteTest()
-                    delayMoveCuvetteTest(tempCuvettePos)
+                    delayMoveCuvetteTest(cuvettePos)
                 }
             }
 

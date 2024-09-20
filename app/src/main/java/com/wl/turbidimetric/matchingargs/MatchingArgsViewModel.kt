@@ -1147,7 +1147,7 @@ class MatchingArgsViewModel(
                     moveCuvetteTest(-cuvettePos)
                 } else {
 //                    moveCuvetteTest()
-                    delayMoveCuvetteTest(tempCuvettePos)
+                    delayMoveCuvetteTest(cuvettePos)
                 }
 
             }
@@ -1164,7 +1164,7 @@ class MatchingArgsViewModel(
                     moveCuvetteTest(-cuvettePos)
                 } else {
 //                    moveCuvetteTest()
-                    delayMoveCuvetteTest(tempCuvettePos)
+                    delayMoveCuvetteTest(cuvettePos)
                 }
 
             }
@@ -1181,7 +1181,7 @@ class MatchingArgsViewModel(
                     calcMatchingArg()
                 } else {
 //                    moveCuvetteTest()
-                    delayMoveCuvetteTest(tempCuvettePos)
+                    delayMoveCuvetteTest(cuvettePos)
                 }
             }
 

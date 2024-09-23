@@ -60,8 +60,11 @@ class TestModuleDebugFragment :
     private fun listenerEvent() {
         vd.btnStartIntervalTest.setOnClickListener {
             vm.startIntervalTest(
+                vd.rbTest.isChecked,
+                vd.rbTest2.isChecked,
+                vd.tetHeatDuration.text.toString(),
                 vd.tetCuvetteIntervalDuration.text.toString(),
-                vd.tetCuvetteDelayDuration.text.toString()
+                vd.tetCuvetteDelayDuration.text.toString(),
             )
         }
         vd.btnClear.setOnClickListener {

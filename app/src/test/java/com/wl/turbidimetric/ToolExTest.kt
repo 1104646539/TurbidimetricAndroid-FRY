@@ -16,6 +16,12 @@ import kotlin.math.log10
 import kotlin.math.pow
 
 class ToolExTest {
+    @Test
+    fun testf(){
+        val cs = intArrayOf(0,0,0,1)
+        val index = cs.indexOfFirst { it == 1 }
+        Assert.assertEquals(index,3)
+    }
 
     @Test
     fun crc16Test() {

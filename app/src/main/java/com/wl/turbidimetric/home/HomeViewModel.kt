@@ -2297,7 +2297,7 @@ class HomeViewModel(
         val targetTime =
             if (appViewModel.testState == TestState.Test2) testShelfInterval2 else if (appViewModel.testState == TestState.Test3) testShelfInterval3 else testShelfInterval4
         val stirTime = stirTimes.first { it.toInt() != 0 }
-        val intervalTemp = targetTime - (Date().time - stirTime) - 1000
+        val intervalTemp = targetTime - (Date().time - stirTime) - 1500
         i("getFirstDelayTime intervalTemp=$intervalTemp stirTime=$stirTime targetTime=$targetTime")
         return intervalTemp
     }
@@ -2336,7 +2336,7 @@ class HomeViewModel(
             //倒数第二个需要检测的
             val stirTime = stirTimes[cuvettePos - 5]
             val offsetTime = (Date().time - stirTime)
-            testInterval = testShelfInterval1 - offsetTime
+            testInterval = testShelfInterval1 - offsetTime - 1500
             i("goTest testInterval=$testInterval cuvettePos=$cuvettePos")
             viewModelScope.launch {
                 delay(testInterval)

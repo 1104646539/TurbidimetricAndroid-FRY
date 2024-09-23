@@ -1,6 +1,5 @@
 package com.wl.turbidimetric.test.debug.testModuleDebug
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -35,15 +34,11 @@ import com.wl.turbidimetric.model.TempModel
 import com.wl.turbidimetric.model.TestModel
 import com.wl.turbidimetric.model.TestType
 import com.wl.turbidimetric.util.Callback2
-import com.wl.wllib.DateUtil
 import com.wl.wllib.LogToFile.i
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import org.apache.log4j.helpers.FormattingInfo
 import java.util.Date
-import java.util.Timer
-import kotlin.concurrent.timer
 
 class TestModuleDebugViewModel(private val appViewModel: AppViewModel) : BaseViewModel(),
     Callback2 {
@@ -55,6 +50,33 @@ class TestModuleDebugViewModel(private val appViewModel: AppViewModel) : BaseVie
         IntervalTestModule
     }
 
+    enum class Type {
+        DripReagent, Test
+    }
+
+    var firstType = Type.DripReagent
+    var twoType = Type.Test
+    var curType = firstType
+
+    //当前检测次数
+    var curCount = 1
+
+    var cuvetteShelfPos = 0
+    var cuvettePos = -1
+    var result = mutableListOf<Int>()
+
+
+    //上一次移动比色皿的时间
+    var prevMoveCuvetteTime = 0L
+
+    //比色皿之间的移动间隔
+    var intervalDuration = 0
+
+    //比色皿移动到位后的检测间隔
+    var waitDuration = 0
+
+    //第一次检测之前的加热间隔
+    var heatDelayTime = 0
     fun listener() {
         appViewModel.serialPort.addCallback(this)
         appViewModel.testType = TestType.Debug
@@ -70,18 +92,10 @@ class TestModuleDebugViewModel(private val appViewModel: AppViewModel) : BaseVie
 
     }
 
-    var cuvetteShelfPos = 0
-    var cuvettePos = -1
-    var result = mutableListOf<Int>()
-
-    //上一次移动比色皿的时间
-    var prevMoveCuvetteTime = 0L
-
-    var reset = false
     override fun readDataGetStateModel(reply: ReplyModel<GetStateModel>) {
         debugType?.let {
             i("接收到 获取状态")
-            val firstIndex = reply.data.cuvetteShelfs.firstOrNull { it == 1 } ?: -1
+            val firstIndex = reply.data.cuvetteShelfs.indexOfFirst { it == 1 }
             if (firstIndex == -1) {
                 changeHilt("请放入比色皿架")
                 testFinish()
@@ -106,8 +120,18 @@ class TestModuleDebugViewModel(private val appViewModel: AppViewModel) : BaseVie
                 testFinish()
             } else {
                 //去移动，检测
-                moveCuvetteTest("2", true)
+                curType = firstType
+                changeHilt(testMsg.value.plus("\n第一次"))
+                moveCuvetteNext()
             }
+        }
+    }
+
+    private fun moveCuvetteNext(pos: Int = 1) {
+        if (curType == Type.DripReagent) {
+            moveCuvetteDripReagent("$pos", true)
+        } else {
+            moveCuvetteTest("$pos", true)
         }
     }
 
@@ -124,13 +148,31 @@ class TestModuleDebugViewModel(private val appViewModel: AppViewModel) : BaseVie
     }
 
     override fun readDataMoveCuvetteDripReagentModel(reply: ReplyModel<MoveCuvetteDripReagentModel>) {
-
+        debugType?.let {
+            i("接收到 移动比色皿到加试剂位 cuvettePos=$cuvettePos waitDuration=$waitDuration")
+            readDataMoveCuvette()
+        }
     }
 
     override fun readDataMoveCuvetteTestModel(reply: ReplyModel<MoveCuvetteTestModel>) {
         debugType?.let {
-            i("接收到 移动比色到检测位 cuvettePos=$cuvettePos waitDuration=$waitDuration")
-            viewModelScope.launch {
+            i("接收到 移动比色皿到检测位 cuvettePos=$cuvettePos waitDuration=$waitDuration")
+            readDataMoveCuvette()
+        }
+    }
+
+    private fun readDataMoveCuvette() {
+        viewModelScope.launch {
+            if (cuvettePos == 0) {
+                i("heatDelayTime=$heatDelayTime")
+                delay(heatDelayTime.toLong())
+                val pos = if (curType == Type.Test) 1 else 5
+                viewModelScope.launch {
+                    delay(heatDelayTime.toLong())
+                    moveCuvetteNext(pos)
+                }
+            } else {
+                i("waitDuration=$waitDuration")
                 delay(waitDuration.toLong())
                 test()
             }
@@ -170,17 +212,54 @@ class TestModuleDebugViewModel(private val appViewModel: AppViewModel) : BaseVie
             i("接收到 检测${reply.data.value}")
 //            result.add(reply.data.value)
             changeHilt(testMsg.value.plus("${reply.data.value},"))
-            if (cuvettePos == 10) {
+            if ((cuvettePos == 10 && curType == Type.Test) || (cuvettePos == 14 && curType == Type.DripReagent)) {
                 //结束了
-                cuvetteShelfPos = 0
-                moveCuvetteShelf("$cuvetteShelfPos")
-
+                if (curCount == 2) {
+                    cuvetteShelfPos = 0
+                    moveCuvetteShelf("$cuvetteShelfPos")
+                } else {
+                    //还有下一次检测
+                    changeTwoCount()
+                }
             } else {
+
                 viewModelScope.launch {
                     val temp = intervalDuration - (Date().time - prevMoveCuvetteTime)
                     delay(temp)
-                    moveCuvetteTest("1", true)
+//                    moveCuvetteTest("1", true)
+                    moveCuvetteNext()
                 }
+            }
+        }
+    }
+
+    /**
+     * 进入第二次检测
+     */
+    private fun changeTwoCount() {
+        changeHilt(testMsg.value.plus("\n第二次"))
+        curCount = 2
+        curType = twoType
+        resetCuvettePos()
+    }
+
+    /**
+     * 复位
+     */
+    private fun resetCuvettePos() {
+        if (curType == Type.DripReagent) {
+            if (firstType == Type.Test) {//不同命令不能向后
+                cuvettePos = -1
+                moveCuvetteDripReagent("1", true)
+            } else {
+                moveCuvetteDripReagent("$cuvettePos", false)
+            }
+        } else {
+            if (firstType == Type.DripReagent) {//不同命令不能向后
+                cuvettePos = -1
+                moveCuvetteTest("1", true)
+            } else {
+                moveCuvetteTest("$cuvettePos", false)
             }
         }
     }
@@ -224,25 +303,36 @@ class TestModuleDebugViewModel(private val appViewModel: AppViewModel) : BaseVie
 
     }
 
-    var intervalDuration = 0
-    var waitDuration = 0
-    fun startIntervalTest(interval: String, wait: String) {
+    fun startIntervalTest(
+        firstTestPos: Boolean,
+        twoTestPos: Boolean,
+        heatTime: String,
+        interval: String,
+        waitTest: String
+    ) {
+        if (heatTime.isNullOrEmpty()) {
+            changeHilt("加热等待时间错误")
+            return
+        }
         if (interval.isNullOrEmpty()) {
             changeHilt("间隔错误")
             return
         }
-        if (wait.isNullOrEmpty()) {
+        if (waitTest.isNullOrEmpty()) {
             changeHilt("等待间隔错误")
             return
         }
+        firstType = if (firstTestPos) Type.Test else Type.DripReagent
+        twoType = if (twoTestPos) Type.Test else Type.DripReagent
+        heatDelayTime = heatTime.toIntOrNull() ?: 0
         intervalDuration = interval.toIntOrNull() ?: 0
-        if (intervalDuration !in 1..500000) {
-            changeHilt("间隔错误,必须为1-500000")
+        if (intervalDuration !in 0..500000) {
+            changeHilt("间隔错误,必须为0-500000")
             return
         }
-        waitDuration = wait.toIntOrNull() ?: 0
-        if (waitDuration !in 1..500000) {
-            changeHilt("等待间隔错误,必须为1-500000")
+        waitDuration = waitTest.toIntOrNull() ?: 0
+        if (waitDuration !in 0..500000) {
+            changeHilt("等待间隔错误,必须为0-500000")
             return
         }
         if (intervalDuration - waitDuration < 1000) {
@@ -259,6 +349,8 @@ class TestModuleDebugViewModel(private val appViewModel: AppViewModel) : BaseVie
         cuvetteShelfPos = 0
         cuvettePos = -1
         result.clear()
+        curType = firstType
+        curCount = 1
     }
 
 
@@ -345,10 +437,19 @@ class TestModuleDebugViewModel(private val appViewModel: AppViewModel) : BaseVie
             return
         }
         val step = msg.toIntOrNull() ?: 0
-        if (step !in 1..4) {
-            changeHilt("移动位置错误,必须为1-10")
-            return
+//        if (step !in 1..15) {
+//            changeHilt("移动位置错误,必须为1-15")
+//            return
+//        }
+        if (forward) {
+            cuvettePos += step
+        } else {
+            cuvettePos -= step
         }
+        if (cuvettePos < 0) cuvettePos = 0
+        prevMoveCuvetteTime = Date().time
+        i("发送 移动比色皿到加试剂位 cuvettePos=$cuvettePos step=$step prevMoveCuvetteTime=$prevMoveCuvetteTime")
+
         appViewModel.serialPort.moveCuvetteDripReagent(forward, step)
     }
 
@@ -363,13 +464,18 @@ class TestModuleDebugViewModel(private val appViewModel: AppViewModel) : BaseVie
             return
         }
         val step = msg.toIntOrNull() ?: 0
-        if (step !in 1..10) {
-            changeHilt("移动位置错误,必须为1-10")
-            return
+//        if (step !in 1..10) {
+//            changeHilt("移动位置错误,必须为1-10")
+//            return
+//        }
+        if (forward) {
+            cuvettePos += step
+        } else {
+            cuvettePos -= step
         }
-        cuvettePos += step
+        if (cuvettePos < 0) cuvettePos = 0
         prevMoveCuvetteTime = Date().time
-        i("发送 移动比色皿 cuvettePos=$cuvettePos step=$step prevMoveCuvetteTime=$prevMoveCuvetteTime")
+        i("发送 移动比色皿到检测位 cuvettePos=$cuvettePos step=$step prevMoveCuvetteTime=$prevMoveCuvetteTime")
         appViewModel.serialPort.moveCuvetteTest(forward, step)
     }
 

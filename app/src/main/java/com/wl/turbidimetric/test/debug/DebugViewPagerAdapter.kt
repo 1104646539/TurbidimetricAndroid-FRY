@@ -9,11 +9,12 @@ import com.wl.turbidimetric.test.debug.motorDebug.MotorDebugFragment
 import com.wl.turbidimetric.test.debug.scanbarcode.ScanBarcodeFragment
 import com.wl.turbidimetric.test.debug.scanbarcode.ScanBarcodeViewModel
 import com.wl.turbidimetric.test.debug.singlecmd.SingleCmdFragment
+import com.wl.turbidimetric.test.debug.testModuleDebug.TestModuleDebugFragment
 
 class DebugViewPagerAdapter(fragmentActivity: FragmentActivity) :
     FragmentStateAdapter(fragmentActivity) {
     override fun getItemCount(): Int {
-        return 5
+        return 6
     }
 
     override fun createFragment(position: Int): Fragment {
@@ -32,6 +33,9 @@ class DebugViewPagerAdapter(fragmentActivity: FragmentActivity) :
             }
             4 -> {
                 MotorDebugFragment.newInstance()
+            }
+            5 -> {
+                TestModuleDebugFragment.newInstance()
             }
             else -> {
                 TestChartFragment.newInstance()

@@ -31,39 +31,34 @@ class DebugActivity : BaseActivity<DebugViewModel, ActivityDebugBinding>() {
 
         vd.tl.post {
             lifecycleScope.launch {
-                withContext(Dispatchers.IO) {
-                    delay(1000)
-                    withContext(Dispatchers.Main){
-                        vd.nav.setOnBack { finishAfterTransition() }
-                        vd.vp.isUserInputEnabled = false
-                        vd.vp.offscreenPageLimit = ViewPager2.OFFSCREEN_PAGE_LIMIT_DEFAULT
-                        vd.vp.adapter = DebugViewPagerAdapter(this@DebugActivity)
+                vd.nav.setOnBack { finishAfterTransition() }
+                vd.vp.isUserInputEnabled = false
+                vd.vp.offscreenPageLimit = ViewPager2.OFFSCREEN_PAGE_LIMIT_DEFAULT
+                vd.vp.adapter = DebugViewPagerAdapter(this@DebugActivity)
 
-                        vd.tl.addTab(vd.tl.newTab().setText("单步调试"))
-                        vd.tl.addTab(vd.tl.newTab().setText("检测分析调试"))
-                        vd.tl.addTab(vd.tl.newTab().setText("扫码调试"))
-                        vd.tl.addTab(vd.tl.newTab().setText("调试参数设置"))
-                        vd.tl.addTab(vd.tl.newTab().setText("电机调试"))
+                vd.tl.addTab(vd.tl.newTab().setText("单步调试"))
+                vd.tl.addTab(vd.tl.newTab().setText("检测分析调试"))
+                vd.tl.addTab(vd.tl.newTab().setText("扫码调试"))
+                vd.tl.addTab(vd.tl.newTab().setText("调试参数设置"))
+                vd.tl.addTab(vd.tl.newTab().setText("电机调试"))
+                vd.tl.addTab(vd.tl.newTab().setText("检测模块调试"))
 
-                        vd.tl.addOnTabSelectedListener(object : OnTabSelectedListener {
-                            override fun onTabSelected(tab: TabLayout.Tab?) {
-                                vd.vp.setCurrentItem(tab?.position ?: 0, false)
-                            }
-
-                            override fun onTabUnselected(tab: TabLayout.Tab?) {
-
-                            }
-
-                            override fun onTabReselected(tab: TabLayout.Tab?) {
-
-                            }
-                        })
+                vd.tl.addOnTabSelectedListener(object : OnTabSelectedListener {
+                    override fun onTabSelected(tab: TabLayout.Tab?) {
+                        vd.vp.setCurrentItem(tab?.position ?: 0, false)
                     }
-                }
+
+                    override fun onTabUnselected(tab: TabLayout.Tab?) {
+
+                    }
+
+                    override fun onTabReselected(tab: TabLayout.Tab?) {
+
+                    }
+                })
             }
         }
     }
-
 
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

@@ -423,9 +423,9 @@ class MatchingArgsViewModel(
 //    private val testValues2 =
 //        doubleArrayOf(1.0, 16.0, 35.0, 140.0, 310.0, 623.0, 0.3, 0.3, 0.3, 0.3)
     //测试四参数拟合
-    private val testValues1 = doubleArrayOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+    private val testValues1 = doubleArrayOf(8.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
     private val testValues2 =
-        doubleArrayOf(0.1, 15.9, 37.5, 178.8, 329.3, 437.7, 0.3, 0.3, 0.3, 0.3)
+        doubleArrayOf(3.0, 8.0, 52.0, 140.0, 351.0, 437.7, 0.3, 0.3, 0.3, 0.3)
 
     //    private val testValues2 =
 //        doubleArrayOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
@@ -681,10 +681,10 @@ class MatchingArgsViewModel(
         cuvetteShelfPos = -1
 
         if (SystemGlobal.isCodeDebug) {
-            testShelfInterval1 = 10 * 1000
-            testShelfInterval2 = 50 * 1000
-            testShelfInterval3 = 110 * 1000
-            testShelfInterval4 = 170 * 1000
+            testShelfInterval1 = testS
+            testShelfInterval2 = testS
+            testShelfInterval3 = testS
+            testShelfInterval4 = testS
         } else {
             testShelfInterval1 = localDataRepository.getTest1DelayTime()
             testShelfInterval2 = localDataRepository.getTest2DelayTime()
@@ -1279,6 +1279,10 @@ class MatchingArgsViewModel(
         result = calcAbsorbanceDifferences(resultTest1, resultTest2, resultTest3, resultTest4)
 
         absorbancys = result.map { it.toDouble() }
+        //如果目标值为0，那么反应度就强制为0
+//        absorbancys =
+//            result.mapIndexed { index, bigDecimal -> if (targetCons.getOrNull(index) == 0.0) 0.0 else bigDecimal.toDouble() }
+
 
         //更新拟合参数
         abss.clear()

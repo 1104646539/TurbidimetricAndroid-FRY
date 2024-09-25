@@ -106,19 +106,20 @@ class MatchingStateLayout : FrameLayout {
         var temp = if (abss.isNotEmpty()) {
             resultType =
                 if (matchingType == MatchingConfigLayout.MatchingType.Matching) "拟合" else "质控"
-            data.find { d ->
+            data.map { d ->
                 val targets = d.targetCon.split("-").map { it.toDouble() }
                 var low = if (targets.size > 1) targets[0] else targets[0] * 0.9
                 var high = if (targets.size > 1) targets[1] else targets[0] * 1.1
-                if (d.testCon.toDouble().compareTo(0).absoluteValue > 0.001) {
-                    d.testCon.toDouble() < low || d.testCon.toDouble() > high
+                if (low > 0.001 && high > 0.001) {
+                    d.testCon.toDouble() in low..high
                 } else {
                     //如果目标值是0就不判断
                     true
                 }
-            }.let { ret ->
+            }.indexOfFirst { !it }.let { index ->
                 val fit = curProject?.fitGoodness ?: 0.0
-                if (ret == null && fit >= 0.99) {
+                //没有不合格的
+                if (index == -1 && fit >= 0.99) {
                     "合格"
                 } else {
                     "不合格"

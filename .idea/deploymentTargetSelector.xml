@@ -19,9 +19,6 @@
       <SelectionState runConfigName="getProject_getAll()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="ExampleInstrumentedTest">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
       <SelectionState runConfigName="removeProjects2_returnTrue()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>

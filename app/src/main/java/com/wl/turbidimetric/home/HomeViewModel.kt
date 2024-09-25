@@ -644,10 +644,10 @@ class HomeViewModel(
         i("检测模式:${getTestMode()} \n跳过比色皿:$cuvetteStartPos \n输入检测数量:$needTestNum \n选择标曲:$selectProject \n起始编号:${getDetectionNum()}")
 
         if (SystemGlobal.isCodeDebug) {
-            testShelfInterval1 = 30 * 1000
-            testShelfInterval2 = 150 * 1000
-            testShelfInterval3 = 0 * 1000
-            testShelfInterval4 = 0 * 1000
+            testShelfInterval1 = testS
+            testShelfInterval2 = testS
+            testShelfInterval3 = testS
+            testShelfInterval4 = testS
         } else {
             testShelfInterval1 = localDataRepository.getTest1DelayTime()
             testShelfInterval2 = localDataRepository.getTest2DelayTime()

@@ -300,8 +300,8 @@ class SingleCmdViewModel(private val appViewModel: AppViewModel) : BaseViewModel
             return
         }
         val step = msg.toIntOrNull() ?: 0
-        if (step !in 1..10) {
-            changeHilt("移动位置错误,必须为1-10")
+        if (step !in 1..15) {
+            changeHilt("移动位置错误,必须为1-15")
             return
         }
         enable.postValue(false)
@@ -319,8 +319,8 @@ class SingleCmdViewModel(private val appViewModel: AppViewModel) : BaseViewModel
             return
         }
         val step = msg.toIntOrNull() ?: 0
-        if (step !in 1..10) {
-            changeHilt("移动位置错误,必须为1-10")
+        if (step !in 1..11) {
+            changeHilt("移动位置错误,必须为1-11")
             return
         }
         enable.postValue(false)

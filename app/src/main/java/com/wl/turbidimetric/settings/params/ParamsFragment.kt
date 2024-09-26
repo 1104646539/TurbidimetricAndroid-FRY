@@ -177,6 +177,17 @@ class ParamsFragment :
 
     private fun listenerView() {
         vd.btnChange.setOnClickListener {
+            if (appVm.testState.isRunning()) {
+                hiltDialog.showPop(requireContext()) { dialog ->
+                    dialog.showDialog(
+                        "检测中不能更改，请等待检测结束",
+                        confirmText = "确定",
+                        confirmClick = {
+                            dialog.dismiss()
+                        })
+                }
+                return@setOnClickListener
+            }
             vm.change(
                 vd.tietR1.text.toString().toIntOrNull() ?: 0,
                 vd.tietR2.text.toString().toIntOrNull() ?: 0,

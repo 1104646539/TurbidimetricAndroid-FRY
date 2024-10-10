@@ -128,7 +128,8 @@ class MatchingArgsFragment :
 
         adapter.onSelectChange = { project ->
             u("选中的=${project}")
-            changeCurve(project)
+//            changeCurve(project)
+            vm.changeSelectProject(project)
         }
 
         lifecycleScope.launch {
@@ -146,8 +147,7 @@ class MatchingArgsFragment :
 
         lifecycleScope.launch {
             vm.curveUiState.collectLatest {
-                vd.tvEquationText.text = it.equationText
-                vd.tvFitgoodnessText.text = it.fitGoodnessText
+                changeCurve(it.curProject)
             }
         }
         vd.vMatching.setOnClickListener {

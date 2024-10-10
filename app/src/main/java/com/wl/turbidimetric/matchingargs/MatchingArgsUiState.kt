@@ -96,14 +96,7 @@ sealed class MatchingArgsDialogUiState {
 }
 
 data class MatchingArgsCurveUiState(
-    /**
-     * 显示选中项目的拟合公式
-     */
-    val equationText: String,
-    /**
-     * 显示选中项目的拟合度 R²
-     */
-    val fitGoodnessText: String,
+    val curProject: CurveModel
 )
 
 data class MatchingConfigUiState(

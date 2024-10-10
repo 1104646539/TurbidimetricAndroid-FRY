@@ -32,7 +32,7 @@ android {
         minSdk 24
         targetSdk 32
         versionCode 1
-        versionName "1.0.0.0-92增加检测中不能修改设置部分参数"
+        versionName "1.0.0.0-93修复质控不能打印选中的曲线信息的问题"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 

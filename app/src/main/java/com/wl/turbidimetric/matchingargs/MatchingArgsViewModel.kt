@@ -2089,16 +2089,7 @@ class MatchingArgsViewModel(
         selectProject = project
         viewModelScope.launch {
             _curveUiState.emit(
-                MatchingArgsCurveUiState(
-                    equationText = getEquation(
-                        FitterType.toValue(project.fitterType),
-                        mutableListOf(project.f0, project.f1, project.f2, project.f3)
-                    ),
-                    fitGoodnessText = getFitGoodness(
-                        FitterType.toValue(project.fitterType),
-                        project.fitGoodness
-                    )
-                )
+                MatchingArgsCurveUiState(project)
             )
         }
     }

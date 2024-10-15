@@ -380,6 +380,7 @@ class MatchingConfigMatchingLayout : FrameLayout {
         if (cons.size > 5) {
             etTargetCon6?.setText(cons[5].toString())
         }
+        etTargetCon6?.isEnabled = !autoAttenuation && (gradsNum > 5)
     }
 
 }

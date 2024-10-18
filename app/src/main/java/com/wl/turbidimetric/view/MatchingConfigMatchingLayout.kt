@@ -259,6 +259,14 @@ class MatchingConfigMatchingLayout : FrameLayout {
 
             etTargetCon6?.isEnabled = !autoAttenuation && (gradsNum > 5)
 
+            if (autoAttenuation) {
+                //选择了自动稀释，需要把浓度变为0 50 200 500 1000
+                etTargetCon1?.setText("0")
+                etTargetCon2?.setText("50")
+                etTargetCon3?.setText("200")
+                etTargetCon4?.setText("500")
+                etTargetCon5?.setText("1000")
+            }
         }
 
         etQualityLow1?.setText(qualityLow1.toString())

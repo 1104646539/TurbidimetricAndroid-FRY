@@ -32,7 +32,7 @@ android {
         minSdk 24
         targetSdk 32
         versionCode 1
-        versionName "1.0.0.0-94修复质控选择6个时不能输入的问题"
+        versionName "1.0.0.0-95修复检测结束比色皿架可能不复位的问题"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 

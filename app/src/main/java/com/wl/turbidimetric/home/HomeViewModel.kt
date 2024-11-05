@@ -291,6 +291,11 @@ class HomeViewModel(
      */
     private var cuvetteShelfMoveFinish = false
 
+    /**
+     * 当比色皿架正在移动时，触发了检测结束的命令，这时需要复位，但不能直接复位，把此标志位置true,等待移动比色皿架完成再执行检测结束动作
+     */
+    private var replayTestFinishAction = false
+
     /**样本架是否移动完毕
      *
      */
@@ -2162,7 +2167,11 @@ class HomeViewModel(
                         stepDripReagent()
                     } else {
                         i("不需要加试剂,检测结束！")
-                        testFinishAction()
+                        if (cuvetteShelfMoveFinish) {//比色皿架可以移动
+                            testFinishAction()
+                        } else {//比色皿架正在移动，等待移动完毕再移动复位
+                            replayTestFinishAction = true;
+                        }
                     }
                 } else {
                     //这排样本已经取完样了，移动到下一排接着取样
@@ -2408,6 +2417,11 @@ class HomeViewModel(
         if (continueTestCuvetteState) {
             showCuvetteDeficiencyDialog()
             return
+        }
+        //需要恢复检测结束动作
+        if (replayTestFinishAction) {
+            replayTestFinishAction = false
+            testFinishAction()
         }
 
         if (appViewModel.testState != TestState.TestFinish) {

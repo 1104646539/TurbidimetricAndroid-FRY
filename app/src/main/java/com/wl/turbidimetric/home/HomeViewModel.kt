@@ -1849,7 +1849,7 @@ class HomeViewModel(
         if (state == TestState.Test2) {
             i("stepTest cuvettePos=$cuvettePos needMoveStep=$needMoveStep")
             if (needMoveStep > -1) {//需要跳过
-                cuvettePos = -1
+                cuvettePos = 0
                 moveCuvetteTest(needMoveStep + 2)
             } else {//不需要跳过
                 cuvettePos = getNextStepCuvetteStartPos()
@@ -1872,7 +1872,7 @@ class HomeViewModel(
             val prevState = if (state == TestState.Test3) CuvetteState.Test2 else CuvetteState.Test3
             val firstIndex =
                 mCuvetteStates[cuvetteShelfPos]!!.indexOfFirst { it.state == prevState }
-            moveCuvetteTest(firstIndex - cuvettePos)
+            moveCuvetteTest(firstIndex - cuvettePos + 1)
         }
     }
 

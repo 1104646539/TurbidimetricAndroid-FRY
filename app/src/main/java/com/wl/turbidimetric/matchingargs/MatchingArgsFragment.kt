@@ -20,6 +20,7 @@ import com.wl.wllib.LogToFile.i
 import com.wl.turbidimetric.base.BaseFragment
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.view.MatchingConfigLayout
+import com.wl.turbidimetric.view.dialog.ICON_HINT
 import com.wl.turbidimetric.view.dialog.MatchingConfigDialog
 import com.wl.wllib.LogToFile.u
 import kotlinx.coroutines.flow.collectLatest
@@ -351,16 +352,16 @@ class MatchingArgsFragment :
                      * 命令提示错误，中断所有程序
                      */
                     is MatchingArgsDialogUiState.StateFailed -> {
-//                        dialog.showPop(requireContext(), isCancelable = false) {
-//                            it.showDialog(
-//                                msg = state.msg,
-//                                confirmText = "我知道了",
-//                                confirmClick = { baseDialog ->
-//                                    baseDialog.dismiss()
-//                                },
-//                                showIcon = true, iconId = ICON_HINT
-//                            )
-//                        }
+                        dialog.showPop(requireContext(), isCancelable = false) {
+                            it.showDialog(
+                                msg = state.msg,
+                                confirmText = "我知道了",
+                                confirmClick = { baseDialog ->
+                                    baseDialog.dismiss()
+                                },
+                                showIcon = true, iconId = ICON_HINT
+                            )
+                        }
                     }
 
                     else -> {

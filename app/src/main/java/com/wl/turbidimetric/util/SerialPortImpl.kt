@@ -505,7 +505,7 @@ class SerialPortImpl(
                 if (count > 0) {
                     val re = byteArray.copyOf(count).toUByteArray()
                     data.addAll(re)
-//                        c("每次接收的re=${re.toHex()}")
+                    c("每次接收的re=${re.toHex()}")
                 }
                 if (SystemGlobal.mcuUpdate) {
                     parseMcuUpdate()
@@ -523,6 +523,11 @@ class SerialPortImpl(
                                 count++
                                 if (hCount == count) {
                                     //找到了前缀
+                                    if((k + allCount + 1) > data.size){
+                                        c("数据长度不对，需要"+(k + allCount + 1)+"，只有"+data.size)
+                                        data.clear()
+                                        break@i
+                                    }
                                     val temp: UByteArray =
                                         data.toUByteArray().copyOfRange(i, k + allCount + 1)
                                     val ready =
@@ -545,8 +550,10 @@ class SerialPortImpl(
                                     break@i
                                 }
                             } else {
-                                i("不对了")
-                                continue@i
+                                i("不对了=${data.toUByteArray().toHex()}")
+                                data.clear()
+                                break@i
+//                                continue@i
                             }
                             k++
                         }

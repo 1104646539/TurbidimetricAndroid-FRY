@@ -32,7 +32,7 @@ android {
         minSdk 24
         targetSdk 32
         versionCode 1
-        versionName "1.0.0.0-96修复跳过2个比色皿检测2个位置检测错乱的问题"
+        versionName "1.0.0.0-99串口修复乱码长短闪退问题"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 

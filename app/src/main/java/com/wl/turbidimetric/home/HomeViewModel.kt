@@ -558,7 +558,7 @@ class HomeViewModel(
     val sampleExists = mutableListOf(true, true, true, true, true, true, true, true, true, true)
 
     //测试用 每排之间的检测间隔
-    val testS: Long = 100
+    val testS: Long = 5000
 
     //测试用 每个比色皿之间的检测间隔
     val testP: Long = 100
@@ -650,7 +650,7 @@ class HomeViewModel(
 
         if (SystemGlobal.isCodeDebug) {
             testShelfInterval1 = testS
-            testShelfInterval2 = testS
+            testShelfInterval2 = testS + 1000 * 20
             testShelfInterval3 = testS
             testShelfInterval4 = testS
         } else {
@@ -1495,7 +1495,7 @@ class HomeViewModel(
             if (appViewModel.testState == TestState.Test2) testShelfInterval2 else if (appViewModel.testState == TestState.Test3) testShelfInterval3 else testShelfInterval4
         val stirTime = stirTimes[cuvettePos]
         val intervalTemp = targetTime - (Date().time - stirTime)
-        i("intervalTemp=$intervalTemp stirTime=$stirTime targetTime=$targetTime")
+        i("intervalTemp=$intervalTemp stirTime=$stirTime targetTime=$targetTime cuvettePos=$cuvettePos")
         viewModelScope.launch {
             delay(intervalTemp)
             moveCuvetteTest()
@@ -1841,38 +1841,16 @@ class HomeViewModel(
      * @param state TestState 要切换到的状态
      */
     private fun stepTest(state: TestState) {
-        i(" ———————— stepTest state=$state  cuvettePos=$cuvettePos————————————————————————————————————————————————————————————————————————————————————————————————=")
+        i(" ———————— stepTest state=$state  cuvettePos=$cuvettePos cuvetteStartPos=$cuvetteStartPos————————————————————————————————————————————————————————————————————————————————————————————————=")
         appViewModel.testState = state
-        //获取跳过的步数
-        val needMoveStep = getFirstCuvetteStartPos()
-        //切换到TestState.Test2时，当前下位机的比色皿位置cuvettePos == 0，则不需要计算需要回退多少格，直接往前移动
         if (state == TestState.Test2) {
-            i("stepTest cuvettePos=$cuvettePos needMoveStep=$needMoveStep")
-            if (needMoveStep > -1) {//需要跳过
-                cuvettePos = 0
-                moveCuvetteTest(needMoveStep + 2)
-            } else {//不需要跳过
-                cuvettePos = getNextStepCuvetteStartPos()
-                i("stepTest cuvettePos=$cuvettePos needMoveStep=$needMoveStep")
-                moveCuvetteTest()
-            }
+            //先去第一个位置等待
+            cuvettePos = -1
+            moveCuvetteTest()
         } else {
-            //如果 nextStartPos > -1 代表要跳过，更新比色皿状态
-            i("stepTest cuvettePos=$cuvettePos needMoveStep=$needMoveStep $cuvetteStartPos")
-            if (needMoveStep > -1) {
-                if (isFirstCuvetteShelf()) {
-                    if (cuvetteStartPos > 0) {
-                        repeat(cuvetteStartPos) {
-                            updateCuvetteState(it, CuvetteState.Skip, null, null)
-                        }
-                    }
-                }
-            }
-            //获取第一个需要检测的下标，计算当前位置到该位置的下标
-            val prevState = if (state == TestState.Test3) CuvetteState.Test2 else CuvetteState.Test3
-            val firstIndex =
-                mCuvetteStates[cuvetteShelfPos]!!.indexOfFirst { it.state == prevState }
-            moveCuvetteTest(firstIndex - cuvettePos + 1)
+            i("stepTest3 cuvettePos=$cuvettePos cuvetteStartPos=$cuvetteStartPos")
+            //先去第一个位置等待
+            moveCuvetteTest(-cuvettePos)
         }
     }
 
@@ -2292,10 +2270,47 @@ class HomeViewModel(
             val firstTime = getFirstDelayTime()
             viewModelScope.launch {
                 delay(firstTime)
-                moveCuvetteTest()
+//                moveCuvetteTest()
+                moveFirstCuvetteTest()
             }
         } else {
             test()
+        }
+    }
+
+    private fun moveFirstCuvetteTest() {
+        var state = appViewModel.testState
+        //获取跳过的步数
+        val needMoveStep = getFirstCuvetteStartPos()
+        //切换到TestState.Test2时，当前下位机的比色皿位置cuvettePos == 0，则不需要计算需要回退多少格，直接往前移动
+        if (state == TestState.Test2) {
+            if (needMoveStep > -1) {//需要跳过
+                cuvettePos = 0
+                moveCuvetteTest(needMoveStep + 2)
+                i("stepTest  needMoveStep=$needMoveStep")
+            } else {//不需要跳过
+                cuvettePos = 0
+                i("stepTest2  needMoveStep=$needMoveStep")
+                moveCuvetteTest()
+            }
+        } else {
+            //如果 needMoveStep > -1 代表要跳过，更新比色皿状态
+            i("stepTest3 cuvettePos=$cuvettePos needMoveStep=$needMoveStep cuvetteStartPos=$cuvetteStartPos")
+            if (needMoveStep > -1) {
+                if (isFirstCuvetteShelf()) {
+                    if (cuvetteStartPos > 0) {
+                        repeat(cuvetteStartPos) {
+                            updateCuvetteState(it, CuvetteState.Skip, null, null)
+                        }
+                    }
+                }
+            }
+            //获取第一个需要检测的下标，计算当前位置到该位置的下标
+            val prevState = if (state == TestState.Test3) CuvetteState.Test2 else CuvetteState.Test3
+            val firstIndex =
+                mCuvetteStates[cuvetteShelfPos]!!.indexOfFirst { it.state == prevState }
+            moveCuvetteTest(firstIndex - cuvettePos + 1)
+
         }
     }
 
@@ -3261,6 +3276,7 @@ class HomeViewModel(
      */
     fun selectFocChange(shelfIndex: Int, index: Int, item: Item) {
         viewModelScope.launch {
+            delay(50)
             _itemDetailsUiState.emit(HomeDetailsUiState(shelfIndex, index, item, false))
         }
     }
@@ -3282,16 +3298,6 @@ class HomeViewModel(
     }
 
 
-//    data class CuvetteItem(
-//        var state: CuvetteState, var testResult: TestResultModel? = null, var sampleID: String? = ""
-//    )
-//
-//    data class SampleItem(
-//        var state: SampleState,
-//        var testResult: TestResultModel? = null,
-//        var cuvetteID: String? = "",
-//        var sampleType: SampleType? = null
-//    )
 }
 
 class HomeViewModelFactory(

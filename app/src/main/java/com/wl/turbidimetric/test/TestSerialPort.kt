@@ -41,7 +41,7 @@ object TestSerialPort {
             SerialGlobal.CMD_GetState -> {
                 delay(200)
 //                if (index < 2) {
-                reply = reply.plus(ubyteArrayOf(0x0u, 0x2u, 0x88u, 0xffu))// 0011 0011
+                reply = reply.plus(ubyteArrayOf(0x0u, 0x2u, 0x11u, 0xffu))// 0011 0011
 //                } else {
 //                reply = reply.plus(ubyteArrayOf(0x0u, 0x2u, 0x11u, 0xffu))//0001 0001
 //                }
@@ -50,12 +50,12 @@ object TestSerialPort {
 
             SerialGlobal.CMD_MoveSample -> {
                 delay(100)
-//                if (index in 1..9 || index in 15 .. 19) {
-//                    reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x0u))//0不存在 1样本管 2比色杯
-//                } else {
-                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x2u))//0不存在 1样本管 2比色杯
-//                }
-//                index++
+                if (index in 3 .. 4) {
+                    reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x2u))//0不存在 1样本管 2比色杯
+                } else {
+                    reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x0u))//0不存在 1样本管 2比色杯
+                }
+                index++
 //                if (index == 10) {
 //                    index = 0
 //                }
@@ -141,6 +141,7 @@ object TestSerialPort {
 //                delay(5000)
                 reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x0u))
             }
+
             SerialGlobal.CMD_Stir -> {
 //                delay(2000)
                 reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x0u))

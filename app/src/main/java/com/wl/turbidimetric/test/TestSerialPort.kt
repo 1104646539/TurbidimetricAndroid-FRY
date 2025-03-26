@@ -50,15 +50,15 @@ object TestSerialPort {
 
             SerialGlobal.CMD_MoveSample -> {
                 delay(100)
-                if (index in 3 .. 4) {
+                if (index in 3 .. 3) {
                     reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x2u))//0不存在 1样本管 2比色杯
                 } else {
                     reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x0u))//0不存在 1样本管 2比色杯
                 }
                 index++
-//                if (index == 10) {
-//                    index = 0
-//                }
+                if (index == 10) {
+                    index = 0
+                }
             }
 
             SerialGlobal.CMD_MoveCuvetteShelf -> {

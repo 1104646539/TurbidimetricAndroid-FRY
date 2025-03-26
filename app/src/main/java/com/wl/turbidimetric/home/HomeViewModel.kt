@@ -500,7 +500,7 @@ class HomeViewModel(
     /**
      * 记录每个比色皿的搅拌时间
      */
-    val stirTimes = longArrayOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    var stirTimes = longArrayOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
     /**
      * 是否允许获取温度（在调试时不自动获取）
@@ -2278,6 +2278,9 @@ class HomeViewModel(
         }
     }
 
+    /**
+     * 移动到第一个需要检测的比色皿位
+     */
     private fun moveFirstCuvetteTest() {
         var state = appViewModel.testState
         //获取跳过的步数
@@ -2310,7 +2313,6 @@ class HomeViewModel(
             val firstIndex =
                 mCuvetteStates[cuvetteShelfPos]!!.indexOfFirst { it.state == prevState }
             moveCuvetteTest(firstIndex - cuvettePos + 1)
-
         }
     }
 
@@ -2322,8 +2324,10 @@ class HomeViewModel(
         val targetTime =
             if (appViewModel.testState == TestState.Test2) testShelfInterval2 else if (appViewModel.testState == TestState.Test3) testShelfInterval3 else testShelfInterval4
         val stirTime = stirTimes.first { it.toInt() != 0 }
-        val intervalTemp = targetTime - (Date().time - stirTime) - 1500
-        i("getFirstDelayTime intervalTemp=$intervalTemp stirTime=$stirTime targetTime=$targetTime")
+        val nowTime = Date().time
+        val intervalTemp = targetTime - (nowTime - stirTime) - 1500
+        i("getFirstDelayTime intervalTemp=$intervalTemp nowTime=$nowTime stirTime=$stirTime targetTime=$targetTime")
+//        stirTimes.forEach { i("getFirstDelayTime stirTimes $it") }
         return intervalTemp
     }
 
@@ -2429,6 +2433,8 @@ class HomeViewModel(
         c("接收到 移动比色皿架 reply=$reply cuvetteShelfPos=$cuvetteShelfPos cuvetteStartPos=$cuvetteStartPos")
         cuvetteShelfMoveFinish = true
 
+        initCuvetteShelfState()
+
         //如果是比色皿不足复位的
         if (continueTestCuvetteState) {
             showCuvetteDeficiencyDialog()
@@ -2453,6 +2459,14 @@ class HomeViewModel(
                 }
             }
         }
+    }
+
+    /**
+     * 比色皿架移动时，初始化当前比色皿架相关的信息
+     *
+     */
+    private fun initCuvetteShelfState() {
+        stirTimes.forEachIndexed { index, _ -> stirTimes[index] = 0 }
     }
 
     /**

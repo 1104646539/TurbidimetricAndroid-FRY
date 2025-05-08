@@ -52,6 +52,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginRight="43dp"
+        android:visibility="gone"
         android:src="@drawable/state_printer_none"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toLeftOf="@id/tv_time"

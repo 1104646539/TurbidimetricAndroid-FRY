@@ -1671,14 +1671,14 @@ class HomeViewModel(
             )
         }
         //自动打印A4报告
-        if (appViewModel.getAutoPrintReport() && PrintSDKHelper.isPreparePrint()) {
-            appViewModel.printHelper.addPrintWork(
-                testResultModel,
-                appViewModel.getHospitalName(),
-                appViewModel.getDetectionDoctor(),
-                appViewModel.getReportFileNameBarcode()
-            )
-        }
+//        if (appViewModel.getAutoPrintReport() && PrintSDKHelper.isPreparePrint()) {
+//            appViewModel.printHelper.addPrintWork(
+//                testResultModel,
+//                appViewModel.getHospitalName(),
+//                appViewModel.getDetectionDoctor(),
+//                appViewModel.getReportFileNameBarcode()
+//            )
+//        }
     }
 
 

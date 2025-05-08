@@ -32,7 +32,7 @@ android {
         minSdk 24
         targetSdk 32
         versionCode 1
-        versionName "1.0.0.0-101修复跳过时偶尔时间错误的问题"
+        versionName "1.0.0.0-102修复打印问题"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 

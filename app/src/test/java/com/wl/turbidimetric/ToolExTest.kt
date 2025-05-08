@@ -3,6 +3,7 @@ package com.wl.turbidimetric
 import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.CurveModel
+import com.wl.wllib.CRC
 import com.wl.wllib.CRC.CRC16
 import com.wl.wllib.LogToFile
 import com.wl.wllib.toLongTimeStr
@@ -78,7 +79,8 @@ class ToolExTest {
 
     @Test
     fun verifyCrcTest() {
-//        Assert.assertTrue(VerifyCrc(ubyteArrayOf(0x01u, 0x01u, 0x00u, 0x00u, 0x00u, 0x18u, 0x3cu)))
+        CRC.CRC16(ubyteArrayOf(0x01u, 0x01u, 0x00u, 0x00u, 0x00u, 0x18u, 0x3cu))
+//        Assert.assertTrue()
 //
 //        Assert.assertFalse(VerifyCrc(ubyteArrayOf(0x01u, 0x01u, 0x00u, 0x00u, 0x00u, 0x11u, 0x11u)))
 //

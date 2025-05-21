@@ -108,9 +108,18 @@ class MatchingStateLayout : FrameLayout {
                 if (matchingType == MatchingConfigLayout.MatchingType.Matching) "拟合" else "质控"
             data.map { d ->
                 val targets = d.targetCon.split("-").map { it.toDouble() }
-                var low = if (targets.size > 1) targets[0] else targets[0] * 0.9
-                var high = if (targets.size > 1) targets[1] else targets[0] * 1.1
+                //合格范围
+                var bl  = 0.1
+                if(targets[0] in 49.9..50.1){//如果目标浓度是50
+                    bl = 0.2
+                }
+
+                var low = if (targets.size > 1) targets[0] else targets[0] * (1 - bl)
+                var high = if (targets.size > 1) targets[1] else targets[0] * (1 + bl)
+
+
                 if (low > 0.001 && high > 0.001) {
+
                     d.testCon.toDouble() in low..high
                 } else {
                     //如果目标值是0就不判断

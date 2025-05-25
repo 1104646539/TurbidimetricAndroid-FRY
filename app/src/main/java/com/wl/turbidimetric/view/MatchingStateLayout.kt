@@ -111,7 +111,7 @@ class MatchingStateLayout : FrameLayout {
                 //合格范围
                 var bl  = 0.1
                 if(targets[0] in 0.1..50.1){//如果目标浓度是50
-                    bl = 0.2
+                    bl = 0.3
                 }
 
                 var low = if (targets.size > 1) targets[0] else targets[0] * (1 - bl)

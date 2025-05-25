@@ -6,6 +6,7 @@ import org.apache.commons.math3.fitting.PolynomialCurveFitter
 import org.apache.commons.math3.fitting.SimpleCurveFitter
 import org.apache.commons.math3.fitting.WeightedObservedPoints
 import org.apache.commons.math3.stat.regression.SimpleRegression
+import kotlin.math.abs
 import kotlin.math.min
 import kotlin.math.pow
 
@@ -69,7 +70,7 @@ class ThreeFun : Fitter {
         val points = WeightedObservedPoints()
 
         for (i in guess.indices) {
-            points.add(values[i], guess[i])
+            points.add( guess[i],values[i])
         }
 
         val fitter = PolynomialCurveFitter.create(3) //指定多项式阶数
@@ -77,9 +78,9 @@ class ThreeFun : Fitter {
         params = fitter.fit(points.toList()) // 曲线拟合，结果保存于数组
 
 
-        yss = DoubleArray(values.size)
+        yss = DoubleArray(guess.size)
         //step2、验算
-        for (i in yss.indices) {
+        for (i in guess.indices) {
             yss[i] = ratCalcCon(params, values[i])
         }
 
@@ -103,9 +104,27 @@ class ThreeFun : Fitter {
     }
 
     companion object {
-        @JvmStatic
-        fun f2(p: DoubleArray, x: Double): Double {
-            return p[0] + p[1] * x + p[2] * x * x + p[3] * x * x * x
+//        @JvmStatic
+//        fun f2(p: DoubleArray, x: Double): Double {
+//            return p[0] + p[1] * x + p[2] * x * x + p[3] * x * x * x
+//        }
+        fun f2(p: DoubleArray, y: Double): Double {
+
+            // 目标函数
+            fun f(x: Double) = p[0] + p[1] * x + p[2] * x * x + p[3] * x * x * x - y
+            // 导数
+            fun df(x: Double) = p[1] + 2 * p[2] * x + 3 * p[3] * x * x
+
+            var x = 0.0
+            repeat(100) {
+                val fx = f(x)
+                val dfx = df(x)
+                if (dfx == 0.0) return x // 避免除零
+                val x1 = x - fx / dfx
+                if (abs(x1 - x) < 1e-8) return x1
+                x = x1
+            }
+            return x
         }
     }
 }

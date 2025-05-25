@@ -24,15 +24,52 @@ class CurveFitterTest {
     }
 
     /**
-     * 三次多项式拟合测试
+     * 三次多项式拟合测�?
      */
     @Test
     fun threadFunTest() {
-        val p1 = -27.5.toDouble()
-        val p2 = 28.8.toDouble()
-        val p3 = 239.6.toDouble()
-        val p4 = 975.6.toDouble()
-        val p5 = 1979.toDouble()
+        val p1 = 5.toDouble()
+        val p2 = 28.toDouble()
+        val p3 = 50.toDouble()
+        val p4 = 210.toDouble()
+        val p5 = 342.toDouble()
+        val p6 = 435.toDouble()
+
+
+        val m1 = 0.toDouble()
+        val m2 = 25.toDouble()
+        val m3 = 50.toDouble()
+        val m4 = 200.toDouble()
+        val m5 = 500.toDouble()
+        val m6 = 1000.toDouble()
+
+        val ps = doubleArrayOf(p1, p2, p3, p4, p5,p6)
+        val ms = doubleArrayOf(m1, m2, m3, m4, m5,m6)
+//        FitterType.values().forEach { type ->
+
+        val fitter = FitterFactory.create(FitterType.Three)
+        fitter.calcParams(ps, ms)
+//            println("type=$type \n参数")
+        fitter.params.forEach {
+            print("it=$it")
+        }
+        println("\n验算")
+        ps.forEach { v ->
+            val con = fitter.ratCalcCon(fitter.params, v)
+            print("con=$con")
+        }
+        println()
+    }
+    /**
+     * 三次多项式拟合测�?
+     */
+    @Test
+    fun threadFunTest3() {
+        val p1 = 5.toDouble()
+        val p2 = 54.toDouble()
+        val p3 = 205.toDouble()
+        val p4 = 343.toDouble()
+        val p5 = 422.toDouble()
 
 
         val m1 = 0.toDouble()
@@ -54,61 +91,9 @@ class CurveFitterTest {
         println("\n验算")
         ps.forEach { v ->
             val con = fitter.ratCalcCon(fitter.params, v)
-            print("con=$con")
+            println("con=$con")
         }
         println()
-    }
-
-    /**
-     * 三次多项式拟合测试
-     */
-    @Test
-    fun threadFunTest2() {
-        val p1 = -27.5.toDouble()
-        val p2 = 28.8.toDouble()
-        val p3 = 239.6.toDouble()
-        val p4 = 975.6.toDouble()
-        val p5 = 1979.toDouble()
-
-
-        val m1 = 0.toDouble()
-        val m5 = 50.toDouble()
-        val m3 = 500.toDouble()
-        val m2 = 1000.toDouble()
-        val m4 = 200.toDouble()
-
-        val ps = doubleArrayOf(p1, p2, p3, p4, p5)
-        val ms = doubleArrayOf(m1, m2, m3, m4, m5)
-        val cf = CurveFitterUtil()
-        cf.calcParams(ps, ms)
-
-        val a = cf.params[0]
-        val b = cf.params[1]
-        val c = cf.params[2]
-        val d = cf.params[3]
-
-        for (p in cf.params) {
-            println("params=$p")
-        }
-        println("df=${cf.fitGoodness}")
-        for (p in ps) {
-            val r3 = d.toBigDecimal().multiply(p.toBigDecimal().pow(3))
-            val r2 = c.toBigDecimal().multiply(p.toBigDecimal().pow(2))
-            val r = b.toBigDecimal().multiply(p.toBigDecimal())
-            var con = a.toBigDecimal() + r + r2 + r3
-
-            println("con=$con")
-//            val con2 = cf.f(doubleArrayOf(4.26006, 1.27627, -0.00104, 0.0000003988), p)
-            val con2 = CurveFitterUtil.f(cf.params, p)
-            println("con2=$con2")
-        }
-        println("-------------------------------------")
-        val cf2 = matchingArg(FitterType.Three, ps.map { it }, ms)
-
-        for (p in cf2.params) {
-            println("params=$p")
-        }
-        println("df=${cf2.fitGoodness}")
     }
 
 
@@ -157,7 +142,7 @@ class CurveFitterTest {
 //            println("con2=$con2")
 
         }
-        println("--------------开始重新计算-----------------------")
+        println("--------------开始重新计�?-----------------------")
         var dif50 = 50 - con50fs
         println("50差值：$dif50")
         dif50 = if (dif50 >= 0) {
@@ -165,10 +150,10 @@ class CurveFitterTest {
         } else {
             dif50 / 2
         }
-        println("50差值计算后：$dif50")
+        println("50差值计算后�?$dif50")
 
         val dif0 = p1 - dif50
-        println("0原始吸光度-50差值计算后：$dif0")
+        println("0原始吸光�?-50差值计算后�?$dif0")
 
         val np1 = dif0.toDouble()
 
@@ -199,7 +184,7 @@ class CurveFitterTest {
     }
 
     /**
-     * 线性拟合测试
+     * 线性拟合测�?
      */
     @Test
     fun linearFunTest() {
@@ -236,7 +221,7 @@ class CurveFitterTest {
     }
 
     /**
-     * 四参数拟合测试
+     * 四参数拟合测�?
      */
     @Test
     fun fourFunTest2() {
@@ -262,7 +247,7 @@ class CurveFitterTest {
     }
 
     /**
-     * 四参数拟合测试
+     * 四参数拟合测�?
      */
     @Test
     fun fourFunTest() {
@@ -397,5 +382,23 @@ class CurveFitterTest {
             val con = LinearFun.f2(doubleArrayOf(f0, f1, f2, f3), it)
             println("con=$con")
         }
+    }
+
+    fun solveCubic(a: Double, b: Double, c: Double, d: Double, y: Double, guess: Double = 0.0): Double {
+        // Ŀ�꺯��
+        fun f(x: Double) = a + b * x + c * x * x + d * x * x * x - y
+        // ����
+        fun df(x: Double) = b + 2 * c * x + 3 * d * x * x
+
+        var x = guess
+        repeat(100) {
+            val fx = f(x)
+            val dfx = df(x)
+            if (dfx == 0.0) return x // �������
+            val x1 = x - fx / dfx
+            if (abs(x1 - x) < 1e-8) return x1
+            x = x1
+        }
+        return x
     }
 }

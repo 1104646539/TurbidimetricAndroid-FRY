@@ -423,9 +423,9 @@ class MatchingArgsViewModel(
 //    private val testValues2 =
 //        doubleArrayOf(1.0, 16.0, 35.0, 140.0, 310.0, 623.0, 0.3, 0.3, 0.3, 0.3)
     //测试四参数拟合
-    private val testValues1 = doubleArrayOf(8.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+    private val testValues1 = doubleArrayOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
     private val testValues2 =
-        doubleArrayOf(3.0, 3.0, 52.0, 140.0, 351.0, 437.7, 0.3, 0.3, 0.3, 0.3)
+        doubleArrayOf(5.0, 54.0, 205.0, 343.0, 422.0, 435.7, 0.3, 0.3, 0.3, 0.3)
 
     //    private val testValues2 =
 //        doubleArrayOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)

@@ -110,7 +110,7 @@ class MatchingStateLayout : FrameLayout {
                 val targets = d.targetCon.split("-").map { it.toDouble() }
                 //合格范围
                 var bl  = 0.1
-                if(targets[0] in 49.9..50.1){//如果目标浓度是50
+                if(targets[0] in 0.1..50.1){//如果目标浓度是50
                     bl = 0.2
                 }
 

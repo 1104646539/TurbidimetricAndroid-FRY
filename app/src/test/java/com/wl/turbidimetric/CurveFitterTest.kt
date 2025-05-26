@@ -28,12 +28,12 @@ class CurveFitterTest {
      */
     @Test
     fun threadFunTest() {
-        val p1 = 5.toDouble()
-        val p2 = 28.toDouble()
-        val p3 = 50.toDouble()
-        val p4 = 210.toDouble()
+        val p1 = 4.toDouble()
+        val p2 = 18.toDouble()
+        val p3 = 39.toDouble()
+        val p4 = 181.toDouble()
         val p5 = 342.toDouble()
-        val p6 = 435.toDouble()
+        val p6 = 423.toDouble()
 
 
         val m1 = 0.toDouble()
@@ -56,7 +56,7 @@ class CurveFitterTest {
         println("\n验算")
         ps.forEach { v ->
             val con = fitter.ratCalcCon(fitter.params, v)
-            print("con=$con")
+            println("con=$con")
         }
         println()
     }

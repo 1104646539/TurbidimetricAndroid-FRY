@@ -116,7 +116,7 @@ class ThreeFun : Fitter {
             fun df(x: Double) = p[1] + 2 * p[2] * x + 3 * p[3] * x * x
 
             var x = 0.0
-            repeat(100) {
+            repeat(5000) {
                 val fx = f(x)
                 val dfx = df(x)
                 if (dfx == 0.0) return x // 避免除零

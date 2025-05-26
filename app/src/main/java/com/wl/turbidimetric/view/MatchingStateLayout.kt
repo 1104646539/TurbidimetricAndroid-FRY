@@ -2,6 +2,7 @@ package com.wl.turbidimetric.view
 
 import android.content.Context
 import android.util.AttributeSet
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.AdapterView
@@ -18,6 +19,7 @@ import com.wl.turbidimetric.matchingargs.MatchingStateAdapter
 import com.wl.turbidimetric.matchingargs.SpnSampleAdapter
 import com.wl.turbidimetric.model.CurveModel
 import com.wl.turbidimetric.util.FitterType
+import com.wl.wllib.LogToFile
 import kotlin.math.absoluteValue
 
 class MatchingStateLayout : FrameLayout {
@@ -106,11 +108,22 @@ class MatchingStateLayout : FrameLayout {
         var temp = if (abss.isNotEmpty()) {
             resultType =
                 if (matchingType == MatchingConfigLayout.MatchingType.Matching) "拟合" else "质控"
+            //将目标浓度为0的结果的验算也设为0
+            val index = data.indexOfFirst { d ->
+                val targets = d.targetCon.split("-").map { it.toDouble() }
+                //如果目标浓度是50
+                targets.size <=1 && targets[0] in -0.1..0.1
+            }
+            if (index in 0..data.size) {
+                LogToFile.i("更改前=data[index]=${data[index]}")
+                data[index] = data[index].copy(testCon = "0")
+                LogToFile.i("更改后=data[index]=${data[index]}")
+            }
             data.map { d ->
                 val targets = d.targetCon.split("-").map { it.toDouble() }
                 //合格范围
-                var bl  = 0.1
-                if(targets[0] in 0.1..50.1){//如果目标浓度是50
+                var bl = 0.1
+                if (targets[0] in 0.1..50.1) {//如果目标浓度是50
                     bl = 0.3
                 }
 

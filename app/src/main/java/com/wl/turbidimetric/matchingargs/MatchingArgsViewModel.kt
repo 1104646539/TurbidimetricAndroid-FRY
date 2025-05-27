@@ -1344,14 +1344,13 @@ class MatchingArgsViewModel(
                 this.fitterType = selectFitterType.ordinal
                 this.fitGoodness = cf.fitGoodness
                 this.createTime = Date().toTimeStr()
-                this.reagentNO = reagentNOStr
-                this.gradsNum = gradsNum
+                this.reagentNO = this@MatchingArgsViewModel.reagentNOStr
+                this.gradsNum = this@MatchingArgsViewModel.gradsNum
                 this.targets = targetCons.toDoubleArray()
                 this.reactionValues =
-                    abss.subList(0, gradsNum).map { it.toInt() }.toIntArray()
+                    abss.subList(0, this@MatchingArgsViewModel.gradsNum).map { it.toInt() }.toIntArray()
                 this.yzs = cf.yss.map { it.toInt() }.toIntArray()
             }.copyForProject(selectMatchingProject!!)
-//        print()
             testMsg.postValue(msg.toString())
             showMatchingStateDialog()
         }

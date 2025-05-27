@@ -228,7 +228,7 @@ class ThermalPrintUtil(private val serialPort: BaseSerialPort) {
         sb.append("序号:$reagentNo\n")
         sb.append("项目名:$projectName\n")
         sb.append("质控时间:$createTime\n")
-        repeat(5) {
+        repeat(matchingNum) {
             val nd = "${nds[it]}ng/mL".fix(15)
             val abs = "${absorbancys[it].toInt()}".fix(5)
             sb.append("${it + 1} $nd $abs")

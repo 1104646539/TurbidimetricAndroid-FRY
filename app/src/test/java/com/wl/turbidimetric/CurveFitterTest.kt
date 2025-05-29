@@ -1,6 +1,5 @@
 package com.wl.turbidimetric
 
-import com.wl.turbidimetric.ex.matchingArg
 import com.wl.turbidimetric.util.CurveFitterUtil
 import com.wl.turbidimetric.util.FitterFactory
 import com.wl.turbidimetric.util.FitterType
@@ -43,8 +42,8 @@ class CurveFitterTest {
         val m5 = 500.toDouble()
         val m6 = 1000.toDouble()
 
-        val ps = doubleArrayOf(p1, p2, p3, p4, p5,p6)
-        val ms = doubleArrayOf(m1, m2, m3, m4, m5,m6)
+        val ps = doubleArrayOf(p1, p2, p3, p4, p5, p6)
+        val ms = doubleArrayOf(m1, m2, m3, m4, m5, m6)
 //        FitterType.values().forEach { type ->
 
         val fitter = FitterFactory.create(FitterType.Three)
@@ -60,16 +59,17 @@ class CurveFitterTest {
         }
         println()
     }
+
     /**
      * 三次多项式拟合测�?
      */
     @Test
     fun threadFunTest3() {
-        val p1 = 5.toDouble()
-        val p2 = 54.toDouble()
-        val p3 = 205.toDouble()
-        val p4 = 343.toDouble()
-        val p5 = 422.toDouble()
+        val p1 = 4.toDouble()
+        val p2 = 9.toDouble()
+        val p3 = 35.toDouble()
+        val p4 = 96.toDouble()
+        val p5 = 161.toDouble()
 
 
         val m1 = 0.toDouble()
@@ -92,6 +92,15 @@ class CurveFitterTest {
         ps.forEach { v ->
             val con = fitter.ratCalcCon(fitter.params, v)
             println("con=$con")
+        }
+        var reaction2 = arrayListOf(0.0)
+        for (i in 0..500) {
+            reaction2.add(i * 2.0)
+        }
+//        var reaction2 = doubleArrayOf(132.0,161.0)
+        reaction2.forEach { v ->
+            val con = fitter.ratCalcCon(fitter.params, v)
+            println("con2=$con")
         }
         println()
     }
@@ -365,8 +374,8 @@ class CurveFitterTest {
 
         val abss = doubleArrayOf(43.0, 41.0, -16.0)
         abss.forEach {
-            val con = ThreeFun.f2(doubleArrayOf(f0, f1, f2, f3), it)
-            println("con=$con")
+//            val con = ThreeFun.f2(doubleArrayOf(f0, f1, f2, f3), it, guess, params)
+//            println("con=$con")
         }
     }
 
@@ -384,9 +393,17 @@ class CurveFitterTest {
         }
     }
 
-    fun solveCubic(a: Double, b: Double, c: Double, d: Double, y: Double, guess: Double = 0.0): Double {
+    fun solveCubic(
+        a: Double,
+        b: Double,
+        c: Double,
+        d: Double,
+        y: Double,
+        guess: Double = 0.0
+    ): Double {
         // Ŀ�꺯��
         fun f(x: Double) = a + b * x + c * x * x + d * x * x * x - y
+
         // ����
         fun df(x: Double) = b + 2 * c * x + 3 * d * x * x
 

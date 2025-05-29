@@ -88,7 +88,7 @@ class NetworkFragment :
     fun setConfig(
         ip: String, gateway: String, netmask: String, dns1: String
     ) {
-        NetworkUtil.setStaticIp(requireContext(), ip, gateway, netmask, dns1)
+        NetworkUtil.setStaticIp(requireContext(), ip,  netmask,gateway, dns1)
     }
 
     companion object {

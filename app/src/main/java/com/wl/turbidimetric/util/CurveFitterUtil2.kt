@@ -124,15 +124,22 @@ class ThreeFun : Fitter {
 //            for (value in values) {
 //                print("value=${value}")
 //            }
-            println("初始猜想 反应度=${y} 浓度=${x} index=${index}")
+//            println("初始猜想 反应度=${y} 浓度=${x} index=${index}")
             repeat(5000) {
                 val fx = f(x)
                 val dfx = df(x)
-                if (dfx == 0.0) return x // 避免除零
+                if (dfx == 0.0) {// 避免除零
+//                    println("浓度=${x}")
+                    return x
+                }
                 val x1 = x - fx / dfx
-                if (abs(x1 - x) < 1e-6) return x1
+                if (abs(x1 - x) < 1e-6) {
+//                    println("浓度=${x1}")
+                    return x1
+                }
                 x = x1
             }
+//            println("浓度=${x}")
             return x
         }
     }

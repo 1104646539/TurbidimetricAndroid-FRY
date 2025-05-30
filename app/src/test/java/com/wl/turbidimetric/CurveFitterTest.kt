@@ -94,9 +94,9 @@ class CurveFitterTest {
             println("con=$con")
         }
         var reaction2 = arrayListOf(0.0)
-        for (i in 0..500) {
-            reaction2.add(i * 2.0)
-        }
+//        for (i in 0..500) {
+//            reaction2.add(i * 2.0)
+//        }
 //        var reaction2 = doubleArrayOf(132.0,161.0)
         reaction2.forEach { v ->
             val con = fitter.ratCalcCon(fitter.params, v)

@@ -158,15 +158,15 @@ class App : Application() {
         //四参数
         curveSource.addCurve(CurveModel().apply {
             reagentNO = "${557}"
-            f0 = -1.818473101
-            f1 = 1.253206105
-            f2 = 374.2468309
-            f3 = 564.4612105
-            fitGoodness = 0.99999999
+            f0 = 171479.92881
+            f1 = -0.76618
+            f2 = 52921.78949
+            f3 =  -3.62716
+            fitGoodness =  0.99945
             fitterType = FitterType.Four.ordinal
             gradsNum = 6
-            reactionValues = intArrayOf(0, 24, 49, 200, 500, 1000)
-            targets = doubleArrayOf(0.0, 25.0, 50.0, 200.0, 500.0, 1000.0)
+            reactionValues = intArrayOf(0, 795, 2424, 3851, 5435, 7808)
+            targets = doubleArrayOf(0.0, 50.0, 200.0, 400.0, 600.0, 1000.0)
             yzs = intArrayOf(0, 24, 49, 200, 500, 1000)
             createTime = Date().toTimeStr()
         }.copyForProject(project))

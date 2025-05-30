@@ -425,13 +425,13 @@ class MatchingArgsViewModel(
     //测试四参数拟合
     private val testValues1 = doubleArrayOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
     private val testValues2 =
-        doubleArrayOf(4.0, 18.0, 39.0, 181.0, 342.0, 423.0, 0.3, 0.3, 0.3, 0.3)
+        doubleArrayOf(-2.0, 4.0, 24.0, 78.0, 143.0, 0.0, 0.0, 0.0, 0.0, 0.0)
 
-    //    private val testValues2 =
-//        doubleArrayOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
-    private val testValues3 = doubleArrayOf(0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3)
+//        private val testValues2 =
+//        doubleArrayOf(10.0, 38.0, 129.0, 284.0, 440.0, 57.0,219.0, 0.0, 0.0, 0.0)
+    private val testValues3 = doubleArrayOf(0.0, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3)
     private val testValues4 =
-        doubleArrayOf(0.9998, 1.0035, 1.0178, 1.0642, 1.1586, 1.0141, 1.0585, 1.0, 1.0, 1.0)
+        doubleArrayOf(0.0, 1.0035, 1.0178, 1.0642, 1.1586, 1.0141, 1.0585, 1.0, 1.0, 1.0)
     private val testOriginalValues1 =
         intArrayOf(65532, 65532, 65532, 65532, 65532, 65532, 65532, 65532, 65532, 65532)
     private val testOriginalValues2 =
@@ -1348,7 +1348,8 @@ class MatchingArgsViewModel(
                 this.gradsNum = this@MatchingArgsViewModel.gradsNum
                 this.targets = targetCons.toDoubleArray()
                 this.reactionValues =
-                    abss.subList(0, this@MatchingArgsViewModel.gradsNum).map { it.toInt() }.toIntArray()
+                    abss.subList(0, this@MatchingArgsViewModel.gradsNum).map { it.toInt() }
+                        .toIntArray()
                 this.yzs = cf.yss.map { it.toInt() }.toIntArray()
             }.copyForProject(selectMatchingProject!!)
             testMsg.postValue(msg.toString())

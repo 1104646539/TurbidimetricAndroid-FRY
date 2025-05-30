@@ -24,6 +24,7 @@ import com.wl.turbidimetric.model.SampleType
 import com.wl.turbidimetric.util.Fitter
 import com.wl.turbidimetric.util.FitterFactory
 import com.wl.turbidimetric.util.FitterType
+import com.wl.turbidimetric.util.ThreeFun
 import com.wl.wllib.LogToFile.i
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -180,6 +181,12 @@ fun matchingArg(fitterType: FitterType, absorbances: List<Double>, targets: Doub
  */
 fun calcCon(absorbance: BigDecimal, project: CurveModel): Int {
     val fitter = FitterFactory.create(FitterType.toValue(project.fitterType))
+    if (FitterType.toValue(project.fitterType) == FitterType.Three) {
+        (fitter as ThreeFun).values =
+            project.reactionValues.map { d -> d.toDouble() }.toDoubleArray()
+        fitter.guess = project.targets.map { d -> d }.toDoubleArray()
+    }
+
     var con = fitter.ratCalcCon(
         doubleArrayOf(project.f0, project.f1, project.f2, project.f3), absorbance.toDouble()
     )
@@ -505,29 +512,49 @@ fun getFitGoodness(fitterType: FitterType, fitGoodness: Double): String {
 fun getChartEntry(curve: CurveModel): List<Entry> {
     val values = mutableListOf<Entry>()
     val num = 50
-    var y = 0
+    var y = 0.0
     var x = 0
-    var needContinue = true
+//    var needContinue = true
+    var lastReaction = curve.reactionValues.last()
+    var lastCon = curve.targets.last()
+    val isThree = FitterType.toValue(curve.fitterType) == FitterType.Three
     repeat(num) {
-        if (!needContinue) return@repeat
-        if (FitterType.toValue(curve.fitterType) == FitterType.Three) {
-            y += 2000 / num
+        if (isThree) {
+            y += lastReaction / num.toDouble()
+            FitterType.toValue(curve.fitterType)
             x = calcCon(y.toBigDecimal(), curve)
-            if (x > 1000) {
-                needContinue = false
-            }
         } else {
-            x += 1000 / num
+            y += lastReaction / num.toDouble()
             val fitter = FitterFactory.create(FitterType.toValue(curve.fitterType))
-            y = fitter.conCalcRat(
+            x = fitter.ratCalcCon(
                 doubleArrayOf(curve.f0, curve.f1, curve.f2, curve.f3),
-                x.toDouble()
+                y.toDouble()
             ).toInt()
         }
         if (x >= 0 && y >= 0) {
-            values.add(Entry(x.toFloat(), y.toFloat()))
+            if ((isThree && y <= lastReaction) && x < lastCon || !isThree) {
+                values.add(Entry(x.toFloat(), y.toFloat()))
+            }
         }
     }
+    if (isThree) {
+        y = lastReaction.toDouble()
+        FitterType.toValue(curve.fitterType)
+        x = calcCon(y.toBigDecimal(), curve)
+    } else {
+        y = lastReaction.toDouble()
+        val fitter = FitterFactory.create(FitterType.toValue(curve.fitterType))
+        x = fitter.ratCalcCon(
+            doubleArrayOf(curve.f0, curve.f1, curve.f2, curve.f3),
+            y.toDouble()
+        ).toInt()
+    }
+//    if (x >= 0 && y >= 0) {
+//        if ((isThree && y <= lastReaction) && x < lastCon || !isThree) {
+            values.add(Entry(x.toFloat(), y.toFloat()))
+//        }
+//    }
+
     return values
 }
 
@@ -645,8 +672,9 @@ fun dpToPx(context: Context, dp: Int): Int {
 }
 
 fun Fragment.dpToPx(dp: Int): Int {
-    return dpToPx(this.requireContext(),dp)
+    return dpToPx(this.requireContext(), dp)
 }
+
 fun Activity.dpToPx(dp: Int): Int {
-    return dpToPx(this,dp)
+    return dpToPx(this, dp)
 }

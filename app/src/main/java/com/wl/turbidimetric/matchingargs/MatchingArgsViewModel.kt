@@ -354,7 +354,7 @@ class MatchingArgsViewModel(
     /**
      * 拟合梯度数量
      */
-    var gradsNum = 5
+    var gradsNum = 6
 
 //    /**
 //     * 平均值
@@ -374,12 +374,12 @@ class MatchingArgsViewModel(
     /**
      * 选择用来拟合的方程
      */
-    var selectFitterType: FitterType = FitterType.Three
+    var selectFitterType: FitterType = FitterType.Four
 
     /**
      * 拟合梯度对应的浓度
      */
-    var targetCons = mutableListOf<Double>()
+    var targetCons = mutableListOf<Double>(0.0,25.0,52.0,200.0,500.0,1000.0)
 
     /**
      * 选择用来质控的曲线
@@ -396,10 +396,10 @@ class MatchingArgsViewModel(
      */
     var curves = mutableListOf<CurveModel>()
 
-    var qualityLow1 = 0
-    var qualityLow2 = 0
-    var qualityHigh1 = 0
-    var qualityHigh2 = 0
+    var qualityLow1 = 85
+    var qualityLow2 = 115
+    var qualityHigh1 = 340
+    var qualityHigh2 = 460
 
     /**
      * 比色皿舱门正在操作 （现在用作结束检测，将r2试剂转出来）
@@ -425,7 +425,8 @@ class MatchingArgsViewModel(
     //测试四参数拟合
     private val testValues1 = doubleArrayOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
     private val testValues2 =
-        doubleArrayOf(-2.0, 4.0, 24.0, 78.0, 143.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+        doubleArrayOf(8.0, 13.0, 18.0, 70.0, 192.0, 322.0, 55.0, 220.0, 0.0, 0.0)
+
 
 //        private val testValues2 =
 //        doubleArrayOf(10.0, 38.0, 129.0, 284.0, 440.0, 57.0,219.0, 0.0, 0.0, 0.0)

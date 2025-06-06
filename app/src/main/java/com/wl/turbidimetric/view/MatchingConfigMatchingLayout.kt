@@ -239,6 +239,9 @@ class MatchingConfigMatchingLayout : FrameLayout {
         rbGrad5?.isChecked = gradsNum == 5
         rbGrad6?.isChecked = gradsNum == 6
 
+        rbAuto?.isEnabled = gradsNum == 5
+        rbManual?.isEnabled = true
+
         changeCon()
         etTargetCon6?.visibility = (gradsNum > 5).isShow()
 

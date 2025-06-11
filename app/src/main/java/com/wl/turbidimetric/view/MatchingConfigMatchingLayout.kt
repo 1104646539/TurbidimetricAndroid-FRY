@@ -125,7 +125,8 @@ class MatchingConfigMatchingLayout : FrameLayout {
         spnProjectAdapter = SpnSampleAdapter(rootView.context, projectNames)
         spnProject?.adapter = spnProjectAdapter
 
-        fitterTypes.addAll(FitterType.values())
+//        fitterTypes.addAll(FitterType.values())
+        fitterTypes.add(FitterType.Four)
         fitterTypeNames.addAll(fitterTypes.map { it.showName })
         spnFitterTypeAdapter = SpnSampleAdapter(rootView.context, fitterTypeNames)
         spnFitterType?.adapter = spnFitterTypeAdapter

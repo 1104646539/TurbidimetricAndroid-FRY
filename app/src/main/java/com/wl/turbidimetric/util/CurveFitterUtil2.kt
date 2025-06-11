@@ -1,5 +1,6 @@
 package com.wl.turbidimetric.util
 
+import android.util.Log
 import com.wl.turbidimetric.ex.isNotValid
 import org.apache.commons.math3.fitting.PolynomialCurveFitter
 import org.apache.commons.math3.fitting.WeightedObservedPoints
@@ -142,9 +143,8 @@ class ThreeFun : Fitter {
 //            println("浓度=${x}")
             return x
         }
-    }
-}
 
+    }}
 /**
  * 线性拟合
  */

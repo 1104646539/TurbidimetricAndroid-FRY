@@ -74,7 +74,9 @@ class MatchingConfigQualityLayout : FrameLayout {
                 }
             }
         } else {
-            selectCurve = curves[selectProjectIndex]
+            if(curves.isNotEmpty()){
+                selectCurve = curves[selectProjectIndex]
+            }
             this.spnProject?.let {
                 it.post {
                     it.setSelection(selectProjectIndex)

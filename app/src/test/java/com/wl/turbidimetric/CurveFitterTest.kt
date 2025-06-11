@@ -65,11 +65,12 @@ class CurveFitterTest {
      */
     @Test
     fun threadFunTest3() {
-        val p1 = 4.toDouble()
-        val p2 = 9.toDouble()
-        val p3 = 35.toDouble()
-        val p4 = 96.toDouble()
-        val p5 = 161.toDouble()
+//        5.0, 39.0, 156.0, 320.0, 405.0
+        val p1 = 5.toDouble()
+        val p2 = 39.toDouble()
+        val p3 = 156.toDouble()
+        val p4 = 320.toDouble()
+        val p5 = 405.toDouble()
 
 
         val m1 = 0.toDouble()
@@ -93,7 +94,7 @@ class CurveFitterTest {
             val con = fitter.ratCalcCon(fitter.params, v)
             println("con=$con")
         }
-        var reaction2 = arrayListOf(0.0)
+        var reaction2 = arrayListOf(405.0,413.0)
 //        for (i in 0..500) {
 //            reaction2.add(i * 2.0)
 //        }

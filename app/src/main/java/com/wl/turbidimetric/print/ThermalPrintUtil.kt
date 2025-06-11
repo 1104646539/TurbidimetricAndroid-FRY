@@ -261,6 +261,9 @@ class ThermalPrintUtil(private val serialPort: BaseSerialPort) {
         sb.append("\n")
         sb.append("\n")
         sb.append("\n")
+        sb.append("\n")
+        sb.append("\n")
+        sb.append("\n")
 
         return sb.toString()
     }
@@ -357,7 +360,11 @@ class ThermalPrintUtil(private val serialPort: BaseSerialPort) {
         result:String,
     ): String {
         val sb = StringBuilder()
-        sb.append("\n\n")
+        sb.append("\n")
+        sb.append("\n")
+        sb.append("\n")
+        sb.append("\n")
+        sb.append("\n")
         sb.append("序号:$reagentNo\n")
         sb.append("项目名:$projectName\n")
         sb.append("质控时间:$createTime\n")
@@ -382,6 +389,12 @@ class ThermalPrintUtil(private val serialPort: BaseSerialPort) {
         sb.append("F(3)=${params[3].scale(10)}")
         sb.append("\n")
         sb.append("结论:$result")
+        sb.append("\n")
+        sb.append("\n")
+        sb.append("\n")
+        sb.append("\n")
+        sb.append("\n")
+        sb.append("\n")
         sb.append("\n")
         sb.append("\n")
         sb.append("\n")

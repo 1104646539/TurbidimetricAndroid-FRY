@@ -117,8 +117,8 @@ class MatchingArgsFragment :
                     projects = ret
                     adapter.submit(ret.toMutableList())
                     if (ret.isNotEmpty()) {
-                        adapter.setSelectIndex(ret.lastIndex)
-                        adapter.notifyItemChanged(ret.lastIndex)
+                        adapter.setSelectIndex(0)
+                        adapter.notifyItemChanged(0)
                     }
                     projects?.let { ps ->
                         vm.updateCurves(ps)

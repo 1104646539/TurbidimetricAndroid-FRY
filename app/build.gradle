@@ -8,23 +8,23 @@ plugins {
 }
 
 android {
-//    signingConfigs {
-//        debug {
-//            storeFile file('E:\\platform.keystore')
-//            storePassword '123456'
-//            keyAlias 'platform'
-//            keyPassword '123456'
-//        }
-//        release {
-////            manifestPlaceholders = [
-////                    APP_NAME: "@string/app_name",
-////            ]
-//            storeFile file('E:\\platform.keystore')
-//            storePassword '123456'
-//            keyAlias 'platform'
-//            keyPassword '123456'
-//        }
-//    }
+    signingConfigs {
+        debug {
+            storeFile file('E:\\platform.keystore')
+            storePassword '123456'
+            keyAlias 'platform'
+            keyPassword '123456'
+        }
+        release {
+//            manifestPlaceholders = [
+//                    APP_NAME: "@string/app_name",
+//            ]
+            storeFile file('E:\\platform.keystore')
+            storePassword '123456'
+            keyAlias 'platform'
+            keyPassword '123456'
+        }
+    }
     compileSdk 33
 
     defaultConfig {
@@ -32,7 +32,7 @@ android {
         minSdk 24
         targetSdk 32
         versionCode 1
-        versionName "1.0.0.0-109修改默认拟合方式"
+        versionName "1.0.1.0-2测试质控打印间隙"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 

@@ -3,7 +3,11 @@ package com.wl.turbidimetric.datamanager
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
+import android.widget.PopupWindow
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
@@ -177,7 +181,8 @@ class DataManagerFragment :
 
         vd.btnExportExcel.setOnClickListener {
             u("导出Excel")
-            exportExcelAll()
+//            exportExcelAll()
+            showExportExcelPopupWindow()
         }
         vd.btnUpload.setOnClickListener {
             u("上传")
@@ -205,12 +210,47 @@ class DataManagerFragment :
         vd.btnExportPdf.setOnClickListener {
             u("导出报告")
             exportReport()
+
         }
         vd.btnPrintPdf.setOnClickListener {
             u("打印报告")
             printReport()
         }
 
+    }
+
+    var popupWindow: PopupWindow? = null
+    var popupBtnExportExcelAll: Button? = null;
+    var popupBtnExportExcelSelected: Button? = null;
+    private fun showExportExcelPopupWindow() {
+        if (popupWindow == null) {
+            val view = View.inflate(requireActivity(), R.layout.layout_pop_btns, null)
+            popupWindow = PopupWindow(
+                view,
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true
+            )
+            popupWindow?.isTouchable = true
+            popupWindow?.isOutsideTouchable = true
+            popupBtnExportExcelAll = view.findViewById(R.id.btn_export_excel_all)
+            popupBtnExportExcelSelected = view.findViewById(R.id.btn_export_excel_selected)
+            popupBtnExportExcelAll?.setOnClickListener {
+                exportExcelAll()
+                closeExportExcelPopupWindow()
+            }
+            popupBtnExportExcelSelected?.setOnClickListener {
+                exportExcelSelected()
+                closeExportExcelPopupWindow()
+            }
+        }
+        popupWindow?.showAsDropDown(
+            vd.btnExportExcel,
+            0,
+            -180,
+        )
+    }
+
+    private fun closeExportExcelPopupWindow() {
+        popupWindow?.dismiss()
     }
 
 
@@ -451,7 +491,8 @@ class DataManagerFragment :
                                     appVm.getReportFileNameBarcode(),
                                     { count, successCount, failedCount ->
                                         vm.exportReportSuccess("导出报告完成，本次导出总数${count}条,成功${successCount}条,失败${failedCount}条")
-                                    }, { err ->
+                                    },
+                                    { err ->
                                         vm.exportReportFailed("导出报告失败 $err")
                                     },
                                 )

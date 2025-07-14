@@ -144,6 +144,9 @@ class DataManagerViewModel(
             is DataManagerIntent.ExportExcelAll -> {
                 exportExcel(exportAll = true)
             }
+            is DataManagerIntent.ExportExcelSelected -> {
+                exportExcel(exportAll = false,intent.items)
+            }
 
             is DataManagerIntent.PrintSelected -> {
                 print(intent.items)

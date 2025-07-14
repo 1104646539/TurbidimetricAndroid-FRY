@@ -11,4 +11,10 @@
     <style name="TabLayoutTextStyle" parent="TextAppearance.Design.Tab">
         <item name="android:textSize">26sp</item>
     </style>
+
+    <style name="PopupWindowStyle" parent="android:Animation" >
+        <item name="android:windowEnterAnimation">@anim/card_flip_left_in</item>
+        <item name="android:windowExitAnimation">@anim/card_flip_right_out</item>
+    </style>
+
 </resources>

@@ -66,11 +66,11 @@ class CurveFitterTest {
     @Test
     fun threadFunTest3() {
 //        5.0, 39.0, 156.0, 320.0, 405.0
-        val p1 = 5.toDouble()
-        val p2 = 39.toDouble()
-        val p3 = 156.toDouble()
-        val p4 = 320.toDouble()
-        val p5 = 405.toDouble()
+        val p1 = 4.toDouble()
+        val p2 = 9.toDouble()
+        val p3 = 35.toDouble()
+        val p4 = 96.toDouble()
+        val p5 = 161.toDouble()
 
 
         val m1 = 0.toDouble()
@@ -90,6 +90,7 @@ class CurveFitterTest {
             print("it=$it")
         }
         println("\n验算")
+        println("${fitter.fitGoodness}")
         ps.forEach { v ->
             val con = fitter.ratCalcCon(fitter.params, v)
             println("con=$con")

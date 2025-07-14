@@ -59,11 +59,11 @@ class MatchingConfigMatchingLayout : FrameLayout {
     var reagentNoStr: String = ""
     var quality: Boolean = false
     var autoAttenuation = false
-    var gradsNum = 5
+    var gradsNum = 6
     var selectProject: ProjectModel? = null
-    var selectFitterType: FitterType = FitterType.Three
-    val defaultCon5 = arrayListOf(0.0, 0.0, 0.0, 0.0, 0.0)
-    val defaultCon6 = arrayListOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+    var selectFitterType: FitterType = FitterType.Four
+    val defaultCon5 = arrayListOf(0.0, 50.0, 200.0, 500.0, 1000.0)
+    val defaultCon6 = arrayListOf(0.0, 25.0, 50.0, 200.0, 500.0, 1000.0)
     var cons = mutableListOf<Double>()
 
 
@@ -125,12 +125,15 @@ class MatchingConfigMatchingLayout : FrameLayout {
         spnProjectAdapter = SpnSampleAdapter(rootView.context, projectNames)
         spnProject?.adapter = spnProjectAdapter
 
-//        fitterTypes.addAll(FitterType.values())
-        fitterTypes.add(FitterType.Four)
+        fitterTypes.addAll(FitterType.values())
+//        val defaultIndex = fitterTypes.indexOf(FitterType.Four)
+
+//        fitterTypes.add(FitterType.Four)
         fitterTypeNames.addAll(fitterTypes.map { it.showName })
         spnFitterTypeAdapter = SpnSampleAdapter(rootView.context, fitterTypeNames)
         spnFitterType?.adapter = spnFitterTypeAdapter
 
+        selectFitterType = FitterType.Four
     }
 
 
@@ -143,7 +146,7 @@ class MatchingConfigMatchingLayout : FrameLayout {
         quality: Boolean = false,
         projects: List<ProjectModel>,
         autoAttenuation: Boolean,
-        gradsNum: Int = 5,
+        gradsNum: Int = 6,
         selectProject: ProjectModel? = null,
         selectFitterType: FitterType = FitterType.Three,
         targetCons: List<Double> = mutableListOf()
@@ -335,7 +338,7 @@ class MatchingConfigMatchingLayout : FrameLayout {
     private fun projectChange() {
         selectProject?.let {
             if (it.grads.size != gradsNum) {
-                gradsNum = it.grads.size
+//                gradsNum = it.grads.size
                 if (gradsNum == 5) {  //5可以选择自动或人工稀释
                     rbAuto?.isEnabled = true
                 } else {

@@ -69,7 +69,7 @@ class ThreeFun : Fitter {
         val points = WeightedObservedPoints()
 
         for (i in guess.indices) {
-            points.add(guess[i], values[i])
+            points.add( values[i],guess[i])
         }
 
         val fitter = PolynomialCurveFitter.create(3) //指定多项式阶数
@@ -88,14 +88,19 @@ class ThreeFun : Fitter {
     }
 
     override fun ratCalcCon(p: DoubleArray, x: Double): Double {
-        return f2(p, x, guess, values)
+        return f2(p, x)
     }
 
     override fun conCalcRat(p: DoubleArray, x: Double): Double {
-        return f2(p, x, guess, values)
+        return f2(p, x)
     }
 
 
+//    private fun calcRSquared2(): Double {
+//        return (CurveFitterUtil.calcuteNumerator(
+//            guess, yss
+//        ) / CurveFitterUtil.calculateDenominator(guess, yss)).isNotValid()
+//    }
     private fun calcRSquared2(): Double {
         return (CurveFitterUtil.calcuteNumerator(
             guess, yss
@@ -103,48 +108,49 @@ class ThreeFun : Fitter {
     }
 
     companion object {
-        //        @JvmStatic
-//        fun f2(p: DoubleArray, x: Double): Double {
-//            return p[0] + p[1] * x + p[2] * x * x + p[3] * x * x * x
-//        }
-        fun f2(p: DoubleArray, y: Double, guess: DoubleArray, values: DoubleArray): Double {
-            // 目标函数
-            fun f(x: Double) = p[0] + p[1] * x + p[2] * x * x + p[3] * x * x * x - y
-
-            // 导数
-            fun df(x: Double) = p[1] + 2 * p[2] * x + 3 * p[3] * x * x
-
-            var x = y
-            val index = values.indexOfLast { d -> d <= y }
-            if (index >= 0 && guess.size > index) {
-                x = guess[index]
-            }
-            if (x < 0) {
-                x = 0.0
-            }
-//            for (value in values) {
-//                print("value=${value}")
-//            }
-//            println("初始猜想 反应度=${y} 浓度=${x} index=${index}")
-            repeat(5000) {
-                val fx = f(x)
-                val dfx = df(x)
-                if (dfx == 0.0) {// 避免除零
-//                    println("浓度=${x}")
-                    return x
-                }
-                val x1 = x - fx / dfx
-                if (abs(x1 - x) < 1e-6) {
-//                    println("浓度=${x1}")
-                    return x1
-                }
-                x = x1
-            }
-//            println("浓度=${x}")
-            return x
+                @JvmStatic
+        fun f2(p: DoubleArray, x: Double): Double {
+            return p[0] + p[1] * x + p[2] * x * x + p[3] * x * x * x
         }
+//        fun f2(p: DoubleArray, y: Double, guess: DoubleArray, values: DoubleArray): Double {
+//            // 目标函数
+//            fun f(x: Double) = p[0] + p[1] * x + p[2] * x * x + p[3] * x * x * x - y
+//
+//            // 导数
+//            fun df(x: Double) = p[1] + 2 * p[2] * x + 3 * p[3] * x * x
+//
+//            var x = y
+//            val index = values.indexOfLast { d -> d <= y }
+//            if (index >= 0 && guess.size > index) {
+//                x = guess[index]
+//            }
+//            if (x < 0) {
+//                x = 0.0
+//            }
+////            for (value in values) {
+////                print("value=${value}")
+////            }
+////            println("初始猜想 反应度=${y} 浓度=${x} index=${index}")
+//            repeat(5000) {
+//                val fx = f(x)
+//                val dfx = df(x)
+//                if (dfx == 0.0) {// 避免除零
+////                    println("浓度=${x}")
+//                    return x
+//                }
+//                val x1 = x - fx / dfx
+//                if (abs(x1 - x) < 1e-6) {
+////                    println("浓度=${x1}")
+//                    return x1
+//                }
+//                x = x1
+//            }
+////            println("浓度=${x}")
+//            return x
+//        }
 
-    }}
+    }
+}
 /**
  * 线性拟合
  */

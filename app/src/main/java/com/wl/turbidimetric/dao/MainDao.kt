@@ -16,6 +16,7 @@ import com.wl.turbidimetric.model.TestResultModel
 import kotlinx.coroutines.flow.Flow
 
 @Dao
+@SuppressWarnings(RoomWarnings.CURSOR_MISMATCH)
 interface MainDao {
     @Transaction
     @Query(

@@ -2,7 +2,6 @@ package com.wl.turbidimetric.print
 
 import com.wl.turbidimetric.ex.scale
 import com.wl.turbidimetric.model.TestResultAndCurveModel
-import com.wl.turbidimetric.report.PrintHelper.PrintReport
 import com.wl.turbidimetric.util.WorkQueue
 import com.wl.weiqianwllib.serialport.BaseSerialPort
 import com.wl.weiqianwllib.serialport.WQSerialGlobal
@@ -181,24 +180,28 @@ class ThermalPrintUtil(private val serialPort: BaseSerialPort) {
 
     fun printMatchingQuality(
         absorbancys: List<Int>,
-        nds: DoubleArray,
+        targets: DoubleArray,
+        orderTargets: MutableList<String>,
         yzs: List<Int>,
         params: MutableList<Double>,
         createTime: String,
         projectName: String,
         reagentNo: String,
         matchingNum: Int,
+        projectUnit: String,
         onPrintListener: OnPrintListener?
     ) {
         val msg = getMatchingQualityMsg(
             absorbancys.toMutableList(),
-            nds,
+            targets,
+            orderTargets,
             yzs.toMutableList(),
             params,
             createTime,
             projectName,
             reagentNo,
-            matchingNum
+            matchingNum,
+            projectUnit
         )
         sendAndCheckState(getPrintByte(msg), onPrintListener)
     }
@@ -206,7 +209,8 @@ class ThermalPrintUtil(private val serialPort: BaseSerialPort) {
     /**
      * 获取拟合和质控的打印文字
      * @param absorbancys MutableList<Double>
-     * @param nds DoubleArray
+     * @param targets DoubleArray
+     * @param orderTargets MutableList<String>
      * @param yzs MutableList<Double>
      * @param params DoubleArray
      * @param quality Boolean
@@ -214,13 +218,15 @@ class ThermalPrintUtil(private val serialPort: BaseSerialPort) {
      */
     private fun getMatchingQualityMsg(
         absorbancys: MutableList<Int>,
-        nds: DoubleArray,
+        targets: DoubleArray,
+        orderTargets: MutableList<String>,
         yzs: MutableList<Int>,
         params: MutableList<Double>,
         createTime: String,
         projectName: String,
         reagentNo: String,
-        matchingNum: Int
+        matchingNum: Int,
+        projectUnit: String,
     ): String {
 
         val sb = StringBuilder()
@@ -229,26 +235,43 @@ class ThermalPrintUtil(private val serialPort: BaseSerialPort) {
         sb.append("项目名:$projectName\n")
         sb.append("质控时间:$createTime\n")
         repeat(matchingNum) {
-            val nd = "${nds[it]}ng/mL".fix(15)
+            val nd = "${targets[it]}${projectUnit}".fix(15)
             val abs = "${absorbancys[it].toInt()}".fix(5)
             sb.append("${it + 1} $nd $abs")
             sb.append("\n")
-            val yz = "(${yzs[it]}ng/mL)".fix(17)
+            val yz = "(${yzs[it]}${projectUnit})".fix(17)
             sb.append(" $yz ")
             sb.append("\n")
         }
 
-        sb.append("\n\n")
+        sb.append("\n")
 
         if (yzs.size > matchingNum && absorbancys.size > matchingNum) {
-            sb.append("${yzs[matchingNum]}ng/mL")
+
+            val nd = "${orderTargets[0]}${projectUnit}".fix(13)
+            val abs = "${absorbancys[matchingNum].toInt()}".fix(5)
+            sb.append("low $nd $abs")
             sb.append("\n")
-            sb.append("${absorbancys[matchingNum]}")
-            sb.append("\n\n")
-            sb.append("${yzs[matchingNum + 1]}ng/mL")
+            val yz = "(${yzs[matchingNum]}${projectUnit})".fix(16)
+            sb.append(" $yz ")
             sb.append("\n")
-            sb.append("${absorbancys[matchingNum + 1]}")
-            sb.append("\n\n")
+
+            val nd2 = "${orderTargets[0]}${projectUnit}".fix(12)
+            val abs2 = "${absorbancys[matchingNum+1].toInt()}".fix(5)
+            sb.append("high $nd2 $abs2")
+            sb.append("\n")
+            val yz2 = "(${yzs[matchingNum+1]}${projectUnit})".fix(16)
+            sb.append(" $yz2 ")
+            sb.append("\n")
+            sb.append("\n")
+//            sb.append("${yzs[matchingNum]}ng/mL")
+//            sb.append("\n")
+//            sb.append("${absorbancys[matchingNum]}")
+//            sb.append("\n\n")
+//            sb.append("${yzs[matchingNum + 1]}ng/mL")
+//            sb.append("\n")
+//            sb.append("${absorbancys[matchingNum + 1]}")
+//            sb.append("\n\n")
         }
 
         sb.append("F(0)=${params[0].scale(10)}")
@@ -357,7 +380,7 @@ class ThermalPrintUtil(private val serialPort: BaseSerialPort) {
         qualityHighCon: Int,
         qualityLowAbs: Double,
         qualityHighAbs: Double,
-        result:String,
+        result: String,
     ): String {
         val sb = StringBuilder()
         sb.append("\n")

@@ -3,6 +3,7 @@ package com.wl.turbidimetric.db
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.wl.turbidimetric.db.converters.StringToStringListConverters
 import com.wl.turbidimetric.dao.GlobalDao
 import com.wl.turbidimetric.dao.LogDao
 import com.wl.turbidimetric.dao.MainDao
@@ -26,7 +27,8 @@ import com.wl.turbidimetric.model.TestResultModel
     BigDecimalConverters::class,
     IntArrayConverters::class,
     DoubleArrayConverters::class,
-    LogLevelConverters::class
+    LogLevelConverters::class,
+    StringToStringListConverters::class
 )
 abstract class MainRoomDatabase : RoomDatabase() {
 

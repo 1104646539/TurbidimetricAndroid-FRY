@@ -36,6 +36,10 @@ data class CurveModel(
      */
     var targets: DoubleArray = doubleArrayOf(),
     /**
+     * 拟合时的质控浓度目标值
+     */
+    var orderTargets:Array<String> = arrayOf(),
+    /**
      * 验证值 ，指拟合时使用的拟合参数反算出的值
      */
     var yzs: IntArray = intArrayOf(),
@@ -53,7 +57,7 @@ data class CurveModel(
     var isValid: Boolean = true
 ) {
     override fun toString(): String {
-        return "CurveModel(id=$curveId,projectName=$projectName,projectCode=$projectCode,projectLjz=$projectLjz,projectUnit=$projectUnit,f0=$f0,f1=$f1,f2=$f2,f3=$f3,fitGoodness=$fitGoodness,createTime=$createTime,reagentNO=$reagentNO,yzs=$yzs,fitterType=$fitterType,gradsNum=$gradsNum,reactionValues=${reactionValues.joinToString()},targets=${targets.joinToString()})"
+        return "CurveModel(id=$curveId,projectName=$projectName,projectCode=$projectCode,projectLjz=$projectLjz,projectUnit=$projectUnit,f0=$f0,f1=$f1,f2=$f2,f3=$f3,fitGoodness=$fitGoodness,createTime=$createTime,reagentNO=$reagentNO,yzs=$yzs,fitterType=$fitterType,gradsNum=$gradsNum,reactionValues=${reactionValues.joinToString()},targets=${targets.joinToString()},orderTargets=${orderTargets.joinToString()})"
     }
 
     override fun equals(other: Any?): Boolean {
@@ -73,6 +77,7 @@ data class CurveModel(
         if (createTime != other.createTime) return false
         if (isSelect != other.isSelect) return false
         if (reagentNO != other.reagentNO) return false
+        if (orderTargets != other.orderTargets) return false
         if (reactionValues != null) {
             if (other.reactionValues == null) return false
             if (!reactionValues.contentEquals(other.reactionValues)) return false
@@ -105,6 +110,7 @@ data class CurveModel(
         result = 31 * result + reagentNO.hashCode()
         result = 31 * result + reactionValues.contentHashCode()
         result = 31 * result + targets.contentHashCode()
+        result = 31 * result + orderTargets.hashCode()
         result = 31 * result + yzs.contentHashCode()
         result = 31 * result + fitterType.hashCode()
         result = 31 * result + gradsNum.hashCode()

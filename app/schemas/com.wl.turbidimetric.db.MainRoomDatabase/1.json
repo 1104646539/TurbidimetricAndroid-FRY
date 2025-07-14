@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "04797e715d2bfbac4fdbfdba615fac57",
+    "identityHash": "3eac1491891a9a7342989678f7a4df9a",
     "entities": [
       {
         "tableName": "TestResultModel",
@@ -250,7 +250,7 @@
       },
       {
         "tableName": "CurveModel",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`curveId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `projectName` TEXT NOT NULL, `projectCode` TEXT NOT NULL, `projectLjz` INTEGER NOT NULL, `projectUnit` TEXT NOT NULL, `f0` REAL NOT NULL, `f1` REAL NOT NULL, `f2` REAL NOT NULL, `f3` REAL NOT NULL, `fitGoodness` REAL NOT NULL, `createTime` TEXT NOT NULL, `isSelect` INTEGER NOT NULL, `reagentNO` TEXT NOT NULL, `reactionValues` TEXT NOT NULL, `targets` TEXT NOT NULL, `yzs` TEXT NOT NULL, `fitterType` INTEGER NOT NULL, `gradsNum` INTEGER NOT NULL, `isValid` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`curveId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `projectName` TEXT NOT NULL, `projectCode` TEXT NOT NULL, `projectLjz` INTEGER NOT NULL, `projectUnit` TEXT NOT NULL, `f0` REAL NOT NULL, `f1` REAL NOT NULL, `f2` REAL NOT NULL, `f3` REAL NOT NULL, `fitGoodness` REAL NOT NULL, `createTime` TEXT NOT NULL, `isSelect` INTEGER NOT NULL, `reagentNO` TEXT NOT NULL, `reactionValues` TEXT NOT NULL, `targets` TEXT NOT NULL, `orderTargets` TEXT NOT NULL, `yzs` TEXT NOT NULL, `fitterType` INTEGER NOT NULL, `gradsNum` INTEGER NOT NULL, `isValid` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "curveId",
@@ -339,6 +339,12 @@
           {
             "fieldPath": "targets",
             "columnName": "targets",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "orderTargets",
+            "columnName": "orderTargets",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -606,7 +612,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '04797e715d2bfbac4fdbfdba615fac57')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '3eac1491891a9a7342989678f7a4df9a')"
     ]
   }
 }

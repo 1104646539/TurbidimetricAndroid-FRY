@@ -379,7 +379,7 @@ class MatchingArgsViewModel(
     /**
      * 拟合梯度对应的浓度
      */
-    var targetCons = mutableListOf<Double>(0.0,25.0,52.0,200.0,500.0,1000.0)
+    var targetCons = mutableListOf<Double>(0.0, 25.0, 52.0, 200.0, 500.0, 1000.0)
 
     /**
      * 选择用来质控的曲线
@@ -428,7 +428,7 @@ class MatchingArgsViewModel(
         doubleArrayOf(12.0, 41.0, 160.0, 321.0, 410.0, 81.0, 282.0, 220.0, 0.0, 0.0)
 
 
-//        private val testValues2 =
+    //        private val testValues2 =
 //        doubleArrayOf(10.0, 38.0, 129.0, 284.0, 440.0, 57.0,219.0, 0.0, 0.0, 0.0)
     private val testValues3 = doubleArrayOf(0.0, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3)
     private val testValues4 =
@@ -1337,6 +1337,11 @@ class MatchingArgsViewModel(
 //                    "验算 ${yzs}\n" +
                         "吸光度:$abss \n" + "拟合度:${cf.fitGoodness} \n" + "参数:${cf.params.joinToString()} \n" + "验算:${cf.yss.joinToString()}\n"
             )
+            val tempTarget: MutableList<String> = arrayListOf();
+            if (quality) {
+                tempTarget.add("${qualityLow1}-${qualityLow2}")
+                tempTarget.add("${qualityHigh1}-${qualityHigh2}")
+            }
             curProject = CurveModel().apply {
                 this.f0 = cf.params.getOrNull(0) ?: 0.0
                 this.f1 = cf.params.getOrNull(1) ?: 0.0
@@ -1348,8 +1353,11 @@ class MatchingArgsViewModel(
                 this.reagentNO = this@MatchingArgsViewModel.reagentNOStr
                 this.gradsNum = this@MatchingArgsViewModel.gradsNum
                 this.targets = targetCons.toDoubleArray()
+                this.orderTargets = tempTarget.toTypedArray()
                 this.reactionValues =
-                    abss.subList(0, this@MatchingArgsViewModel.gradsNum).map { it.toInt() }
+                    abss
+//                        .subList(0, this@MatchingArgsViewModel.gradsNum)
+                        .map { it.toInt() }
                         .toIntArray()
                 this.yzs = cf.yss.map { it.toInt() }.toIntArray()
             }.copyForProject(selectMatchingProject!!)
@@ -1367,12 +1375,14 @@ class MatchingArgsViewModel(
                 appViewModel.thermalPrintUtil.printMatchingQuality(
                     it.reactionValues.toList(),
                     it.targets,
+                    it.orderTargets.toMutableList(),
                     it.yzs.toList(),
                     mutableListOf(it.f0, it.f1, it.f2, it.f3),
                     it.createTime,
                     it.projectName,
                     it.reagentNO,
                     it.gradsNum,
+                    it.projectUnit,
                     onPrintListener = object : ThermalPrintUtil.OnPrintListener {
                         override fun onPrinterPagerOut() {
                             toast("打印机缺纸，请重新安装纸后再次尝试打印", Toast.LENGTH_LONG)

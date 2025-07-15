@@ -256,7 +256,7 @@ class ThermalPrintUtil(private val serialPort: BaseSerialPort) {
             sb.append(" $yz ")
             sb.append("\n")
 
-            val nd2 = "${orderTargets[0]}${projectUnit}".fix(12)
+            val nd2 = "${orderTargets[1]}${projectUnit}".fix(12)
             val abs2 = "${absorbancys[matchingNum+1].toInt()}".fix(5)
             sb.append("high $nd2 $abs2")
             sb.append("\n")

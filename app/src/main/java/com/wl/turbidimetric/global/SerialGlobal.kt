@@ -132,6 +132,11 @@ object SerialGlobal {
     const val CMD_OverloadParams: UByte = 0x1Au
 
     /**
+     * 填充R1
+     */
+    const val CMD_FullR1: UByte = 0x1Bu
+
+    /**
      * 响应
      */
     const val CMD_Response: UByte = 0xFFu

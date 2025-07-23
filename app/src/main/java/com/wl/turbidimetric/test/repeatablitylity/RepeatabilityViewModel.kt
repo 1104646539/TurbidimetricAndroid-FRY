@@ -423,6 +423,10 @@ class RepeatabilityViewModel(
 
     }
 
+    override fun readDataFullR1Model(reply: ReplyModel<FullR1Model>) {
+
+    }
+
     /**
      * 接收到获取状态
      * @param reply ReplyModel<GetStateModel>

@@ -18,11 +18,15 @@ class DebugSettingsViewModel(
 ) : BaseViewModel() {
     private val testMsg = MutableStateFlow("")
     val looperTest = MutableLiveData(appViewModel.getLooperTest())
+    val waitPreheatTime = MutableLiveData(appViewModel.getWaitPreheatTime())
+    val preheatTime = MutableLiveData(appViewModel.getPreheatTime().toString())
     val tempLowLimit = MutableLiveData(localDataSource.getTempLowLimit().toString())
     val tempUpLimit = MutableLiveData(localDataSource.getTempUpLimit().toString())
 
     fun saveConfig() {
         localDataSource.setLooperTest(looperTest.value ?: false)
+        localDataSource.setWaitPreheatTime(waitPreheatTime.value ?: false)
+        localDataSource.setPreheatTime( preheatTime.value?.toIntOrNull() ?: LocalDataGlobal.Default.PreheatTime)
         localDataSource.setTempLowLimit(
             tempLowLimit.value?.toIntOrNull() ?: LocalDataGlobal.Default.TempLowLimit
         )

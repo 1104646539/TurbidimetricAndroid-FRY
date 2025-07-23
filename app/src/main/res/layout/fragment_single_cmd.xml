@@ -186,7 +186,17 @@
                         android:text="1"
                         android:textSize="24sp" />
                 </com.google.android.material.textfield.TextInputLayout>
-
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btn_full_r1"
+                    style="@style/BtnPositive"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:minWidth="150dp"
+                    android:text="填充R1"
+                    app:layout_constraintBottom_toBottomOf="@+id/til_correction_temp_r1"
+                    app:layout_constraintStart_toEndOf="@+id/til_correction_temp_r1" />
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/btn_move_sample_shelf"
                     style="@style/BtnPositive"

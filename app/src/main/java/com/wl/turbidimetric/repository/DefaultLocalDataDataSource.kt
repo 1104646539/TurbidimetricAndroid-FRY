@@ -152,6 +152,14 @@ class DefaultLocalDataDataSource(
         return global().TempLowLimit
     }
 
+    override fun getWaitPreheatTime(): Boolean {
+        return global().WaitPreheatTime
+    }
+
+    override fun getPreheatTime(): Int {
+        return global().PreheatTime
+    }
+
     override fun setLooperTest(looperTest: Boolean) {
         update {
             it.copy(LooperTest = looperTest)
@@ -323,6 +331,18 @@ class DefaultLocalDataDataSource(
     override fun setTempLowLimit(temp: Int) {
         update {
             it.copy(TempLowLimit = temp)
+        }
+    }
+
+    override fun setWaitPreheatTime(wait: Boolean) {
+        update {
+            it.copy(WaitPreheatTime = wait)
+        }
+    }
+
+    override fun setPreheatTime(second: Int) {
+        update {
+            it.copy(PreheatTime = second)
         }
     }
 }

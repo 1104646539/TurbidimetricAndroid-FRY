@@ -176,6 +176,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 }
                 vd.ivCleanoutFluid.setImageResource(if (it.cleanoutFluidState.not()) R.drawable.state_cleanout_fluid_empty else R.drawable.state_cleanout_fluid_full)
                 vd.tvTemp.text = it.reactionTemp.toString().plus("℃")
+                vd.tvReagentR1Temp.text = it.r1Temp.toString().plus("℃")
             }
         }
         vd.svSample1.clickIndex = { it, item -> showDetails(0, it, item) }
@@ -245,6 +246,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         lifecycleScope.launchWhenCreated {
             appVm.obDebugMode.collectLatest {
                 vd.btnDebugDialog.visibility = it.isShow()
+                vd.tvReagentR1Temp.visibility = it.isShow()
             }
         }
         vd.btnDebugDialog.setOnClickListener {
@@ -287,6 +289,11 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 vd.tvAnalyse2.text = "(正在自检，请稍后)"
                 vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg)
                 vm.enableView(false)
+            } else if (testState.isPreheatTime()) {
+                vd.tvAnalyse.text = "正在预热,请稍后"
+                vd.tvAnalyse2.text = ""
+                vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg)
+                vm.enableView(false)
             } else if (testState.isRunningError()) {
                 vd.tvAnalyse.text = "运行错误"
                 vd.tvAnalyse2.text = "(请联系维护人员)"
@@ -303,20 +310,20 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg)
                 vm.enableView(false)
             } else {
-                //当温度不够时，只在第一次时更新显示正在预热
-                if (!appVm.getTempCanBeTest()) {
-                    vd.tvAnalyse.text = "正在预热,请稍后"
-                    vd.tvAnalyse2.text = ""
-                    vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg)
-                    vm.enableView(false)
-                } else {
-                    //只要有一次温度达标了就不再检查了
-                    appVm.processIntent(AppIntent.NeedJudgeTempChange(false))
-                    vd.tvAnalyse.text = "开始分析"
-                    vd.tvAnalyse2.text = "(点击分析)"
-                    vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg2)
-                    vm.enableView(true)
-                }
+//                //当温度不够时，只在第一次时更新显示正在预热
+//                if (!appVm.getTempCanBeTest()) {
+//                    vd.tvAnalyse.text = "正在预热,请稍后"
+//                    vd.tvAnalyse2.text = ""
+//                    vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg)
+//                    vm.enableView(false)
+//                } else {
+                //只要有一次温度达标了就不再检查了
+                appVm.processIntent(AppIntent.NeedJudgeTempChange(false))
+                vd.tvAnalyse.text = "开始分析"
+                vd.tvAnalyse2.text = "(点击分析)"
+                vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg2)
+                vm.enableView(true)
+//                }
             }
         }
     }
@@ -429,7 +436,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
     private fun showConfigDialog() {
         i("showConfigDialog before")
         homeConfigDialog.showPop(requireContext(), width = 1000) {
-            it.showDialog(vm.configViewEnable.value ?: true,
+            it.showDialog(
+                vm.configViewEnable.value ?: true,
                 projects,
                 vm.selectProject,
                 vm.cuvetteStartPos,
@@ -644,6 +652,27 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                                 confirmClick = { baseDialog: BasePopupView ->
                                     baseDialog.dismiss()
                                 }.throttle(),
+                                showIcon = true,
+                                iconId = ICON_HINT
+                            )
+                        }
+                    }
+                    /**
+                     * 填充R1失败
+                     */
+                    is HomeDialogUiState.FullR1Failed -> {
+                        dialog.showPop(requireContext(), isCancelable = false) {
+                            it.showDialog(
+                                msg = "填充R1失败，R1试剂不足。",
+                                confirmText = "重新填充",
+                                confirmClick = { baseDialog: BasePopupView ->
+                                    baseDialog.dismiss()
+                                    vm.fullR1()
+                                }.throttle(),
+//                                cancelText = "暂不填充",
+//                                cancelClick  = { baseDialog: BasePopupView ->
+//                                    baseDialog.dismiss()
+//                                }.throttle(),
                                 showIcon = true,
                                 iconId = ICON_HINT
                             )

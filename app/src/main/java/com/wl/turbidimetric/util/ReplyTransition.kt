@@ -47,14 +47,21 @@ fun transitionGetMachineStateModel(data: UByteArray): ReplyModel<GetMachineState
     val cleanoutFluid = (states shr 29) and 1
     val squeezing = (states shr 30) and 1
 
-    if (removeSampleAndCuvette == 1) errorInfo.add(ErrorInfo("错误号:1", "错误信息:${MOTORS[(13)]}"))
+    if (removeSampleAndCuvette == 1) errorInfo.add(
+        ErrorInfo(
+            "错误号:1",
+            "错误信息:${MOTORS[(13)]}"
+        )
+    )
     if (door == 1) errorInfo.add(ErrorInfo("错误号:1", "错误信息:${MOTORS[(14)]}"))
     if (r1 == 1) errorInfo.add(ErrorInfo("错误号:1", "错误信息:${MOTORS[15]}"))
     if (cleanoutFluid == 1) errorInfo.add(ErrorInfo("错误号:1", "错误信息:${MOTORS[(16)]}"))
     if (squeezing == 1) errorInfo.add(ErrorInfo("错误号:1", "错误信息:${MOTORS[(17)]}"))
 
     return ReplyModel(
-        SerialGlobal.CMD_GetMachineState, convertReplyState(data[1].toInt()), GetMachineStateModel(errorInfo)
+        SerialGlobal.CMD_GetMachineState,
+        convertReplyState(data[1].toInt()),
+        GetMachineStateModel(errorInfo)
     )
 }
 
@@ -87,7 +94,9 @@ fun transitionGetStateModel(data: UByteArray): ReplyModel<GetStateModel> {
  */
 fun transitionMoveCuvetteShelfModel(data: UByteArray): ReplyModel<MoveCuvetteShelfModel> {
     return ReplyModel(
-        SerialGlobal.CMD_MoveCuvetteShelf, convertReplyState(data[1].toInt()), MoveCuvetteShelfModel()
+        SerialGlobal.CMD_MoveCuvetteShelf,
+        convertReplyState(data[1].toInt()),
+        MoveCuvetteShelfModel()
     )
 }
 
@@ -110,7 +119,9 @@ fun transitionMoveSampleShelfModel(data: UByteArray): ReplyModel<MoveSampleShelf
 fun transitionMoveSampleModel(data: UByteArray): ReplyModel<MoveSampleModel> {
     val type = data[5].toInt().takeIf { it < 3 } ?: 0
     return ReplyModel(
-        SerialGlobal.CMD_MoveSample, convertReplyState(data[1].toInt()), MoveSampleModel(SampleType.values()[type])
+        SerialGlobal.CMD_MoveSample,
+        convertReplyState(data[1].toInt()),
+        MoveSampleModel(SampleType.values()[type])
     )
 }
 
@@ -121,7 +132,9 @@ fun transitionMoveSampleModel(data: UByteArray): ReplyModel<MoveSampleModel> {
  */
 fun transitionMoveCuvetteDripSampleModel(data: UByteArray): ReplyModel<MoveCuvetteDripSampleModel> {
     return ReplyModel(
-        SerialGlobal.CMD_MoveCuvetteDripSample, convertReplyState(data[1].toInt()), MoveCuvetteDripSampleModel()
+        SerialGlobal.CMD_MoveCuvetteDripSample,
+        convertReplyState(data[1].toInt()),
+        MoveCuvetteDripSampleModel()
     )
 }
 
@@ -132,7 +145,9 @@ fun transitionMoveCuvetteDripSampleModel(data: UByteArray): ReplyModel<MoveCuvet
  */
 fun transitionMoveCuvetteDripReagentModel(data: UByteArray): ReplyModel<MoveCuvetteDripReagentModel> {
     return ReplyModel(
-        SerialGlobal.CMD_MoveCuvetteDripReagent, convertReplyState(data[1].toInt()), MoveCuvetteDripReagentModel()
+        SerialGlobal.CMD_MoveCuvetteDripReagent,
+        convertReplyState(data[1].toInt()),
+        MoveCuvetteDripReagentModel()
     )
 }
 
@@ -237,7 +252,9 @@ fun transitionTakeReagentModel(data: UByteArray): ReplyModel<TakeReagentModel> {
  */
 fun transitionTestModel(data: UByteArray): ReplyModel<TestModel> {
     return ReplyModel(
-        SerialGlobal.CMD_Test, convertReplyState(data[1].toInt()), TestModel(value = merge(data.copyOfRange(2, 6)))
+        SerialGlobal.CMD_Test,
+        convertReplyState(data[1].toInt()),
+        TestModel(value = merge(data.copyOfRange(2, 6)))
     )
 }
 
@@ -316,6 +333,7 @@ fun transitionSqueezingModel(data: UByteArray): ReplyModel<SqueezingModel> {
         )
     )
 }
+
 /**
  * 解析成 mcu升级
  * @param data UByteArray
@@ -328,6 +346,7 @@ fun transitionMcuUpdateModel(data: UByteArray): ReplyModel<McuUpdateModel> {
         )
     )
 }
+
 /**
  * 电机控制
  * @param data UByteArray
@@ -340,6 +359,7 @@ fun transitionMotorModel(data: UByteArray): ReplyModel<MotorModel> {
         )
     )
 }
+
 /**
  * 重载参数
  * @param data UByteArray
@@ -349,6 +369,19 @@ fun transitionOverloadParamsModel(data: UByteArray): ReplyModel<OverloadParamsMo
     return ReplyModel(
         SerialGlobal.CMD_OverloadParams, convertReplyState(data[1].toInt()), OverloadParamsModel(
             data[3].toInt(),
+        )
+    )
+}
+
+/**
+ * 重载参数
+ * @param data UByteArray
+ * @return ReplyModel<SqueezingModel>
+ */
+fun transitionFullR1Model(data: UByteArray): ReplyModel<FullR1Model> {
+    return ReplyModel(
+        SerialGlobal.CMD_FullR1, convertReplyState(data[1].toInt()), FullR1Model(
+            data[5].toInt(),
         )
     )
 }

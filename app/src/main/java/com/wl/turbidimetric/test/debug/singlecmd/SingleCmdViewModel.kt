@@ -10,6 +10,7 @@ import com.wl.turbidimetric.global.SerialGlobal
 import com.wl.turbidimetric.model.CuvetteDoorModel
 import com.wl.turbidimetric.model.DripReagentModel
 import com.wl.turbidimetric.model.DripSampleModel
+import com.wl.turbidimetric.model.FullR1Model
 import com.wl.turbidimetric.model.GetMachineStateModel
 import com.wl.turbidimetric.model.GetStateModel
 import com.wl.turbidimetric.model.GetVersionModel
@@ -52,6 +53,7 @@ class SingleCmdViewModel(private val appViewModel: AppViewModel) : BaseViewModel
 
     fun clearListener() {
         appViewModel.serialPort.removeCallback(this)
+        appViewModel.testType = TestType.Test
         i("appViewModel.serialPort.callback onCleared")
     }
 
@@ -167,7 +169,8 @@ class SingleCmdViewModel(private val appViewModel: AppViewModel) : BaseViewModel
     }
 
     override fun readDataTempModel(reply: ReplyModel<TempModel>) {
-        var msg = "获取设置温度完成\n r1温度：${reply.data.r1Temp} 反应槽温度：${reply.data.reactionTemp}"
+        var msg =
+            "获取设置温度完成\n r1温度：${reply.data.r1Temp} 反应槽温度：${reply.data.reactionTemp}"
         changeResult(msg)
     }
 
@@ -179,7 +182,7 @@ class SingleCmdViewModel(private val appViewModel: AppViewModel) : BaseViewModel
         val overloadParams = cmd == SerialGlobal.CMD_OverloadParams.toInt()
         i("stateSuccess cmd=$cmd state=$state")
         var stateFailedText = when (convertReplyState(state)) {
-            ReplyState.INVALID_PARAMETER ->   if (overloadParams) "重载参数失败" else "非法数据 命令号:${cmd}"
+            ReplyState.INVALID_PARAMETER -> if (overloadParams) "重载参数失败" else "非法数据 命令号:${cmd}"
             ReplyState.MOTOR_ERR -> "电机错误 命令号:${cmd}"
             ReplyState.SENSOR_ERR -> "传感器错误 命令号:${cmd}"
             ReplyState.ORDER -> "意外的命令号"
@@ -207,12 +210,25 @@ class SingleCmdViewModel(private val appViewModel: AppViewModel) : BaseViewModel
         changeResult(msg)
     }
 
+    override fun readDataFullR1Model(reply: ReplyModel<FullR1Model>) {
+        var msg = "填充R1完成"
+        changeResult(msg)
+    }
+
     /**
      * 自检
      */
     fun getMachineState() {
         enable.postValue(false)
         appViewModel.serialPort.getMachineState()
+    }
+
+    /**
+     * 填充R1
+     */
+    fun fullR1() {
+        enable.postValue(false)
+        appViewModel.serialPort.fullR1()
     }
 
     /**
@@ -559,7 +575,7 @@ class SingleCmdViewModel(private val appViewModel: AppViewModel) : BaseViewModel
      */
     fun correctionTemp(tempReaction: String, tempR1: String) {
         enable.postValue(false)
-        appViewModel.serialPort.setTemp(tempReaction.toInt(),tempR1.toInt())
+        appViewModel.serialPort.setTemp(tempReaction.toInt(), tempR1.toInt())
     }
 }
 

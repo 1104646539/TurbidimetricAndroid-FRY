@@ -10,6 +10,7 @@ import com.wl.turbidimetric.ex.getAppViewModel
 import com.wl.turbidimetric.model.CuvetteDoorModel
 import com.wl.turbidimetric.model.DripReagentModel
 import com.wl.turbidimetric.model.DripSampleModel
+import com.wl.turbidimetric.model.FullR1Model
 import com.wl.turbidimetric.model.GetMachineStateModel
 import com.wl.turbidimetric.model.GetStateModel
 import com.wl.turbidimetric.model.GetVersionModel
@@ -172,6 +173,10 @@ class MotorDebugViewModel(private val appViewModel: AppViewModel) : BaseViewMode
 
     override fun readDataOverloadParamsModel(reply: ReplyModel<OverloadParamsModel>) {
 
+
+    }
+
+    override fun readDataFullR1Model(reply: ReplyModel<FullR1Model>) {
 
     }
 

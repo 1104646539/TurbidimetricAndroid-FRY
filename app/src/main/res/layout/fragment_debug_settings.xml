@@ -23,6 +23,37 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <CheckBox
+            android:id="@+id/cb_wait_preheat_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="@={vm.waitPreheatTime}"
+            android:text="等待预热后的时间"
+            android:textSize="26sp"
+            app:layout_constraintLeft_toLeftOf="@id/cb_looper_test"
+            app:layout_constraintTop_toBottomOf="@id/cb_looper_test" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_preheat_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            app:layout_constraintBottom_toBottomOf="@id/cb_wait_preheat_time"
+            app:layout_constraintLeft_toRightOf="@+id/cb_wait_preheat_time"
+            app:layout_constraintTop_toTopOf="@id/cb_wait_preheat_time">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tiet_preheat_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="等待时间(单位：秒)"
+                android:inputType="numberSigned"
+                android:maxLength="3"
+                android:minWidth="250dp"
+                android:text="@={vm.preheatTime}"
+                android:textSize="20sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
         <TextView
             android:id="@+id/tv_temp"
             style="@style/TextHilt"
@@ -32,8 +63,8 @@
             android:layout_marginTop="20dp"
             android:text="检测温度:"
             android:textSize="26sp"
-            app:layout_constraintLeft_toLeftOf="@id/cb_looper_test"
-            app:layout_constraintTop_toBottomOf="@id/cb_looper_test" />
+            app:layout_constraintLeft_toLeftOf="@id/cb_wait_preheat_time"
+            app:layout_constraintTop_toBottomOf="@id/cb_wait_preheat_time" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/til_low_limit"

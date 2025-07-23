@@ -29,6 +29,8 @@ interface LocalDataSource {
     fun getReportIntervalTime(): Int
     fun getTempUpLimit(): Int
     fun getTempLowLimit(): Int
+    fun getWaitPreheatTime(): Boolean
+    fun getPreheatTime(): Int
 
     fun setLooperTest(looperTest: Boolean)
     fun setHospitalName(name: String)
@@ -58,6 +60,7 @@ interface LocalDataSource {
     fun setReportIntervalTime(value: Int)
     fun setTempUpLimit(temp: Int)
     fun setTempLowLimit(temp: Int)
-
+    fun setWaitPreheatTime(wait: Boolean)
+    fun setPreheatTime(second: Int)
     fun resetGlobal()
 }

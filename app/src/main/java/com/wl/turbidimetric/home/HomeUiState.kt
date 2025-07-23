@@ -49,6 +49,12 @@ sealed class HomeDialogUiState {
      * 返回状态失败、非法参数、传感器错误、电机错误等的提示
      */
     class StateFailed(val msg: String) : HomeDialogUiState()
+
+    /**
+     * 填充R1失败
+     */
+    class FullR1Failed() : HomeDialogUiState()
+
 }
 
 data class HomeMachineUiState(

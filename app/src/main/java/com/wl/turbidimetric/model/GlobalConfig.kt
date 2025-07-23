@@ -120,4 +120,12 @@ data class GlobalConfig(
      * 可以检测的温度的下限
      */
     val TempLowLimit: Int = LocalDataGlobal.Default.TempLowLimit,
+    /**
+     * 是否需要等待预热时间
+     */
+    val WaitPreheatTime: Boolean = LocalDataGlobal.Default.WaitPreheatTime,
+    /**
+     * 等待预热时间 秒
+     */
+    val PreheatTime: Int = LocalDataGlobal.Default.PreheatTime,
 )

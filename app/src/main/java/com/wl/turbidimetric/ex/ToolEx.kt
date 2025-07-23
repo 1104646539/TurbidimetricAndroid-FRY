@@ -551,7 +551,7 @@ fun getChartEntry(curve: CurveModel): List<Entry> {
     }
 //    if (x >= 0 && y >= 0) {
 //        if ((isThree && y <= lastReaction) && x < lastCon || !isThree) {
-            values.add(Entry(x.toFloat(), y.toFloat()))
+    values.add(Entry(x.toFloat(), y.toFloat()))
 //        }
 //    }
 
@@ -570,7 +570,8 @@ fun <T : ViewModel> getAppViewModel(classVm: Class<T>): T {
  * @param combine 一个接口中的多个回调方法是否共用防抖时间
  */
 fun <T> T.throttle(during: Long = 2000L, combine: Boolean = true): T {
-    return Proxy.newProxyInstance(this!!::class.java.classLoader, this!!::class.java.interfaces,
+    return Proxy.newProxyInstance(
+        this!!::class.java.classLoader, this!!::class.java.interfaces,
         object : InvocationHandler {
 
             private val map = HashMap<Method?, Long>()
@@ -662,8 +663,8 @@ fun View.getPrintParamsAnim(): MainActivity.PrintAnimParams {
 /**
  * 当前温度是否可以检测
  */
-fun TempCanBeTest(temp: Int, tempLowLimit: Int, tempUpLimit: Int): Boolean {
-    return temp in tempLowLimit..tempUpLimit
+fun TempCanBeTest(reactionTemp: Int, r1Temp: Int, tempLowLimit: Int, tempUpLimit: Int): Boolean {
+    return (reactionTemp in tempLowLimit..tempUpLimit) && (r1Temp in tempLowLimit..tempUpLimit)
 }
 
 fun dpToPx(context: Context, dp: Int): Int {

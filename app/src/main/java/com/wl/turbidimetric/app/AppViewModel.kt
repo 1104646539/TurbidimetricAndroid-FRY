@@ -12,7 +12,6 @@ import com.wl.turbidimetric.model.TestType
 import com.wl.turbidimetric.print.ThermalPrintUtil
 import com.wl.turbidimetric.report.PrintHelper
 import com.wl.turbidimetric.repository.if2.LocalDataSource
-import com.wl.turbidimetric.repository.if2.LogListDataSource
 import com.wl.turbidimetric.upload.hl7.util.ConnectStatus
 import com.wl.turbidimetric.upload.hl7.util.getLocalConfig
 import com.wl.turbidimetric.util.ScanCodeUtil
@@ -118,6 +117,10 @@ class AppViewModel(
      * 反应槽温度
      */
     private var reactionTemp = 0
+    /**
+     * R1温度
+     */
+    private var r1Temp = 0
 
     /**
      * 反应槽的温度
@@ -144,6 +147,7 @@ class AppViewModel(
     fun getTempCanBeTest(): Boolean {
         return !needJudgeTemp || (needJudgeTemp && TempCanBeTest(
             reactionTemp,
+            r1Temp,
             localDataSource.getTempLowLimit(),
             localDataSource.getTempUpLimit()
         ))
@@ -154,6 +158,13 @@ class AppViewModel(
         return localDataSource.getLooperTest()
     }
 
+    fun getWaitPreheatTime(): Boolean {
+        return localDataSource.getWaitPreheatTime()
+    }
+    fun getPreheatTime(): Int {
+        return localDataSource.getPreheatTime()
+    }
+
 
     fun getAutoPrintReceipt(): Boolean {
         return localDataSource.getAutoPrintReceipt()
@@ -162,6 +173,7 @@ class AppViewModel(
     fun getHospitalName(): String {
         return localDataSource.getHospitalName()
     }
+
     fun getDetectionDoctor(): String {
         return localDataSource.getDetectionDoctor()
     }
@@ -184,6 +196,13 @@ class AppViewModel(
 
     private fun setLooperTest(looperTest: Boolean) {
         localDataSource.setLooperTest(looperTest)
+    }
+
+    private fun setWaitPreheatTime(wait: Boolean) {
+        localDataSource.setWaitPreheatTime(wait)
+    }
+    private fun setPreheatTime(second: Int) {
+        localDataSource.setPreheatTime(second)
     }
 
     private fun changeDetectionNum(detectionNum: Long) {
@@ -266,10 +285,11 @@ class AppViewModel(
      * 更新反应槽温度
      * @param value Int
      */
-    private fun changeReactionTemp(value: Int) {
-        reactionTemp = value
+    private fun changeTemp(reactionValue: Int,r1Value: Int) {
+        reactionTemp = reactionValue
+        r1Temp = r1Value
         viewModelScope.launch {
-            _reactionTemp.emit(value)
+            _reactionTemp.emit(reactionValue)
         }
     }
 
@@ -323,8 +343,8 @@ class AppViewModel(
                 changeFirstTest(intent.value)
             }
 
-            is AppIntent.ReactionTempChange -> {
-                changeReactionTemp(intent.value)
+            is AppIntent.TempChange -> {
+                changeTemp(intent.reactionTemp,intent.r1Temp)
             }
         }
     }
@@ -365,6 +385,6 @@ sealed class AppIntent {
     data class LooperTestChange(val looperTest: Boolean) : AppIntent()
     data class DetectionNumChange(val detectionNum: Long) : AppIntent()
     data class NeedJudgeTempChange(val value: Boolean) : AppIntent()
-    data class ReactionTempChange(val value: Int) : AppIntent()
+    data class TempChange(val reactionTemp: Int, val r1Temp: Int) : AppIntent()
 
 }

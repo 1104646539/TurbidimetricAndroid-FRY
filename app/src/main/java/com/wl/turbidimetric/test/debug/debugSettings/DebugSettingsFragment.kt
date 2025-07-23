@@ -39,7 +39,7 @@ class DebugSettingsFragment :
         vd.btnSave.setOnClickListener {
             verify(
                 vm.tempLowLimit.value?.toIntOrNull() ?: LocalDataGlobal.Default.TempLowLimit,
-                vm.tempUpLimit.value?.toIntOrNull() ?: LocalDataGlobal.Default.TempUpLimit
+                vm.tempUpLimit.value?.toIntOrNull() ?: LocalDataGlobal.Default.TempUpLimit,
             ).let {
                 if (it.isNotEmpty()) {
                     toast(it)

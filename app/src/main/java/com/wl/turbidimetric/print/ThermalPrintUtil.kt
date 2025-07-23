@@ -28,6 +28,12 @@ class ThermalPrintUtil(private val serialPort: BaseSerialPort) {
         private val GET_STATE = byteArrayOf(0x1C, 0x76)
 
         /**
+         * 设置打印方向，颠倒打印
+         */
+
+        private val Set_Print_Direction: ByteArray = byteArrayOf(0x1B, 0x63, 0x00)
+
+        /**
          * 打印机状态 缺纸
          */
         private const val PAGER_OUT: Byte = 0x55
@@ -41,7 +47,6 @@ class ThermalPrintUtil(private val serialPort: BaseSerialPort) {
          * 发送打印信息后的间隔时间
          */
         private const val INTERVAL_TIME = 300;
-
         /**
          * 发送获取打印机状态的超时时长
          */
@@ -175,6 +180,7 @@ class ThermalPrintUtil(private val serialPort: BaseSerialPort) {
      * 获取打印机状态
      */
     private fun sendGetState() {
+        send(Set_Print_Direction)
         send(GET_STATE)
     }
 
@@ -247,7 +253,7 @@ class ThermalPrintUtil(private val serialPort: BaseSerialPort) {
         sb.append("\n")
 
         if (yzs.size > matchingNum && absorbancys.size > matchingNum) {
-
+            sb.append(" \n")
             val nd = "${orderTargets[0]}${projectUnit}".fix(13)
             val abs = "${absorbancys[matchingNum].toInt()}".fix(5)
             sb.append("low $nd $abs")
@@ -257,13 +263,14 @@ class ThermalPrintUtil(private val serialPort: BaseSerialPort) {
             sb.append("\n")
 
             val nd2 = "${orderTargets[1]}${projectUnit}".fix(12)
-            val abs2 = "${absorbancys[matchingNum+1].toInt()}".fix(5)
+            val abs2 = "${absorbancys[matchingNum + 1].toInt()}".fix(5)
             sb.append("high $nd2 $abs2")
             sb.append("\n")
-            val yz2 = "(${yzs[matchingNum+1]}${projectUnit})".fix(16)
+            val yz2 = "(${yzs[matchingNum + 1]}${projectUnit})".fix(16)
             sb.append(" $yz2 ")
             sb.append("\n")
-            sb.append("\n")
+            sb.append(" \n")
+            sb.append(" \n")
 //            sb.append("${yzs[matchingNum]}ng/mL")
 //            sb.append("\n")
 //            sb.append("${absorbancys[matchingNum]}")

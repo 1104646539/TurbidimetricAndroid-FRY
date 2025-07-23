@@ -398,6 +398,13 @@ class SerialPortImpl(
 
             }
 
+            SerialGlobal.CMD_FullR1 -> {
+                callback {
+                    it.readDataFullR1Model(transitionFullR1Model(ready))
+                }
+
+            }
+
             else -> {}
         }
     }
@@ -523,8 +530,8 @@ class SerialPortImpl(
                                 count++
                                 if (hCount == count) {
                                     //找到了前缀
-                                    if((k + allCount + 1) > data.size){
-                                        c("数据长度不对，需要"+(k + allCount + 1)+"，只有"+data.size)
+                                    if ((k + allCount + 1) > data.size) {
+                                        c("数据长度不对，需要" + (k + allCount + 1) + "，只有" + data.size)
                                         data.clear()
                                         break@i
                                     }
@@ -1070,6 +1077,17 @@ class SerialPortImpl(
         writeAsync(
             createCmd(
                 SerialGlobal.CMD_OverloadParams,
+            )
+        )
+    }
+
+    /**
+     * 填充R1
+     */
+    override fun fullR1() {
+        writeAsync(
+            createCmd(
+                SerialGlobal.CMD_FullR1,
             )
         )
     }

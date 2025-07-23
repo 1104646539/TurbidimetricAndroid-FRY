@@ -3,6 +3,7 @@ package com.wl.turbidimetric.util
 import com.wl.turbidimetric.model.CuvetteDoorModel
 import com.wl.turbidimetric.model.DripReagentModel
 import com.wl.turbidimetric.model.DripSampleModel
+import com.wl.turbidimetric.model.FullR1Model
 import com.wl.turbidimetric.model.GetMachineStateModel
 import com.wl.turbidimetric.model.GetStateModel
 import com.wl.turbidimetric.model.GetVersionModel
@@ -53,6 +54,7 @@ interface Callback2 {
     fun readDataSqueezing(reply: ReplyModel<SqueezingModel>)
     fun readDataMotor(reply: ReplyModel<MotorModel>)
     fun readDataOverloadParamsModel(reply: ReplyModel<OverloadParamsModel>)
+    fun readDataFullR1Model(reply: ReplyModel<FullR1Model>)
 }
 
 fun interface McuUpdateCallBack {

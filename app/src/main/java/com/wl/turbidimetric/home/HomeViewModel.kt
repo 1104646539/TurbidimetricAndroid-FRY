@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.wl.turbidimetric.app.App
 import com.wl.turbidimetric.app.AppIntent
 import com.wl.turbidimetric.app.AppViewModel
+import com.wl.turbidimetric.app.MachineState
 import com.wl.turbidimetric.base.BaseViewModel
 import com.wl.turbidimetric.db.ServiceLocator
 import com.wl.turbidimetric.ex.calcAbsorbance
@@ -30,6 +31,7 @@ import com.wl.turbidimetric.model.CuvetteState
 import com.wl.turbidimetric.model.DripReagentModel
 import com.wl.turbidimetric.model.DripSampleModel
 import com.wl.turbidimetric.model.ErrorInfo
+import com.wl.turbidimetric.model.FullR1Model
 import com.wl.turbidimetric.model.GetMachineStateModel
 import com.wl.turbidimetric.model.GetStateModel
 import com.wl.turbidimetric.model.GetVersionModel
@@ -63,8 +65,6 @@ import com.wl.turbidimetric.model.TestResultModel
 import com.wl.turbidimetric.model.TestState
 import com.wl.turbidimetric.model.TestType
 import com.wl.turbidimetric.model.convertReplyState
-import com.wl.turbidimetric.report.PrintSDKHelper
-import com.wl.turbidimetric.repository.DefaultLogListDataSource
 import com.wl.turbidimetric.repository.if2.CurveSource
 import com.wl.turbidimetric.repository.if2.LocalDataSource
 import com.wl.turbidimetric.repository.if2.LogListDataSource
@@ -79,7 +79,6 @@ import com.wl.turbidimetric.upload.service.OnGetPatientCallback
 import com.wl.turbidimetric.upload.service.OnUploadCallback
 import com.wl.turbidimetric.util.Callback2
 import com.wl.turbidimetric.util.OnScanResult
-import com.wl.turbidimetric.util.ScanCodeUtil
 import com.wl.turbidimetric.util.SerialPortImpl
 import com.wl.wllib.LogToFile.c
 import com.wl.wllib.LogToFile.i
@@ -97,6 +96,8 @@ import java.math.BigDecimal
 import java.util.Date
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 class HomeViewModel(
     private val appViewModel: AppViewModel,
@@ -136,7 +137,7 @@ class HomeViewModel(
                 i("listener2 ${originalCallback} ${callback.size}")
             }
         }
-        listenerTempState()
+//        listenerTempState()
     }
 
     /**
@@ -874,14 +875,58 @@ class HomeViewModel(
     override fun readDataTempModel(reply: ReplyModel<TempModel>) {
         c("接收到 获取设置温度 reply=$reply")
 
-        appViewModel.processIntent(AppIntent.ReactionTempChange(reply.data.reactionTemp))
+        appViewModel.processIntent(AppIntent.TempChange(reply.data.reactionTemp, reply.data.r1Temp))
         _testMachineUiState.update {
             it.copy(
                 reactionTemp = reply.data.reactionTemp / 10.0, r1Temp = reply.data.r1Temp / 10.0
             )
         }
+        listenerR1Temp()
     }
 
+    /**
+     * 预热完成已执行
+     */
+    var preheatFinish = false
+
+    /**
+     * 填充R1已完成
+     */
+    var fullR1Finish = false;
+
+    /**
+     * 自检成功后，监听温度,预热,填充R1
+     * 两个阶段，
+     * 1、等待温度上升到指定温度
+     * 2、等待指定时间 15分钟
+     * 3、填充R1
+     */
+    private fun listenerR1Temp() {
+        if (appViewModel.testState.isPreheatTime()) {
+            if (appViewModel.getTempCanBeTest()) {
+                //温度合格，进入第2阶段
+                if (localDataRepository.getWaitPreheatTime()) {
+                    viewModelScope.launch(Dispatchers.IO) {
+                        delay(localDataRepository.getPreheatTime().seconds)
+                        preheatFinish()
+                    }
+                } else {
+                    //不等待直接预热完成
+                    preheatFinish()
+                }
+            }
+        }
+    }
+
+
+    /**
+     * 预热完成,开始填充R1
+     */
+    private fun preheatFinish() {
+        if (preheatFinish) return
+        preheatFinish = true;
+        fullR1()
+    }
 
     /**
      * 在收到每个命令的时候判断是否是状态错误
@@ -948,6 +993,36 @@ class HomeViewModel(
 
     override fun readDataOverloadParamsModel(reply: ReplyModel<OverloadParamsModel>) {
 
+    }
+
+    /**
+     * 接收到 填充R1
+     * @param reply ReplyModel<FullR1Model>
+     */
+    override fun readDataFullR1Model(reply: ReplyModel<FullR1Model>) {
+        c("接收到 填充R1 reply=$reply")
+        if (appViewModel.testType.isDebug()) return
+        if (appViewModel.testState.isPreheatTime()) {
+            if (reply.data.state == 1) {
+                //成功，可以检测了
+                fullR1Finish = true
+                appViewModel.testState = TestState.Normal
+            } else {
+                //失败
+                fullR1Finish = false
+
+                showFullR1FailedDialog()
+            }
+        }
+    }
+
+    /**
+     * 显示填充R1失败对话框
+     */
+    private fun showFullR1FailedDialog() {
+        viewModelScope.launch {
+            _dialogUiState.emit(HomeDialogUiState.FullR1Failed())
+        }
     }
 
     /**
@@ -2672,9 +2747,10 @@ class HomeViewModel(
         errorInfo = reply.data.errorInfo
         appViewModel.testState = TestState.None
         if (errorInfo.isNullOrEmpty()) {
-            appViewModel.testState = TestState.Normal
-            //自检成功后获取一下r1,r2，清洗液状态
+            appViewModel.testState = TestState.PreheatTime
+            //自检成功后获取一下r1,r2，清洗液状态，获取温度
             getState()
+            listenerTempState()
         } else {
             EventBus.getDefault().post(EventMsg<Any>(what = EventGlobal.WHAT_HIDE_SPLASH))
             appViewModel.testState = TestState.NotGetMachineState
@@ -2701,6 +2777,7 @@ class HomeViewModel(
         }
     }
 
+
     /**
      * 接收到获取状态
      */
@@ -2710,7 +2787,7 @@ class HomeViewModel(
         r2Volume = reply.data.r2Volume
         cleanoutFluid = reply.data.cleanoutFluid
         c("接收到 获取状态 appViewModel.testState=${appViewModel.testState} reply=$reply continueTestCuvetteState=$continueTestCuvetteState continueTestSampleState=$continueTestSampleState clickStart=$clickStart r1Reagent=$r1Reagent r2Reagent=$r2Reagent cleanoutFluid=$cleanoutFluid continueTestGetState=$continueTestGetState")
-        if (appViewModel.testState == TestState.Normal) {
+        if (appViewModel.testState == TestState.PreheatTime) {
             EventBus.getDefault().post(EventMsg<Any>(what = EventGlobal.WHAT_HIDE_SPLASH))
             viewModelScope.launch(Dispatchers.IO) {
                 _dialogUiState.emit(HomeDialogUiState.GetMachineDismiss)
@@ -3206,6 +3283,14 @@ class HomeViewModel(
             if (detectionNumInput.isEmpty()) localDataRepository.getDetectionNum() else detectionNumInput,
             needTestNum
         )
+    }
+
+    /**
+     * 填充R1
+     */
+    public fun fullR1() {
+        c("发送 填充R1")
+        appViewModel.serialPort.fullR1()
     }
 
     /**

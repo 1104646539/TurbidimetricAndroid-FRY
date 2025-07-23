@@ -55,6 +55,8 @@ object LocalDataGlobal {
         val ReportIntervalTime = 35
         val TempUpLimit = 400
         val TempLowLimit = 360
+        val WaitPreheatTime = true
+        val PreheatTime = 900
     }
 
 

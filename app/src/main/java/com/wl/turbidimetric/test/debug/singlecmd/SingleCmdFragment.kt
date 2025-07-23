@@ -62,6 +62,7 @@ class SingleCmdFragment :
                 vd.btnMoveSampleShelfReset.isEnabled = it
                 vd.btnOverloadParams.isEnabled = it
                 vd.btnCorrectionTemp.isEnabled = it
+                vd.btnFullR1.isEnabled = it
             }
         }
     }
@@ -70,6 +71,9 @@ class SingleCmdFragment :
 
         vd.btnGetMachineState.setOnClickListener {
             vm.getMachineState()
+        }
+        vd.btnFullR1.setOnClickListener {
+            vm.fullR1()
         }
         vd.btnMoveSampleShelf.setOnClickListener {
             vm.moveSampleShelf(vd.tetMoveSampleShelfStep.text.toString())
@@ -158,7 +162,10 @@ class SingleCmdFragment :
             vm.overloadParams()
         }
         vd.btnCorrectionTemp.setOnClickListener {
-            vm.correctionTemp(vd.tetCorrectionTempReaction.text.toString(),vd.tetCorrectionTempR1.text.toString())
+            vm.correctionTemp(
+                vd.tetCorrectionTempReaction.text.toString(),
+                vd.tetCorrectionTempR1.text.toString()
+            )
         }
     }
 

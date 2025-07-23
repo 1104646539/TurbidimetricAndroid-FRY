@@ -99,8 +99,9 @@ class MatchingStateLayout : FrameLayout {
 
     /**
      * 判断结果是否合格，并返回描述结论
-     * 测量浓度 < 目标浓度的±10%内为合格
-     * 质控测量浓度 <= 输入的目标浓度范围内为合格
+     * 目标浓度 0 不参与
+     *         >0 && <200 ±15
+     *         >=200 ± 7.5%
      * @return String
      */
     private fun getResult() {
@@ -112,7 +113,7 @@ class MatchingStateLayout : FrameLayout {
             val index = data.indexOfFirst { d ->
                 val targets = d.targetCon.split("-").map { it.toDouble() }
                 //如果目标浓度是50
-                targets.size <=1 && targets[0] in -0.1..0.1
+                targets.size <= 1 && targets[0] in -0.1..0.1
             }
             if (index in 0..data.size) {
                 LogToFile.i("更改前=data[index]=${data[index]}")
@@ -122,17 +123,31 @@ class MatchingStateLayout : FrameLayout {
             data.map { d ->
                 val targets = d.targetCon.split("-").map { it.toDouble() }
                 //合格范围
-                var bl = 0.1
-                if (targets[0] in 0.1..50.1) {//如果目标浓度是50
-                    bl = 0.3
+                var bl = 0.075
+                var low = 0.0
+                var high = 0.0
+                if (targets.size > 1) {
+                    low = targets[0]
+                    high = targets[1]
+                } else {
+                    if (targets[0] in 0.1..200.0) {
+                        low = targets[0] - 15
+                        high = targets[0] + 15
+                    } else {
+                        low = targets[0] * (1 - bl)
+                        high = targets[0] * (1 + bl)
+                    }
+                    if (low <= 0.001) {
+                        //在targets[0] < 15 && > 0 的时候
+                        //如果low<0不要进入下面的不判断
+                        low = 0.1
+                    }
                 }
-
-                var low = if (targets.size > 1) targets[0] else targets[0] * (1 - bl)
-                var high = if (targets.size > 1) targets[1] else targets[0] * (1 + bl)
+//                var low = if (targets.size > 1) targets[0] else targets[0] * (1 - bl)
+//                var high = if (targets.size > 1) targets[1] else targets[0] * (1 + bl)
 
 
                 if (low > 0.001 && high > 0.001) {
-
                     d.testCon.toDouble() in low..high
                 } else {
                     //如果目标值是0就不判断

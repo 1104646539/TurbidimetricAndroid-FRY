@@ -201,7 +201,7 @@ class MatchingArgsFragment :
                 vd.vMatching.setBackgroundResource(R.drawable.shape_analyse_test_bg)
                 vd.tvMatching.setText("运行错误")
                 vm.configEnable.postValue(false)
-            } else if (!appVm.getTempCanBeTest()) {
+            } else if (testState.isPreheatTime()) {
                 vd.vMatching.setBackgroundResource(R.drawable.shape_analyse_test_bg)
                 vd.tvMatching.setText("正在预热")
                 vm.configEnable.postValue(false)

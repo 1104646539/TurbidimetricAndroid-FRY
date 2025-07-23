@@ -9,21 +9,21 @@ plugins {
 
 android {
     signingConfigs {
-        debug {
-            storeFile file('E:\\platform.keystore')
-            storePassword '123456'
-            keyAlias 'platform'
-            keyPassword '123456'
-        }
-        release {
-//            manifestPlaceholders = [
-//                    APP_NAME: "@string/app_name",
-//            ]
-            storeFile file('E:\\platform.keystore')
-            storePassword '123456'
-            keyAlias 'platform'
-            keyPassword '123456'
-        }
+//        debug {
+//            storeFile file('E:\\platform.keystore')
+//            storePassword '123456'
+//            keyAlias 'platform'
+//            keyPassword '123456'
+//        }
+//        release {
+////            manifestPlaceholders = [
+////                    APP_NAME: "@string/app_name",
+////            ]
+//            storeFile file('E:\\platform.keystore')
+//            storePassword '123456'
+//            keyAlias 'platform'
+//            keyPassword '123456'
+//        }
     }
     compileSdk 33
 
@@ -32,7 +32,7 @@ android {
         minSdk 24
         targetSdk 32
         versionCode 1
-        versionName "1.0.1.0-10修复打印错误"
+        versionName "1.0.2.0-增加预热时间"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 

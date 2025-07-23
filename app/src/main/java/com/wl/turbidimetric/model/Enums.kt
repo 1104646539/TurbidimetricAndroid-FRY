@@ -201,6 +201,7 @@ enum class TestState(val state: Int) {
     None(0),//等待开始自检
     GetMachineState(10),//自检中
     NotGetMachineState(11),//自检失败后未重新自检
+    PreheatTime(12),//正常的，自检成功后，等待预热
     RunningError(50),//在运行时出现错误
     Normal(100),//正常的，自检成功后，等待开始
     GetState(101),//获取状态中
@@ -246,6 +247,14 @@ enum class TestState(val state: Int) {
      */
     fun isRunning(): Boolean {
         return this.state > Normal.state
+    }
+
+    /**
+     * 是否正在预热
+     * @return Boolean
+     */
+    fun isPreheatTime(): Boolean {
+        return this.state == PreheatTime.state
     }
 
     /**

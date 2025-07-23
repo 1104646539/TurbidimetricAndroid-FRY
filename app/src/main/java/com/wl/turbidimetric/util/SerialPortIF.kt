@@ -227,6 +227,11 @@ interface SerialPortIF {
     fun overloadParams()
 
     /**
+     * 填充R1
+     */
+    fun fullR1()
+
+    /**
      * 创建一个完整的命令
      */
     private fun createCmd(

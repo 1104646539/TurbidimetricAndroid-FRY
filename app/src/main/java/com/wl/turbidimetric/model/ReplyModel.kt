@@ -251,3 +251,10 @@ data class MotorModel(val resetState: Int = 0)
  * @constructor
  */
 data class OverloadParamsModel(val v: Int = 0)
+
+/**
+ * 充满R1
+ * @property v Int
+ * @constructor
+ */
+data class FullR1Model(val state: Int = 0)

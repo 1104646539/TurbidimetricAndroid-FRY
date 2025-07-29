@@ -466,7 +466,7 @@ class SingleCmdViewModel(private val appViewModel: AppViewModel) : BaseViewModel
             return
         }
         val volume = msg.toIntOrNull() ?: 0
-        if (volume !in 1..10000) {
+        if (volume !in 1..20000) {
             changeHilt("清洗时长错误,必须为1-10000")
             return
         }

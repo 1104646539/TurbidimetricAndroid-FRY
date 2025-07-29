@@ -905,7 +905,7 @@ class HomeViewModel(
         if (appViewModel.testState.isPreheatTime()) {
             if (appViewModel.getTempCanBeTest()) {
                 //温度合格，进入第2阶段
-                if (localDataRepository.getWaitPreheatTime()) {
+                if (localDataRepository.getWaitPreheatTime() && !SystemGlobal.isCodeDebug) {
                     viewModelScope.launch(Dispatchers.IO) {
                         delay(localDataRepository.getPreheatTime().seconds)
                         preheatFinish()

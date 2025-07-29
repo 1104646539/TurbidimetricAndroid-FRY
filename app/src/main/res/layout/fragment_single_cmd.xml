@@ -921,6 +921,17 @@
                         android:textSize="24sp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btn_drain_water"
+                    style="@style/BtnPositive"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginLeft="10dp"
+                    android:minWidth="150dp"
+                    android:text="排水"
+                    app:layout_constraintLeft_toRightOf="@+id/textInputLayout15"
+                    app:layout_constraintTop_toTopOf="@+id/textInputLayout15" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </ScrollView>

@@ -63,6 +63,7 @@ class SingleCmdFragment :
                 vd.btnOverloadParams.isEnabled = it
                 vd.btnCorrectionTemp.isEnabled = it
                 vd.btnFullR1.isEnabled = it
+                vd.btnDrainWater.isEnabled = it
             }
         }
     }
@@ -133,6 +134,9 @@ class SingleCmdFragment :
         }
         vd.btnSamplingProbeCleaning.setOnClickListener {
             vm.samplingProbeCleaning(vd.tetSamplingProbeCleaningDuration.text.toString())
+        }
+        vd.btnDrainWater.setOnClickListener {
+            vm.samplingProbeCleaning("20000")
         }
         vd.btnPierced.setOnClickListener {
             vm.pierced()

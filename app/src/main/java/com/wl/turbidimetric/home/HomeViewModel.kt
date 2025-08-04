@@ -96,7 +96,6 @@ import java.math.BigDecimal
 import java.util.Date
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 class HomeViewModel(
@@ -514,7 +513,7 @@ class HomeViewModel(
     var allowTakeReagent = true
 
     /**
-     * 是否允许加样(在出现加样时比色皿非空的情况下，只检测已经加好样的样本，不继续取样加样)
+     * 是否允许加样(在出现加样时比色皿不为空的情况下，只检测已经加好样的样本，不继续取样加样)
      */
     var allowDripSample = true
 
@@ -933,7 +932,7 @@ class HomeViewModel(
      *
      * 成功：0
      *
-     * 失败：1:非法参数 2:电机错误 3:传感器错误 4:取样失败（样本量不足） 5:比色皿非空 6:取试剂失败
+     * 失败：1:非法参数 2:电机错误 3:传感器错误 4:取样失败（样本量不足） 5:比色皿不为空 6:取试剂失败
      *
      * 其中 1 2 3 在每个命令都通用，在这里判断并提示
      *
@@ -1834,7 +1833,7 @@ class HomeViewModel(
         appViewModel.testState = TestState.DripSample
         cuvettePos = -1
 
-        if (!allowTakeReagent || !allowDripSample) {//取试剂失败|比色皿非空，不允许再检测
+        if (!allowTakeReagent || !allowDripSample) {//取试剂失败|比色皿不为空，不允许再检测
             testFinishAction()
             return
         }
@@ -2088,12 +2087,28 @@ class HomeViewModel(
         if (appViewModel.testState.isNotPrepare()) return
         c("接收到 加样 reply=$reply cuvettePos=$cuvettePos samplePos=$samplePos")
 
+        //记录当前比色皿架第一个加样的时间
+        val firstPos = getFirstCuvetteStartPos()
+        if (firstPos == -1) {
+            //不是第一排或者没有跳过的
+            if (cuvettePos == 0) {
+                cuvetteShelfStartDuration = Date().time
+                i("加样时间同步 登记起始时间=${cuvetteShelfStartDuration} cuvettePos=$cuvettePos firstPos=$firstPos samplePos=$samplePos")
+            }
+        } else {
+            //是第一排并且有跳过的
+            if (cuvettePos == (firstPos + 1)) {
+                cuvetteShelfStartDuration = Date().time
+                i("加样时间同步 登记起始时间=${cuvetteShelfStartDuration} cuvettePos=$cuvettePos firstPos=$firstPos samplePos=$samplePos")
+            }
+        }
+
         dripSampleFinish = true
         viewModelScope.launch {
 //            val result = createResultModel(
 //                scanResults[samplePos - 1], mSamplesStates[sampleShelfPos]?.get(samplePos - 1)
 //            )
-            if (reply.state == ReplyState.CUVETTE_NOT_EMPTY && !appViewModel.getLooperTest()) {//比色皿非空，不加样了
+            if (reply.state == ReplyState.CUVETTE_NOT_EMPTY && !appViewModel.getLooperTest()) {//比色皿不为空，不加样了
                 allowDripSample = false
                 updateCuvetteState(
                     cuvettePos,
@@ -2103,7 +2118,7 @@ class HomeViewModel(
                 )
                 DbLogUtil.err(
                     TestType.Test,
-                    "比色皿非空:比色皿位置:${cuvetteShelfPos + 1}-$cuvettePos \n样本位置${sampleShelfPos + 1}- $samplePos"
+                    "比色皿不为空:比色皿位置:${cuvetteShelfPos + 1}-$cuvettePos \n样本位置${sampleShelfPos + 1}- $samplePos"
                 )
             } else {//正常加样，继续
                 updateCuvetteState(
@@ -2276,10 +2291,39 @@ class HomeViewModel(
     private fun stepDripReagent() {
         i(" ———————— stepDripReagent appViewModel.testState=${appViewModel.testState} ————————————————————————————————————————————————————————————————————————————————————————————————=")
         appViewModel.testState = TestState.DripReagent
+        val needDelayDuration = calculateAlignDuration()
         cuvettePos = -1
-        val step = getNextStepCuvetteStartPos()
-        moveCuvetteDripReagent(step + 2)
-        takeReagent()
+        //计算对齐时间，不管加样了多少，都对齐十个的加样时间
+
+        viewModelScope.launch {
+            delay(needDelayDuration.seconds)
+            val step = getNextStepCuvetteStartPos()
+            moveCuvetteDripReagent(step + 2)
+            takeReagent()
+        }
+    }
+
+
+    /**
+     * 这排比色皿开始的加样时间
+     */
+    var cuvetteShelfStartDuration = 0L
+
+    /**
+     * 这排比色皿结束的加样时间
+     */
+    var cuvetteShelfEndDuration = 0L
+
+    /**
+     * 计算需对齐的加样时间
+     * @return Int
+     */
+    private fun calculateAlignDuration(): Int {
+        cuvetteShelfEndDuration = Date().time
+        val usedDuration = (cuvetteShelfEndDuration - cuvetteShelfStartDuration) / 1000
+        val delayDuration = SystemGlobal.DripSampleAlignDuration - usedDuration
+        i("加样时间同步 比色皿位置=${cuvettePos} 已用时长=${usedDuration} 等待时间=${delayDuration}")
+        return (delayDuration).toInt()
     }
 
     /**
@@ -2623,7 +2667,7 @@ class HomeViewModel(
             dialogMsg = "请检查"
         }
         if (!allowDripSample) {
-            dialogMsg = dialogMsg.plus("比色皿非空")
+            dialogMsg = dialogMsg.plus("比色皿不为空")
         }
         if (!allowTakeReagent) {
             if (dialogMsg.length > 3) {

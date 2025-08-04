@@ -79,7 +79,7 @@ import java.util.Date
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 import kotlin.random.Random
-
+import kotlin.time.Duration.Companion.seconds
 /**
  * 曲线拟合和质控
  *
@@ -1448,6 +1448,14 @@ class MatchingArgsViewModel(
         if (appViewModel.testState.isNotPrepare()) return
         i("接收到 加样 reply=$reply cuvettePos=$cuvettePos testState=${appViewModel.testState} sampleStep=$sampleStep samplePos=$samplePos")
 
+        //记录当前比色皿架第一个加样的时间
+
+        if (cuvettePos == 1) {
+            cuvetteShelfStartDuration = Date().time
+            i("加样时间同步 登记起始时间=${cuvetteShelfStartDuration} cuvettePos=$cuvettePos samplePos=$samplePos")
+        }
+
+
         dripSamplingFinish = true
         samplingFinish = false
         if (reply.state == ReplyState.CUVETTE_NOT_EMPTY) {//比色皿非空
@@ -1661,13 +1669,19 @@ class MatchingArgsViewModel(
                 || (matchingType == MatchingConfigLayout.MatchingType.Quality && sampleStep == 2)
             ) {
                 //开始加试剂的步骤
+
                 appViewModel.testState = TestState.DripReagent
+                val needDelayDuration = calculateAlignDuration()
                 sampleStep = 0
                 cuvettePos = -1
-                moveSample(-samplePos + 1)
-                moveCuvetteDripReagent()
+                viewModelScope.launch {
+                    delay(needDelayDuration.seconds)
 
-                takeReagent()
+                    moveSample(-samplePos + 1)
+                    moveCuvetteDripReagent()
+
+                    takeReagent()
+                }
             } else {//继续移动已混匀的样本
                 i("sampleStep=$sampleStep")
                 var targetIndex = 1
@@ -1686,6 +1700,29 @@ class MatchingArgsViewModel(
         }
     }
 
+
+
+    /**
+     * 这排比色皿开始的加样时间
+     */
+    var cuvetteShelfStartDuration = 0L
+
+    /**
+     * 这排比色皿结束的加样时间
+     */
+    var cuvetteShelfEndDuration = 0L
+
+    /**
+     * 计算需对齐的加样时间
+     * @return Int
+     */
+    private fun calculateAlignDuration(): Int {
+        cuvetteShelfEndDuration = Date().time
+        val usedDuration = (cuvetteShelfEndDuration - cuvetteShelfStartDuration) / 1000
+        val delayDuration = SystemGlobal.DripSampleAlignDuration - usedDuration
+        i("加样时间同步 比色皿位置=${cuvettePos} 已用时长=${usedDuration} 等待时间=${delayDuration}")
+        return (delayDuration).toInt()
+    }
 
     /**
      * 接收到搅拌针清洗

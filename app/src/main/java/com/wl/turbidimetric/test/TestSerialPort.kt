@@ -41,7 +41,7 @@ object TestSerialPort {
             SerialGlobal.CMD_GetState -> {
                 delay(200)
 //                if (index < 2) {
-                reply = reply.plus(ubyteArrayOf(0x0u, 0x2u, 0x11u, 0xffu))// 0011 0011
+                reply = reply.plus(ubyteArrayOf(0x0u, 0x2u, 0x33u, 0xffu))// 0011 0011
 //                } else {
 //                reply = reply.plus(ubyteArrayOf(0x0u, 0x2u, 0x11u, 0xffu))//0001 0001
 //                }
@@ -50,7 +50,7 @@ object TestSerialPort {
 
             SerialGlobal.CMD_MoveSample -> {
                 delay(100)
-//                if (index in 3 .. 3) {
+//                if (index in 0 .. 5) {
 //                reply = ubyteArrayOf(data[0], 0x01u, 0x0u, 0x0u, 0x0u, 0x0u)
                 reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x2u))//0不存在 1样本管 2比色杯
 //                } else {

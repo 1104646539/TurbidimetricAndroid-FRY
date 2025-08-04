@@ -96,4 +96,8 @@ object SystemGlobal {
             getResource().getString(R.string.nav_settings)
         ),
     )
+    /**
+     * 比色皿架加样总时长要求
+     */
+    const val DripSampleAlignDuration = 240L
 }

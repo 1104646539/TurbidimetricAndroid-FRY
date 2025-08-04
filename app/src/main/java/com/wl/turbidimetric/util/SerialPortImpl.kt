@@ -488,7 +488,7 @@ class SerialPortImpl(
                     if (take != null
                         && !testState.isRunningError()
                     ) {
-                        c("重发了 $take")
+                        c("重发了 ${take.toHex()}")
                         writeAsync(take)
                     }
                 }

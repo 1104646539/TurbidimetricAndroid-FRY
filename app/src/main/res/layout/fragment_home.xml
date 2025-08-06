@@ -19,7 +19,7 @@
             android:textColor="@color/black2"
             android:textSize="22sp"
             app:layout_constraintBottom_toTopOf="@id/iv_analyse_indicate"
-            app:layout_constraintLeft_toLeftOf="@id/sv_cuvette_1"
+            app:layout_constraintLeft_toLeftOf="@id/sv_cuvette_4"
             app:layout_constraintRight_toRightOf="@id/sv_cuvette_4" />
 
         <ImageView
@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:src="@drawable/analyse_indicate"
             app:layout_constraintBottom_toTopOf="@id/tv_cuvette_shelf_1"
-            app:layout_constraintLeft_toLeftOf="@id/sv_cuvette_1"
+            app:layout_constraintLeft_toLeftOf="@id/sv_cuvette_4"
             app:layout_constraintRight_toRightOf="@id/sv_cuvette_4" />
 
         <TextView
@@ -53,50 +53,51 @@
             app:layout_constraintRight_toRightOf="@id/sv_cuvette_3"
             app:layout_constraintTop_toTopOf="@id/tv_cuvette_shelf_1" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="3"
-            android:textColor="@color/black2"
-            android:textSize="18sp"
-            app:layout_constraintLeft_toLeftOf="@id/sv_cuvette_2"
-            app:layout_constraintRight_toRightOf="@id/sv_cuvette_2"
-            app:layout_constraintTop_toTopOf="@id/tv_cuvette_shelf_1" />
+<!--        <TextView-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="3"-->
+<!--            android:textColor="@color/black2"-->
+<!--            android:textSize="18sp"-->
+<!--            app:layout_constraintLeft_toLeftOf="@id/sv_cuvette_2"-->
+<!--            app:layout_constraintRight_toRightOf="@id/sv_cuvette_2"-->
+<!--            app:layout_constraintTop_toTopOf="@id/tv_cuvette_shelf_1" />-->
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="4"
-            android:textColor="@color/black2"
-            android:textSize="18sp"
-            app:layout_constraintLeft_toLeftOf="@id/sv_cuvette_1"
-            app:layout_constraintRight_toRightOf="@id/sv_cuvette_1"
-            app:layout_constraintTop_toTopOf="@id/tv_cuvette_shelf_1" />
+<!--        <TextView-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="4"-->
+<!--            android:textColor="@color/black2"-->
+<!--            android:textSize="18sp"-->
+<!--            app:layout_constraintLeft_toLeftOf="@id/sv_cuvette_1"-->
+<!--            app:layout_constraintRight_toRightOf="@id/sv_cuvette_1"-->
+<!--            app:layout_constraintTop_toTopOf="@id/tv_cuvette_shelf_1" />-->
+
+<!--        <com.wl.turbidimetric.view.ShelfView-->
+<!--            android:id="@+id/sv_cuvette_1"-->
+<!--            android:layout_width="47dp"-->
+<!--            android:layout_height="565dp"-->
+<!--            android:layout_marginLeft="130dp"-->
+<!--            android:layout_marginTop="200dp"-->
+<!--            app:layout_constraintLeft_toLeftOf="parent"-->
+<!--            app:layout_constraintTop_toTopOf="parent" />-->
+
+<!--        <com.wl.turbidimetric.view.ShelfView-->
+<!--            android:id="@+id/sv_cuvette_2"-->
+<!--            android:layout_width="47dp"-->
+<!--            android:layout_height="565dp"-->
+<!--            android:layout_marginLeft="19dp"-->
+<!--            app:layout_constraintLeft_toRightOf="@id/sv_cuvette_1"-->
+<!--            app:layout_constraintTop_toTopOf="@id/sv_cuvette_1" />-->
 
         <com.wl.turbidimetric.view.ShelfView
-            android:id="@+id/sv_cuvette_1"
+            android:id="@+id/sv_cuvette_3"
             android:layout_width="47dp"
             android:layout_height="565dp"
             android:layout_marginLeft="130dp"
             android:layout_marginTop="200dp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
-        <com.wl.turbidimetric.view.ShelfView
-            android:id="@+id/sv_cuvette_2"
-            android:layout_width="47dp"
-            android:layout_height="565dp"
-            android:layout_marginLeft="19dp"
-            app:layout_constraintLeft_toRightOf="@id/sv_cuvette_1"
-            app:layout_constraintTop_toTopOf="@id/sv_cuvette_1" />
-
-        <com.wl.turbidimetric.view.ShelfView
-            android:id="@+id/sv_cuvette_3"
-            android:layout_width="47dp"
-            android:layout_height="565dp"
-            android:layout_marginLeft="19dp"
-            app:layout_constraintLeft_toRightOf="@id/sv_cuvette_2"
-            app:layout_constraintTop_toTopOf="@id/sv_cuvette_2" />
 
         <com.wl.turbidimetric.view.ShelfView
             android:id="@+id/sv_cuvette_4"
@@ -169,35 +170,35 @@
             app:layout_constraintRight_toRightOf="@id/sv_sample_1"
             app:layout_constraintTop_toTopOf="@id/tv_sample_shelf_1" />
 
-        <com.wl.turbidimetric.view.ShelfView
+        <com.wl.turbidimetric.view.ShelfView5
             android:id="@+id/sv_sample_1"
             android:layout_width="47dp"
-            android:layout_height="565dp"
+            android:layout_height="280dp"
             android:layout_marginLeft="130dp"
             android:layout_marginTop="200dp"
             app:layout_constraintLeft_toRightOf="@id/sv_cuvette_4"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.wl.turbidimetric.view.ShelfView
+        <com.wl.turbidimetric.view.ShelfView5
             android:id="@+id/sv_sample_2"
             android:layout_width="47dp"
-            android:layout_height="565dp"
+            android:layout_height="280dp"
             android:layout_marginLeft="19dp"
             app:layout_constraintLeft_toRightOf="@id/sv_sample_1"
             app:layout_constraintTop_toTopOf="@id/sv_sample_1" />
 
-        <com.wl.turbidimetric.view.ShelfView
+        <com.wl.turbidimetric.view.ShelfView5
             android:id="@+id/sv_sample_3"
             android:layout_width="47dp"
-            android:layout_height="565dp"
+            android:layout_height="280dp"
             android:layout_marginLeft="19dp"
             app:layout_constraintLeft_toRightOf="@id/sv_sample_2"
             app:layout_constraintTop_toTopOf="@id/sv_sample_2" />
 
-        <com.wl.turbidimetric.view.ShelfView
+        <com.wl.turbidimetric.view.ShelfView5
             android:id="@+id/sv_sample_4"
             android:layout_width="47dp"
-            android:layout_height="565dp"
+            android:layout_height="280dp"
             android:layout_marginLeft="19dp"
             app:layout_constraintLeft_toRightOf="@id/sv_sample_3"
             app:layout_constraintTop_toTopOf="@id/sv_sample_3" />

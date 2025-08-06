@@ -33,6 +33,7 @@ import com.wl.turbidimetric.upload.model.GetPatientType
 import com.wl.turbidimetric.upload.model.Patient
 import com.wl.turbidimetric.upload.service.OnGetPatientCallback
 import com.wl.turbidimetric.view.ShelfView
+import com.wl.turbidimetric.view.ShelfView5
 import com.wl.turbidimetric.view.dialog.GetTestPatientInfoDialog
 import com.wl.turbidimetric.view.dialog.HiltDialog
 import com.wl.turbidimetric.view.dialog.HomeConfigDialog
@@ -197,16 +198,10 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 vd.svSample4.itemStates = it[3]
             }
         }
-        vd.svCuvette1.shape = ShelfView.Shape.Rectangle
-        vd.svCuvette2.shape = ShelfView.Shape.Rectangle
+
         vd.svCuvette3.shape = ShelfView.Shape.Rectangle
         vd.svCuvette4.shape = ShelfView.Shape.Rectangle
-        vd.svCuvette1.clickIndex = { it, item ->
-            showDetails(3, it, item)
-        }
-        vd.svCuvette2.clickIndex = { it, item ->
-            showDetails(2, it, item)
-        }
+
         vd.svCuvette3.clickIndex = { it, item ->
             showDetails(1, it, item)
         }
@@ -215,8 +210,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         }
         lifecycleScope.launchWhenCreated {
             vm.cuvetteStates.collectLatest {
-                vd.svCuvette1.itemStates = it[3]
-                vd.svCuvette2.itemStates = it[2]
                 vd.svCuvette3.itemStates = it[1]
                 vd.svCuvette4.itemStates = it[0]
             }
@@ -489,7 +482,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 //        DBManager.ProjectBox.put(project)
     }
 
-    private val arraySample = mutableListOf<ShelfView>()
+    private val arraySample = mutableListOf<ShelfView5>()
     private val arrayCuvette = mutableListOf<ShelfView>()
     private fun listenerData() {
         arraySample.add(vd.svSample1)
@@ -498,8 +491,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         arraySample.add(vd.svSample4)
         arrayCuvette.add(vd.svCuvette4)
         arrayCuvette.add(vd.svCuvette3)
-        arrayCuvette.add(vd.svCuvette2)
-        arrayCuvette.add(vd.svCuvette1)
         lifecycleScope.launch {
             /**
              * 显示调试的数据

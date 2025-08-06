@@ -33,7 +33,7 @@ object TestSerialPort {
 //                if (index <= 0) {
 //                    reply = reply.plus(ubyteArrayOf(0x3Fu, 0xFFu, 0xFFu, 0xFFu))
 //                } else {
-                reply = reply.plus(ubyteArrayOf(0x00u, 0x00u, 0x00u, 0x00u))
+                reply = reply.plus(ubyteArrayOf(0x00u, 0x00u, 0x00u, 0x0bu))
 //                }
 //                index++
             }

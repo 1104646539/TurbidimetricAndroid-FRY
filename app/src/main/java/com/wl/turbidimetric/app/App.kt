@@ -116,7 +116,7 @@ class App : Application() {
                 }
                 projectSource.addProject(project)
                 projectSource.addProject(project2)
-//                insertTestCurve(project)
+                insertTestCurve(project)
             }
         }
     }

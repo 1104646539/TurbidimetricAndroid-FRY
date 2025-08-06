@@ -1,5 +1,6 @@
 package com.wl.turbidimetric.home
 
+import android.os.Build
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -223,7 +224,7 @@ class HomeViewModel(
     /**比色皿架状态 1有 0无 顺序是从中间往旁边
      *
      */
-    private var cuvetteShelfStates: IntArray = IntArray(4)
+    private var cuvetteShelfStates: IntArray = IntArray(2)
 
 
     /**当前排所有比色皿的状态
@@ -284,7 +285,7 @@ class HomeViewModel(
     /**样本最大步数
      *
      */
-    private val sampleMax = 10
+    private val sampleMax = 6
 
     /**比色皿架是否移动完毕
      *
@@ -832,7 +833,7 @@ class HomeViewModel(
         piercedFinish = true
         updateSampleState(samplePos, SampleState.Pierced)
         //当不需要取样时，直接下一步
-        if (!sampleNeedSampling(samplePos - 1)) {
+        if (!sampleNeedSampling(samplePos - 2)) {
             samplingFinish = true
             dripSampleFinish = true
             i("不需要取样 下一步")
@@ -847,7 +848,7 @@ class HomeViewModel(
     private fun goDripSample() {
         i("sampleMoveFinish=$sampleMoveFinish samplingFinish=$samplingFinish cuvetteMoveFinish=$cuvetteMoveFinish cuvetteShelfMoveFinish=$cuvetteShelfMoveFinish")
         if (samplePos > 0 && sampleMoveFinish && samplingFinish && cuvetteMoveFinish && cuvetteShelfMoveFinish && sampleNeedDripSampling(
-                samplePos - 1
+                samplePos - 2
             )
         ) {
             dripSample()
@@ -977,7 +978,7 @@ class HomeViewModel(
         if (appViewModel.testState.isNotPrepare()) return
         c("接收到 挤压 reply=$reply")
 
-        updateSampleState(samplePos - 1, SampleState.Squeezing)
+        updateSampleState(samplePos - 2, SampleState.Squeezing)
         //注：如果上次取样针清洗未结束，就等待清洗结束后再加样,否则直接加样
         if (samplingProbeCleaningFinish) {
             sampling()
@@ -1083,7 +1084,7 @@ class HomeViewModel(
         val isNonexistent = reply.data.type.isNonexistent()
         val isCuvette = reply.data.type.isCuvette()
         //最后一个位置不需要扫码，直接取样
-        if (samplePos < sampleMax) {
+        if (samplePos < sampleMax - 1) {
 //            if ((SystemGlobal.isCodeDebug && !sampleExists[samplePos]) || (isAuto() && LocalData.SampleExist && isNonexistent)) {
             //如果是自动模式并且已开启样本传感器,并且是未识别到样本，才是没有样本
             if ((isAuto() && localDataRepository.getSampleExist() && isNonexistent)) {
@@ -1103,11 +1104,11 @@ class HomeViewModel(
             }
         }
         //判断是否需要取样。取样位和扫码位差一个位置
-        if (sampleNeedSampling(samplePos - 1)) {
+        if (sampleNeedSampling(samplePos - 2)) {
             val isSample =
-                mSamplesStates[sampleShelfPos]?.get(samplePos - 1)?.sampleType?.isSample() == true
+                mSamplesStates[sampleShelfPos]?.get(samplePos - 2)?.sampleType?.isSample() == true
             squeezing(isSample)
-        } else if (samplePos == sampleMax && sampleMoveFinish) {
+        } else if ((samplePos == sampleMax || samplePos == sampleMax - 1) && sampleMoveFinish) {
             //加入sampleMoveFinish的判断是为了防止在上面的nextStepDripReagent()之前samplePos=sampleMax-1，而移动了样本后，导致samplePos == sampleMax从而发生同时移动样本和比色皿的问题
             //最后一个样本，并且不需要取样时，下一步
             nextStepDripReagent()
@@ -1423,7 +1424,7 @@ class HomeViewModel(
         scanFinish = true
         piercedFinish = true
         //当不需要取样时，直接下一步
-        if (!sampleNeedSampling(samplePos - 1)) {
+        if (!sampleNeedSampling(samplePos - 2)) {
             samplingFinish = true
             dripSampleFinish = true
             i("不需要取样 下一步")
@@ -2106,7 +2107,7 @@ class HomeViewModel(
         dripSampleFinish = true
         viewModelScope.launch {
 //            val result = createResultModel(
-//                scanResults[samplePos - 1], mSamplesStates[sampleShelfPos]?.get(samplePos - 1)
+//                scanResults[samplePos - 2], mSamplesStates[sampleShelfPos]?.get(samplePos - 2)
 //            )
             if (reply.state == ReplyState.CUVETTE_NOT_EMPTY && !appViewModel.getLooperTest()) {//比色皿不为空，不加样了
                 allowDripSample = false
@@ -2125,9 +2126,9 @@ class HomeViewModel(
                     cuvettePos, CuvetteState.DripSample, null, "${sampleShelfPos + 1}- $samplePos"
                 )
             }
-            changeSampleResultToCuvette(samplePos - 1)
+            changeSampleResultToCuvette(samplePos - 2)
             updateSampleState(
-                samplePos - 1, null, null, null, "${cuvetteShelfPos + 1}- ${cuvettePos + 1}"
+                samplePos - 2, null, null, null, "${cuvetteShelfPos + 1}- ${cuvettePos + 1}"
             )
             samplingProbeCleaning()
 
@@ -2204,9 +2205,9 @@ class HomeViewModel(
         if ((piercedFinish && (scanFinish || lastSamplePos(
                 samplePos
             )) && (sampleNeedSampling(
-                samplePos - 1
+                samplePos - 2
             ) && samplingFinish && dripSampleFinish) || (!sampleNeedSampling(
-                samplePos - 1
+                samplePos - 2
             ))) || samplePos == 0
         ) {
             // 最后一个比色皿 && 样本位置大于0 && 比色皿移动完成 && 样本移动完成 && 加样完成 && 这排比色皿需要加试剂（有已经加样的）
@@ -2321,7 +2322,10 @@ class HomeViewModel(
     private fun calculateAlignDuration(): Int {
         cuvetteShelfEndDuration = Date().time
         val usedDuration = (cuvetteShelfEndDuration - cuvetteShelfStartDuration) / 1000
-        val delayDuration = SystemGlobal.DripSampleAlignDuration - usedDuration
+        var delayDuration = SystemGlobal.DripSampleAlignDuration - usedDuration
+        if (SystemGlobal.isCodeDebug) {
+            delayDuration = 10
+        }
         i("加样时间同步 比色皿位置=${cuvettePos} 已用时长=${usedDuration} 等待时间=${delayDuration}")
         return (delayDuration).toInt()
     }
@@ -2347,27 +2351,27 @@ class HomeViewModel(
         c("接收到 取样 reply=$reply cuvettePos=$cuvettePos samplePos=$samplePos cuvetteShelfPos=$cuvetteShelfPos sampleShelfPos=$sampleShelfPos")
         samplingFinish = true
         if (reply.state == ReplyState.SAMPLING_FAILED && !appViewModel.getLooperTest()) {//取样失败
-            updateSampleState(samplePos - 1, SampleState.SamplingFailed)
-            updateResultStateForSample(samplePos - 1, ResultState.SamplingFailed)
+            updateSampleState(samplePos - 2, SampleState.SamplingFailed)
+            updateResultStateForSample(samplePos - 2, ResultState.SamplingFailed)
             selectFocChange(
                 sampleShelfPos,
-                samplePos - 1,
-                _samplesStates.value[sampleShelfPos]?.get(samplePos - 1)!!
+                samplePos - 2,
+                _samplesStates.value[sampleShelfPos]?.get(samplePos - 2)!!
             )
             samplingProbeCleaning()
             nextStepDripReagent()
             DbLogUtil.warring(
                 TestType.Test,
-                "取样失败:样本位置:${sampleShelfPos + 1}-${samplePos - 1}"
+                "取样失败:样本位置:${sampleShelfPos + 1}-${samplePos - 2}"
             )
 
         } else {//取样成功
-            updateSampleState(samplePos - 1, SampleState.Sampling)
-            updateResultStateForSample(samplePos - 1, ResultState.SamplingSuccess)
+            updateSampleState(samplePos - 2, SampleState.Sampling)
+            updateResultStateForSample(samplePos - 2, ResultState.SamplingSuccess)
             selectFocChange(
                 sampleShelfPos,
-                samplePos - 1,
-                _samplesStates.value[sampleShelfPos]?.get(samplePos - 1)!!
+                samplePos - 2,
+                _samplesStates.value[sampleShelfPos]?.get(samplePos - 2)!!
             )
             goDripSample()
         }
@@ -3217,7 +3221,7 @@ class HomeViewModel(
      */
     private fun sampling() {
         val type =
-            mSamplesStates.get(sampleShelfPos)?.get(samplePos - 1)?.sampleType ?: SampleType.CUVETTE
+            mSamplesStates.get(sampleShelfPos)?.get(samplePos - 2)?.sampleType ?: SampleType.CUVETTE
         c("发送 取样 type=$type")
         samplingFinish = false
         dripSampleFinish = false

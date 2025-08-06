@@ -41,19 +41,18 @@
         <item>样本针Z</item>
         <item>试剂泵</item>
         <item>搅拌</item>
-        <item>扶正</item>
+        <item>刺破</item>
         <item>转盘</item>
-        <item>请移除样本架和比色皿</item>
-        <item>舱门未关</item>
-        <item>R1试剂不足</item>
+        <item>电机初始化错误</item>
+        <item>液位初始化错误</item>
+        <item>蒸馏水不足</item>
         <item>清洗液不足</item>
+        <item>R1缓冲液不足</item>
+        <item>请移出样本架</item>
+        <item>请移出比色皿</item>
+        <item>舱门未关</item>
         <item>挤压错误</item>
-    </string-array>
-    <!--暂时没用-->
-    <string-array name="errorNum">
-        <item>不能复位</item>
-        <item>不能向前移动</item>
-        <item>管架X轴错误</item>
+        <item>从机无响应</item>
     </string-array>
 
 </resources>

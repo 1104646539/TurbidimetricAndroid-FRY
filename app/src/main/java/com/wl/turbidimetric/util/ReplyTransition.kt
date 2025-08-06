@@ -12,13 +12,8 @@ import com.wl.turbidimetric.model.*
  *
  * 自检的错误信息
  */
-val MOTORS: Array<String> = getResource().getStringArray(R.array.getMachineStateErrors)
+val Errors: Array<String> = getResource().getStringArray(R.array.getMachineStateErrors)
 
-/**
- * 错误号的具体信息
- * 错误0代表无错误 错误1代表不能复位  错误2表示不能向前移动 错误3表示管架X轴错误
- */
-val ERRORNUM = getResource().getStringArray(R.array.errorNum)
 /**
  *一次合格的回复格式如下。一共14位，其中6位前缀，1位功能码，1位状态码，4位数据位，2位CRC校验位
  * 前缀	        功能   状态码    数据位		校验
@@ -33,31 +28,14 @@ val ERRORNUM = getResource().getStringArray(R.array.errorNum)
 fun transitionGetMachineStateModel(data: UByteArray): ReplyModel<GetMachineStateModel> {
     val errorInfo = mutableListOf<ErrorInfo>()
     val states = merge(data.copyOfRange(2, 6))
-    for (i in 0..12) {
-        val num = (states shr (i * 2)) and 3
-//        println("states=$states num=$num i =$i ")
+
+    for (i in Errors.indices) {
+        val num = (states shr i) and 1
+        println("states=$states num=$num i =$i ")
         if (num > 0) {
-            errorInfo.add(ErrorInfo("错误号:$num", "错误信息:${MOTORS[i]}"))
+            errorInfo.add(ErrorInfo("错误号:$num", "错误信息:${Errors[i]}"))
         }
     }
-    //这几个是只有一种错误的，固定错误号为1
-    val removeSampleAndCuvette = (states shr 26) and 1
-    val door = (states shr 27) and 1
-    val r1 = (states shr 28) and 1
-    val cleanoutFluid = (states shr 29) and 1
-    val squeezing = (states shr 30) and 1
-
-    if (removeSampleAndCuvette == 1) errorInfo.add(
-        ErrorInfo(
-            "错误号:1",
-            "错误信息:${MOTORS[(13)]}"
-        )
-    )
-    if (door == 1) errorInfo.add(ErrorInfo("错误号:1", "错误信息:${MOTORS[(14)]}"))
-    if (r1 == 1) errorInfo.add(ErrorInfo("错误号:1", "错误信息:${MOTORS[15]}"))
-    if (cleanoutFluid == 1) errorInfo.add(ErrorInfo("错误号:1", "错误信息:${MOTORS[(16)]}"))
-    if (squeezing == 1) errorInfo.add(ErrorInfo("错误号:1", "错误信息:${MOTORS[(17)]}"))
-
     return ReplyModel(
         SerialGlobal.CMD_GetMachineState,
         convertReplyState(data[1].toInt()),
@@ -77,7 +55,7 @@ fun transitionGetStateModel(data: UByteArray): ReplyModel<GetStateModel> {
                 getStep(data[4], 4), getStep(data[4], 5), getStep(data[4], 6), getStep(data[4], 7)
             ),
             cuvetteShelfs = intArrayOf(
-                getStep(data[4], 0), getStep(data[4], 1), getStep(data[4], 2), getStep(data[4], 3)
+                getStep(data[4], 0), getStep(data[4], 1)
             ),
             r1Reagent = getStep(data[5], 1) == 1,
             r2Reagent = getStep(data[5], 0) == 1,

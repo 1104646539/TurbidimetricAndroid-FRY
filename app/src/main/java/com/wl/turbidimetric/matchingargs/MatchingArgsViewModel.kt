@@ -80,6 +80,7 @@ import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.seconds
+
 /**
  * 曲线拟合和质控
  *
@@ -271,7 +272,7 @@ class MatchingArgsViewModel(
     /**
      * 比色皿架状态 1有 0无 顺序是从中间往旁边
      */
-    private var cuvetteShelfStates: IntArray = IntArray(4)
+    private var cuvetteShelfStates: IntArray = IntArray(2)
 
     private val _dialogUiState = MutableSharedFlow<MatchingArgsDialogUiState>()
     val dialogUiState: SharedFlow<MatchingArgsDialogUiState> = _dialogUiState.asSharedFlow()
@@ -726,6 +727,8 @@ class MatchingArgsViewModel(
 
         i("cuvetteShelfPos=${cuvetteShelfPos} sampleShelfPos=${sampleShelfPos}")
         val discArray = mutableListOf<String>()
+        val qualityNum =
+            if (matchingType == MatchingConfigLayout.MatchingType.Matching && quality) 2 else 0
         if (cuvetteShelfPos == -1) {
             i("没有比色皿架")
             discArray.add("比色皿")
@@ -733,7 +736,12 @@ class MatchingArgsViewModel(
         if (sampleShelfPos == -1) {
             i("没有样本架")
             discArray.add("样本架")
+        } else if (sampleShelfStates.filter { it == 1 }.size < 2 && (gradsNum + qualityNum) > 5) {
+            //如果需要的拟合数量+质控数量>5，则需要最少有两个样本架
+            i("样本架不足")
+            discArray.add("样本架")
         }
+
 
         checkTestState(accord = {
             appViewModel.testState = if (!autoAttenuation) {
@@ -1107,9 +1115,10 @@ class MatchingArgsViewModel(
         if (!runningMatching()) return
         if (appViewModel.testState.isNotPrepare()) return
         sampleShelfMoveFinish = true
+        samplePos = -1
         if (appViewModel.testState != TestState.TestFinish) {
             //一开始就要移动到第二个位置去取第一个位置的稀释液
-            moveSample(2)
+            moveSample(3)
         }
     }
 
@@ -1473,7 +1482,7 @@ class MatchingArgsViewModel(
                     //已经加完三个了，清洗取样针，然后进行下一个步骤，取标准品
                     samplingProbeCleaning()
                 } else {
-                    moveSample(-samplePos + 1)
+                    moveSample(-samplePos + 2)
                 }
             }
 
@@ -1513,11 +1522,11 @@ class MatchingArgsViewModel(
         }
         when (appViewModel.testState) {
             TestState.DripDiluentVolume -> {//去加稀释液
-                moveSample(sampleStep + 1)
+                moveSample(sampleStep + 2)
             }
 
             TestState.DripStandardVolume -> {//去加标准品
-                moveSample(1)
+                moveSample(2)
             }
 
             TestState.MoveSample -> {//去加已混匀的样本
@@ -1633,6 +1642,11 @@ class MatchingArgsViewModel(
     }
 
     /**
+     * 样本最大步数
+     */
+    val sampleMax = 6
+
+    /**
      * 接收到取样针清洗
      * @param reply ReplyModel<SamplingProbeCleaningModel>
      */
@@ -1652,17 +1666,17 @@ class MatchingArgsViewModel(
         if (appViewModel.testState == TestState.DripDiluentVolume) {//加完稀释液后的清洗
             sampleStep = 0
             appViewModel.testState = TestState.DripStandardVolume
-            moveSample(-samplePos + 2)//直接到取标准品的位置
+            moveSample(-samplePos + 3)//直接到取标准品的位置
         } else if (appViewModel.testState == TestState.DripStandardVolume) {//加标准后的清洗
             if (sampleStep == sampleStepMax) {
                 //开始移动已混匀样本的步骤
                 //第一步、先复位样本和比色皿
                 appViewModel.testState = TestState.MoveSample
                 sampleStep = 0
-                moveSample(-samplePos + 1)
+                moveSample(-samplePos + 2)
                 moveCuvetteShelf(cuvetteShelfPos)
             } else {//继续加标准品
-                moveSample(0)
+                moveSample(1)
             }
         } else if (appViewModel.testState == TestState.MoveSample) {//加已混匀的样本的清洗
             if ((matchingType == MatchingConfigLayout.MatchingType.Matching && (sampleStep == gradsNum && !quality) || (sampleStep == gradsNum + 2 && quality))
@@ -1677,13 +1691,13 @@ class MatchingArgsViewModel(
                 viewModelScope.launch {
                     delay(needDelayDuration.seconds)
 
-                    moveSample(-samplePos + 1)
+                    moveSample(-samplePos + 2)
                     moveCuvetteDripReagent()
 
                     takeReagent()
                 }
             } else {//继续移动已混匀的样本
-                i("sampleStep=$sampleStep")
+                i("sampleStep=$sampleStep samplePos=$samplePos")
                 var targetIndex = 1
                 if (matchingType == MatchingConfigLayout.MatchingType.Matching) {
                     targetIndex = if (autoAttenuation) {
@@ -1694,13 +1708,59 @@ class MatchingArgsViewModel(
                 } else {
                     targetIndex = 1
                 }
-                moveSample(targetIndex)
+                //如果需要移动到下一排样本
+                if (samplePos < sampleMax) {
+                    moveSample(targetIndex)
+                } else {
+                    moveSampleShelfNext()
+                }
                 moveCuvetteDripSample()
             }
         }
     }
 
+    /**
+     * 判断是否是这排最后一个样本了
+     * @param pos Int
+     * @return Boolean
+     */
+    private fun lastSamplePos(pos: Int): Boolean {
+        return sampleMax == pos
+    }
 
+    /**
+     * 判断是否是最后一排样本了
+     * @param pos Int
+     * @return Boolean
+     */
+    private fun lastSampleShelf(pos: Int): Boolean {
+        return lastSampleShelfPos == pos
+    }
+
+    /**
+     * 移动到下一排,第一次的时候不能调用，
+     * 因为在只有一排时调用，会直接显示样本不足
+     */
+    private fun moveSampleShelfNext() {
+        if (lastSampleShelf(sampleShelfPos) && lastSamplePos(samplePos)) {
+            //已经是最后一排了，结束检测
+            i("样本取样结束")
+//            showTestSampleDeficiencyDialog()
+            return
+        }
+        sampleMoveFinish = false
+        val oldPos = sampleShelfPos
+        for (i in sampleShelfPos + 1 until sampleShelfStates.size) {
+            if (sampleShelfStates[i] == 1) {
+                if (sampleShelfPos == oldPos) {
+                    sampleShelfPos = i
+                }
+            }
+        }
+
+        moveSampleShelf(sampleShelfPos)
+        i("moveSampleShelfNext sampleShelfPos=$sampleShelfPos oldPos=$oldPos samplePos=$samplePos sampleMax=$sampleMax")
+    }
 
     /**
      * 这排比色皿开始的加样时间
@@ -1719,7 +1779,10 @@ class MatchingArgsViewModel(
     private fun calculateAlignDuration(): Int {
         cuvetteShelfEndDuration = Date().time
         val usedDuration = (cuvetteShelfEndDuration - cuvetteShelfStartDuration) / 1000
-        val delayDuration = SystemGlobal.DripSampleAlignDuration - usedDuration
+        var delayDuration = SystemGlobal.DripSampleAlignDuration - usedDuration
+        if (SystemGlobal.isCodeDebug) {
+            delayDuration = 10
+        }
         i("加样时间同步 比色皿位置=${cuvettePos} 已用时长=${usedDuration} 等待时间=${delayDuration}")
         return (delayDuration).toInt()
     }

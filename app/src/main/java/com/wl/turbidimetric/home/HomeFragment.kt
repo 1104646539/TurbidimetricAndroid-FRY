@@ -42,6 +42,7 @@ import com.wl.turbidimetric.view.dialog.ICON_HINT
 import com.wl.turbidimetric.view.dialog.PatientInfoDialog
 import com.wl.turbidimetric.view.dialog.isShow
 import com.wl.turbidimetric.view.dialog.showPop
+import com.wl.wllib.LogToFile
 import com.wl.wllib.LogToFile.i
 import com.wl.wllib.LogToFile.u
 import com.wl.wllib.toLongTimeStr
@@ -219,7 +220,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 changeAnalyseState(it)
             }
         }
-
         vd.vTest.setOnClickListener {
             if (appVm.testState.isNotPrepare()) {
                 vm.dialogGetMachineFailedConfirm()

@@ -32,7 +32,7 @@ android {
         minSdk 24
         targetSdk 32
         versionCode 1
-        versionName "1.0.3.0-FRY-2修改自检报错的问题"
+        versionName "1.0.3.0-FRY-3添加获取仓门状态"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 

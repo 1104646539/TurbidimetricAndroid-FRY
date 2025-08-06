@@ -29,6 +29,7 @@ import com.wl.turbidimetric.repository.DefaultLocalDataDataSource
 import com.wl.turbidimetric.repository.if2.LocalDataSource
 import com.wl.turbidimetric.repository.if2.LogListDataSource
 import com.wl.turbidimetric.util.CrashHandler
+import com.wl.turbidimetric.util.DoorHelper
 import com.wl.turbidimetric.util.FitterType
 import com.wl.turbidimetric.util.ScanCodeUtil
 import com.wl.turbidimetric.util.SerialPortIF
@@ -74,7 +75,10 @@ class App : Application() {
     val appVm: AppViewModel by lazy {
         getAppViewModel(AppViewModel::class.java)
     }
-
+    val doorHelper: DoorHelper by lazy {
+        DoorHelper(
+        )
+    }
     override fun onCreate() {
         super.onCreate()
         instance = this

@@ -206,6 +206,7 @@ class HomeViewModel(
             cleanoutFluidState = false,
             reactionTemp = 0.0,
             r1Temp = 0.0,
+            distilledWater = false
         )
     )
     val testMachineUiState: StateFlow<HomeMachineUiState> = _testMachineUiState.asStateFlow()
@@ -462,6 +463,17 @@ class HomeViewModel(
             field = value
             _testMachineUiState.update {
                 it.copy(r1State = value)
+            }
+        }
+
+    /**
+     * 蒸馏水状态
+     */
+    var distilledWater: Boolean = false
+        set(value) {
+            field = value
+            _testMachineUiState.update {
+                it.copy(distilledWater = value)
             }
         }
 
@@ -1805,7 +1817,7 @@ class HomeViewModel(
         discArray: MutableList<String> = mutableListOf<String>(),
         discrepancy: (String) -> Unit
     ) {
-        if (!appViewModel.getLooperTest() && (!r1Reagent || !r2Reagent || r2Volume == 0 || !cleanoutFluid || discArray.isNotEmpty())) {
+        if (!appViewModel.getLooperTest() && (!r1Reagent || !r2Reagent || r2Volume == 0 || !cleanoutFluid || !distilledWater || discArray.isNotEmpty())) {
             var temp = ""
             if (!r1Reagent) {
                 discArray.add("R1试剂")
@@ -1818,6 +1830,10 @@ class HomeViewModel(
             if (!cleanoutFluid) {
                 i("没有清洗液")
                 discArray.add("清洗液")
+            }
+            if (!distilledWater) {
+                i("没有蒸馏水")
+                discArray.add("蒸馏水")
             }
             temp = "请添加" + discArray.joinToString(",")
             discrepancy.invoke(temp)
@@ -2834,6 +2850,7 @@ class HomeViewModel(
         r2Reagent = reply.data.r2Reagent
         r2Volume = reply.data.r2Volume
         cleanoutFluid = reply.data.cleanoutFluid
+        distilledWater = reply.data.distilledWater
         c("接收到 获取状态 appViewModel.testState=${appViewModel.testState} reply=$reply continueTestCuvetteState=$continueTestCuvetteState continueTestSampleState=$continueTestSampleState clickStart=$clickStart r1Reagent=$r1Reagent r2Reagent=$r2Reagent cleanoutFluid=$cleanoutFluid continueTestGetState=$continueTestGetState")
         if (appViewModel.testState == TestState.PreheatTime) {
             EventBus.getDefault().post(EventMsg<Any>(what = EventGlobal.WHAT_HIDE_SPLASH))

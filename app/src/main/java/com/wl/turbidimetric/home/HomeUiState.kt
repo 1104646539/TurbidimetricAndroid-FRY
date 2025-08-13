@@ -64,6 +64,7 @@ data class HomeMachineUiState(
     val cleanoutFluidState: Boolean,//清洗液状态
     val reactionTemp: Double,//反应槽温度
     val r1Temp: Double,//r1温度
+    val distilledWater: Boolean,//蒸馏水状态
 )
 
 data class HomeConfigUiState(

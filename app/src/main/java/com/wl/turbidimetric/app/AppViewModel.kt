@@ -14,6 +14,7 @@ import com.wl.turbidimetric.report.PrintHelper
 import com.wl.turbidimetric.repository.if2.LocalDataSource
 import com.wl.turbidimetric.upload.hl7.util.ConnectStatus
 import com.wl.turbidimetric.upload.hl7.util.getLocalConfig
+import com.wl.turbidimetric.util.DoorHelper
 import com.wl.turbidimetric.util.ScanCodeUtil
 import com.wl.turbidimetric.util.SerialPortIF
 import com.wl.wllib.DateUtil
@@ -33,6 +34,7 @@ import java.util.Date
 class AppViewModel(
     private val localDataSource: LocalDataSource,
     val serialPort: SerialPortIF,
+    val doorHelper: DoorHelper,
     val thermalPrintUtil: ThermalPrintUtil,
     val printHelper: PrintHelper,
     val scanCodeUtil: ScanCodeUtil
@@ -117,6 +119,7 @@ class AppViewModel(
      * 反应槽温度
      */
     private var reactionTemp = 0
+
     /**
      * R1温度
      */
@@ -161,6 +164,7 @@ class AppViewModel(
     fun getWaitPreheatTime(): Boolean {
         return localDataSource.getWaitPreheatTime()
     }
+
     fun getPreheatTime(): Int {
         return localDataSource.getPreheatTime()
     }
@@ -201,6 +205,7 @@ class AppViewModel(
     private fun setWaitPreheatTime(wait: Boolean) {
         localDataSource.setWaitPreheatTime(wait)
     }
+
     private fun setPreheatTime(second: Int) {
         localDataSource.setPreheatTime(second)
     }
@@ -285,7 +290,7 @@ class AppViewModel(
      * 更新反应槽温度
      * @param value Int
      */
-    private fun changeTemp(reactionValue: Int,r1Value: Int) {
+    private fun changeTemp(reactionValue: Int, r1Value: Int) {
         reactionTemp = reactionValue
         r1Temp = r1Value
         viewModelScope.launch {
@@ -344,7 +349,7 @@ class AppViewModel(
             }
 
             is AppIntent.TempChange -> {
-                changeTemp(intent.reactionTemp,intent.r1Temp)
+                changeTemp(intent.reactionTemp, intent.r1Temp)
             }
         }
     }
@@ -368,6 +373,22 @@ class AppViewModel(
         if (localDataSource.getCurrentVersion() < packageInfo.versionCode) {
             localDataSource.setCurrentVersion(packageInfo.versionCode)
         }
+    }
+
+    /**
+     * 样本仓门是否关闭
+     * @return Boolean
+     */
+    fun sampleDoorIsClose(): Boolean {
+        return doorHelper.SampleDoorIsClose()
+    }
+
+    /**
+     * 比色皿门是否关闭
+     * @return Boolean
+     */
+    fun cuvetteDoorIsClose(): Boolean {
+        return doorHelper.CuvetteDoorIsClose()
     }
 
 }

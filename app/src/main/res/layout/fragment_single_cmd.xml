@@ -170,8 +170,8 @@
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/til_correction_temp_r1"
                     android:layout_width="wrap_content"
-                    android:layout_marginLeft="20dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
                     app:layout_constraintLeft_toRightOf="@+id/til_correction_temp_reaction"
                     app:layout_constraintTop_toTopOf="@+id/btn_correction_temp">
 
@@ -186,6 +186,7 @@
                         android:text="1"
                         android:textSize="24sp" />
                 </com.google.android.material.textfield.TextInputLayout>
+
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/btn_full_r1"
                     style="@style/BtnPositive"
@@ -197,6 +198,31 @@
                     android:text="填充R1"
                     app:layout_constraintBottom_toBottomOf="@+id/til_correction_temp_r1"
                     app:layout_constraintStart_toEndOf="@+id/til_correction_temp_r1" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btn_sample_door_state"
+                    style="@style/BtnPositive"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:minWidth="150dp"
+                    android:text="样本仓门状态"
+                    app:layout_constraintBottom_toBottomOf="@+id/btn_full_r1"
+                    app:layout_constraintStart_toEndOf="@+id/btn_full_r1" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btn_cuvette_door_state"
+                    style="@style/BtnPositive"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:minWidth="150dp"
+                    android:text="比色皿仓门状态"
+                    app:layout_constraintBottom_toBottomOf="@+id/btn_sample_door_state"
+                    app:layout_constraintStart_toEndOf="@+id/btn_sample_door_state" />
+
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/btn_move_sample_shelf"
                     style="@style/BtnPositive"
@@ -926,8 +952,8 @@
                     style="@style/BtnPositive"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
                     android:layout_marginLeft="10dp"
+                    android:layout_marginTop="5dp"
                     android:minWidth="150dp"
                     android:text="排水"
                     app:layout_constraintLeft_toRightOf="@+id/textInputLayout15"

@@ -33,7 +33,7 @@ object TestSerialPort {
 //                if (index <= 0) {
 //                    reply = reply.plus(ubyteArrayOf(0x3Fu, 0xFFu, 0xFFu, 0xFFu))
 //                } else {
-                reply = reply.plus(ubyteArrayOf(0x00u, 0x00u, 0x00u, 0x0bu))
+                reply = reply.plus(ubyteArrayOf(0x00u, 0x00u, 0x00u, 0x00u))
 //                }
 //                index++
             }
@@ -41,7 +41,7 @@ object TestSerialPort {
             SerialGlobal.CMD_GetState -> {
                 delay(200)
 //                if (index < 2) {
-                reply = reply.plus(ubyteArrayOf(0x0u, 0x2u, 0x33u, 0xffu))// 0011 0011
+                reply = reply.plus(ubyteArrayOf(0xffu, 0xffu, 0xffu, 0xffu))// 0011 0011
 //                } else {
 //                reply = reply.plus(ubyteArrayOf(0x0u, 0x2u, 0x11u, 0xffu))//0001 0001
 //                }

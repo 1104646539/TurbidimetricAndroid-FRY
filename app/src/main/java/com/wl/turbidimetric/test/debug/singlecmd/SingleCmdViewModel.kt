@@ -577,6 +577,16 @@ class SingleCmdViewModel(private val appViewModel: AppViewModel) : BaseViewModel
         enable.postValue(false)
         appViewModel.serialPort.setTemp(tempReaction.toInt(), tempR1.toInt())
     }
+
+    fun sampleDoor() {
+        val close = appViewModel.doorHelper.SampleDoorIsClose()
+        resultMsg.value = "样本仓门是否关闭:${close}"
+    }
+
+    fun cuvetteDoor() {
+        val close = appViewModel.doorHelper.CuvetteDoorIsClose()
+        resultMsg.value = "比色皿仓门是否关闭:${close}"
+    }
 }
 
 class SingleCmdViewModelFactory(

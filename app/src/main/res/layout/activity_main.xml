@@ -55,7 +55,6 @@
         <ImageView
             android:id="@+id/iv_start"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:src="@drawable/start" />
+            android:layout_height="match_parent"/>
     </RelativeLayout>
 </layout>

@@ -81,6 +81,7 @@ data class ErrorInfo(val errorMsg: String, val motorMsg: String)
  * @property r2Reagent Boolean r2状态
  * @property cleanoutFluid Boolean 清洗液状态
  * @property r2Volume Int r2量
+ * @property distilledWater Boolean 蒸馏水状态
  * @constructor
  */
 data class GetStateModel(
@@ -89,7 +90,8 @@ data class GetStateModel(
     val r1Reagent: Boolean = true,
     val r2Reagent: Boolean = true,
     val cleanoutFluid: Boolean = true,
-    val r2Volume: Int = 0
+    val r2Volume: Int = 0,
+    val distilledWater: Boolean = true,
 )
 
 /**

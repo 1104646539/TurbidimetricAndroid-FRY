@@ -79,6 +79,7 @@ class App : Application() {
         DoorHelper(
         )
     }
+
     override fun onCreate() {
         super.onCreate()
         instance = this
@@ -165,8 +166,8 @@ class App : Application() {
             f0 = 171479.92881
             f1 = -0.76618
             f2 = 52921.78949
-            f3 =  -3.62716
-            fitGoodness =  0.99945
+            f3 = -3.62716
+            fitGoodness = 0.99945
             fitterType = FitterType.Four.ordinal
             gradsNum = 6
             reactionValues = intArrayOf(0, 795, 2424, 3851, 5435, 7808)
@@ -245,6 +246,7 @@ class App : Application() {
                 return AppViewModel(
                     localDataDataSource,
                     App.instance!!.serialPort,
+                    App.instance!!.doorHelper,
                     App.instance!!.thermalPrintUtil,
                     App.instance!!.printHelper,
                     App.instance!!.scanCodeUtil,

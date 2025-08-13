@@ -59,8 +59,9 @@ fun transitionGetStateModel(data: UByteArray): ReplyModel<GetStateModel> {
             ),
             r1Reagent = getStep(data[5], 1) == 1,
             r2Reagent = getStep(data[5], 0) == 1,
-            cleanoutFluid = getStep(data[5], 2) == 1,
-            r2Volume = data[3].toInt()
+            cleanoutFluid = getStep(data[2], 1) == 1,
+            r2Volume = data[3].toInt(),
+            distilledWater = getStep(data[2], 0) == 1,
         )
     )
 }

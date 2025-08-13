@@ -64,6 +64,8 @@ class SingleCmdFragment :
                 vd.btnCorrectionTemp.isEnabled = it
                 vd.btnFullR1.isEnabled = it
                 vd.btnDrainWater.isEnabled = it
+                vd.btnSampleDoorState.isEnabled = it
+                vd.btnCuvetteDoorState.isEnabled = it
             }
         }
     }
@@ -170,6 +172,12 @@ class SingleCmdFragment :
                 vd.tetCorrectionTempReaction.text.toString(),
                 vd.tetCorrectionTempR1.text.toString()
             )
+        }
+        vd.btnCuvetteDoorState.setOnClickListener {
+            vm.cuvetteDoor()
+        }
+        vd.btnSampleDoorState.setOnClickListener {
+            vm.sampleDoor()
         }
     }
 

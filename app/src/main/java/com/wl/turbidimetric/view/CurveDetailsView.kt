@@ -81,7 +81,7 @@ class CurveDetailsView @JvmOverloads constructor(
     private fun updateChart(curve: CurveModel?) {
 //        curve?.let { curve ->
         val values = ArrayList<Entry>()
-        if (curve?.reactionValues != null && curve?.reactionValues.isNotEmpty()) {
+        if (curve?.reactionValues != null && curve.reactionValues.isNotEmpty()) {
             values.addAll(getChartEntry(curve))
             tvEmpty?.visibility = View.GONE
             lcCurve?.visibility = View.VISIBLE

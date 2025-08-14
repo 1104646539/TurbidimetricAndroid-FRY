@@ -107,7 +107,7 @@ class LeftNavigationView @JvmOverloads constructor(
 
     var onItemChangeListener: OnItemChangeListener? = null
 
-    override fun onDraw(canvas: Canvas?) {
+    override fun onDraw(canvas: Canvas) {
         canvas?.let {
             navItems.forEachIndexed { index, item ->
                 drawItem(canvas, index)

@@ -669,6 +669,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                             )
                         }
                     }
+
+                    else -> {}
                 }
             }
         }

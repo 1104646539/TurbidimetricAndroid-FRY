@@ -222,16 +222,16 @@ class App : Application() {
     }
 
     object AppViewModelStoreOwner : ViewModelStoreOwner {
-        private val viewModelStore = ViewModelStore()
+       override val viewModelStore = ViewModelStore()
         private val viewModelProvider: ViewModelProvider by lazy {
             ViewModelProvider(
                 this, AppViewModelFactory()
             )
         }
 
-        override fun getViewModelStore(): ViewModelStore {
-            return viewModelStore
-        }
+//        override fun getViewModelStore(): ViewModelStore {
+//            return viewModelStore
+//        }
 
         fun <T : ViewModel> getAppViewModel(classVm: Class<T>): T {
             return viewModelProvider[classVm]

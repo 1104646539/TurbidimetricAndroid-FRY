@@ -25,14 +25,14 @@ android {
 //            keyPassword '123456'
 //        }
     }
-    compileSdk 33
+    compileSdk 35
 
     defaultConfig {
         applicationId "com.wl.turbidimetric"
         minSdk 24
         targetSdk 32
         versionCode 1
-        versionName "1.0.3.0-FRY-3添加获取仓门状态"
+        versionName "1.0.3.0-FRY-4修改仓门号"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 
@@ -61,8 +61,12 @@ android {
     buildFeatures {
         dataBinding true
         buildConfig = true
-
+        compose true
     }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.15"
+    }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -97,6 +101,7 @@ android {
         checkReleaseBuilds false
         abortOnError false
     }
+    namespace 'com.wl.turbidimetric'
 }
 
 dependencies {
@@ -112,94 +117,89 @@ dependencies {
 //    implementation 'androidx.core:core-animation:1.0.0'
 //    implementation files('libs\\iText-5.0.5.jar')
     //test mock
-    testImplementation 'org.mockito:mockito-core:4.4.0'
-    androidTestImplementation "org.mockito:mockito-android:4.4.0"
+    testImplementation libs.mockito.core
+    androidTestImplementation libs.mockito.android
     //test junit
-    androidTestImplementation "androidx.test:runner:1.5.0"
-    androidTestImplementation "androidx.test:rules:1.5.0"
+    androidTestImplementation libs.androidx.test.runner
+    androidTestImplementation libs.androidx.test.rules
     // test UI testing with UI Automator
 //    androidTestImplementation "androidx.test.uiautomator:uiautomator:2.1.0"
     //test 协程
-    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4"
-    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4"
+    testImplementation libs.kotlinx.coroutines.android
+    testImplementation libs.kotlinx.coroutines.test
     //test junit
-    androidTestImplementation 'androidx.test.ext:junit:1.1.4'
-    androidTestImplementation "androidx.test.ext:junit-ktx:1.1.4"
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
+    androidTestImplementation libs.androidx.test.ext.junit
+    androidTestImplementation libs.androidx.test.ext.junit.ktx
+    androidTestImplementation libs.espresso.core
     //test truth
-    androidTestImplementation "androidx.test.ext:truth:1.5.0"
+    androidTestImplementation libs.androidx.test.truth
     //test orchestrator
-    androidTestUtil "androidx.test:orchestrator:1.4.2"
+    androidTestUtil libs.androidx.test.orchestrator
 
     //mockito
-    testImplementation 'org.mockito:mockito-core:3.0.0'
+    testImplementation libs.mockito.core3
     //powermock
-    testImplementation 'org.powermock:powermock-module-junit4:2.0.2'
-    testImplementation 'org.powermock:powermock-api-mockito2:2.0.2'
+//    testImplementation libs.powermock.junit4
+//    testImplementation libs.powermock.mockito2
     //robolectric
-    testImplementation 'androidx.test:core:1.2.0'
-    androidTestImplementation 'androidx.appcompat:appcompat:1.1.1'
+    testImplementation libs.androidx.test.core
+    androidTestImplementation libs.appcompat
 //    androidTestImplementation 'com.google.android.material:material:1.6.0'
 
 //    testImplementation 'org.robolectric:robolectric:4.3.1'testImplementation 'androidx.test:core:1.2.0'
 //    testImplementation 'org.robolectric:robolectric:4.3.1'
 
-    implementation 'androidx.core:core-ktx:1.7.0'
+    implementation libs.androidx.core.ktx
     //old 1.5.1
-    implementation 'androidx.appcompat:appcompat:1.1.1'
-    implementation("com.google.android.material:material:1.6.0") {
+    implementation libs.appcompat
+    implementation(libs.material) {
         exclude group: 'androidx.recyclerview', module: 'recyclerview'
     }
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation libs.constraintlayout
     implementation project(path: ':wllib')
     implementation project(path: ':MPChartLib')
     implementation project(path: ':weiqianwllib')
 
 
     //navigation
-    def nav_version = "2.5.3"
-    implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
-    implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
+    implementation libs.navigation.fragment.ktx
+    implementation libs.navigation.ui.ktx
 
     //paging3
-    def paging_version = "3.1.1"
-    implementation("androidx.paging:paging-runtime:$paging_version") {
+    implementation(libs.paging.runtime) {
         exclude group: 'androidx.recyclerview', module: 'recyclerview'
     }
     // alternatively - without Android dependencies for tests
-    testImplementation "androidx.paging:paging-common:$paging_version"
-    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
+    testImplementation libs.paging.common
+    implementation libs.swiperefreshlayout
 
     //room
-    def room_version = "2.5.0"
-    implementation "androidx.room:room-runtime:$room_version"
-    annotationProcessor "androidx.room:room-compiler:$room_version"
-    kapt "androidx.room:room-compiler:$room_version"
-    implementation "androidx.room:room-paging:$room_version"
-    implementation "androidx.room:room-ktx:$room_version"
+    implementation libs.room.runtime
+    annotationProcessor libs.room.compiler
+    kapt libs.room.compiler
+    implementation libs.room.paging
+    implementation libs.room.ktx
 
     //hilt
-    implementation "com.google.dagger:hilt-android:2.42"
-    kapt "com.google.dagger:hilt-android-compiler:2.42"
-    kapt "androidx.hilt:hilt-compiler:1.0.0"
+    implementation libs.hilt.android
+    kapt libs.hilt.android.compiler
+    kapt libs.androidx.hilt.compiler
 
-    def lifecycle_version = "2.4.1"
-
-    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
-    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
+    implementation libs.lifecycle.livedata.ktx
+    implementation libs.lifecycle.viewmodel.ktx
+    implementation libs.lifecycle.runtime.ktx
     //logger
 //    implementation 'com.jakewharton.timber:timber:4.5.1'
     //操作u盘
-    implementation 'me.jahnen.libaums:core:0.9.1'
+    implementation libs.libaums.core
     //serial port usb转串
 //    implementation 'com.github.mik3y:usb-serial-for-android:3.4.6'
     //eventbus
-    implementation("org.greenrobot:eventbus:3.3.1")
-    implementation 'com.github.felHR85:UsbSerial:6.1.0'
+    implementation(libs.eventbus)
+    implementation libs.usbserial
 
     //documentfile 官方文件管理的新类
-    implementation 'androidx.documentfile:documentfile:1.0.1'
+    implementation libs.documentfile
     //mmkv键值对
 //    implementation 'com.tencent:mmkv:1.2.16'
 
@@ -207,35 +207,46 @@ dependencies {
 //        exclude group: 'androidx.recyclerview', module: 'recyclerview'
 //    }
     //old 1.3.0
-    implementation 'androidx.recyclerview:recyclerview:1.2.0'
+    implementation libs.recyclerview
     //datastore
-    implementation "androidx.datastore:datastore-preferences:1.0.0"
+    implementation libs.datastore.preferences
     //时间选择器
 //    implementation ("com.jzxiang.pickerview:TimePickerDialog:1.0.1") {
 //        exclude group: 'com.android.support', module: 'support-v4'
 //    }
-    implementation 'com.wdullaer:materialdatetimepicker:4.2.3'
-    implementation 'com.github.gzu-liyujiang.AndroidPicker:WheelPicker:4.1.11'
-    implementation 'com.github.gzu-liyujiang.AndroidPicker:Common:4.1.11'
-    implementation 'com.github.gzu-liyujiang.AndroidPicker:WheelView:4.1.11'
-    implementation "com.github.skydoves:powerspinner:1.2.1"
+    implementation libs.materialdatetimepicker
+    implementation libs.androidpicker.wheelpicker
+    implementation libs.androidpicker.common
+    implementation libs.androidpicker.wheelview
+    implementation libs.powerspinner
     //dialog
-    implementation("com.github.li-xiaojun:XPopup:2.9.19") {
+    implementation(libs.xpopup) {
         exclude group: "com.davemorrissey.labs", module: "subsampling-scale-image-view-androidx"
     }
     //json解析
-    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation libs.gson
 
     //itext7 生成pdf
-    implementation "com.itextpdf:itext-core:8.0.2"
-    implementation "com.itextpdf:bouncy-castle-adapter:8.0.2"
+    implementation libs.itext.core
+    implementation libs.itext.bc.adapter
 
     //printhand
-    implementation 'com.dynamixsoftware.intentapi:intentAPI:12'
-    implementation 'com.dynamixsoftware.printingsdk:printingSDK:12'
+    implementation libs.intentapi
+    implementation libs.printingsdk
     //内存泄露检测
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.10'
-    implementation 'com.github.fondesa:recycler-view-divider:3.6.0'
-
-
+    debugImplementation libs.leakcanary.android
+    implementation libs.fondesa.recycler.divider
+    implementation platform(libs.androidx.compose.bom)
+    implementation libs.androidx.activity.compose
+    implementation libs.androidx.ui
+    implementation libs.androidx.ui.graphics
+    implementation libs.androidx.ui.tooling.preview
+    implementation libs.androidx.material3
+//    testImplementation libs.junit
+//    androidTestImplementation libs.androidx.junit
+//    androidTestImplementation libs.androidx.espresso.core
+    androidTestImplementation platform(libs.androidx.compose.bom)
+    androidTestImplementation libs.androidx.ui.test.junit4
+    debugImplementation libs.androidx.ui.tooling
+    debugImplementation libs.androidx.ui.test.manifest
 }

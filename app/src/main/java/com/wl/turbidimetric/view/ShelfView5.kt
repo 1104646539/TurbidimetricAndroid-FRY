@@ -136,7 +136,7 @@ class ShelfView5 :
     private var itemRects: Array<RectF?> = arrayOfNulls(size)
 
 
-    override fun onDraw(canvas: Canvas?) {
+    override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         canvas?.let {
 

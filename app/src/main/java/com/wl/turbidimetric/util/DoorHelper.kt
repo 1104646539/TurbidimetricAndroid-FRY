@@ -10,6 +10,6 @@ class DoorHelper {
     }
 
     fun CuvetteDoorIsClose(): Boolean {
-        return gpioUtil.GetGpio(0) == 1
+        return gpioUtil.GetGpio(2) == 1
     }
 }

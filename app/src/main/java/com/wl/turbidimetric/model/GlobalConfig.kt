@@ -1,6 +1,7 @@
 package com.wl.turbidimetric.model
 
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import com.wl.turbidimetric.datastore.LocalDataGlobal
 

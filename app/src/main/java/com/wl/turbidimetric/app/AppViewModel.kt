@@ -365,7 +365,7 @@ class AppViewModel(
         SystemGlobal.versionName = String(
             ((packageInfo?.versionName) ?: "").toByteArray(), charset("UTF-8")
         )
-        SystemGlobal.versionCode = packageInfo?.versionCode
+        SystemGlobal.versionCode = packageInfo?.versionCode!!
 
         i("versionName=${SystemGlobal.versionName} versionCode=${SystemGlobal.versionCode}")
 

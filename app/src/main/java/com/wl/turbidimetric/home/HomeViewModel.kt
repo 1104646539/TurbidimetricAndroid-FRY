@@ -111,7 +111,8 @@ class HomeViewModel(
     init {
 //        listener()
     }
-
+    //region [test]
+    //endregion
     /**
      * 自检
      */

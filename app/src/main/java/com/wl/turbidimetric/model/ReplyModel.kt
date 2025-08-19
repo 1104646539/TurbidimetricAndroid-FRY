@@ -37,6 +37,11 @@ enum class ReplyState {
     TAKE_REAGENT_FAILED,
 
     /**
+     * 挤压错误
+     */
+    SQUEEZING_FAILED,
+
+    /**
      * 其他
      */
     ORDER,

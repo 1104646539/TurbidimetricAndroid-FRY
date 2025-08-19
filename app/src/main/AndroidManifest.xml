@@ -61,24 +61,6 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
-<!--        <activity-->
-<!--            android:name=".ComposeTestActivity"-->
-<!--            android:configChanges="orientation|keyboardHidden|keyboard"-->
-<!--            android:exported="true"-->
-<!--            android:windowSoftInputMode="adjustPan|stateAlwaysHidden">-->
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.MAIN" />-->
-
-<!--&lt;!&ndash;                 <category android:name="android.intent.category.HOME" />&ndash;&gt;-->
-<!--&lt;!&ndash;                 <category android:name="android.intent.category.DEFAULT" />&ndash;&gt;-->
-<!--&lt;!&ndash;                 <category android:name="android.intent.category.MONKEY" />&ndash;&gt;-->
-<!--                <category android:name="android.intent.category.LAUNCHER" />-->
-<!--            </intent-filter>-->
-
-<!--            <meta-data-->
-<!--                android:name="android.app.lib_name"-->
-<!--                android:value="" />-->
-<!--        </activity>-->
         <receiver android:name=".app.Auto"
             android:exported="true">
             <intent-filter>

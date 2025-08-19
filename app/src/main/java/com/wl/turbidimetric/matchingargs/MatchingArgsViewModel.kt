@@ -356,7 +356,7 @@ class MatchingArgsViewModel(
     /**
      * 拟合梯度数量
      */
-    var gradsNum = 6
+    var gradsNum = 5
 
 //    /**
 //     * 平均值
@@ -501,6 +501,7 @@ class MatchingArgsViewModel(
             ReplyState.INVALID_PARAMETER -> "非法数据 命令号:${cmd}"
             ReplyState.MOTOR_ERR -> "电机错误 命令号:${cmd}"
             ReplyState.SENSOR_ERR -> "传感器错误 命令号:${cmd}"
+            ReplyState.SQUEEZING_FAILED -> "挤压错误 命令号:${cmd}"
             ReplyState.ORDER -> "意外的命令号"
             else -> {
                 ""
@@ -1783,6 +1784,7 @@ class MatchingArgsViewModel(
         if (SystemGlobal.isCodeDebug) {
             delayDuration = 10
         }
+        delayDuration = 0
         i("加样时间同步 比色皿位置=${cuvettePos} 已用时长=${usedDuration} 等待时间=${delayDuration}")
         return (delayDuration).toInt()
     }

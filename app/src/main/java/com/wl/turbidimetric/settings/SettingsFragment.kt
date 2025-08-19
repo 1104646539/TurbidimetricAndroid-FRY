@@ -279,7 +279,7 @@ class SettingsFragment constructor() :
      * 启动调试页面
      */
     private fun debug() {
-        if (appVm.testState != TestState.NotGetMachineState && appVm.testState != TestState.PreheatTime && appVm.testState.isTestRunning()) {
+        if (appVm.testState != TestState.NotGetMachineState && !appVm.testState.isRunningError() && appVm.testState != TestState.PreheatTime && appVm.testState.isTestRunning()) {
             toast("正在检测，请稍后")
             return
         }

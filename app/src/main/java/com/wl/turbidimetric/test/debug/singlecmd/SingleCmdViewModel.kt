@@ -185,6 +185,7 @@ class SingleCmdViewModel(private val appViewModel: AppViewModel) : BaseViewModel
             ReplyState.INVALID_PARAMETER -> if (overloadParams) "重载参数失败" else "非法数据 命令号:${cmd}"
             ReplyState.MOTOR_ERR -> "电机错误 命令号:${cmd}"
             ReplyState.SENSOR_ERR -> "传感器错误 命令号:${cmd}"
+            ReplyState.SQUEEZING_FAILED -> "挤压错误 命令号:${cmd}"
             ReplyState.ORDER -> "意外的命令号"
             else -> {
                 ""

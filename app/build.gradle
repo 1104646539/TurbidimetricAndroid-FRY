@@ -32,7 +32,7 @@ android {
         minSdk 24
         targetSdk 32
         versionCode 1
-        versionName "1.0.3.0-FRY-4修改仓门号"
+        versionName "1.0.3.0-FRY-5修改扫码调试等"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 
@@ -61,11 +61,8 @@ android {
     buildFeatures {
         dataBinding true
         buildConfig = true
-        compose true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.15"
-    }
+
 
     buildTypes {
         release {
@@ -236,17 +233,4 @@ dependencies {
     //内存泄露检测
     debugImplementation libs.leakcanary.android
     implementation libs.fondesa.recycler.divider
-    implementation platform(libs.androidx.compose.bom)
-    implementation libs.androidx.activity.compose
-    implementation libs.androidx.ui
-    implementation libs.androidx.ui.graphics
-    implementation libs.androidx.ui.tooling.preview
-    implementation libs.androidx.material3
-//    testImplementation libs.junit
-//    androidTestImplementation libs.androidx.junit
-//    androidTestImplementation libs.androidx.espresso.core
-    androidTestImplementation platform(libs.androidx.compose.bom)
-    androidTestImplementation libs.androidx.ui.test.junit4
-    debugImplementation libs.androidx.ui.tooling
-    debugImplementation libs.androidx.ui.test.manifest
 }

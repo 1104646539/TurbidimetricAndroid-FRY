@@ -86,7 +86,7 @@ class ScanBarcodeViewModel(private val appViewModel: AppViewModel) : BaseViewMod
     /**样本最大步数
      *
      */
-    private val sampleMax = 10
+    private val sampleMax = 5
 
     /**
      * 总扫码次数

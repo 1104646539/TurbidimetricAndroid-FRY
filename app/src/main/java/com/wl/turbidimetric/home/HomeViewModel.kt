@@ -962,6 +962,7 @@ class HomeViewModel(
             ReplyState.INVALID_PARAMETER -> "非法数据 命令号:${cmd}"
             ReplyState.MOTOR_ERR -> "电机错误 命令号:${cmd}"
             ReplyState.SENSOR_ERR -> "传感器错误 命令号:${cmd}"
+            ReplyState.SQUEEZING_FAILED -> "挤压错误 命令号:${cmd}"
             ReplyState.ORDER -> "意外的命令号"
             else -> {
                 ""
@@ -1096,6 +1097,9 @@ class HomeViewModel(
         sampleType = reply.data.type
         val isNonexistent = reply.data.type.isNonexistent()
         val isCuvette = reply.data.type.isCuvette()
+        val isNeedSample = sampleNeedSampling(samplePos - 2)
+        val isNextStepDripReagent =
+            (samplePos == sampleMax || samplePos == sampleMax - 1) && sampleMoveFinish
         //最后一个位置不需要扫码，直接取样
         if (samplePos < sampleMax - 1) {
 //            if ((SystemGlobal.isCodeDebug && !sampleExists[samplePos]) || (isAuto() && LocalData.SampleExist && isNonexistent)) {
@@ -1117,11 +1121,11 @@ class HomeViewModel(
             }
         }
         //判断是否需要取样。取样位和扫码位差一个位置
-        if (sampleNeedSampling(samplePos - 2)) {
+        if (isNeedSample) {
             val isSample =
                 mSamplesStates[sampleShelfPos]?.get(samplePos - 2)?.sampleType?.isSample() == true
             squeezing(isSample)
-        } else if ((samplePos == sampleMax || samplePos == sampleMax - 1) && sampleMoveFinish) {
+        } else if (isNextStepDripReagent) {
             //加入sampleMoveFinish的判断是为了防止在上面的nextStepDripReagent()之前samplePos=sampleMax-1，而移动了样本后，导致samplePos == sampleMax从而发生同时移动样本和比色皿的问题
             //最后一个样本，并且不需要取样时，下一步
             nextStepDripReagent()
@@ -2343,6 +2347,7 @@ class HomeViewModel(
         if (SystemGlobal.isCodeDebug) {
             delayDuration = 10
         }
+        delayDuration = 0
         i("加样时间同步 比色皿位置=${cuvettePos} 已用时长=${usedDuration} 等待时间=${delayDuration}")
         return (delayDuration).toInt()
     }

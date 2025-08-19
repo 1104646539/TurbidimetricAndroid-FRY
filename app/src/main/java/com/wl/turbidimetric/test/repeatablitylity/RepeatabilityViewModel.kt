@@ -132,7 +132,7 @@ class RepeatabilityViewModel(
 
     /**
      * 当前样本位置
-     * 0-10 一共11次。其中每个样本的刺破位隔挤压取样位一个位置，所以第0个位置只能用来刺破，第10个位置不能刺破，只能挤压取样
+     * 0-5
      */
     private var samplePos = -1
 
@@ -603,7 +603,7 @@ class RepeatabilityViewModel(
         when (appViewModel.testState) {
             TestState.MoveSample -> {//因为需要检测第一个样本是否是比色杯，所以一次移动一个位置
                 if (samplePos == 0) {
-                    //如果是样本管，直接检测结束，并报错，因为质控不允许使用样本管
+                    //如果是样本管，直接检测结束，并报错，因为不允许使用样本管
                     if (reply.data.type.isSample()) {
                         isDetectedSample = true
                         matchingFinish()
@@ -1216,6 +1216,7 @@ class RepeatabilityViewModel(
                 ReplyState.INVALID_PARAMETER -> "非法数据 命令号:${cmd}"
                 ReplyState.MOTOR_ERR -> "电机错误 命令号:${cmd}"
                 ReplyState.SENSOR_ERR -> "传感器错误 命令号:${cmd}"
+                ReplyState.SQUEEZING_FAILED -> "挤压错误 命令号:${cmd}"
                 ReplyState.ORDER -> "意外的命令号"
                 else -> {
                     ""

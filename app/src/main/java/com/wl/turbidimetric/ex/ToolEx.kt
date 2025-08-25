@@ -121,7 +121,7 @@ fun calcAbsorbanceDifferences(
     var absorbances = arrayListOf<BigDecimal>()
     for (i in resultTest1.indices) {
         absorbances.add(
-            calcAbsorbanceDifference(resultTest1[i], resultTest2[i])
+            calcAbsorbanceDifference(resultTest1[i], resultTest4[i])
         )
     }
     return absorbances

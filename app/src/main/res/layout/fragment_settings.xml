@@ -83,6 +83,7 @@
                     android:id="@+id/siv_log_list"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
+                    android:visibility="gone"
                     android:layout_marginTop="5dp"
                     app:bg="@drawable/bg_item_settings"
                     app:selectable="true"

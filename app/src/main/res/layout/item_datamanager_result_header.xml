@@ -37,7 +37,7 @@
             android:layout_height="wrap_content"
             android:minWidth="115dp"
             android:text="项目名"
-            android:visibility="visible" />
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/tv_barcode"
@@ -46,7 +46,7 @@
             android:layout_height="wrap_content"
             android:minWidth="100dp"
             android:text="条码"
-            android:visibility="visible" />
+            android:visibility="gone" />
 
 
         <TextView
@@ -123,7 +123,8 @@
             style="@style/TextHilt"
             android:layout_width="90dp"
             android:layout_height="wrap_content"
-            android:text="第二次" />
+            android:text="第二次"
+            android:visibility="visible" />
 
 
         <TextView
@@ -140,7 +141,7 @@
             android:layout_width="90dp"
             android:layout_height="wrap_content"
             android:text="第四次"
-            android:visibility="gone" />
+            android:visibility="visible" />
 
         <TextView
             android:id="@+id/tv_test_original_value1"
@@ -155,7 +156,8 @@
             style="@style/TextHilt"
             android:layout_width="90dp"
             android:layout_height="wrap_content"
-            android:text="原始2" />
+            android:text="原始2"
+            android:visibility="visible" />
 
 
         <TextView
@@ -173,7 +175,7 @@
             android:layout_width="90dp"
             android:layout_height="wrap_content"
             android:text="原始4"
-            android:visibility="gone" />
+            android:visibility="visible" />
 
         <TextView
             android:id="@+id/tv_state_upload"

@@ -41,7 +41,7 @@ object TestSerialPort {
             SerialGlobal.CMD_GetState -> {
                 delay(200)
 //                if (index < 2) {
-                reply = reply.plus(ubyteArrayOf(0x03u, 0xffu, 0xffu, 0xffu))// 0011 0011
+                reply = reply.plus(ubyteArrayOf(0x03u, 0xffu, 0x3fu, 0xffu))// 0011 0011
 //                } else {
 //                reply = reply.plus(ubyteArrayOf(0x0u, 0x2u, 0x11u, 0xffu))//0001 0001
 //                }
@@ -117,7 +117,7 @@ object TestSerialPort {
             }
 
             SerialGlobal.CMD_TakeReagent -> {
-//                delay(5000)
+                delay(3000)
 //                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x01u, 0x1u))// 存在r1试剂 1，r2试剂量 1
 //                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x00u, 0x0u))// 不存在r1试剂 0，r2试剂量 0
 //                if (index == 6) {
@@ -129,6 +129,7 @@ object TestSerialPort {
             }
 
             SerialGlobal.CMD_StirProbeCleaning -> {
+                delay(3000)
                 reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x01u))// 有清洗液 1
 //                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x01u))// 无清洗液 0
             }
@@ -139,12 +140,12 @@ object TestSerialPort {
             }
 
             SerialGlobal.CMD_DripReagent -> {
-//                delay(5000)
+                delay(3000)
                 reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x0u))
             }
 
             SerialGlobal.CMD_Stir -> {
-//                delay(2000)
+                delay(3000)
                 reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x0u))
             }
 

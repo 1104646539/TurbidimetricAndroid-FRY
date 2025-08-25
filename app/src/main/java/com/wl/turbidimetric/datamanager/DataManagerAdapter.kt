@@ -136,11 +136,11 @@ class DataManagerAdapter :
             binding.tvTestValue1.visibility = debug.isShow()
             binding.tvTestValue2.visibility = debug.isShow()
             binding.tvTestValue3.visibility = debug.isShow()
-//                binding.tvTestValue4.visibility = it.isShow()
+            binding.tvTestValue4.visibility = debug.isShow()
             binding.tvTestOriginalValue1.visibility = debug.isShow()
             binding.tvTestOriginalValue2.visibility = debug.isShow()
             binding.tvTestOriginalValue3.visibility = debug.isShow()
-//                binding.tvTestOriginalValue4.visibility = it.isShow()
+            binding.tvTestOriginalValue4.visibility = debug.isShow()
         }
 
     }

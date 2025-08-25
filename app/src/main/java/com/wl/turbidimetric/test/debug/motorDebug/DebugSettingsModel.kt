@@ -53,11 +53,11 @@ class MotorDebugViewModel(private val appViewModel: AppViewModel) : BaseViewMode
         "6（试剂针X）",
         "7（试剂针Z）",
         "8（样本针X）",
-        "9（样本针Y）",
+        "9（样本针Z）",
         "10（试剂泵）",
         "11（搅拌）",
         "12（扶正）",
-        "13（转盘）"
+        "13（试剂）"
     )
     val motorIndex = MutableLiveData(0);
 

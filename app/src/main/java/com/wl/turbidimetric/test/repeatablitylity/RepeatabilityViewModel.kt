@@ -10,7 +10,6 @@ import com.wl.turbidimetric.base.BaseViewModel
 import com.wl.turbidimetric.db.ServiceLocator
 import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.SystemGlobal
-import com.wl.turbidimetric.log.DbLogUtil
 import com.wl.turbidimetric.model.*
 import com.wl.turbidimetric.repository.if2.CurveSource
 import com.wl.turbidimetric.repository.if2.LocalDataSource
@@ -237,7 +236,7 @@ class RepeatabilityViewModel(
     /**
      * 记录每个比色皿的搅拌时间
      */
-    val stirTimes = longArrayOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    val dripReagentTimes = longArrayOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
     /**
      * 结束时的异常提示信息
@@ -440,6 +439,7 @@ class RepeatabilityViewModel(
         val r1Reagent = reply.data.r1Reagent
         val r2Reagent = reply.data.r2Reagent
         val cleanoutFluid = reply.data.cleanoutFluid
+        val distilledWater = reply.data.distilledWater
 
         getInitialPos()
 
@@ -459,6 +459,9 @@ class RepeatabilityViewModel(
         } else if (!cleanoutFluid) {
             i("没有清洗液试剂")
             "清洗液不足，请添加"
+        } else if (!distilledWater) {
+            i("没有蒸馏水")
+            "蒸馏水不足，请添加"
         } else {
             ""
         }
@@ -609,8 +612,8 @@ class RepeatabilityViewModel(
                         matchingFinish()
                         return
                     }
-                    moveSample(1)
-                } else if (samplePos == 1) {
+                    moveSample(2)
+                } else if (samplePos == 2) {
                     sampleStep++
                     sampling(localDataRepository.getSamplingVolume().roundToInt())
                 }
@@ -677,8 +680,8 @@ class RepeatabilityViewModel(
         }
         if (cuvettePos > 4 && cuvetteNeedTest(cuvettePos - 5)) {
             testFinish = false
-            val stirTime = stirTimes[cuvettePos - 5]
-            val intervalTemp = testShelfInterval1 - (Date().time - stirTime)
+            val stirTime = dripReagentTimes[cuvettePos - 5]
+            val intervalTemp = testShelfInterval1 - (Date().time - stirTime) - 1500
             i("intervalTemp=$intervalTemp stirTime=$stirTime testShelfInterval1=$testShelfInterval1")
             viewModelScope.launch {
                 delay(intervalTemp)
@@ -817,6 +820,7 @@ class RepeatabilityViewModel(
 
 
     }
+
     /**
      * 根据检测次数 和 比色皿的位置计算还有多久才移动到下一个检测位
      * @param cuvettePos Int
@@ -824,7 +828,7 @@ class RepeatabilityViewModel(
     private fun delayMoveCuvetteTest(cuvettePos: Int) {
         val targetTime =
             if (appViewModel.testState == TestState.Test2) testShelfInterval2 else if (appViewModel.testState == TestState.Test3) testShelfInterval3 else testShelfInterval4
-        val stirTime = stirTimes[cuvettePos]
+        val stirTime = dripReagentTimes[cuvettePos]
         val intervalTemp = targetTime - (Date().time - stirTime)
         i("intervalTemp=$intervalTemp stirTime=$stirTime targetTime=$targetTime")
         viewModelScope.launch {
@@ -832,6 +836,7 @@ class RepeatabilityViewModel(
             moveCuvetteTest()
         }
     }
+
     /**
      * 拟合结束，复位
      */
@@ -958,17 +963,16 @@ class RepeatabilityViewModel(
         if (appViewModel.testState.isNotPrepare()) return
         i("接收到 搅拌 reply=$reply cuvettePos=$cuvettePos")
         stirFinish = true
-        updateStirTime()
         updateCuvetteState(cuvettePos - 2, CuvetteState.Stir)
         stirProbeCleaning()
     }
 
     /**
-     * 更新比色皿的搅拌时间
+     * 更新比色皿的加试剂时间
      */
-    private fun updateStirTime() {
-        if (cuvettePos < 2 || cuvettePos > 12) return
-        stirTimes[cuvettePos - 2] = Date().time
+    private fun updateDripReagent() {
+        if (cuvettePos < 0 || cuvettePos > 9) return
+        dripReagentTimes[cuvettePos] = Date().time
     }
 
     /**
@@ -982,7 +986,7 @@ class RepeatabilityViewModel(
         dripReagentFinish = true
         takeReagentFinish = false
         updateCuvetteState(cuvettePos, CuvetteState.DripReagent)
-
+        updateDripReagent()
         dripReagentAndStirAndTestFinish()
     }
 
@@ -1083,6 +1087,7 @@ class RepeatabilityViewModel(
             test()
         }
     }
+
     /**
      * 获取这次检测的第一个要检测的比色皿的间隔时间
      * @return Long
@@ -1090,11 +1095,12 @@ class RepeatabilityViewModel(
     private fun getFirstDelayTime(): Long {
         val targetTime =
             if (appViewModel.testState == TestState.Test2) testShelfInterval2 else if (appViewModel.testState == TestState.Test3) testShelfInterval3 else testShelfInterval4
-        val stirTime = stirTimes.first { it.toInt() != 0 }
-        val intervalTemp = targetTime - (Date().time - stirTime) - 1000
+        val stirTime = dripReagentTimes.first { it.toInt() != 0 }
+        val intervalTemp = targetTime - (Date().time - stirTime) - 1500
         i("getFirstDelayTime intervalTemp=$intervalTemp stirTime=$stirTime targetTime=$targetTime")
         return intervalTemp
     }
+
     /**
      * 接收到取试剂
      * @param reply ReplyModel<TakeReagentModel>

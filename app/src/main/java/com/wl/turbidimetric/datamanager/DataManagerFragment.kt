@@ -322,13 +322,13 @@ class DataManagerFragment :
                 vd.header.tvAge.visibility = isDebug.not().isShow()
 
                 vd.header.tvTestValue1.visibility = isDebug.isShow()
-                vd.header.tvTestValue2.visibility = isDebug.isShow()
+//                vd.header.tvTestValue2.visibility = isDebug.isShow()
                 vd.header.tvTestValue3.visibility = isDebug.isShow()
-//                vd.header.tvTestValue4.visibility = isDebug.isShow()
+                vd.header.tvTestValue4.visibility = isDebug.isShow()
                 vd.header.tvTestOriginalValue1.visibility = isDebug.isShow()
-                vd.header.tvTestOriginalValue2.visibility = isDebug.isShow()
+//                vd.header.tvTestOriginalValue2.visibility = isDebug.isShow()
                 vd.header.tvTestOriginalValue3.visibility = isDebug.isShow()
-//                vd.header.tvTestOriginalValue4.visibility = isDebug.isShow()
+                vd.header.tvTestOriginalValue4.visibility = isDebug.isShow()
 
                 if (isDebug) {
                     updateLayoutParams(requireContext(), vd.header.tvId, 80)

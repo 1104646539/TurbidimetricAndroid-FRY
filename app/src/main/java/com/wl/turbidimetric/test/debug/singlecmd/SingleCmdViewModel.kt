@@ -69,7 +69,7 @@ class SingleCmdViewModel(private val appViewModel: AppViewModel) : BaseViewModel
         val sampleShelfStr = reply.data.sampleShelfs.joinTo(StringBuffer())
         val cuvetteShelfStr = reply.data.cuvetteShelfs.joinTo(StringBuffer())
         var msg =
-            "获取状态完成\n清洗液状态:${reply.data.cleanoutFluid.isExist()} R1状态:${reply.data.r1Reagent.isExist()} R2状态:${reply.data.r2Reagent.isExist()} ${reply.data.r2Volume}\n样本架状态:${sampleShelfStr} 比色皿架状态:${cuvetteShelfStr}"
+            "获取状态完成\n清洗液状态:${reply.data.cleanoutFluid.isExist()} R1状态:${reply.data.r1Reagent.isExist()} R2状态:${reply.data.r2Reagent.isExist()} ${reply.data.r2Volume} 蒸馏水状态:${reply.data.distilledWater.isExist()} \n样本架状态:${sampleShelfStr} 比色皿架状态:${cuvetteShelfStr} "
         changeResult(msg)
     }
 
@@ -260,8 +260,8 @@ class SingleCmdViewModel(private val appViewModel: AppViewModel) : BaseViewModel
             return
         }
         val step = msg.toIntOrNull() ?: 0
-        if (step !in 0..4) {
-            changeHilt("移动位置错误,必须为0-4")
+        if (step !in 0..2) {
+            changeHilt("移动位置错误,必须为0-2")
             return
         }
         enable.postValue(false)
@@ -280,7 +280,7 @@ class SingleCmdViewModel(private val appViewModel: AppViewModel) : BaseViewModel
         }
         val step = msg.toIntOrNull() ?: 0
         if (step !in 1..10) {
-            changeHilt("移动位置错误,必须为1-10")
+            changeHilt("移动位置错误,必须为1-7")
             return
         }
         enable.postValue(false)

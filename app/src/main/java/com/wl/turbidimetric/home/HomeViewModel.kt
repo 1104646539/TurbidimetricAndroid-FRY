@@ -1,6 +1,5 @@
 package com.wl.turbidimetric.home
 
-import android.os.Build
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -8,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.wl.turbidimetric.app.App
 import com.wl.turbidimetric.app.AppIntent
 import com.wl.turbidimetric.app.AppViewModel
-import com.wl.turbidimetric.app.MachineState
 import com.wl.turbidimetric.base.BaseViewModel
 import com.wl.turbidimetric.db.ServiceLocator
 import com.wl.turbidimetric.ex.calcAbsorbance
@@ -512,9 +510,9 @@ class HomeViewModel(
     var cleaningBeforeStartTest = false
 
     /**
-     * 记录每个比色皿的搅拌时间
+     * 记录每个比色皿的加试剂时间
      */
-    var stirTimes = longArrayOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    var dripReagentTimes = longArrayOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
     /**
      * 是否允许获取温度（在调试时不自动获取）
@@ -1132,7 +1130,7 @@ class HomeViewModel(
         }
     }
 
-    /**
+    /**d
      * 判断是否是最后一个比色皿。
      * 1、直接是最后一排，
      * 1.1 最后一个 返回是
@@ -1585,7 +1583,7 @@ class HomeViewModel(
     private fun delayMoveCuvetteTest(cuvettePos: Int) {
         val targetTime =
             if (appViewModel.testState == TestState.Test2) testShelfInterval2 else if (appViewModel.testState == TestState.Test3) testShelfInterval3 else testShelfInterval4
-        val stirTime = stirTimes[cuvettePos]
+        val stirTime = dripReagentTimes[cuvettePos]
         val intervalTemp = targetTime - (Date().time - stirTime)
         i("intervalTemp=$intervalTemp stirTime=$stirTime targetTime=$targetTime cuvettePos=$cuvettePos")
         viewModelScope.launch {
@@ -1670,7 +1668,7 @@ class HomeViewModel(
                 resultModels[resultIndex]?.result?.resultState = ResultState.Test.ordinal
                 //计算单个结果浓度
                 val abs = calcAbsorbanceDifference(
-                    resultTest1[cuvetteCorrPos], resultTest2[cuvetteCorrPos]
+                    resultTest1[cuvetteCorrPos], resultTest4[cuvetteCorrPos]
                 )
                 absorbances.add(abs)
                 selectProject?.let { project ->
@@ -2043,7 +2041,7 @@ class HomeViewModel(
         if (appViewModel.testState.isNotPrepare()) return
         c("接收到 搅拌 reply=$reply cuvettePos=$cuvettePos")
 
-        updateStirTime()
+//        updateStirTime()
         stirFinish = true
         updateCuvetteState(cuvettePos - 2, CuvetteState.Stir)
         updateResultState(cuvettePos - 2, ResultState.Stir)
@@ -2051,11 +2049,11 @@ class HomeViewModel(
     }
 
     /**
-     * 更新比色皿的搅拌时间
+     * 更新比色皿的加试剂时间
      */
-    private fun updateStirTime() {
-        if (cuvettePos < 2 || cuvettePos > 12) return
-        stirTimes[cuvettePos - 2] = Date().time
+    private fun updateDripReagent() {
+        if (cuvettePos < 0 || cuvettePos > 9) return
+        dripReagentTimes[cuvettePos] = Date().time
     }
 
     /**
@@ -2067,6 +2065,7 @@ class HomeViewModel(
         c("接收到 加试剂 reply=$reply cuvettePos=$cuvettePos")
 
         dripReagentFinish = true
+        updateDripReagent()
         updateCuvetteState(cuvettePos, CuvetteState.DripReagent)
         nextDripReagent()
         selectFocChange(
@@ -2468,7 +2467,7 @@ class HomeViewModel(
     private fun getFirstDelayTime(): Long {
         val targetTime =
             if (appViewModel.testState == TestState.Test2) testShelfInterval2 else if (appViewModel.testState == TestState.Test3) testShelfInterval3 else testShelfInterval4
-        val stirTime = stirTimes.first { it.toInt() != 0 }
+        val stirTime = dripReagentTimes.first { it.toInt() != 0 }
         val nowTime = Date().time
         val intervalTemp = targetTime - (nowTime - stirTime) - 1500
         i("getFirstDelayTime intervalTemp=$intervalTemp nowTime=$nowTime stirTime=$stirTime targetTime=$targetTime")
@@ -2508,12 +2507,13 @@ class HomeViewModel(
             testFinish = false //先置为未检测完成
             var testInterval = 0L
             //倒数第二个需要检测的
-            val stirTime = stirTimes[cuvettePos - 5]
+            val stirTime = dripReagentTimes[cuvettePos - 5]
             val offsetTime = (Date().time - stirTime)
             testInterval = testShelfInterval1 - offsetTime - 1500
             i("goTest testInterval=$testInterval cuvettePos=$cuvettePos")
             viewModelScope.launch {
                 delay(testInterval)
+//                delay(0)
                 test()
             }
 
@@ -2611,7 +2611,7 @@ class HomeViewModel(
      *
      */
     private fun initCuvetteShelfState() {
-        stirTimes.forEachIndexed { index, _ -> stirTimes[index] = 0 }
+        dripReagentTimes.forEachIndexed { index, _ -> dripReagentTimes[index] = 0 }
     }
 
     /**

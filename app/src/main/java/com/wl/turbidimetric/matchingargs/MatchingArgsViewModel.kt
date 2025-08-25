@@ -14,8 +14,6 @@ import com.wl.turbidimetric.ex.calcAbsorbanceDifferences
 import com.wl.turbidimetric.ex.calcCon
 import com.wl.turbidimetric.ex.copyForProject
 import com.wl.turbidimetric.ex.getAppViewModel
-import com.wl.turbidimetric.ex.getEquation
-import com.wl.turbidimetric.ex.getFitGoodness
 import com.wl.turbidimetric.ex.isSample
 import com.wl.turbidimetric.ex.matchingArg
 import com.wl.turbidimetric.ex.toast
@@ -341,7 +339,7 @@ class MatchingArgsViewModel(
     /**
      * 记录每个比色皿的搅拌时间
      */
-    val stirTimes = longArrayOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    val dripReagentTimes = longArrayOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
     /**
      * 全部可选择的项目
@@ -412,7 +410,7 @@ class MatchingArgsViewModel(
     private var r2Reagent = false
     private var r2Volume = 0
     private var cleanoutFluid = false
-
+    private var distilledWater = false
     /**
      * 测试用的 start
      */
@@ -723,6 +721,7 @@ class MatchingArgsViewModel(
         r2Reagent = reply.data.r2Reagent
         r2Volume = reply.data.r2Volume
         cleanoutFluid = reply.data.cleanoutFluid
+        distilledWater = reply.data.distilledWater
 
         getInitialPos()
 
@@ -786,6 +785,10 @@ class MatchingArgsViewModel(
             if (!cleanoutFluid) {
                 i("没有清洗液")
                 discArray.add("清洗液")
+            }
+            if (!distilledWater) {
+                i("没有蒸馏水")
+                discArray.add("蒸馏水")
             }
             temp = "请添加" + discArray.joinToString(",")
             discrepancy.invoke(temp)
@@ -1036,8 +1039,8 @@ class MatchingArgsViewModel(
         }
         if (cuvettePos > 4 && cuvetteNeedTest(cuvettePos - 5)) {
             testFinish = false
-            val stirTime = stirTimes[cuvettePos - 5]
-            val testInterval = testShelfInterval1 - (Date().time - stirTime)
+            val stirTime = dripReagentTimes[cuvettePos - 5]
+            val testInterval = testShelfInterval1 - (Date().time - stirTime) - 1500
             i("goDripReagentAndStirAndTest testInterval=$testInterval stirTime=$stirTime")
             viewModelScope.launch {
                 delay(testInterval)
@@ -1213,7 +1216,7 @@ class MatchingArgsViewModel(
     private fun delayMoveCuvetteTest(cuvettePos: Int) {
         val targetTime =
             if (appViewModel.testState == TestState.Test2) testShelfInterval2 else if (appViewModel.testState == TestState.Test3) testShelfInterval3 else testShelfInterval4
-        val stirTime = stirTimes[cuvettePos]
+        val stirTime = dripReagentTimes[cuvettePos]
         val intervalTemp = targetTime - (Date().time - stirTime)
         i("intervalTemp=$intervalTemp stirTime=$stirTime targetTime=$targetTime")
         viewModelScope.launch {
@@ -1421,20 +1424,18 @@ class MatchingArgsViewModel(
         if (!runningMatching()) return
         if (appViewModel.testState.isNotPrepare()) return
         i("接收到 搅拌 reply=$reply cuvettePos=$cuvettePos")
-        updateStirTime()
         stirFinish = true
         updateCuvetteState(cuvettePos - 2, CuvetteState.Stir)
         stirProbeCleaning()
     }
 
     /**
-     * 更新比色皿的搅拌时间
+     * 更新比色皿的加试剂时间
      */
-    private fun updateStirTime() {
-        if (cuvettePos < 2 || cuvettePos > 12) return
-        stirTimes[cuvettePos - 2] = Date().time
+    private fun updateDripReagent() {
+        if (cuvettePos < 0 || cuvettePos > 9) return
+        dripReagentTimes[cuvettePos] = Date().time
     }
-
     /**
      * 接收到加试剂
      * @param reply ReplyModel<DripReagentModel>
@@ -1446,6 +1447,7 @@ class MatchingArgsViewModel(
         dripReagentFinish = true
         updateCuvetteState(cuvettePos, CuvetteState.DripReagent)
 
+        updateDripReagent()
         dripReagentAndStirAndTestFinish()
     }
 
@@ -1593,8 +1595,8 @@ class MatchingArgsViewModel(
     private fun getFirstDelayTime(): Long {
         val targetTime =
             if (appViewModel.testState == TestState.Test2) testShelfInterval2 else if (appViewModel.testState == TestState.Test3) testShelfInterval3 else testShelfInterval4
-        val stirTime = stirTimes.first { it.toInt() != 0 }
-        val intervalTemp = targetTime - (Date().time - stirTime) - 1000
+        val stirTime = dripReagentTimes.first { it.toInt() != 0 }
+        val intervalTemp = targetTime - (Date().time - stirTime) - 1500
         i("getFirstDelayTime intervalTemp=$intervalTemp stirTime=$stirTime targetTime=$targetTime")
         return intervalTemp
     }

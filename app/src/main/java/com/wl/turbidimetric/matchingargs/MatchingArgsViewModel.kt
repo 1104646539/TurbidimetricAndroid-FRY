@@ -1525,7 +1525,7 @@ class MatchingArgsViewModel(
         }
         when (appViewModel.testState) {
             TestState.DripDiluentVolume -> {//去加稀释液
-                moveSample(sampleStep + 2)
+                moveSample(sampleStep + 1)
             }
 
             TestState.DripStandardVolume -> {//去加标准品

@@ -382,12 +382,12 @@ class RepeatabilityViewModel(
         cuvettePos = -1
         sampleShelfPos = -1
         cuvetteShelfPos = -1
-
+        samplingFinish = false
         if (SystemGlobal.isCodeDebug) {
             testShelfInterval1 = 10 * 1000
-            testShelfInterval2 = 50 * 1000
-            testShelfInterval3 = 110 * 1000
-            testShelfInterval4 = 170 * 1000
+            testShelfInterval2 = 0 * 1000
+            testShelfInterval3 = 0 * 1000
+            testShelfInterval4 = 0 * 1000
         } else {
             testShelfInterval1 = localDataRepository.getTest1DelayTime()
             testShelfInterval2 = localDataRepository.getTest2DelayTime()

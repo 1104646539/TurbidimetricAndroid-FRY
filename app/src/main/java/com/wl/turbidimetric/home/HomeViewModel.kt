@@ -2042,6 +2042,7 @@ class HomeViewModel(
         c("接收到 搅拌 reply=$reply cuvettePos=$cuvettePos")
 
 //        updateStirTime()
+        updateDripReagent()
         stirFinish = true
         updateCuvetteState(cuvettePos - 2, CuvetteState.Stir)
         updateResultState(cuvettePos - 2, ResultState.Stir)
@@ -2052,8 +2053,8 @@ class HomeViewModel(
      * 更新比色皿的加试剂时间
      */
     private fun updateDripReagent() {
-        if (cuvettePos < 0 || cuvettePos > 9) return
-        dripReagentTimes[cuvettePos] = Date().time
+        if (cuvettePos < 2 || cuvettePos > 11) return
+        dripReagentTimes[cuvettePos - 2] = Date().time
     }
 
     /**
@@ -2065,7 +2066,6 @@ class HomeViewModel(
         c("接收到 加试剂 reply=$reply cuvettePos=$cuvettePos")
 
         dripReagentFinish = true
-        updateDripReagent()
         updateCuvetteState(cuvettePos, CuvetteState.DripReagent)
         nextDripReagent()
         selectFocChange(

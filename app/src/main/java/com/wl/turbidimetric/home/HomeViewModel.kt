@@ -1668,7 +1668,7 @@ class HomeViewModel(
                 resultModels[resultIndex]?.result?.resultState = ResultState.Test.ordinal
                 //计算单个结果浓度
                 val abs = calcAbsorbanceDifference(
-                    resultTest1[cuvetteCorrPos], resultTest4[cuvetteCorrPos]
+                    resultTest1[cuvetteCorrPos], resultTest2[cuvetteCorrPos]
                 )
                 absorbances.add(abs)
                 selectProject?.let { project ->

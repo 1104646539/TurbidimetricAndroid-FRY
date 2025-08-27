@@ -32,7 +32,7 @@ android {
         minSdk 24
         targetSdk 32
         versionCode 1
-        versionName "1.0.3.0-FRY-7-1加试剂时间"
+        versionName "1.0.3.0-FRY-7-2搅拌时间"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 

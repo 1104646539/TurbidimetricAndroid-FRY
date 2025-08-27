@@ -963,6 +963,7 @@ class RepeatabilityViewModel(
         if (appViewModel.testState.isNotPrepare()) return
         i("接收到 搅拌 reply=$reply cuvettePos=$cuvettePos")
         stirFinish = true
+        updateDripReagent()
         updateCuvetteState(cuvettePos - 2, CuvetteState.Stir)
         stirProbeCleaning()
     }
@@ -971,8 +972,8 @@ class RepeatabilityViewModel(
      * 更新比色皿的加试剂时间
      */
     private fun updateDripReagent() {
-        if (cuvettePos < 0 || cuvettePos > 9) return
-        dripReagentTimes[cuvettePos] = Date().time
+        if (cuvettePos < 2 || cuvettePos > 11) return
+        dripReagentTimes[cuvettePos - 2] = Date().time
     }
 
     /**
@@ -986,7 +987,7 @@ class RepeatabilityViewModel(
         dripReagentFinish = true
         takeReagentFinish = false
         updateCuvetteState(cuvettePos, CuvetteState.DripReagent)
-        updateDripReagent()
+//        updateDripReagent()
         dripReagentAndStirAndTestFinish()
     }
 

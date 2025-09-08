@@ -19,7 +19,9 @@ import com.wl.turbidimetric.util.ScanCodeUtil
 import com.wl.turbidimetric.util.SerialPortIF
 import com.wl.wllib.DateUtil
 import com.wl.wllib.LogToFile.i
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,6 +29,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.Date
+import kotlin.time.measureTime
 
 /**
  * 全局唯一的ViewModel，用来保存全局通用的属性
@@ -391,6 +394,23 @@ class AppViewModel(
         return doorHelper.CuvetteDoorIsClose()
     }
 
+    /**
+     * 等待样本仓门关闭
+     */
+    fun waitSampleClose(onBeforeAction: () -> Unit) {
+        viewModelScope.launch {
+            val ret = async { startWaitDoorState(true, true) }.await()
+            onBeforeAction.invoke()
+        }
+    }
+
+    private fun startWaitDoorState(sampleDoor: Boolean, isClose: Boolean): Int {
+        while (true) {
+            if (doorHelper.SampleDoorIsClose() == isClose) {
+                return 1
+            }
+        }
+    }
 }
 
 sealed class AppIntent {

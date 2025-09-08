@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 
 object SystemGlobal {
 //    /**
-//     * 检测模式状态
+//     * 检测模式状态232
 //     */
 //    var testState = TestState.None
 //        set(value) {

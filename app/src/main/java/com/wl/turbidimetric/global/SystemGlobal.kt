@@ -21,7 +21,7 @@ object SystemGlobal {
 //    val obTestState = _obTestState.asStateFlow()
 
 
-    /**
+    /**-
      * 是否是在只使用安卓板时调试用的
      */
     var isCodeDebug = true

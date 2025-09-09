@@ -16,6 +16,14 @@ sealed class HomeDialogUiState {
      * 关闭 自检中
      */
     object GetMachineDismiss : HomeDialogUiState()
+    /**
+     * 显示 自检中
+     */
+    object DoorHintShow : HomeDialogUiState()
+    /**
+     * 关闭 自检中
+     */
+    object DoorHintDismiss : HomeDialogUiState()
 
     /**
      * 显示自检失败对话框

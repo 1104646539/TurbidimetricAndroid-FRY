@@ -109,6 +109,9 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
     private val waitDialog: HiltDialog by lazy {
         HiltDialog(requireContext())
     }
+    private val doorDialog: HiltDialog by lazy {
+        HiltDialog(requireContext())
+    }
 
     /**
      * 待检信息列表
@@ -524,6 +527,24 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 
                     is HomeDialogUiState.GetMachineDismiss -> {
                         dialogGetMachine.dismiss()
+                    }
+
+                    is HomeDialogUiState.DoorHintShow -> {
+                        doorDialog.showPop(requireContext(), isCancelable = false) {
+                            it.showDialog(
+                                msg = "请关闭仓门",
+                                confirmText = "我已关闭",
+                                confirmClick = { baseDialog: BasePopupView ->
+//                                    it.dismiss()
+                                }.throttle(),
+                                showIcon = false,
+                                iconId = ICON_HINT
+                            )
+                        }
+                    }
+
+                    is HomeDialogUiState.DoorHintDismiss -> {
+                        doorDialog.dismiss()
                     }
                     /**
                      * 自检失败对话框

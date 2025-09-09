@@ -139,6 +139,16 @@ class AppViewModel(
     val obReactionTemp = _reactionTemp.asSharedFlow()
 
     /**
+     * 样本仓门状态
+     */
+    private var _sampleDoorIsClose = MutableSharedFlow<Boolean>(1)
+
+    /**
+     * 样本仓门状态
+     */
+    val obSampleDoorIsClose = _sampleDoorIsClose.asSharedFlow()
+
+    /**
      * 是否是调试模式
      */
     var isDebugMode = false
@@ -255,6 +265,18 @@ class AppViewModel(
     }
 
     /**
+     * 更新当前时间
+     */
+    private fun listenerSampleDoorState() {
+        viewModelScope.launch(Dispatchers.IO) {
+            while (true) {
+                _sampleDoorIsClose.emit(doorHelper.SampleDoorIsClose())
+                delay(500)
+            }
+        }
+    }
+
+    /**
      * 更新打印机状态
      */
     private fun changePrinterState(state: PrinterState) {
@@ -313,6 +335,7 @@ class AppViewModel(
         when (intent) {
             AppIntent.ListenerTime -> {
                 listenerTime()
+                listenerSampleDoorState()
             }
 
             is AppIntent.PrintNumChange -> {
@@ -395,18 +418,25 @@ class AppViewModel(
     }
 
     /**
-     * 等待样本仓门关闭
+     * 等待样本仓门
      */
-    fun waitSampleClose(onBeforeAction: () -> Unit) {
+    fun waitSampleState(isClose: Boolean, onBeforeAction: () -> Unit) {
         viewModelScope.launch {
-            val ret = async { startWaitDoorState(true, true) }.await()
+            val ret = async { startWaitDoorState(true, isClose) }.await()
             onBeforeAction.invoke()
         }
     }
 
-    private fun startWaitDoorState(sampleDoor: Boolean, isClose: Boolean): Int {
+    private suspend fun startWaitDoorState(sampleDoor: Boolean, isClose: Boolean): Int {
         while (true) {
-            if (doorHelper.SampleDoorIsClose() == isClose) {
+            delay(500)
+            val state =
+                if (sampleDoor) {
+                    doorHelper.SampleDoorIsClose()
+                } else {
+                    doorHelper.CuvetteDoorIsClose()
+                }
+            if (isClose == state) {
                 return 1
             }
         }

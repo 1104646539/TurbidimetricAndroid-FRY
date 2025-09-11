@@ -6,7 +6,7 @@ import kotlinx.coroutines.CoroutineScope
 class DoorHelper {
     private val gpioUtil = GPIOUtil()
     fun SampleDoorIsClose(): Boolean {
-        return gpioUtil.GetGpio(1) == 1
+        return gpioUtil.GetGpio(0) == 1
     }
 
     fun CuvetteDoorIsClose(): Boolean {

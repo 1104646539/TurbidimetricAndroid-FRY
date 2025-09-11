@@ -19,7 +19,9 @@ import com.wl.turbidimetric.util.ScanCodeUtil
 import com.wl.turbidimetric.util.SerialPortIF
 import com.wl.wllib.DateUtil
 import com.wl.wllib.LogToFile.i
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,6 +29,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.Date
+import kotlin.time.measureTime
 
 /**
  * 全局唯一的ViewModel，用来保存全局通用的属性
@@ -134,6 +137,16 @@ class AppViewModel(
      * 反应槽的温度
      */
     val obReactionTemp = _reactionTemp.asSharedFlow()
+
+    /**
+     * 样本仓门状态
+     */
+    private var _sampleDoorIsClose = MutableSharedFlow<Boolean>(1)
+
+    /**
+     * 样本仓门状态
+     */
+    val obSampleDoorIsClose = _sampleDoorIsClose.asSharedFlow()
 
     /**
      * 是否是调试模式
@@ -252,6 +265,18 @@ class AppViewModel(
     }
 
     /**
+     * 更新当前时间
+     */
+    private fun listenerSampleDoorState() {
+        viewModelScope.launch(Dispatchers.IO) {
+            while (true) {
+                _sampleDoorIsClose.emit(doorHelper.SampleDoorIsClose())
+                delay(500)
+            }
+        }
+    }
+
+    /**
      * 更新打印机状态
      */
     private fun changePrinterState(state: PrinterState) {
@@ -310,6 +335,7 @@ class AppViewModel(
         when (intent) {
             AppIntent.ListenerTime -> {
                 listenerTime()
+                listenerSampleDoorState()
             }
 
             is AppIntent.PrintNumChange -> {
@@ -391,6 +417,30 @@ class AppViewModel(
         return doorHelper.CuvetteDoorIsClose()
     }
 
+    /**
+     * 等待样本仓门
+     */
+    fun waitSampleState(isClose: Boolean, onBeforeAction: () -> Unit) {
+        viewModelScope.launch {
+            val ret = async { startWaitDoorState(true, isClose) }.await()
+            onBeforeAction.invoke()
+        }
+    }
+
+    private suspend fun startWaitDoorState(sampleDoor: Boolean, isClose: Boolean): Int {
+        while (true) {
+            delay(500)
+            val state =
+                if (sampleDoor) {
+                    doorHelper.SampleDoorIsClose()
+                } else {
+                    doorHelper.CuvetteDoorIsClose()
+                }
+            if (isClose == state) {
+                return 1
+            }
+        }
+    }
 }
 
 sealed class AppIntent {

@@ -626,6 +626,14 @@ class MatchingArgsViewModel(
             }
             return
         }
+        if(!appViewModel.sampleDoorIsClose()){
+            viewModelScope.launch {
+                _dialogUiState.emit(
+                    MatchingArgsDialogUiState.Accident("请关闭仓门")
+                )
+            }
+            return
+        }
 //        var hiltStr = ""
 //        if (matchingType == MatchingConfigLayout.MatchingType.Matching) {
 //            if (reagentNOStr.isNullOrEmpty()) {

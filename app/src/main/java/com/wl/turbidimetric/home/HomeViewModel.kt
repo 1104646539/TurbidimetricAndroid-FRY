@@ -88,6 +88,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
@@ -609,6 +610,9 @@ class HomeViewModel(
     private fun clickVerify(): Boolean {
         val errorMsg = if (appViewModel.testState.isRunning()) {
             "正在检测，请勿操作！"
+            //        } else if (SystemGlobal.isCodeDebug && !appViewModel.sampleDoorIsClose()) {
+        } else if (!appViewModel.sampleDoorIsClose()) {
+            "请关闭仓门"
         } else if (appViewModel.testState.isRunningError()) {
             "请停止使用仪器并联系供应商维修"
         } else if (selectProject == null) {
@@ -2821,6 +2825,7 @@ class HomeViewModel(
             //自检成功后获取一下r1,r2，清洗液状态，获取温度
             getState()
             listenerTempState()
+            listenerDoorState()
         } else {
             EventBus.getDefault().post(EventMsg<Any>(what = EventGlobal.WHAT_HIDE_SPLASH))
             appViewModel.testState = TestState.NotGetMachineState
@@ -2847,6 +2852,46 @@ class HomeViewModel(
         }
     }
 
+    /**
+     * 是否显示了提示不能打开样本仓门的对话框
+     */
+    var showDoorDialog = false
+
+    /**
+     * 监听样本仓门状态
+     */
+    private fun listenerDoorState() {
+        viewModelScope.launch {
+            appViewModel.obSampleDoorIsClose.collectLatest { isClose ->
+                if (SystemGlobal.isCodeDebug && (appViewModel.testType.isTest() || appViewModel.testType.isMatchingArgs())) {
+                    if (!isClose) {
+                        if (appViewModel.testState.isRunning()) {
+                            showDoorDialog = true
+                            showDoorDialog()
+                        } else if (showDoorDialog) {
+                            showDoorDialog = false
+                            hideDoorDialog()
+                        }
+                    } else if (showDoorDialog) {
+                        showDoorDialog = false
+                        hideDoorDialog()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun showDoorDialog() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _dialogUiState.emit(HomeDialogUiState.DoorHintShow)
+        }
+    }
+
+    private fun hideDoorDialog() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _dialogUiState.emit(HomeDialogUiState.DoorHintDismiss)
+        }
+    }
 
     /**
      * 接收到获取状态

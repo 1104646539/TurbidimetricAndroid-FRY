@@ -119,12 +119,12 @@ class ParamsViewModel constructor(
         if (stirDuration !in 0..5000) {
             return "搅拌时长必须小于5000"
         }
-        if (test1DelayTime < 30000) {
-            return "第一次检测时间必须大于30s"
-        }
-        if (test2DelayTime < 90000) {
-            return "第二次检测时间必须大于90s"
-        }
+//        if (test1DelayTime < 30000) {
+//            return "第一次检测时间必须大于30s"
+//        }
+//        if (test2DelayTime < 90000) {
+//            return "第二次检测时间必须大于90s"
+//        }
         if (test2DelayTime < test1DelayTime) {
             return "第二次检测时间必须大于第一次检测时间"
         }

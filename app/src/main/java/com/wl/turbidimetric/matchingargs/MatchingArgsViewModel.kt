@@ -411,6 +411,7 @@ class MatchingArgsViewModel(
     private var r2Volume = 0
     private var cleanoutFluid = false
     private var distilledWater = false
+
     /**
      * 测试用的 start
      */
@@ -626,7 +627,7 @@ class MatchingArgsViewModel(
             }
             return
         }
-        if(!appViewModel.sampleDoorIsClose()){
+        if (!appViewModel.sampleDoorIsClose()) {
             viewModelScope.launch {
                 _dialogUiState.emit(
                     MatchingArgsDialogUiState.Accident("请关闭仓门")
@@ -744,7 +745,8 @@ class MatchingArgsViewModel(
         if (sampleShelfPos == -1) {
             i("没有样本架")
             discArray.add("样本架")
-        } else if (sampleShelfStates.filter { it == 1 }.size < 2 && (gradsNum + qualityNum) > 5) {
+        } else if (matchingType == MatchingConfigLayout.MatchingType.Matching
+            && sampleShelfStates.filter { it == 1 }.size < 2 && (gradsNum + qualityNum) > 5) {
             //如果需要的拟合数量+质控数量>5，则需要最少有两个样本架
             i("样本架不足")
             discArray.add("样本架")
@@ -1444,6 +1446,7 @@ class MatchingArgsViewModel(
         if (cuvettePos < 0 || cuvettePos > 9) return
         dripReagentTimes[cuvettePos] = Date().time
     }
+
     /**
      * 接收到加试剂
      * @param reply ReplyModel<DripReagentModel>

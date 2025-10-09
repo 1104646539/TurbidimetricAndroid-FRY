@@ -154,7 +154,7 @@ class MatchingArgsViewModel(
      * qc(l)    qc(l)
      * qc(h)    qc(h)
      */
-    private val moveBlendingPos = arrayListOf(0, 5, 4, 3, 2, 6, 7)
+    private val moveBlendingPos = arrayListOf(0, 6, 5, 4, 3, 7, 3)
 
     /**
      * 是否要同时质控
@@ -1540,7 +1540,7 @@ class MatchingArgsViewModel(
             }
 
             TestState.DripStandardVolume -> {//去加标准品
-                moveSample(2)
+                moveSample(1)
             }
 
             TestState.MoveSample -> {//去加已混匀的样本
@@ -1690,7 +1690,7 @@ class MatchingArgsViewModel(
                 moveSample(-samplePos + 2)
                 moveCuvetteShelf(cuvetteShelfPos)
             } else {//继续加标准品
-                moveSample(1)
+                moveSample(0)
             }
         } else if (appViewModel.testState == TestState.MoveSample) {//加已混匀的样本的清洗
             if ((matchingType == MatchingConfigLayout.MatchingType.Matching && (sampleStep == gradsNum && !quality) || (sampleStep == gradsNum + 2 && quality))
@@ -1722,8 +1722,9 @@ class MatchingArgsViewModel(
                 } else {
                     targetIndex = 1
                 }
+                i("targetIndex=$targetIndex")
                 //如果需要移动到下一排样本
-                if (samplePos < sampleMax) {
+                if ((targetIndex + samplePos) <= sampleMax) {
                     moveSample(targetIndex)
                 } else {
                     moveSampleShelfNext()
@@ -2072,7 +2073,7 @@ class MatchingArgsViewModel(
      * @param step Int
      */
     private fun moveSample(step: Int = 1) {
-        i("发送 移动样本 step=$step")
+        i("发送 移动样本 step=$step pos=${samplePos + step}")
         sampleMoveFinish = false
         samplePos += step
         appViewModel.serialPort.moveSample(step > 0, step.absoluteValue)

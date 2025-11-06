@@ -113,5 +113,5 @@ fun <T> Boolean.PD(t1: T, t2: T): T {
 }
 
 fun String?.nullOfDefault(defaultValue: String): String {
-    return this ?: defaultValue
+    return if (this.isNullOrEmpty()) defaultValue else this
 }

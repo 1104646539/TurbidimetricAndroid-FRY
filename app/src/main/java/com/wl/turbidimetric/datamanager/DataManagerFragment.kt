@@ -67,7 +67,11 @@ class DataManagerFragment :
     }
 
     val adapter: DataManagerAdapter by lazy {
-        DataManagerAdapter()
+        DataManagerAdapter(
+            resources.getColor(R.color.textColor),
+            resources.getColor(R.color.ljz_red),
+            resources.getColor(R.color.shelf_sample_finish)
+        )
     }
 
     /**
@@ -316,38 +320,44 @@ class DataManagerFragment :
                 adapter?.changeDebug(isDebug)
                 vd.btnDelete.visibility = isDebug.isShow()
 
-                vd.header.tvAbsorbances.visibility = isDebug.isShow()
                 vd.header.tvName.visibility = isDebug.not().isShow()
                 vd.header.tvGender.visibility = isDebug.not().isShow()
                 vd.header.tvAge.visibility = isDebug.not().isShow()
+                vd.header.tvBarcode.visibility = isDebug.not().isShow()
+                vd.header.tvProjectName.visibility = isDebug.not().isShow()
 
+                vd.header.tvAbsorbances.visibility = isDebug.isShow()
                 vd.header.tvTestValue1.visibility = isDebug.isShow()
-//                vd.header.tvTestValue2.visibility = isDebug.isShow()
+                vd.header.tvTestValue2.visibility = isDebug.isShow()
                 vd.header.tvTestValue3.visibility = isDebug.isShow()
                 vd.header.tvTestValue4.visibility = isDebug.isShow()
                 vd.header.tvTestOriginalValue1.visibility = isDebug.isShow()
-//                vd.header.tvTestOriginalValue2.visibility = isDebug.isShow()
+                vd.header.tvTestOriginalValue2.visibility = isDebug.isShow()
                 vd.header.tvTestOriginalValue3.visibility = isDebug.isShow()
                 vd.header.tvTestOriginalValue4.visibility = isDebug.isShow()
 
                 if (isDebug) {
                     updateLayoutParams(requireContext(), vd.header.tvId, 80)
-                    updateLayoutParams(requireContext(), vd.header.tvBarcode, 100)
+//                    updateLayoutParams(requireContext(), vd.header.tvBarcode, 125)
                     updateLayoutParams(requireContext(), vd.header.tvDetectionNum, 100)
-                    updateLayoutParams(requireContext(), vd.header.tvProjectName, 115)
+//                    updateLayoutParams(requireContext(), vd.header.tvGender, 100)
+//                    updateLayoutParams(requireContext(), vd.header.tvAge, 100)
+//                    updateLayoutParams(requireContext(), vd.header.tvProjectName, 145)
                     updateLayoutParams(requireContext(), vd.header.tvTestTime, 220)
                     updateLayoutParams(requireContext(), vd.header.tvResult, 100)
                     updateLayoutParams(requireContext(), vd.header.tvConcentration, 80)
-//                    updateLayoutParams(requireContext(), vd.header.tvAbsorbances, 100)
+                    updateLayoutParams(requireContext(), vd.header.tvAbsorbances, 120)
                 } else {
-                    updateLayoutParams(requireContext(), vd.header.tvId, 110)
-                    updateLayoutParams(requireContext(), vd.header.tvBarcode, 120)
+                    updateLayoutParams(requireContext(), vd.header.tvId, 120)
+//                    updateLayoutParams(requireContext(), vd.header.tvGender, 125)
+//                    updateLayoutParams(requireContext(), vd.header.tvAge, 125)
+//                    updateLayoutParams(requireContext(), vd.header.tvBarcode, 125)
                     updateLayoutParams(requireContext(), vd.header.tvDetectionNum, 120)
-                    updateLayoutParams(requireContext(), vd.header.tvProjectName, 135)
-                    updateLayoutParams(requireContext(), vd.header.tvTestTime, 240)
-                    updateLayoutParams(requireContext(), vd.header.tvResult, 130)
-                    updateLayoutParams(requireContext(), vd.header.tvConcentration, 100)
-//                    updateLayoutParams(requireContext(), vd.header.tvAbsorbances, 120)
+//                    updateLayoutParams(requireContext(), vd.header.tvProjectName, 145)
+                    updateLayoutParams(requireContext(), vd.header.tvTestTime, 280)
+                    updateLayoutParams(requireContext(), vd.header.tvResult, 120)
+                    updateLayoutParams(requireContext(), vd.header.tvConcentration, 125)
+                    updateLayoutParams(requireContext(), vd.header.tvAbsorbances, 120)
                 }
             }
         }

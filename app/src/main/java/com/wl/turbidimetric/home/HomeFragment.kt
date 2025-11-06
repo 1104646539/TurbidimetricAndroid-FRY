@@ -7,6 +7,7 @@ import android.view.Gravity
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
+import androidx.lifecycle.viewModelScope
 import com.lxj.xpopup.core.BasePopupView
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.app.App
@@ -34,6 +35,7 @@ import com.wl.turbidimetric.upload.model.Patient
 import com.wl.turbidimetric.upload.service.OnGetPatientCallback
 import com.wl.turbidimetric.view.ShelfView
 import com.wl.turbidimetric.view.ShelfView5
+import com.wl.turbidimetric.view.dialog.GetMachineStateDialog
 import com.wl.turbidimetric.view.dialog.GetTestPatientInfoDialog
 import com.wl.turbidimetric.view.dialog.HiltDialog
 import com.wl.turbidimetric.view.dialog.HomeConfigDialog
@@ -100,12 +102,17 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
     private val getTestPatientInfoDialog: GetTestPatientInfoDialog by lazy {
         GetTestPatientInfoDialog(requireContext())
     }
-    private val dialogGetMachine: ProgressDialog by lazy {
-        ProgressDialog(requireContext()).apply {
-            setMessage("自检中")
-            setCancelable(false)
-        }
+    private val dialogGetMachine: GetMachineStateDialog by lazy {
+        GetMachineStateDialog(requireContext())
     }
+
+    //    private val dialogGetMachine: ProgressDialog by lazy {
+//        ProgressDialog(requireContext()).apply {
+//            setMessage("自检中")
+//            setIcon(R.drawable.self_machine)
+//            setCancelable(false)
+//        }
+//    }
     private val waitDialog: HiltDialog by lazy {
         HiltDialog(requireContext())
     }
@@ -141,7 +148,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         initView()
         listener()
 
-        vm.goGetMachineState()
+        vm.startGetMachineState()
         vm.goGetVersion()
         lifecycleScope.launch {
             vm.projectDatas.collectLatest {
@@ -189,11 +196,18 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         vd.svSample3.clickIndex = { it, item -> showDetails(2, it, item) }
         vd.svSample4.clickIndex = { it, item -> showDetails(3, it, item) }
 
-        vd.svSample1.shape = ShelfView.Shape.Circle
-        vd.svSample2.shape = ShelfView.Shape.Circle
-        vd.svSample3.shape = ShelfView.Shape.Circle
-        vd.svSample4.shape = ShelfView.Shape.Circle
-
+        vd.svSample1.shape = ShelfView.Shape.Rectangle
+        vd.svSample2.shape = ShelfView.Shape.Rectangle
+        vd.svSample3.shape = ShelfView.Shape.Rectangle
+        vd.svSample4.shape = ShelfView.Shape.Rectangle
+        vd.svSample1.itemRadius = 16f
+        vd.svSample2.itemRadius = 16f
+        vd.svSample3.itemRadius = 16f
+        vd.svSample4.itemRadius = 16f
+        vd.svSample1.size = 5
+        vd.svSample2.size = 5
+        vd.svSample3.size = 5
+        vd.svSample4.size = 5
         lifecycleScope.launchWhenCreated {
             vm.sampleStates.collectLatest {
                 vd.svSample1.itemStates = it[0]
@@ -205,6 +219,10 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 
         vd.svCuvette3.shape = ShelfView.Shape.Rectangle
         vd.svCuvette4.shape = ShelfView.Shape.Rectangle
+        vd.svCuvette3.itemRadius = 8f
+        vd.svCuvette4.itemRadius = 8f
+        vd.svCuvette3.itemPaddingVer = 28f
+        vd.svCuvette4.itemPaddingVer = 28f
 
         vd.svCuvette3.clickIndex = { it, item ->
             showDetails(1, it, item)
@@ -223,7 +241,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 changeAnalyseState(it)
             }
         }
-        vd.vTest.setOnClickListener {
+        vd.btnAnalyse.setOnClickListener {
             if (appVm.testState.isNotPrepare()) {
                 vm.dialogGetMachineFailedConfirm()
                 toast("自检中……")
@@ -276,34 +294,34 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 
     private fun changeAnalyseState(testState: TestState) {
         if (!appVm.testType.isTest() && testState.isRunning()) {
-            vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg)
-            vd.tvAnalyse.text = "正在运行……"
+//            vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg)
+            vd.btnAnalyse.tv.text = "正在运行……"
             vm.enableView(false)
         } else {
             if (testState.machineStateIng()) {
-                vd.tvAnalyse.text = "正在自检"
-                vd.tvAnalyse2.text = "(正在自检，请稍后)"
-                vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg)
+                vd.btnAnalyse.tv.text = "正在自检"
+//                vd.tvAnalyse2.text = "(正在自检，请稍后)"
+//                vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg)
                 vm.enableView(false)
             } else if (testState.isPreheatTime()) {
-                vd.tvAnalyse.text = "正在预热,请稍后"
-                vd.tvAnalyse2.text = ""
-                vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg)
+                vd.btnAnalyse.tv.text = "正在预热,请稍后"
+//                vd.tvAnalyse2.text = ""
+//                vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg)
                 vm.enableView(false)
             } else if (testState.isRunningError()) {
-                vd.tvAnalyse.text = "运行错误"
-                vd.tvAnalyse2.text = "(请联系维护人员)"
-                vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg)
+                vd.btnAnalyse.tv.text = "运行错误"
+//                vd.tvAnalyse2.text = "(请联系维护人员)"
+//                vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg)
                 vm.enableView(false)
             } else if (testState.isNotPrepare()) {
-                vd.tvAnalyse.text = "重新自检"
-                vd.tvAnalyse2.text = "(请重新自检)"
-                vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg)
+                vd.btnAnalyse.tv.text = "重新自检"
+//                vd.tvAnalyse2.text = "(请重新自检)"
+//                vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg)
                 vm.enableView(true)
             } else if (testState.isRunning()) {
-                vd.tvAnalyse.text = "检测中"
-                vd.tvAnalyse2.text = "(仓门已锁，请勿打开,请等待检测结束)"
-                vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg)
+                vd.btnAnalyse.tv.text = "检测中"
+//                vd.tvAnalyse2.text = "(仓门已锁，请勿打开,请等待检测结束)"
+//                vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg)
                 vm.enableView(false)
             } else {
 //                //当温度不够时，只在第一次时更新显示正在预热
@@ -315,9 +333,9 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 //                } else {
                 //只要有一次温度达标了就不再检查了
                 appVm.processIntent(AppIntent.NeedJudgeTempChange(false))
-                vd.tvAnalyse.text = "开始分析"
-                vd.tvAnalyse2.text = "(点击分析)"
-                vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg2)
+                vd.btnAnalyse.tv.text = "开始分析"
+//                vd.tvAnalyse2.text = "(点击分析)"
+//                vd.vTest.setBackgroundResource(R.drawable.shape_analyse_test_bg2)
                 vm.enableView(true)
 //                }
             }
@@ -485,7 +503,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 //        DBManager.ProjectBox.put(project)
     }
 
-    private val arraySample = mutableListOf<ShelfView5>()
+    private val arraySample = mutableListOf<ShelfView>()
     private val arrayCuvette = mutableListOf<ShelfView>()
     private fun listenerData() {
         arraySample.add(vd.svSample1)
@@ -522,7 +540,9 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                      * 自检中
                      */
                     is HomeDialogUiState.GetMachineShow -> {
-                        dialogGetMachine.show()
+                        dialogGetMachine.showPop(requireContext(), isCancelable = false) {
+                            it.show2()
+                        }
                     }
 
                     is HomeDialogUiState.GetMachineDismiss -> {
@@ -709,6 +729,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 //更新详情显示
                 vd.gpDetails.visibility = (!it.hiltDetails).isShow()
                 vd.tvDetailsState.text = "${it.item.state.state ?: "-"}"
+                vd.tvDetailsState.setTextColor(resources.getColor(it.item.state.color))
                 vd.tvDetailsNo.text = "${it.item.id ?: "-"}"
                 vd.tvDetailsNum.text = "${it.item.testResult?.detectionNum ?: "-"}"
                 vd.tvDetailsBarcode.text = "${it.item.testResult?.sampleBarcode ?: "-"}"
@@ -745,7 +766,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             }
         }
         vm.configViewEnable.observe(this@HomeFragment) {
-            vd.vTest.isEnabled = it
+            vd.btnAnalyse.isEnabled = it
         }
     }
 

@@ -4,35 +4,40 @@
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="8dp"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:padding="8dp">
 
         <TextView
             android:id="@+id/tv_project_name"
             style="@style/TextHilt"
-            android:layout_width="120dp"
+            android:layout_width="300dp"
             android:layout_height="wrap_content"
-            android:text="项目名" />
+            android:text="项目名"
+            android:textColor="@color/textColor" />
+
         <TextView
             android:id="@+id/tv_project_code"
             style="@style/TextHilt"
-            android:layout_width="120dp"
+            android:layout_width="300dp"
             android:layout_height="wrap_content"
-            android:text="项目代号" />
+            android:text="项目代号"
+            android:textColor="@color/textColor" />
 
         <TextView
             android:id="@+id/tv_project_ljz"
             style="@style/TextHilt"
-            android:layout_width="120dp"
+            android:layout_width="300dp"
             android:layout_height="wrap_content"
-            android:text="临界值" />
+            android:text="临界值"
+            android:textColor="@color/textColor" />
 
         <TextView
             android:id="@+id/tv_project_unit"
             style="@style/TextHilt"
-            android:layout_width="120dp"
+            android:layout_width="300dp"
             android:layout_height="wrap_content"
-            android:text="浓度单位" />
+            android:text="浓度单位"
+            android:textColor="@color/textColor" />
 
     </LinearLayout>
 </layout>

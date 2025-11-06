@@ -6,8 +6,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:padding="8dp">
+        android:padding="8dp"
+        android:orientation="horizontal">
 
         <ImageView
             android:id="@+id/iv_select"
@@ -18,7 +18,8 @@
         <TextView
             android:id="@+id/tv_id"
             style="@style/TextHilt"
-            android:layout_width="80dp"
+            android:layout_width="120dp"
+            android:textColor="@color/textColor"
             android:layout_height="wrap_content"
             android:text="ID" />
 
@@ -32,18 +33,20 @@
             android:visibility="gone"
             app:autoSizeMaxTextSize="28sp"
             app:autoSizeMinTextSize="10sp"
+            android:textColor="@color/textColor"
             app:autoSizeStepGranularity="1sp"
             app:autoSizeTextType="uniform" />
 
         <TextView
             android:id="@+id/tv_barcode"
             style="@style/TextHilt"
-            android:layout_width="100dp"
+            android:layout_width="125dp"
             android:layout_height="wrap_content"
             android:maxLines="2"
             android:minWidth="100dp"
             android:text="条码"
             android:visibility="gone"
+            android:textColor="@color/textColor"
             app:autoSizeMaxTextSize="28sp"
             app:autoSizeMinTextSize="10sp"
             app:autoSizeStepGranularity="1sp"
@@ -53,7 +56,8 @@
         <TextView
             android:id="@+id/tv_name"
             style="@style/TextHilt"
-            android:layout_width="120dp"
+            android:layout_width="125dp"
+            android:textColor="@color/textColor"
             android:layout_height="wrap_content"
             android:text="姓名" />
 
@@ -61,7 +65,8 @@
         <TextView
             android:id="@+id/tv_gender"
             style="@style/TextHilt"
-            android:layout_width="80dp"
+            android:layout_width="125dp"
+            android:textColor="@color/textColor"
             android:layout_height="wrap_content"
             android:text="性别" />
 
@@ -69,7 +74,8 @@
         <TextView
             android:id="@+id/tv_age"
             style="@style/TextHilt"
-            android:layout_width="80dp"
+            android:textColor="@color/textColor"
+            android:layout_width="125dp"
             android:layout_height="wrap_content"
             android:text="年龄" />
 
@@ -77,8 +83,9 @@
         <TextView
             android:id="@+id/tv_detection_num"
             style="@style/TextHilt"
-            android:layout_width="100dp"
+            android:layout_width="125dp"
             android:layout_height="wrap_content"
+            android:textColor="@color/textColor"
             android:maxLines="2"
             android:text="编号"
             app:autoSizeMaxTextSize="28sp"
@@ -90,13 +97,15 @@
             android:id="@+id/tv_absorbances"
             style="@style/TextHilt"
             android:layout_width="100dp"
+            android:textColor="@color/textColor"
             android:layout_height="wrap_content"
             android:text="反应度" />
 
         <TextView
             android:id="@+id/tv_concentration"
             style="@style/TextHilt"
-            android:layout_width="80dp"
+            android:textColor="@color/textColor"
+            android:layout_width="125dp"
             android:layout_height="wrap_content"
             android:text="浓度" />
 
@@ -104,7 +113,8 @@
         <TextView
             android:id="@+id/tv_result"
             style="@style/TextHilt"
-            android:layout_width="100dp"
+            android:layout_width="125dp"
+            android:textColor="@color/textColor"
             android:layout_height="wrap_content"
             android:text="检测结果" />
 
@@ -112,13 +122,15 @@
         <TextView
             android:id="@+id/tv_test_time"
             style="@style/TextHilt"
-            android:layout_width="220dp"
+            android:layout_width="280dp"
+            android:textColor="@color/textColor"
             android:layout_height="wrap_content"
             android:text="检测时间" />
 
 
         <TextView
             android:id="@+id/tv_test_value1"
+            android:textColor="@color/textColor"
             style="@style/TextHilt"
             android:layout_width="90dp"
             android:layout_height="wrap_content"
@@ -129,15 +141,17 @@
             android:id="@+id/tv_test_value2"
             style="@style/TextHilt"
             android:layout_width="90dp"
-            android:visibility="visible"
+            android:textColor="@color/textColor"
             android:layout_height="wrap_content"
-            android:text="第二次" />
+            android:text="第二次"
+            android:visibility="visible" />
 
 
         <TextView
             android:id="@+id/tv_test_value3"
             style="@style/TextHilt"
             android:layout_width="90dp"
+            android:textColor="@color/textColor"
             android:layout_height="wrap_content"
             android:text="第三次" />
 
@@ -146,6 +160,7 @@
             android:id="@+id/tv_test_value4"
             style="@style/TextHilt"
             android:layout_width="90dp"
+            android:textColor="@color/textColor"
             android:layout_height="wrap_content"
             android:text="第四次"
             android:visibility="visible" />
@@ -153,6 +168,7 @@
         <TextView
             android:id="@+id/tv_test_original_value1"
             style="@style/TextHilt"
+            android:textColor="@color/textColor"
             android:layout_width="90dp"
             android:layout_height="wrap_content"
             android:text="原始1" />
@@ -161,16 +177,18 @@
         <TextView
             android:id="@+id/tv_test_original_value2"
             style="@style/TextHilt"
+            android:textColor="@color/textColor"
             android:layout_width="90dp"
-            android:visibility="visible"
             android:layout_height="wrap_content"
-            android:text="原始2" />
+            android:text="原始2"
+            android:visibility="visible" />
 
 
         <TextView
             android:id="@+id/tv_test_original_value3"
             style="@style/TextHilt"
             android:layout_width="90dp"
+            android:textColor="@color/textColor"
             android:layout_height="wrap_content"
             android:text="原始3"
             android:visibility="visible" />
@@ -179,6 +197,7 @@
         <TextView
             android:id="@+id/tv_test_original_value4"
             style="@style/TextHilt"
+            android:textColor="@color/textColor"
             android:layout_width="90dp"
             android:layout_height="wrap_content"
             android:text="原始4"
@@ -186,7 +205,7 @@
 
         <ImageView
             android:id="@+id/iv_state_upload"
-            android:layout_width="50dp"
+            android:layout_width="140dp"
             android:layout_height="wrap_content"
             android:visibility="visible" />
 

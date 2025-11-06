@@ -3,18 +3,32 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="103dp"
-    android:background="@drawable/top_nav_bg">
+    android:layout_height="92dp"
+    android:background="@color/color_top_nav_bg">
 
     <ImageView
         android:id="@+id/iv_logo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="30dp"
+        android:src="@drawable/icon_logo"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <TextView
+        android:id="@+id/tv_time"
+        style="@style/TextTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="32dp"
+        android:text="12:46"
+        android:textColor="@color/bg_gray"
+        android:textSize="26sp"
+        android:textStyle="normal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="@id/iv_logo"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/iv_state_machine"
@@ -51,11 +65,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginRight="43dp"
-        android:visibility="gone"
         android:src="@drawable/state_printer_none"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintRight_toLeftOf="@id/tv_time"
+        app:layout_constraintRight_toLeftOf="@id/v_shutdown"
         app:layout_constraintTop_toTopOf="parent" />
+
 
     <TextView
         android:id="@+id/tv_print_num"
@@ -70,25 +85,12 @@
         app:layout_constraintLeft_toLeftOf="@id/iv_state_printer"
         app:layout_constraintTop_toBottomOf="@id/iv_state_printer" />
 
-    <TextView
-        android:id="@+id/tv_time"
-        style="@style/TextTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginRight="27dp"
-        android:text="12:46"
-        android:textColor="@color/white"
-        android:textSize="40sp"
-        android:textStyle="normal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintRight_toLeftOf="@id/v_shutdown"
-        app:layout_constraintTop_toTopOf="parent" />
 
-    <View
+    <ImageView
         android:id="@+id/v_shutdown"
-        android:layout_width="1dp"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:background="@color/white"
+        android:src="@drawable/nav_line"
         app:layout_constraintRight_toLeftOf="@id/ll_shutdown" />
 
     <RelativeLayout

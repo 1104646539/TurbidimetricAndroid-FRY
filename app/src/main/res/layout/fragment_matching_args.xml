@@ -13,35 +13,43 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/white"
+        android:background="@drawable/bg_fragment"
         android:orientation="horizontal"
-        tools:layout_marginLeft="335dp"
-        tools:layout_marginTop="103dp"
         tools:layout_width="match_parent">
 
-
-        <ImageView
-            android:id="@+id/iv_indicate"
-            android:layout_width="3dp"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:layout_marginTop="30dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/iv_indicate1"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/tv_title"
-            style="@style/TextHilt"
+        <LinearLayout
+            android:id="@+id/ll_indicate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="12dp"
-            android:text="曲线拟合"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@id/iv_indicate"
-            app:layout_constraintLeft_toRightOf="@id/iv_indicate"
-            app:layout_constraintTop_toTopOf="@id/iv_indicate" />
+            android:background="@drawable/bg_datamanager_header"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/iv_indicate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/iv_indicate1"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_title"
+                style="@style/TextHilt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/textColor"
+                android:layout_marginLeft="12dp"
+                android:text="曲线拟合"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@id/iv_indicate"
+                app:layout_constraintLeft_toRightOf="@id/iv_indicate"
+                app:layout_constraintTop_toTopOf="@id/iv_indicate" />
+        </LinearLayout>
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/gl_center"
@@ -60,7 +68,7 @@
             android:layout_marginRight="20dp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="@id/gl_center"
-            app:layout_constraintTop_toBottomOf="@id/iv_indicate" />
+            app:layout_constraintTop_toBottomOf="@id/ll_indicate" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv"
@@ -105,13 +113,22 @@
             android:layout_marginBottom="20dp"
             android:textColor="@color/themePositiveColor"
             android:visibility="gone"
-            app:layout_constraintBottom_toTopOf="@id/lc_curve"
             app:layout_constraintLeft_toRightOf="@id/gl_center" />
 
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toTopOf="@id/v_config"
+            app:layout_constraintLeft_toLeftOf="@id/gl_center"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+        </LinearLayout>
 
         <com.wl.turbidimetric.view.CurveDetailsView
-            android:layout_width="0dp"
             android:id="@+id/cdv_details"
+            android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintBottom_toTopOf="@id/btn_print"
             app:layout_constraintLeft_toLeftOf="@id/gl_center"
@@ -120,15 +137,16 @@
 
         <com.wl.turbidimetric.view.TextImageButton
             android:id="@+id/btn_print"
-            style="@style/BtnPositive"
-            android:layout_width="wrap_content"
+            style="@style/BtnPositiveFrame"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginRight="20dp"
+            android:layout_marginLeft="80dp"
+            android:layout_marginRight="80dp"
             android:layout_marginBottom="20dp"
             android:minWidth="150dp"
-            android:src="@drawable/datamanager_zoom"
             android:text="打印"
             app:layout_constraintBottom_toBottomOf="@id/gl_bottom"
+            app:layout_constraintLeft_toRightOf="@id/gl_center"
             app:layout_constraintRight_toRightOf="parent" />
 
         <androidx.constraintlayout.widget.Guideline
@@ -136,39 +154,39 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_end="192dp" />
+            app:layout_constraintGuide_end="140dp" />
 
         <View
             android:id="@+id/v_config"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:background="@drawable/shape_analyse_config_bg"
+            android:background="@drawable/bg_shadow"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@id/gl_center"
+            app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@id/gl_bottom"
             app:layout_constraintVertical_bias="1.0" />
 
-        <View
-            android:id="@+id/v_matching"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:background="@drawable/shape_analyse_test_bg"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="@id/gl_center"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/gl_bottom" />
+        <!--        <View-->
+        <!--            android:id="@+id/v_matching"-->
+        <!--            android:layout_width="0dp"-->
+        <!--            android:layout_height="0dp"-->
+        <!--            android:background="@drawable/shape_analyse_test_bg"-->
+        <!--            app:layout_constraintBottom_toBottomOf="parent"-->
+        <!--            app:layout_constraintLeft_toLeftOf="@id/gl_center"-->
+        <!--            app:layout_constraintRight_toRightOf="parent"-->
+        <!--            app:layout_constraintTop_toBottomOf="@id/gl_bottom" />-->
 
         <TextView
             android:id="@+id/tv_settings_matching"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="50dp"
-            android:layout_marginTop="3dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginTop="15dp"
             android:text="拟合设置"
             android:textColor="@color/black2"
-            android:textSize="23sp"
+            android:textSize="24sp"
             android:textStyle="bold"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="@id/gl_bottom" />
@@ -177,7 +195,7 @@
             android:id="@+id/tv_settings_reagent_no"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="3dp"
+            android:layout_marginTop="6dp"
             android:text="曲线序号"
             android:textColor="@color/black2"
             android:textSize="23sp"
@@ -188,45 +206,43 @@
             android:id="@+id/tv_settings_quality"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="3dp"
+            android:layout_marginTop="6dp"
             android:text="是否同时质控"
-            android:textColor="@color/black2"
-            android:textSize="23sp"
-            app:layout_constraintLeft_toLeftOf="@id/gl_bottom2"
-            app:layout_constraintTop_toTopOf="@id/tv_settings_reagent_no" />
-
-        <TextView
-            android:id="@+id/tv_settings_project"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="3dp"
-            android:text="选择项目"
             android:textColor="@color/black2"
             android:textSize="23sp"
             app:layout_constraintLeft_toLeftOf="@id/tv_settings_reagent_no"
             app:layout_constraintTop_toBottomOf="@id/tv_settings_reagent_no" />
 
         <TextView
+            android:id="@+id/tv_settings_project"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="选择项目"
+            android:textColor="@color/black2"
+            android:textSize="23sp"
+            app:layout_constraintLeft_toLeftOf="@id/gl_bottom2"
+            app:layout_constraintTop_toTopOf="@id/tv_settings_reagent_no" />
+
+        <TextView
             android:id="@+id/tv_settings_fun"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="3dp"
             android:text="选择方程"
             android:textColor="@color/black2"
             android:textSize="23sp"
-            app:layout_constraintLeft_toLeftOf="@id/tv_settings_project"
-            app:layout_constraintTop_toBottomOf="@id/tv_settings_project" />
+            app:layout_constraintLeft_toLeftOf="@id/gl_bottom3"
+            app:layout_constraintTop_toTopOf="@id/tv_settings_reagent_no" />
 
         <TextView
             android:id="@+id/tv_settings_target_con"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="3dp"
             android:text="目标浓度"
             android:textColor="@color/black2"
             android:textSize="23sp"
-            app:layout_constraintLeft_toLeftOf="@id/tv_settings_project"
-            app:layout_constraintTop_toBottomOf="@id/tv_settings_fun" />
+            app:layout_constraintLeft_toLeftOf="@id/tv_settings_fun"
+            app:layout_constraintTop_toTopOf="@id/tv_settings_quality" />
+        />
 
 
         <TextView
@@ -236,8 +252,8 @@
             android:text="拟合梯度数量"
             android:textColor="@color/black2"
             android:textSize="23sp"
-            app:layout_constraintLeft_toRightOf="@id/gl_bottom2"
-            app:layout_constraintTop_toTopOf="@id/tv_settings_project" />
+            app:layout_constraintLeft_toLeftOf="@id/gl_bottom4"
+            app:layout_constraintTop_toTopOf="@id/tv_settings_reagent_no" />
 
         <TextView
             android:id="@+id/tv_settings_auto_attenuation"
@@ -246,17 +262,16 @@
             android:text="是否自动稀释"
             android:textColor="@color/black2"
             android:textSize="23sp"
-            app:layout_constraintLeft_toRightOf="@id/gl_bottom2"
-            app:layout_constraintTop_toTopOf="@id/tv_settings_fun" />
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="37dp"
-            android:src="@drawable/analyse_enter"
-            app:layout_constraintBottom_toBottomOf="@id/v_config"
-            app:layout_constraintRight_toRightOf="@id/v_config"
-            app:layout_constraintTop_toTopOf="@id/v_config" />
+            app:layout_constraintLeft_toLeftOf="@id/tv_settings_project"
+            app:layout_constraintTop_toTopOf="@id/tv_settings_quality" />
+        <!--        <ImageView-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_marginRight="37dp"-->
+        <!--            android:src="@drawable/analyse_enter"-->
+        <!--            app:layout_constraintBottom_toBottomOf="@id/v_config"-->
+        <!--            app:layout_constraintRight_toRightOf="@id/v_config"-->
+        <!--            app:layout_constraintTop_toTopOf="@id/v_config" />-->
 
 
         <androidx.constraintlayout.widget.Guideline
@@ -264,40 +279,71 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layout_constraintGuide_begin="420dp" />
+            app:layout_constraintGuide_begin="300dp" />
 
-        <ImageView
-            android:id="@+id/iv_analyse"
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/gl_bottom3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="600dp" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/gl_bottom4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="900dp" />
+
+        <!--        <ImageView-->
+        <!--            android:id="@+id/iv_analyse"-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_marginLeft="80dp"-->
+        <!--            android:src="@drawable/analyse_test_btn"-->
+        <!--            app:layout_constraintBottom_toBottomOf="@id/v_matching"-->
+        <!--            app:layout_constraintLeft_toLeftOf="@id/v_matching"-->
+        <!--            app:layout_constraintTop_toTopOf="@id/v_matching" />-->
+
+        <!--        <TextView-->
+        <!--            android:id="@+id/tv_matching"-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_marginLeft="10dp"-->
+        <!--            android:text="生成曲线中……"-->
+        <!--            android:textColor="@color/white"-->
+        <!--            android:textSize="58sp"-->
+        <!--            android:textStyle="bold"-->
+        <!--            app:layout_constraintBottom_toBottomOf="@id/v_matching"-->
+        <!--            app:layout_constraintLeft_toRightOf="@id/iv_analyse"-->
+        <!--            app:layout_constraintTop_toTopOf="@id/v_matching" />-->
+        <com.wl.turbidimetric.view.TextImageButton
+            android:id="@+id/btn_matching"
+            style="@style/BtnMainBig"
+            android:layout_width="340dp"
+            android:layout_height="95dp"
             android:layout_marginLeft="80dp"
-            android:src="@drawable/analyse_test_btn"
-            app:layout_constraintBottom_toBottomOf="@id/v_matching"
-            app:layout_constraintLeft_toLeftOf="@id/v_matching"
-            app:layout_constraintTop_toTopOf="@id/v_matching" />
+            android:layout_marginRight="80dp"
+            android:minWidth="150dp"
+            android:src="@drawable/icon_btn_analyse"
+            android:text="开始拟合"
+            android:textSize="32sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintLeft_toRightOf="@id/gl_center"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/gl_bottom"
+            app:layout_constraintVertical_bias="0.5" />
 
-        <TextView
-            android:id="@+id/tv_matching"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:text="生成曲线中……"
-            android:textColor="@color/white"
-            android:textSize="58sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@id/v_matching"
-            app:layout_constraintLeft_toRightOf="@id/iv_analyse"
-            app:layout_constraintTop_toTopOf="@id/v_matching" />
-
-        <TextView
-            android:id="@+id/tv_matching2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text=""
-            android:textColor="@color/white"
-            android:textSize="20sp"
-            app:layout_constraintLeft_toLeftOf="@id/tv_matching"
-            app:layout_constraintTop_toBottomOf="@id/tv_matching" />
+        <!--        <TextView-->
+        <!--            android:id="@+id/tv_matching2"-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:text=""-->
+        <!--            android:textColor="@color/white"-->
+        <!--            android:textSize="20sp"-->
+        <!--            app:layout_constraintLeft_toLeftOf="@id/tv_matching"-->
+        <!--            app:layout_constraintTop_toBottomOf="@id/tv_matching" />-->
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

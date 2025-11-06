@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@drawable/bg_item"
+        android:padding="8dp">
+
+        <TextView
+            android:id="@+id/tv_project_name"
+            style="@style/TextHilt"
+            android:layout_width="300dp"
+            android:textColor="@color/text_gray"
+            android:layout_height="wrap_content"
+            android:text="项目名" />
+
+        <TextView
+            android:id="@+id/tv_project_code"
+            style="@style/TextHilt"
+            android:textColor="@color/text_gray"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:text="项目代号" />
+
+        <TextView
+            android:id="@+id/tv_project_ljz"
+            style="@style/TextHilt"
+            android:textColor="@color/text_gray"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:text="临界值" />
+
+        <TextView
+            android:id="@+id/tv_project_unit"
+            style="@style/TextHilt"
+            android:layout_width="300dp"
+            android:textColor="@color/text_gray"
+            android:layout_height="wrap_content"
+            android:text="浓度单位" />
+
+    </LinearLayout>
+</layout>

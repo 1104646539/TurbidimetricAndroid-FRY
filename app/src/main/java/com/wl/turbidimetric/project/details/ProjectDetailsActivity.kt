@@ -33,7 +33,7 @@ class ProjectDetailsActivity :
     }
 
     private fun initData() {
-        vd.nav.setTitle("项目详情")
+//        vd.nav.setTitle("项目详情")
         id = intent.getLongExtra(ID, 0)
         if (id > 0) {
             lifecycleScope.launchWhenCreated {
@@ -46,9 +46,9 @@ class ProjectDetailsActivity :
                 }
 
             }
-            vd.nav.setRight1("保存",onRight)
+            vd.btnSave.tv.text = "保存"
         } else {
-            vd.nav.setRight1("添加",onRight)
+            vd.btnSave.tv.text = "添加"
         }
 
     }
@@ -75,7 +75,7 @@ class ProjectDetailsActivity :
             }
         }
         lifecycleScope.launchWhenCreated {
-            vm.dialogState.collectLatest { state->
+            vm.dialogState.collectLatest { state ->
                 when (state.dialogState) {
                     ProjectDetailsDialogState.NONE -> {
 
@@ -101,7 +101,8 @@ class ProjectDetailsActivity :
             }
         }
     }
-    private var onRight:OnClickListener = OnClickListener {
+
+    private var onRight: OnClickListener = OnClickListener {
         if (id <= 0) {//新增
             lifecycleScope.launch {
                 vm.add(ProjectModel().apply {
@@ -125,10 +126,10 @@ class ProjectDetailsActivity :
             }
         }
     }
+
     private fun listenerEvent() {
 
-
-        vd.nav.setOnBack{
+        vd.llBack.setOnClickListener {
             finishAfterTransition()
         }
     }

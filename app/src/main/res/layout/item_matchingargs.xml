@@ -3,86 +3,104 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="70dp"
+        android:layout_height="60dp"
         android:background="@drawable/bg_item"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
-        <!--        <ImageView-->
-        <!--            android:id="@+id/ivSelect"-->
-        <!--            android:layout_width="24dp"-->
-        <!--            android:layout_height="24dp"-->
-        <!--            android:layout_marginLeft="40dp"-->
-        <!--            android:layout_marginRight="40dp"-->
-        <!--            android:src="@drawable/select_cb_query_data" />-->
+        <TextView
+            android:id="@+id/iv_select"
+            style="@style/TextItem"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:src="@drawable/select_cb_query_data"
+            android:text="选中"
+            android:visibility="gone" />
+
         <TextView
             android:id="@+id/tv_id"
             style="@style/TextItem"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
+            android:layout_width="200dp"
+            android:layout_height="match_parent"
             android:gravity="center"
-            android:text="曲线序号" />
+            android:text="曲线序号"
+            android:textColor="@color/textColor"
+            android:textSize="20sp" />
 
         <TextView
             android:id="@+id/tv_project_name"
             style="@style/TextItem"
-            android:layout_width="180dp"
-            android:layout_height="wrap_content"
+            android:layout_width="235dp"
+            android:layout_height="match_parent"
             android:gravity="center"
-            android:text="项目名" />
+            android:text="项目名"
+            android:textColor="@color/textColor"
+            android:textSize="20sp" />
 
 
         <TextView
             android:id="@+id/tv_f0"
             style="@style/TextItem"
             android:layout_width="120dp"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
+            android:layout_height="match_parent"
             android:gravity="center"
-            android:text="f0" />
+            android:text="f0"
+            android:textColor="@color/textColor"
+            android:textSize="20sp"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/tv_f1"
             style="@style/TextItem"
             android:layout_width="100dp"
-            android:visibility="gone"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:gravity="center"
-            android:text="f1" />
+            android:text="f1"
+            android:textColor="@color/textColor"
+            android:textSize="20sp"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/tv_f2"
             style="@style/TextItem"
-            android:visibility="gone"
             android:layout_width="120dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:gravity="center"
-            android:text="f2" />
+            android:text="f2"
+            android:textColor="@color/textColor"
+            android:textSize="20sp"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/tv_f3"
             style="@style/TextItem"
-            android:visibility="gone"
             android:layout_width="120dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:gravity="center"
-            android:text="f3" />
+            android:text="f3"
+            android:textColor="@color/textColor"
+            android:textSize="20sp"
+            android:visibility="gone" />
 
         <TextView
-            android:id="@+id/tv_fitgoodness"
+            android:id="@+id/tv_fitGoodness"
             style="@style/TextItem"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
+            android:layout_width="235dp"
+            android:layout_height="match_parent"
             android:gravity="center"
-            android:text="拟合度" />
+            android:text="拟合度"
+            android:textColor="@color/textColor"
+            android:textSize="20sp" />
 
 
         <TextView
             android:id="@+id/tv_test_time"
             style="@style/TextItem"
-            android:layout_width="280dp"
-            android:layout_height="wrap_content"
+            android:layout_width="320dp"
+            android:layout_height="match_parent"
             android:gravity="center"
-            android:text="拟合时间" />
+            android:text="拟合时间"
+            android:textColor="@color/textColor"
+            android:textSize="20sp" />
     </LinearLayout>
 </layout>

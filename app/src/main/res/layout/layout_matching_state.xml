@@ -13,7 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Step2 拟合结果"
-        android:textColor="@color/themePositivePressColor" />
+        android:textColor="@color/textColor" />
 
     <LinearLayout
         android:layout_width="wrap_content"

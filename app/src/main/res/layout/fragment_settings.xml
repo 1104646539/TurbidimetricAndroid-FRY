@@ -4,20 +4,23 @@
 
     <LinearLayout
         android:layout_width="match_parent"
+        android:background="@drawable/bg_fragment"
         android:layout_height="match_parent"
         android:orientation="horizontal">
 
         <androidx.core.widget.NestedScrollView
-            android:layout_width="430dp"
+            android:layout_width="320dp"
             android:layout_height="match_parent">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginLeft="5dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="24dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="24dp"
                 android:animateLayoutChanges="true"
+                android:padding="20dp"
+                android:background="@drawable/bg_frame"
                 android:orientation="vertical">
 
                 <com.wl.turbidimetric.view.WlGroup
@@ -29,183 +32,237 @@
                 <com.wl.turbidimetric.view.SettingItemView
                     android:id="@+id/siv_order_settings"
                     android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:layout_marginTop="5dp"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
                     android:src="@drawable/settings_settings"
                     app:bg="@drawable/bg_item_settings_title"
                     app:selectable="false"
                     app:text="基本设置"
-                    app:textColor="@color/white" />
+                    app:textColor="@color/black"
+                    app:textSize="24sp" />
 
                 <com.wl.turbidimetric.view.SettingItemView
                     android:id="@+id/siv_params_setting"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
-                    android:layout_marginTop="5dp"
-                    app:bg="@drawable/bg_item_settings"
+                    android:background="@drawable/bg_item_settings"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
                     app:selectable="true"
                     app:text="参数设置"
-                    app:textColor="@color/text_item_settings" />
+                    app:textColor="@color/textColor"
+                    app:selectedTextColor="@color/white"
+                    app:textSize="20sp" />
 
                 <com.wl.turbidimetric.view.SettingItemView
                     android:id="@+id/siv_detection_num_setting"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
-                    android:layout_marginTop="5dp"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
                     app:bg="@drawable/bg_item_settings"
                     app:selectable="true"
                     app:text="编号设置"
-                    app:textColor="@color/text_item_settings" />
+                    app:textColor="@color/textColor"
+                    app:selectedTextColor="@color/white"
+                    app:textSize="20sp" />
 
 
                 <com.wl.turbidimetric.view.SettingItemView
                     android:id="@+id/siv_machine_test_mode"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
-                    android:layout_marginTop="5dp"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
                     app:bg="@drawable/bg_item_settings"
                     app:selectable="true"
                     app:text="检测设置"
-                    app:textColor="@color/text_item_settings" />
+                    app:textColor="@color/textColor"
+                    app:selectedTextColor="@color/white"
+                    app:textSize="20sp" />
 
 
                 <com.wl.turbidimetric.view.SettingItemView
                     android:id="@+id/siv_project_list"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
-                    android:layout_marginTop="5dp"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
                     app:bg="@drawable/bg_item_settings"
                     app:selectable="true"
                     app:text="项目设置"
-                    app:textColor="@color/text_item_settings" />
+                    app:textColor="@color/textColor"
+                    app:selectedTextColor="@color/white"
+                    app:textSize="20sp" />
 
                 <com.wl.turbidimetric.view.SettingItemView
                     android:id="@+id/siv_log_list"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
                     android:visibility="gone"
-                    android:layout_marginTop="5dp"
                     app:bg="@drawable/bg_item_settings"
                     app:selectable="true"
                     app:text="运行日志"
-                    app:textColor="@color/text_item_settings" />
+                    app:textColor="@color/textColor"
+                    app:selectedTextColor="@color/white"
+                    app:textSize="20sp" />
 
                 <com.wl.turbidimetric.view.SettingItemView
                     android:id="@+id/siv_report_settings"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
-                    android:layout_marginTop="5dp"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
                     app:bg="@drawable/bg_item_settings"
                     app:selectable="false"
                     app:text="报告打印"
-                    app:textColor="@color/text_item_settings" />
+                    app:textColor="@color/textColor"
+                    app:selectedTextColor="@color/white"
+                    app:textSize="20sp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/frameColor" />
 
                 <com.wl.turbidimetric.view.SettingItemView
                     android:id="@+id/siv_debug_title"
                     android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:layout_marginTop="5dp"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
                     android:src="@drawable/settings_debug"
                     app:bg="@drawable/bg_item_settings_title"
                     app:selectable="false"
                     app:text="调试功能"
-                    app:textColor="@color/white" />
+                    app:textColor="@color/black"
+                    app:textSize="24sp" />
 
                 <com.wl.turbidimetric.view.SettingItemView
                     android:id="@+id/siv_debug"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
-                    android:layout_marginTop="5dp"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
                     app:bg="@drawable/bg_item_settings"
                     app:selectable="false"
                     app:text="调试"
-                    app:textColor="@color/text_item_settings" />
+                    app:textColor="@color/textColor"
+                    app:textSize="20sp" />
 
                 <com.wl.turbidimetric.view.SettingItemView
                     android:id="@+id/siv_repeatability"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
-                    android:layout_marginTop="5dp"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
                     app:bg="@drawable/bg_item_settings"
                     app:selectable="false"
                     app:text="重复性测试"
-                    app:textColor="@color/text_item_settings" />
+                    app:textColor="@color/textColor"
+                    app:textSize="20sp" />
 
 
                 <com.wl.turbidimetric.view.SettingItemView
                     android:id="@+id/siv_nav"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
-                    android:layout_marginTop="5dp"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
                     app:bg="@drawable/bg_item_settings"
                     app:selectable="false"
                     app:text="隐藏和显示导航栏"
-                    app:textColor="@color/text_item_settings" />
+                    app:textColor="@color/textColor"
+                    app:textSize="20sp" />
 
                 <com.wl.turbidimetric.view.SettingItemView
                     android:id="@+id/siv_launcher"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
-                    android:layout_marginTop="5dp"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
                     app:bg="@drawable/bg_item_settings"
                     app:selectable="false"
                     app:text="打开桌面"
-                    app:textColor="@color/text_item_settings" />
+                    app:textColor="@color/textColor"
+                    app:textSize="20sp" />
 
                 <com.wl.turbidimetric.view.SettingItemView
                     android:id="@+id/siv_export_log"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
-                    android:layout_marginTop="5dp"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
                     app:bg="@drawable/bg_item_settings"
                     app:selectable="false"
                     app:text="导出日志"
-                    app:textColor="@color/text_item_settings" />
+                    app:textColor="@color/textColor"
+                    app:textSize="20sp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/frameColor" />
 
                 <com.wl.turbidimetric.view.SettingItemView
                     android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:layout_marginTop="5dp"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
                     android:src="@drawable/settings_upload"
                     app:bg="@drawable/bg_item_settings_title"
                     app:selectable="false"
                     app:text="上传设置"
-                    app:textColor="@color/white" />
+                    app:textColor="@color/black"
+                    app:textSize="24sp" />
 
                 <com.wl.turbidimetric.view.SettingItemView
                     android:id="@+id/siv_machine_network"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
-                    android:layout_marginTop="5dp"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
                     app:bg="@drawable/bg_item_settings"
                     app:selectable="true"
                     app:text="本机网络设置"
-                    app:textColor="@color/text_item_settings" />
+                    app:textColor="@color/textColor"
+                    app:textSize="20sp" />
 
                 <com.wl.turbidimetric.view.SettingItemView
                     android:id="@+id/siv_upload"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
-                    android:layout_marginTop="5dp"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
                     app:bg="@drawable/bg_item_settings"
                     app:selectable="false"
                     app:text="连接参数设置"
-                    app:textColor="@color/text_item_settings" />
+                    app:textColor="@color/textColor"
+                    app:textSize="20sp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/frameColor" />
 
                 <com.wl.turbidimetric.view.SettingItemView
                     android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:layout_marginTop="5dp"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
                     android:src="@drawable/settings_version"
                     app:bg="@drawable/bg_item_settings_title"
                     app:selectable="false"
                     app:text="软件版本"
-                    app:textColor="@color/white" />
+                    app:textColor="@color/black"
+                    app:textSize="24sp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
                     android:background="@drawable/bg_item_settings"
                     android:minHeight="200dp"
                     android:orientation="vertical">
@@ -218,8 +275,10 @@
                         android:layout_marginLeft="20dp"
                         android:gravity="left|center_vertical"
                         android:padding="8dp"
+                        android:paddingLeft="20dp"
+                        android:paddingRight="20dp"
                         android:text="上位机软件版本"
-                        android:textSize="26sp" />
+                        app:textSize="20sp" />
 
                     <TextView
                         android:id="@+id/tv_soft_version_mcu"
@@ -229,15 +288,20 @@
                         android:layout_marginLeft="20dp"
                         android:gravity="left|center_vertical"
                         android:padding="8dp"
+                        android:paddingLeft="20dp"
+                        android:paddingRight="20dp"
                         android:text="上位机软件版本"
-                        android:textSize="26sp" />
+                        app:textSize="20sp" />
                 </LinearLayout>
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
 
         <FrameLayout
             android:id="@+id/fl_content"
+            android:padding="10dp"
+            android:background="@drawable/bg_frame"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:layout_margin="24dp" />
     </LinearLayout>
 </layout>

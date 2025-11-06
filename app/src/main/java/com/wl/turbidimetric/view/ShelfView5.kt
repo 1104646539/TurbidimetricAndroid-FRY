@@ -42,8 +42,8 @@ class ShelfView5 :
             postInvalidate()
         }
 
-    val size = 5
-    var shape = ShelfView.Shape.Circle
+    var size = 5
+    var shape = ShelfView.Shape.Rectangle
     val paintBg by lazy {
         Paint().apply {
             isAntiAlias = true
@@ -117,21 +117,24 @@ class ShelfView5 :
 
     var itemHeight = 0f
     var itemWidth = 0f
-    var itemPadding = 6f
+    var itemPaddingVer = 16f //上下的间距
+    var itemPaddingHor = 24f //左右的间距
+    var itemPadding = 8f //item间的间距
+    var itemRadius = 16f
+
     private fun initItemRect() {
-        itemWidth = measuredWidth - itemPadding * 2
-        itemHeight = (measuredHeight - itemPadding * 11) / size
-        var top = itemPadding
-        var y = top
+        itemWidth = (measuredWidth - itemPaddingHor * 2 - itemPadding * (size - 1)) / size
+        itemHeight = measuredHeight - itemPaddingVer * 2
+        var left = itemPaddingHor
+        var l = left
         for (i in itemRects.indices) {
             itemRects[i] = RectF(
-                itemPadding, y,
-                itemPadding + itemWidth, y + itemHeight
+                l, itemPaddingVer,
+                l + itemWidth, itemPaddingVer + itemHeight
             )
-            y += itemHeight + itemPadding
+            l += itemWidth + itemPadding
         }
     }
-
 
     private var itemRects: Array<RectF?> = arrayOfNulls(size)
 
@@ -174,7 +177,7 @@ class ShelfView5 :
                 }
 
             } else {
-                canvas.drawRoundRect(rect, 10f, 10f, paintItem)
+                canvas.drawRoundRect(rect, itemRadius, itemRadius, paintItem)
                 if (itemState.soildWidth > 0 || curFocIndex == index) {//绘制边框
                     paintItemSolid.strokeWidth = itemState.soildWidth.toFloat()
                     if (curFocIndex == index) {
@@ -183,7 +186,10 @@ class ShelfView5 :
                     } else {
                         paintItemSolid.color = getColorCache(itemState.soildColor)
                     }
-                    canvas.drawRoundRect(rectF, 10f, 10f, paintItemSolid)
+                    canvas.drawRoundRect(
+                        rectF, itemRadius,
+                        itemRadius, paintItemSolid
+                    )
                 }
             }
         }
@@ -207,7 +213,7 @@ class ShelfView5 :
         paintBg.color = colorBg
         paintBg.style = Paint.Style.FILL
         paintBg.strokeWidth = 1.0f
-        canvas.drawRoundRect(rectBg, 10f, 10f, paintBg)
+        canvas.drawRoundRect(rectBg, 16f, 16f, paintBg)
     }
 
     var clickX = 0

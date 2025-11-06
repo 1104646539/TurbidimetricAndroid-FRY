@@ -35,12 +35,12 @@ class ProjectListFragment :
                 adapter.submit(it)
             }
         }
-        vd.nav.setTitle("项目列表")
+//        vd.nav.setTitle("项目列表")
 //        vd.nav.setOnBack {
 //            finish()
 //        }
-        vd.nav.setBackTitle(imgHide = true, titleHide = false)
-        vd.nav.setRight1("添加项目") {
+//        vd.nav.setBackTitle(imgHide = true, titleHide = false)
+        vd.btnAddProject.setOnClickListener {
             EventBus.getDefault().post(EventMsg<Long>(EventGlobal.WHAT_PROJECT_LIST_TO_DETAILS))
 
 //            startActivity(Intent(requireContext(), ProjectDetailsActivity::class.java).apply {

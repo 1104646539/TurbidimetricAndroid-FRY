@@ -68,9 +68,9 @@ class ProjectDetailsFragment :
                 }
 
             }
-            vd.nav.setRight1("保存", onRight)
+            vd.btnSave.tv.text = "保存"
         } else {
-            vd.nav.setRight1("添加", onRight)
+            vd.btnSave.tv.text = "添加"
             vd.etProjectName.setText("")
             vd.etProjectCode.setText("")
             vd.etProjectUnit.setText("")
@@ -85,7 +85,7 @@ class ProjectDetailsFragment :
 
     private fun initData() {
         isChange = true
-        vd.nav.setTitle("项目详情")
+//        vd.nav.setTitle("项目详情")
         id = arguments?.getLong(ID, 0) ?: 0
 //        id = intent.getLongExtra(ID, 0)
     }
@@ -130,7 +130,8 @@ class ProjectDetailsFragment :
                         hiltDialog.showPop(requireContext()) {
                             it.showDialog(state.dialogMsg, confirmText = "确定", confirmClick = {
                                 it.dismiss()
-                                EventBus.getDefault().post(EventMsg<String>(EventGlobal.WHAT_PROJECT_DETAILS_FINISH))
+                                EventBus.getDefault()
+                                    .post(EventMsg<String>(EventGlobal.WHAT_PROJECT_DETAILS_FINISH))
 
 //                                finishAfterTransition()
                             })
@@ -167,7 +168,7 @@ class ProjectDetailsFragment :
     }
 
     private fun listenerEvent() {
-        vd.nav.setOnBack {
+        vd.llBack.setOnClickListener {
 //            finishAfterTransition()
             EventBus.getDefault().post(EventMsg<String>(EventGlobal.WHAT_PROJECT_DETAILS_FINISH))
         }

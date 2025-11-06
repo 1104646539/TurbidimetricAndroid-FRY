@@ -7,228 +7,247 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/white"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:background="@drawable/bg_fragment"
         android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/ll_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_datamanager_header"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/iv_indicate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/iv_indicate1"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_title"
+                style="@style/TextHilt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:text="样本分析"
+                android:textColor="@color/textColor"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@id/iv_indicate"
+                app:layout_constraintLeft_toRightOf="@id/iv_indicate"
+                app:layout_constraintTop_toTopOf="@id/iv_indicate" />
+
+        </LinearLayout>
 
         <TextView
             android:id="@+id/tv_cuvette_shelf"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="44dp"
             android:layout_marginBottom="10dp"
             android:text="比色皿"
-            android:textColor="@color/black2"
-            android:textSize="22sp"
-            app:layout_constraintBottom_toTopOf="@id/iv_analyse_indicate"
-            app:layout_constraintLeft_toLeftOf="@id/sv_cuvette_4"
-            app:layout_constraintRight_toRightOf="@id/sv_cuvette_4" />
+            android:textColor="@color/textColor"
+            android:textSize="32sp"
+            app:layout_constraintBottom_toBottomOf="@id/sv_cuvette_4"
+            app:layout_constraintLeft_toRightOf="@id/sv_sample_1"
+            app:layout_constraintTop_toTopOf="@id/sv_cuvette_3" />
 
         <ImageView
-            android:id="@+id/iv_analyse_indicate"
+            android:id="@+id/iv_cuvette_indicate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/analyse_indicate"
-            app:layout_constraintBottom_toTopOf="@id/tv_cuvette_shelf_1"
-            app:layout_constraintLeft_toLeftOf="@id/sv_cuvette_4"
-            app:layout_constraintRight_toRightOf="@id/sv_cuvette_4" />
+            android:layout_marginLeft="10dp"
+            android:src="@drawable/cuvette_indicate1"
+            app:layout_constraintBottom_toBottomOf="@id/sv_cuvette_4"
+            app:layout_constraintLeft_toRightOf="@id/tv_cuvette_shelf"
+            app:layout_constraintTop_toTopOf="@id/sv_cuvette_3" />
+
 
         <TextView
             android:id="@+id/tv_cuvette_shelf_1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="10dp"
             android:text="1"
-            android:textColor="@color/black2"
-            android:textSize="18sp"
-            app:layout_constraintBottom_toTopOf="@id/sv_cuvette_4"
-            app:layout_constraintLeft_toLeftOf="@id/sv_cuvette_4"
-            app:layout_constraintRight_toRightOf="@id/sv_cuvette_4" />
+            android:textColor="@color/textColor"
+            android:textSize="32sp"
+            app:layout_constraintBottom_toBottomOf="@id/sv_cuvette_3"
+            app:layout_constraintLeft_toRightOf="@id/iv_cuvette_indicate"
+            app:layout_constraintTop_toTopOf="@id/sv_cuvette_3" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
             android:text="2"
-            android:textColor="@color/black2"
-            android:textSize="18sp"
-            app:layout_constraintLeft_toLeftOf="@id/sv_cuvette_3"
-            app:layout_constraintRight_toRightOf="@id/sv_cuvette_3"
-            app:layout_constraintTop_toTopOf="@id/tv_cuvette_shelf_1" />
+            android:textColor="@color/textColor"
+            android:textSize="32sp"
+            app:layout_constraintBottom_toBottomOf="@id/sv_cuvette_4"
+            app:layout_constraintLeft_toRightOf="@id/iv_cuvette_indicate"
+            app:layout_constraintTop_toTopOf="@id/sv_cuvette_4" />
 
-<!--        <TextView-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:text="3"-->
-<!--            android:textColor="@color/black2"-->
-<!--            android:textSize="18sp"-->
-<!--            app:layout_constraintLeft_toLeftOf="@id/sv_cuvette_2"-->
-<!--            app:layout_constraintRight_toRightOf="@id/sv_cuvette_2"-->
-<!--            app:layout_constraintTop_toTopOf="@id/tv_cuvette_shelf_1" />-->
-
-<!--        <TextView-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:text="4"-->
-<!--            android:textColor="@color/black2"-->
-<!--            android:textSize="18sp"-->
-<!--            app:layout_constraintLeft_toLeftOf="@id/sv_cuvette_1"-->
-<!--            app:layout_constraintRight_toRightOf="@id/sv_cuvette_1"-->
-<!--            app:layout_constraintTop_toTopOf="@id/tv_cuvette_shelf_1" />-->
-
-<!--        <com.wl.turbidimetric.view.ShelfView-->
-<!--            android:id="@+id/sv_cuvette_1"-->
-<!--            android:layout_width="47dp"-->
-<!--            android:layout_height="565dp"-->
-<!--            android:layout_marginLeft="130dp"-->
-<!--            android:layout_marginTop="200dp"-->
-<!--            app:layout_constraintLeft_toLeftOf="parent"-->
-<!--            app:layout_constraintTop_toTopOf="parent" />-->
-
-<!--        <com.wl.turbidimetric.view.ShelfView-->
-<!--            android:id="@+id/sv_cuvette_2"-->
-<!--            android:layout_width="47dp"-->
-<!--            android:layout_height="565dp"-->
-<!--            android:layout_marginLeft="19dp"-->
-<!--            app:layout_constraintLeft_toRightOf="@id/sv_cuvette_1"-->
-<!--            app:layout_constraintTop_toTopOf="@id/sv_cuvette_1" />-->
 
         <com.wl.turbidimetric.view.ShelfView
             android:id="@+id/sv_cuvette_3"
-            android:layout_width="47dp"
-            android:layout_height="565dp"
-            android:layout_marginLeft="130dp"
+            android:layout_width="760dp"
+            android:layout_height="96dp"
+            android:layout_marginLeft="40dp"
             android:layout_marginTop="200dp"
-            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintLeft_toRightOf="@id/iv_cuvette_indicate"
             app:layout_constraintTop_toTopOf="parent" />
 
         <com.wl.turbidimetric.view.ShelfView
             android:id="@+id/sv_cuvette_4"
-            android:layout_width="47dp"
-            android:layout_height="565dp"
-            android:layout_marginLeft="19dp"
-            app:layout_constraintLeft_toRightOf="@id/sv_cuvette_3"
-            app:layout_constraintTop_toTopOf="@id/sv_cuvette_3" />
+            android:layout_width="760dp"
+            android:layout_height="96dp"
+            android:layout_marginTop="10dp"
+            app:layout_constraintLeft_toLeftOf="@id/sv_cuvette_3"
+            app:layout_constraintTop_toBottomOf="@id/sv_cuvette_3" />
 
         <TextView
             android:id="@+id/tv_sample_shelf"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="48dp"
             android:text="样本"
             android:textColor="@color/black2"
-            android:textSize="22sp"
-            app:layout_constraintBottom_toTopOf="@id/iv_analyse_indicate2"
-            app:layout_constraintLeft_toLeftOf="@id/sv_sample_1"
-            app:layout_constraintRight_toRightOf="@id/sv_sample_4" />
+            android:textSize="32sp"
+            app:layout_constraintBottom_toBottomOf="@id/sv_sample_4"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="@id/sv_sample_1" />
 
         <ImageView
-            android:id="@+id/iv_analyse_indicate2"
+            android:id="@+id/iv_sample_indicate1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/analyse_indicate"
-            app:layout_constraintBottom_toTopOf="@id/tv_sample_shelf_1"
-            app:layout_constraintLeft_toLeftOf="@id/sv_sample_1"
-            app:layout_constraintRight_toRightOf="@id/sv_sample_4" />
+            android:src="@drawable/sample_indicate1"
+            app:layout_constraintBottom_toBottomOf="@id/sv_sample_4"
+            app:layout_constraintLeft_toRightOf="@id/tv_sample_shelf"
+            app:layout_constraintTop_toTopOf="@id/sv_sample_1" />
+
+        <ImageView
+            android:id="@+id/iv_sample_indicate2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:src="@drawable/sample_indicate2"
+            app:layout_constraintBottom_toBottomOf="@id/sv_sample_4"
+            app:layout_constraintLeft_toRightOf="@id/tv_sample_shelf"
+            app:layout_constraintTop_toTopOf="@id/sv_sample_1" />
 
         <TextView
             android:id="@+id/tv_sample_shelf_1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
             android:layout_marginBottom="10dp"
             android:text="4"
-            android:textColor="@color/black2"
-            android:textSize="18sp"
-            app:layout_constraintBottom_toTopOf="@id/sv_sample_4"
-            app:layout_constraintLeft_toLeftOf="@id/sv_sample_4"
-            app:layout_constraintRight_toRightOf="@id/sv_sample_4" />
+            android:textColor="@color/textColor"
+            android:textSize="32sp"
+            app:layout_constraintBottom_toBottomOf="@id/sv_sample_4"
+            app:layout_constraintLeft_toRightOf="@id/iv_sample_indicate1"
+            app:layout_constraintTop_toTopOf="@id/sv_sample_4" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
             android:text="3"
-            android:textColor="@color/black2"
-            android:textSize="18sp"
-            app:layout_constraintLeft_toLeftOf="@id/sv_sample_3"
-            app:layout_constraintRight_toRightOf="@id/sv_sample_3"
-            app:layout_constraintTop_toTopOf="@id/tv_sample_shelf_1" />
+            android:textColor="@color/textColor"
+            android:textSize="32sp"
+            app:layout_constraintBottom_toBottomOf="@id/sv_sample_3"
+            app:layout_constraintLeft_toRightOf="@id/iv_sample_indicate1"
+            app:layout_constraintTop_toTopOf="@id/sv_sample_3" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
             android:text="2"
-            android:textColor="@color/black2"
-            android:textSize="18sp"
-            app:layout_constraintLeft_toLeftOf="@id/sv_sample_2"
-            app:layout_constraintRight_toRightOf="@id/sv_sample_2"
-            app:layout_constraintTop_toTopOf="@id/tv_sample_shelf_1" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="1"
-            android:textColor="@color/black2"
-            android:textSize="18sp"
-            app:layout_constraintLeft_toLeftOf="@id/sv_sample_1"
-            app:layout_constraintRight_toRightOf="@id/sv_sample_1"
-            app:layout_constraintTop_toTopOf="@id/tv_sample_shelf_1" />
-
-        <com.wl.turbidimetric.view.ShelfView5
-            android:id="@+id/sv_sample_1"
-            android:layout_width="47dp"
-            android:layout_height="280dp"
-            android:layout_marginLeft="130dp"
-            android:layout_marginTop="200dp"
-            app:layout_constraintLeft_toRightOf="@id/sv_cuvette_4"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <com.wl.turbidimetric.view.ShelfView5
-            android:id="@+id/sv_sample_2"
-            android:layout_width="47dp"
-            android:layout_height="280dp"
-            android:layout_marginLeft="19dp"
-            app:layout_constraintLeft_toRightOf="@id/sv_sample_1"
-            app:layout_constraintTop_toTopOf="@id/sv_sample_1" />
-
-        <com.wl.turbidimetric.view.ShelfView5
-            android:id="@+id/sv_sample_3"
-            android:layout_width="47dp"
-            android:layout_height="280dp"
-            android:layout_marginLeft="19dp"
-            app:layout_constraintLeft_toRightOf="@id/sv_sample_2"
+            android:textColor="@color/textColor"
+            android:textSize="32sp"
+            app:layout_constraintBottom_toBottomOf="@id/sv_sample_2"
+            app:layout_constraintLeft_toRightOf="@id/iv_sample_indicate1"
             app:layout_constraintTop_toTopOf="@id/sv_sample_2" />
 
-        <com.wl.turbidimetric.view.ShelfView5
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text="1"
+            android:textColor="@color/textColor"
+            android:textSize="32sp"
+            app:layout_constraintBottom_toBottomOf="@id/sv_sample_1"
+            app:layout_constraintLeft_toRightOf="@id/iv_sample_indicate1"
+            app:layout_constraintTop_toTopOf="@id/sv_sample_1" />
+
+        <com.wl.turbidimetric.view.ShelfView
+            android:id="@+id/sv_sample_1"
+            android:layout_width="380dp"
+            android:layout_height="72dp"
+            android:layout_marginLeft="40dp"
+            android:layout_marginTop="200dp"
+            app:layout_constraintLeft_toRightOf="@id/iv_sample_indicate1"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.wl.turbidimetric.view.ShelfView
+            android:id="@+id/sv_sample_2"
+            android:layout_width="380dp"
+            android:layout_height="72dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintLeft_toLeftOf="@id/sv_sample_1"
+            app:layout_constraintTop_toBottomOf="@id/sv_sample_1" />
+
+        <com.wl.turbidimetric.view.ShelfView
+            android:id="@+id/sv_sample_3"
+            android:layout_width="380dp"
+            android:layout_height="72dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintLeft_toLeftOf="@id/sv_sample_2"
+            app:layout_constraintTop_toBottomOf="@id/sv_sample_2" />
+
+        <com.wl.turbidimetric.view.ShelfView
             android:id="@+id/sv_sample_4"
-            android:layout_width="47dp"
-            android:layout_height="280dp"
-            android:layout_marginLeft="19dp"
-            app:layout_constraintLeft_toRightOf="@id/sv_sample_3"
-            app:layout_constraintTop_toTopOf="@id/sv_sample_3" />
+            android:layout_width="380dp"
+            android:layout_height="72dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintLeft_toLeftOf="@id/sv_sample_3"
+            app:layout_constraintTop_toBottomOf="@id/sv_sample_3" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/gl_bottom"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_end="192dp" />
+            app:layout_constraintGuide_end="140dp" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/gl_center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layout_constraintGuide_end="727dp" />
+            app:layout_constraintGuide_end="500dp" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/gl_top"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_begin="50dp" />
+            app:layout_constraintGuide_begin="32dp" />
 
         <ImageView
             android:id="@+id/iv_reagent_r1"
             android:layout_width="wrap_content"
-            android:layout_height="71dp"
-            android:src="@drawable/reagent_r1_1"
+            android:layout_height="wrap_content"
+            android:src="@drawable/state_reagent_r1_full"
             app:layout_constraintLeft_toLeftOf="@id/gl_center"
             app:layout_constraintRight_toLeftOf="@id/iv_reagent_r2"
             app:layout_constraintTop_toTopOf="@id/gl_top"
@@ -238,13 +257,14 @@
             android:id="@+id/tv_reagent_r1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
+            android:layout_marginTop="16dp"
             android:text="试剂R1"
             android:textColor="@color/textColor"
             android:textSize="22sp"
             app:layout_constraintLeft_toLeftOf="@id/iv_reagent_r1"
             app:layout_constraintRight_toRightOf="@id/iv_reagent_r1"
             app:layout_constraintTop_toBottomOf="@id/iv_reagent_r1" />
+
         <TextView
             android:id="@+id/tv_reagent_r1_temp"
             android:layout_width="wrap_content"
@@ -256,11 +276,12 @@
             app:layout_constraintLeft_toLeftOf="@id/iv_reagent_r1"
             app:layout_constraintRight_toRightOf="@id/iv_reagent_r1"
             app:layout_constraintTop_toBottomOf="@id/tv_reagent_r1" />
+
         <ImageView
             android:id="@+id/iv_reagent_r2"
             android:layout_width="wrap_content"
-            android:layout_height="71dp"
-            android:src="@drawable/reagent_r2_1"
+            android:layout_height="wrap_content"
+            android:src="@drawable/state_reagent_r2_1"
             app:layout_constraintLeft_toRightOf="@id/iv_reagent_r1"
             app:layout_constraintRight_toLeftOf="@id/iv_cleanout_fluid"
             app:layout_constraintTop_toTopOf="@id/gl_top" />
@@ -280,7 +301,7 @@
             android:id="@+id/iv_cleanout_fluid"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/cleanout_fluid_1"
+            android:src="@drawable/state_cleanout_fluid_full"
             app:layout_constraintLeft_toRightOf="@id/iv_reagent_r2"
             app:layout_constraintRight_toLeftOf="@id/iv_temp"
             app:layout_constraintTop_toTopOf="@id/gl_top" />
@@ -300,7 +321,7 @@
             android:id="@+id/iv_temp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/temp_1"
+            android:src="@drawable/state_temp"
             app:layout_constraintLeft_toRightOf="@id/iv_cleanout_fluid"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="@id/gl_top" />
@@ -318,34 +339,35 @@
 
         <View
             android:id="@+id/v_info_bg"
-            android:layout_width="437dp"
-            android:layout_height="560dp"
-            android:layout_marginLeft="12dp"
-            android:layout_marginTop="36dp"
-            android:background="@drawable/shape_analyse_info_bg"
-            app:layout_constraintLeft_toLeftOf="@id/gl_center"
-            app:layout_constraintTop_toBottomOf="@id/tv_reagent_r1" />
+            android:layout_width="match_parent"
+            android:layout_height="95dp"
+            android:layout_marginLeft="48dp"
+            android:layout_marginTop="70dp"
+            android:layout_marginRight="48dp"
+            android:background="@drawable/bg_item"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/sv_sample_4" />
 
         <Button
-            android:layout_width="wrap_content"
             android:id="@+id/btn_debug_dialog"
-            android:layout_height="wrap_content"
             style="@style/BtnPositive"
-            android:layout_marginLeft="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
             android:minWidth="150dp"
             android:text="调试框"
-            app:layout_constraintLeft_toRightOf="@id/v_info_bg"
-            app:layout_constraintTop_toTopOf="@id/v_info_bg" />
+            app:layout_constraintLeft_toLeftOf="@id/v_info_bg"
+            app:layout_constraintTop_toBottomOf="@id/v_info_bg" />
 
         <TextView
             android:id="@+id/tv_details_state_hilt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="40dp"
-            android:layout_marginTop="88dp"
             android:text="状态："
             android:textColor="@color/black2"
-            android:textSize="30sp"
+            android:textSize="24sp"
+            app:layout_constraintBottom_toBottomOf="@id/v_info_bg"
             app:layout_constraintLeft_toLeftOf="@id/v_info_bg"
             app:layout_constraintTop_toTopOf="@id/v_info_bg" />
 
@@ -355,7 +377,7 @@
             android:layout_height="wrap_content"
             android:text="未放入样本"
             android:textColor="@color/text_details_state"
-            android:textSize="34sp"
+            android:textSize="24sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@id/tv_details_state_hilt"
             app:layout_constraintLeft_toRightOf="@id/tv_details_state_hilt"
@@ -366,20 +388,21 @@
             android:id="@+id/tv_details_no_hilt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginLeft="40dp"
             android:text="对应样本序号："
             android:textColor="@color/black2"
-            android:textSize="30sp"
-            app:layout_constraintLeft_toLeftOf="@id/tv_details_state_hilt"
-            app:layout_constraintTop_toBottomOf="@id/tv_details_state_hilt" />
+            android:textSize="24sp"
+            app:layout_constraintLeft_toRightOf="@id/tv_details_state"
+            app:layout_constraintTop_toTopOf="@id/tv_details_state_hilt" />
 
         <TextView
             android:id="@+id/tv_details_no"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:minWidth="80dp"
             android:text="-"
             android:textColor="@color/black2"
-            android:textSize="30sp"
+            android:textSize="24sp"
             app:layout_constraintLeft_toRightOf="@id/tv_details_no_hilt"
             app:layout_constraintTop_toTopOf="@id/tv_details_no_hilt" />
 
@@ -387,20 +410,21 @@
             android:id="@+id/tv_details_num_hilt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginLeft="40dp"
             android:text="编号："
             android:textColor="@color/black2"
-            android:textSize="30sp"
-            app:layout_constraintLeft_toLeftOf="@id/tv_details_no_hilt"
-            app:layout_constraintTop_toBottomOf="@id/tv_details_no_hilt" />
+            android:textSize="24sp"
+            app:layout_constraintLeft_toRightOf="@id/tv_details_no"
+            app:layout_constraintTop_toTopOf="@id/tv_details_state_hilt" />
 
         <TextView
             android:id="@+id/tv_details_num"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:minWidth="80dp"
             android:text="-"
             android:textColor="@color/black2"
-            android:textSize="30sp"
+            android:textSize="24sp"
             app:layout_constraintLeft_toRightOf="@id/tv_details_num_hilt"
             app:layout_constraintTop_toTopOf="@id/tv_details_num_hilt" />
 
@@ -408,20 +432,21 @@
             android:id="@+id/tv_details_barcode_hilt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginLeft="40dp"
             android:text="样本条码："
             android:textColor="@color/black2"
-            android:textSize="30sp"
-            app:layout_constraintLeft_toLeftOf="@id/tv_details_num_hilt"
-            app:layout_constraintTop_toBottomOf="@id/tv_details_num_hilt" />
+            android:textSize="24sp"
+            app:layout_constraintLeft_toRightOf="@id/tv_details_num"
+            app:layout_constraintTop_toTopOf="@id/tv_details_state_hilt" />
 
         <TextView
             android:id="@+id/tv_details_barcode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:minWidth="80dp"
             android:text="-"
             android:textColor="@color/black2"
-            android:textSize="30sp"
+            android:textSize="24sp"
             app:layout_constraintLeft_toRightOf="@id/tv_details_barcode_hilt"
             app:layout_constraintTop_toTopOf="@id/tv_details_barcode_hilt" />
 
@@ -429,20 +454,21 @@
             android:id="@+id/tv_details_id_hilt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginLeft="40dp"
             android:text="检测结果ID："
             android:textColor="@color/black2"
-            android:textSize="30sp"
-            app:layout_constraintLeft_toLeftOf="@id/tv_details_barcode_hilt"
-            app:layout_constraintTop_toBottomOf="@id/tv_details_barcode_hilt" />
+            android:textSize="24sp"
+            app:layout_constraintLeft_toRightOf="@id/tv_details_barcode"
+            app:layout_constraintTop_toTopOf="@id/tv_details_state_hilt" />
 
         <TextView
             android:id="@+id/tv_details_id"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:minWidth="80dp"
             android:text="-"
             android:textColor="@color/black2"
-            android:textSize="30sp"
+            android:textSize="24sp"
             app:layout_constraintLeft_toRightOf="@id/tv_details_id_hilt"
             app:layout_constraintTop_toTopOf="@id/tv_details_id_hilt" />
 
@@ -450,20 +476,21 @@
             android:id="@+id/tv_details_result_hilt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginLeft="40dp"
             android:text="检测结果："
             android:textColor="@color/black2"
-            android:textSize="30sp"
-            app:layout_constraintLeft_toLeftOf="@id/tv_details_id_hilt"
-            app:layout_constraintTop_toBottomOf="@id/tv_details_id_hilt" />
+            android:textSize="24sp"
+            app:layout_constraintLeft_toRightOf="@id/tv_details_id"
+            app:layout_constraintTop_toTopOf="@id/tv_details_state_hilt" />
 
         <TextView
             android:id="@+id/tv_details_result"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:minWidth="80dp"
             android:text="-"
             android:textColor="@color/black2"
-            android:textSize="30sp"
+            android:textSize="26sp"
             app:layout_constraintLeft_toRightOf="@id/tv_details_result_hilt"
             app:layout_constraintTop_toTopOf="@id/tv_details_result_hilt" />
 
@@ -480,115 +507,128 @@
             android:orientation="vertical"
             app:layout_constraintGuide_end="228dp" />
 
-        <View
-            android:id="@+id/v_state_1"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:background="@drawable/shape_analyse_state_1"
-            app:layout_constraintBottom_toBottomOf="@id/tv_state_1"
-            app:layout_constraintLeft_toRightOf="@id/gl_right"
-            app:layout_constraintTop_toTopOf="@id/tv_state_1" />
-
-        <TextView
-            android:id="@+id/tv_state_1"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="7dp"
-            android:text="出现异常"
-            android:textColor="@color/textColor"
-            android:textSize="22sp"
-            app:layout_constraintBottom_toBottomOf="@id/v_info_bg"
-            app:layout_constraintLeft_toRightOf="@id/v_state_1" />
+            android:layout_marginTop="90dp"
+            android:gravity="right|center_vertical"
+            android:orientation="horizontal"
+            android:paddingRight="48dp"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/sv_cuvette_4">
 
-        <View
-            android:id="@+id/v_state_2"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:background="@drawable/shape_analyse_state_2"
-            app:layout_constraintBottom_toBottomOf="@id/tv_state_2"
-            app:layout_constraintLeft_toRightOf="@id/gl_right"
-            app:layout_constraintTop_toTopOf="@id/tv_state_2" />
+            <View
+                android:id="@+id/v_state_3"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/shape_analyse_state_3"
+                app:layout_constraintBottom_toBottomOf="@id/tv_state_3"
+                app:layout_constraintLeft_toRightOf="@id/gl_right"
+                app:layout_constraintTop_toTopOf="@id/tv_state_3" />
 
-        <TextView
-            android:id="@+id/tv_state_2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="7dp"
-            android:layout_marginBottom="10dp"
-            android:text="检测完毕"
-            android:textColor="@color/textColor"
-            android:textSize="22sp"
-            app:layout_constraintBottom_toTopOf="@id/tv_state_1"
-            app:layout_constraintLeft_toRightOf="@id/v_state_2" />
+            <TextView
+                android:id="@+id/tv_state_3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:text="取样完成"
+                android:textColor="@color/textColor"
+                android:textSize="24sp"
+                app:layout_constraintBottom_toTopOf="@id/tv_state_2"
+                app:layout_constraintLeft_toRightOf="@id/v_state_3" />
 
-        <View
-            android:id="@+id/v_state_3"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:background="@drawable/shape_analyse_state_3"
-            app:layout_constraintBottom_toBottomOf="@id/tv_state_3"
-            app:layout_constraintLeft_toRightOf="@id/gl_right"
-            app:layout_constraintTop_toTopOf="@id/tv_state_3" />
 
-        <TextView
-            android:id="@+id/tv_state_3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="7dp"
-            android:layout_marginBottom="10dp"
-            android:text="取样完成"
-            android:textColor="@color/textColor"
-            android:textSize="22sp"
-            app:layout_constraintBottom_toTopOf="@id/tv_state_2"
-            app:layout_constraintLeft_toRightOf="@id/v_state_3" />
+            <View
+                android:id="@+id/v_state_4"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginLeft="48dp"
+                android:background="@drawable/shape_analyse_state_4"
+                app:layout_constraintBottom_toBottomOf="@id/tv_state_4"
+                app:layout_constraintLeft_toRightOf="@id/gl_right"
+                app:layout_constraintTop_toTopOf="@id/tv_state_4" />
 
-        <View
-            android:id="@+id/v_state_4"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:background="@drawable/shape_analyse_state_4"
-            app:layout_constraintBottom_toBottomOf="@id/tv_state_4"
-            app:layout_constraintLeft_toRightOf="@id/gl_right"
-            app:layout_constraintTop_toTopOf="@id/tv_state_4" />
+            <TextView
+                android:id="@+id/tv_state_4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:text="检测中"
+                android:textColor="@color/textColor"
+                android:textSize="24sp"
+                app:layout_constraintBottom_toTopOf="@id/tv_state_3"
+                app:layout_constraintLeft_toRightOf="@id/v_state_4" />
 
-        <TextView
-            android:id="@+id/tv_state_4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="7dp"
-            android:layout_marginBottom="10dp"
-            android:text="检测中"
-            android:textColor="@color/textColor"
-            android:textSize="22sp"
-            app:layout_constraintBottom_toTopOf="@id/tv_state_3"
-            app:layout_constraintLeft_toRightOf="@id/v_state_4" />
+            <View
+                android:id="@+id/v_state_2"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginLeft="48dp"
+                android:background="@drawable/shape_analyse_state_2"
+                app:layout_constraintBottom_toBottomOf="@id/tv_state_2"
+                app:layout_constraintLeft_toRightOf="@id/gl_right"
+                app:layout_constraintTop_toTopOf="@id/tv_state_2" />
+
+            <TextView
+                android:id="@+id/tv_state_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:text="检测完毕"
+                android:textColor="@color/textColor"
+                android:textSize="24sp"
+                app:layout_constraintBottom_toTopOf="@id/tv_state_1"
+                app:layout_constraintLeft_toRightOf="@id/v_state_2" />
+
+            <View
+                android:id="@+id/v_state_1"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginLeft="48dp"
+                android:background="@drawable/shape_analyse_state_1"
+                app:layout_constraintBottom_toBottomOf="@id/tv_state_1"
+                app:layout_constraintLeft_toRightOf="@id/gl_right"
+                app:layout_constraintTop_toTopOf="@id/tv_state_1" />
+
+            <TextView
+                android:id="@+id/tv_state_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:text="出现异常"
+                android:textColor="@color/textColor"
+                android:textSize="24sp"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/sv_cuvette_4" />
+
+        </LinearLayout>
 
         <View
             android:id="@+id/v_config"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:background="@drawable/shape_analyse_config_bg"
+            android:background="@drawable/bg_shadow"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@id/gl_center"
-            app:layout_constraintTop_toBottomOf="@id/gl_bottom" />
-
-        <View
-            android:id="@+id/v_test"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:background="@drawable/shape_analyse_test_bg"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="@id/gl_center"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@id/gl_bottom" />
+
+        <!--        <View-->
+        <!--            android:id="@+id/v_test"-->
+        <!--            android:layout_width="0dp"-->
+        <!--            android:layout_height="0dp"-->
+        <!--            android:background="@drawable/shape_analyse_test_bg"-->
+        <!--            app:layout_constraintBottom_toBottomOf="parent"-->
+        <!--            app:layout_constraintLeft_toLeftOf="@id/gl_center"-->
+        <!--            app:layout_constraintRight_toRightOf="parent"-->
+        <!--            app:layout_constraintTop_toBottomOf="@id/gl_bottom" />-->
 
         <TextView
             android:id="@+id/tv_settings_test"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="50dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="24dp"
             android:text="检测设置"
             android:textColor="@color/black2"
             android:textSize="23sp"
@@ -600,7 +640,7 @@
             android:id="@+id/tv_settings_curve"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="12dp"
             android:text="选择标曲"
             android:textColor="@color/black2"
             android:textSize="23sp"
@@ -611,23 +651,21 @@
             android:id="@+id/tv_settings_start_num"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
             android:text="起始编号"
             android:textColor="@color/black2"
             android:textSize="23sp"
-            app:layout_constraintLeft_toLeftOf="@id/tv_settings_curve"
-            app:layout_constraintTop_toBottomOf="@id/tv_settings_curve" />
+            app:layout_constraintLeft_toRightOf="@id/gl_bottom3"
+            app:layout_constraintTop_toTopOf="@id/tv_settings_curve" />
 
         <TextView
             android:id="@+id/tv_settings_skip"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
             android:text="跳过比色皿"
             android:textColor="@color/black2"
             android:textSize="23sp"
-            app:layout_constraintLeft_toLeftOf="@id/tv_settings_curve"
-            app:layout_constraintTop_toBottomOf="@id/tv_settings_start_num" />
+            app:layout_constraintLeft_toRightOf="@id/gl_bottom2"
+            app:layout_constraintTop_toTopOf="@id/tv_settings_curve" />
 
         <TextView
             android:id="@+id/tv_settings_test_num"
@@ -636,178 +674,79 @@
             android:text="检测数量"
             android:textColor="@color/black2"
             android:textSize="23sp"
-            app:layout_constraintLeft_toRightOf="@id/gl_bottom2"
+            app:layout_constraintLeft_toRightOf="@id/gl_bottom4"
             app:layout_constraintTop_toTopOf="@id/tv_settings_curve" />
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="37dp"
-            android:src="@drawable/analyse_enter"
-            app:layout_constraintBottom_toBottomOf="@id/v_config"
-            app:layout_constraintRight_toRightOf="@id/v_config"
-            app:layout_constraintTop_toTopOf="@id/v_config" />
-
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/gl_bottom2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layout_constraintGuide_begin="420dp" />
+            app:layout_constraintGuide_begin="300dp" />
 
-        <ImageView
-            android:id="@+id/iv_analyse"
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/gl_bottom3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="134dp"
-            android:src="@drawable/analyse_test_btn"
-            android:layout_marginTop="20dp"
-            app:layout_constraintBottom_toBottomOf="@id/v_test"
-            app:layout_constraintLeft_toLeftOf="@id/v_test"
-            app:layout_constraintTop_toTopOf="@id/v_test" />
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="600dp" />
 
-        <TextView
-            android:id="@+id/tv_analyse"
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/gl_bottom4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:text="检测中……"
-            android:textColor="@color/white"
-            android:textSize="50sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@id/v_test"
-            app:layout_constraintLeft_toRightOf="@id/iv_analyse"
-            app:layout_constraintTop_toTopOf="@id/v_test" />
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="900dp" />
 
-        <TextView
-            android:id="@+id/tv_analyse2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="仓门已锁，请勿打开,请等待检测结束"
-            android:textColor="@color/white"
-            android:textSize="20sp"
-            app:layout_constraintLeft_toLeftOf="@id/tv_analyse"
-            app:layout_constraintTop_toBottomOf="@id/tv_analyse" />
-
-        <!--        <LinearLayout-->
-        <!--            android:layout_width="200dp"-->
+        <!--        <ImageView-->
+        <!--            android:id="@+id/iv_analyse"-->
+        <!--            android:layout_width="wrap_content"-->
         <!--            android:layout_height="wrap_content"-->
-        <!--            android:layout_marginLeft="40dp"-->
-        <!--            android:orientation="vertical"-->
-        <!--            android:visibility="gone">-->
+        <!--            android:layout_marginLeft="134dp"-->
+        <!--            android:layout_marginTop="20dp"-->
+        <!--            android:src="@drawable/analyse_test_btn"-->
+        <!--            app:layout_constraintBottom_toBottomOf="@id/v_test"-->
+        <!--            app:layout_constraintLeft_toLeftOf="@id/v_test"-->
+        <!--            app:layout_constraintTop_toTopOf="@id/v_test" />-->
+        <com.wl.turbidimetric.view.TextImageButton
+            android:id="@+id/btn_analyse"
+            style="@style/BtnMainBig"
+            android:layout_width="340dp"
+            android:layout_height="95dp"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
+            android:minWidth="150dp"
+            android:src="@drawable/icon_btn_analyse"
+            android:text="开始拟合"
+            android:textSize="32sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintLeft_toRightOf="@id/gl_center"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/gl_bottom"
+            app:layout_constraintVertical_bias="0.5" />
+        <!--        <TextView-->
+        <!--            android:id="@+id/tv_analyse"-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_marginLeft="20dp"-->
+        <!--            android:text="检测中……"-->
+        <!--            android:textColor="@color/white"-->
+        <!--            android:textSize="50sp"-->
+        <!--            android:textStyle="bold"-->
+        <!--            app:layout_constraintBottom_toBottomOf="@id/v_test"-->
+        <!--            app:layout_constraintLeft_toRightOf="@id/iv_analyse"-->
+        <!--            app:layout_constraintTop_toTopOf="@id/v_test" />-->
 
-        <!--            <LinearLayout-->
-        <!--                android:layout_width="match_parent"-->
-        <!--                android:layout_height="wrap_content"-->
-        <!--                android:background="@drawable/bg_round_white"-->
-        <!--                android:gravity="center"-->
-        <!--                android:orientation="vertical"-->
-        <!--                android:paddingTop="58dp"-->
-        <!--                android:paddingBottom="58dp">-->
-
-        <!--                <ImageView-->
-        <!--                    android:id="@+id/iv_r1"-->
-        <!--                    android:layout_width="wrap_content"-->
-        <!--                    android:layout_height="46dp"-->
-        <!--                    android:scaleType="centerCrop"-->
-        <!--                    android:src="@drawable/icon_r1_empty" />-->
-
-        <!--                <TextView-->
-        <!--                    style="@style/TextHilt"-->
-        <!--                    android:layout_width="wrap_content"-->
-        <!--                    android:layout_height="wrap_content"-->
-        <!--                    android:layout_marginTop="18dp"-->
-        <!--                    android:text="试剂R1"-->
-        <!--                    android:textSize="20sp" />-->
-        <!--            </LinearLayout>-->
-
-        <!--            <LinearLayout-->
-        <!--                android:layout_width="match_parent"-->
-        <!--                android:layout_height="wrap_content"-->
-        <!--                android:layout_marginTop="66dp"-->
-        <!--                android:background="@drawable/bg_round_white"-->
-        <!--                android:gravity="center"-->
-        <!--                android:orientation="vertical"-->
-        <!--                android:paddingTop="58dp"-->
-        <!--                android:paddingBottom="58dp">-->
-
-        <!--                <ImageView-->
-        <!--                    android:id="@+id/iv_r2"-->
-        <!--                    android:layout_width="wrap_content"-->
-        <!--                    android:layout_height="46dp"-->
-        <!--                    android:scaleType="centerCrop"-->
-        <!--                    android:src="@drawable/icon_r2_0" />-->
-
-        <!--                <TextView-->
-        <!--                    style="@style/TextHilt"-->
-        <!--                    android:layout_width="wrap_content"-->
-        <!--                    android:layout_height="wrap_content"-->
-        <!--                    android:layout_marginTop="18dp"-->
-        <!--                    android:text="试剂R2"-->
-        <!--                    android:textSize="20sp" />-->
-        <!--            </LinearLayout>-->
-
-        <!--            <LinearLayout-->
-        <!--                android:layout_width="match_parent"-->
-        <!--                android:layout_height="wrap_content"-->
-        <!--                android:layout_marginTop="66dp"-->
-        <!--                android:background="@drawable/bg_round_white"-->
-        <!--                android:gravity="center"-->
-        <!--                android:orientation="vertical"-->
-        <!--                android:paddingTop="58dp"-->
-        <!--                android:paddingBottom="58dp">-->
-
-        <!--                <ImageView-->
-        <!--                    android:id="@+id/iv_cleanout_fluid"-->
-        <!--                    android:layout_width="wrap_content"-->
-        <!--                    android:layout_height="46dp"-->
-        <!--                    android:scaleType="centerCrop"-->
-        <!--                    android:src="@drawable/icon_cleanout_fluid_empty" />-->
-
-        <!--                <TextView-->
-        <!--                    style="@style/TextHilt"-->
-        <!--                    android:layout_width="wrap_content"-->
-        <!--                    android:layout_height="wrap_content"-->
-        <!--                    android:layout_marginTop="18dp"-->
-        <!--                    android:text="清洗液"-->
-        <!--                    android:textSize="20sp" />-->
-        <!--            </LinearLayout>-->
-
-        <!--            <LinearLayout-->
-        <!--                android:layout_width="match_parent"-->
-        <!--                android:layout_height="wrap_content"-->
-        <!--                android:layout_marginTop="66dp"-->
-        <!--                android:background="@drawable/bg_round_white"-->
-        <!--                android:gravity="center"-->
-        <!--                android:minHeight="200dp"-->
-        <!--                android:orientation="vertical">-->
-
-        <!--                <ImageView-->
-        <!--                    android:layout_width="wrap_content"-->
-        <!--                    android:layout_height="46dp"-->
-        <!--                    android:scaleType="centerCrop"-->
-        <!--                    android:src="@drawable/icon_temp" />-->
-
-        <!--                <TextView-->
-        <!--                    style="@style/TextHilt"-->
-        <!--                    android:layout_width="wrap_content"-->
-        <!--                    android:layout_height="wrap_content"-->
-        <!--                    android:layout_marginTop="5dp"-->
-        <!--                    android:text="温度"-->
-        <!--                    android:textSize="20sp" />-->
-
-        <!--                <TextView-->
-        <!--                    android:id="@+id/tv_temp"-->
-        <!--                    style="@style/TextHilt"-->
-        <!--                    android:layout_width="wrap_content"-->
-        <!--                    android:layout_height="wrap_content"-->
-        <!--                    android:layout_marginTop="5dp"-->
-        <!--                    android:text="℃"-->
-        <!--                    android:textColor="@color/themePositiveColor"-->
-        <!--                    android:textSize="20sp" />-->
-        <!--            </LinearLayout>-->
-        <!--        </LinearLayout>-->
+        <!--        <TextView-->
+        <!--            android:id="@+id/tv_analyse2"-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:text="仓门已锁，请勿打开,请等待检测结束"-->
+        <!--            android:textColor="@color/white"-->
+        <!--            android:textSize="20sp"-->
+        <!--            app:layout_constraintLeft_toLeftOf="@id/tv_analyse"-->
+        <!--            app:layout_constraintTop_toBottomOf="@id/tv_analyse" />-->
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

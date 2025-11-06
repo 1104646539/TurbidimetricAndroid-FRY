@@ -38,7 +38,7 @@ class MatchingArgsAdapter :
 //            binding.tvF3.text = (item?.f3 ?: 0.0).scaleStr(8).toString()
             binding.tvTestTime.text =
                 if (item?.createTime.isNullOrEmpty()) "-" else item?.createTime
-            binding.tvFitgoodness.text = (item?.fitGoodness ?: 0.0).toBigDecimal().setScale(7, RoundingMode.DOWN).toPlainString()
+            binding.tvFitGoodness.text = (item?.fitGoodness ?: 0.0).toBigDecimal().setScale(7, RoundingMode.DOWN).toPlainString()
             binding.tvProjectName.text = item?.projectName ?: "-"
         }
     }
@@ -71,11 +71,15 @@ class MatchingArgsAdapter :
             item.let {
                 if (it.isSelect) {
                     holder.binding.root.setBackgroundResource(R.drawable.bg_item_select)
-                } else if (holder.absoluteAdapterPosition % 2 == 0) {
-                    holder.binding.root.setBackgroundColor(Color.WHITE)
-                } else {
-                    holder.binding.root.setBackgroundResource(R.drawable.rip_item)
                 }
+                else
+//                    if (holder.absoluteAdapterPosition % 2 == 0)
+                    {
+                    holder.binding.root.setBackgroundColor(Color.WHITE)
+                }
+//                else {
+//                    holder.binding.root.setBackgroundResource(R.drawable.rip_item)
+//                }
             }
         }
     }

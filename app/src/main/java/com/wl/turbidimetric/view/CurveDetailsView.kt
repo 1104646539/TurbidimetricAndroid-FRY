@@ -111,7 +111,7 @@ class CurveDetailsView @JvmOverloads constructor(
             rvParams.addItemDecoration(
                 context.dividerBuilder()
                     .apply {
-                        color(resources.getColor(R.color.black2))
+                        color(resources.getColor(R.color.frameColor))
                         size(1)
                     }
                     .build()

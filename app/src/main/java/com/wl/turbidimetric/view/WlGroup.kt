@@ -13,7 +13,7 @@ class WlGroup @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : View(context, attributeSet) {
     var ids: String? = ""
-    var hashMap = mutableMapOf<Int, View>()
+    var hashMap = mutableMapOf<Int, SettingItemView>()
     var mRootView: ViewGroup? = null;
 
     init {
@@ -42,7 +42,7 @@ class WlGroup @JvmOverloads constructor(
                         referenceId, "id",
                         context.packageName
                     )
-                    val view = mRootView!!.findViewById<View>(rscId)
+                    val view = mRootView!!.findViewById<SettingItemView>(rscId)
                     hashMap[rscId] = view
 //                    Log.d("TAG", "initIds: rscId=$rscId view=$view")
                 }
@@ -53,6 +53,7 @@ class WlGroup @JvmOverloads constructor(
     public fun setSelected(id: Int) {
         hashMap.forEach { k, v ->
             v.isSelected = (id == k)
+            v.updateTextColor()
         }
     }
 

@@ -2,6 +2,7 @@ package com.wl.turbidimetric.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.wl.turbidimetric.ex.nullOfDefault
 import java.math.BigDecimal
 
 @Entity
@@ -205,7 +206,7 @@ data class TestResultModel(
             val ori: Int = resultState ?: 0
             ResultState.values()[ori].state
         } else {
-            testResult ?: "-"
+            testResult?.nullOfDefault("--") ?: "--"
         }
     }
 

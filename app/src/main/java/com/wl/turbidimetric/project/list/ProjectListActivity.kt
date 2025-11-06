@@ -32,11 +32,11 @@ class ProjectListActivity : BaseActivity<ProjectListViewModel, ActivityProjectLi
                 adapter.submit(it)
             }
         }
-        vd.nav.setTitle("项目列表")
-        vd.nav.setOnBack {
-            finish()
-        }
-        vd.nav.setRight1("添加项目") {
+//        vd.nav.setTitle("项目列表")
+//        vd.nav.setOnBack {
+//            finish()
+//        }
+        vd.btnAddProject.setOnClickListener {
             startActivity(Intent(this, ProjectDetailsActivity::class.java).apply {
                 putExtra(
                     ProjectDetailsActivity.ID,

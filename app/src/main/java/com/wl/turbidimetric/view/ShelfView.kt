@@ -3,6 +3,7 @@ package com.wl.turbidimetric.view
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.graphics.Path
 import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.MotionEvent
@@ -47,7 +48,7 @@ class ShelfView :
             postInvalidate()
         }
 
-    val size = 10
+    var size = 10
     var shape = Shape.Circle
     val paintBg by lazy {
         Paint().apply {
@@ -122,21 +123,24 @@ class ShelfView :
 
     var itemHeight = 0f
     var itemWidth = 0f
-    var itemPadding = 6f
+    var itemPaddingVer = 16f //上下的间距
+    var itemPaddingHor = 24f //左右的间距
+    var itemPadding = 8f //item间的间距
+    var itemRadius = 16f
+
     private fun initItemRect() {
-        itemWidth = measuredWidth - itemPadding * 2
-        itemHeight = (measuredHeight - itemPadding * 11) / 10
-        var top = itemPadding
-        var y = top
+        itemWidth = (measuredWidth - itemPaddingHor * 2 - itemPadding * (size - 1)) / size
+        itemHeight = measuredHeight - itemPaddingVer * 2
+        var left = itemPaddingHor
+        var l = left
         for (i in itemRects.indices) {
             itemRects[i] = RectF(
-                itemPadding, y,
-                itemPadding + itemWidth, y + itemHeight
+                l, itemPaddingVer,
+                l + itemWidth, itemPaddingVer + itemHeight
             )
-            y += itemHeight + itemPadding
+            l += itemWidth + itemPadding
         }
     }
-
 
     private var itemRects: Array<RectF?> = arrayOfNulls(size)
 
@@ -163,7 +167,7 @@ class ShelfView :
         rectF?.let { rect ->
             val color = getColorCache(itemState.color)
             paintItem.color = color
-            if (shape == Shape.Circle) {
+            if (shape == ShelfView.Shape.Circle) {
                 canvas.drawCircle(rect.centerX(), rect.centerY(), itemWidth / 2, paintItem)
 
 
@@ -179,19 +183,45 @@ class ShelfView :
                 }
 
             } else {
-                canvas.drawRoundRect(rect, 10f, 10f, paintItem)
+                canvas.drawRoundRect(rect, itemRadius, itemRadius, paintItem)
                 if (itemState.soildWidth > 0 || curFocIndex == index) {//绘制边框
                     paintItemSolid.strokeWidth = itemState.soildWidth.toFloat()
                     if (curFocIndex == index) {
                         paintItemSolid.strokeWidth = 2f
                         paintItemSolid.color = (colorSelected)
+
+                        resetPath(rectF)
+                        canvas.drawPath(selectPath, paintItem)
                     } else {
                         paintItemSolid.color = getColorCache(itemState.soildColor)
                     }
-                    canvas.drawRoundRect(rectF, 10f, 10f, paintItemSolid)
+                    canvas.drawRoundRect(
+                        rectF, itemRadius,
+                        itemRadius, paintItemSolid
+                    )
                 }
             }
         }
+    }
+
+    val selectPath = Path();
+    val triangleHeight = 10
+    val triangleMargin = 5
+
+    /**
+     * 指示器 三角形
+     */
+    private fun resetPath(rectF: RectF) {
+        selectPath.reset()
+        val x = (rectF.left + rectF.width() / 2)
+        val y = rectF.top - triangleMargin
+        selectPath.moveTo(
+            x,
+            y
+        )
+        selectPath.lineTo(x - triangleHeight, y - triangleHeight)
+        selectPath.lineTo(x + triangleHeight, y - triangleHeight)
+        selectPath.close()
     }
 
     private fun getColorCache(res: Int): Int {
@@ -212,7 +242,7 @@ class ShelfView :
         paintBg.color = colorBg
         paintBg.style = Paint.Style.FILL
         paintBg.strokeWidth = 1.0f
-        canvas.drawRoundRect(rectBg, 10f, 10f, paintBg)
+        canvas.drawRoundRect(rectBg, 16f, 16f, paintBg)
     }
 
     var clickX = 0
@@ -261,3 +291,4 @@ class ShelfView :
         initConfig()
     }
 }
+

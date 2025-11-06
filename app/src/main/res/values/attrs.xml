@@ -5,6 +5,7 @@
         <attr name="android:textSize" format="dimension"></attr>
         <attr name="android:src" format="reference"></attr>
         <attr name="android:text" format="string"></attr>
+        <attr name="android:textStyle" format="integer"></attr>
     </declare-styleable>
     <declare-styleable name="LeftNavigationView">
         <attr name="left_" format="string" />
@@ -13,13 +14,15 @@
     </declare-styleable>
     <declare-styleable name="SettingsItemView">
         <attr name="text" format="string" />
+        <attr name="textSize" format="dimension" />
         <attr name="icon" format="reference" />
         <attr name="textColor" format="color" />
+        <attr name="selectedTextColor" format="color" />
         <attr name="selectable" format="boolean" />
         <attr name="bg" format="reference" />
     </declare-styleable>
     <declare-styleable name="WlGroup">
-        <attr name="ids" format="string"/>
+        <attr name="ids" format="string" />
     </declare-styleable>
 
 </resources>

@@ -6,10 +6,11 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.GradientDrawable
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
-import ca.uhn.hl7v2.util.MessageIterator.Index
+import androidx.core.graphics.drawable.toBitmap
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.ex.getResource
 import com.wl.wllib.LogToFile.i
@@ -19,21 +20,29 @@ class LeftNavigationView @JvmOverloads constructor(
     attributeSet: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : View(context, attributeSet) {
-    private val colorWhite = getResource().getColor(R.color.white)
-    private val colorTextSelected = getResource().getColor(R.color.left_nav_text_selected)
+    private val colorText = getResource().getColor(R.color.left_nav_text_selected)
+    private val colorTextSelected = getResource().getColor(R.color.white)
+    private val colorBg = getResource().getColor(R.color.bg_nav_item_gray)
     private val paintBg by lazy {
         Paint().apply {
-            color = colorWhite
+            color = colorText
+        }
+    }
+    private val paintItemMarin by lazy {
+        Paint().apply {
+            color = colorTextSelected
+            style = Paint.Style.FILL
+            strokeWidth = 2f
         }
     }
     private val paintItemBg by lazy {
         Paint().apply {
-            color = colorTextSelected
+            color = colorBg
         }
     }
     private val paintText by lazy {
         Paint().apply {
-            color = colorWhite
+            color = colorText
             textSize = this@LeftNavigationView.textSize
 
         }
@@ -43,29 +52,28 @@ class LeftNavigationView @JvmOverloads constructor(
     private val leftPadding = 36
 
     //内部的间隔 上 下
-    private val topPadding = 32
-    private val textSize = 35f
+    private val topPadding = 45
+    private val textSize = 32f
     private var textHeight = 60
 
     //文字离上面图标的间隔
-    private val textMarginTop = 20
+    private val textMarginTop = 24
 
     //当前选择的index
     private var curIndex = 0
 
     //每个item的底部间隔
     private val itemMargin = 8
-    private val itemHeight = 186
+    private var itemHeight = 0
+    private var itemWidth = 0
+    private var bgItemMargin = 4
 
     private val navItems = mutableListOf<NavItem>()
     private var bg: Int = 0
-    private var bg2: Int = 0
-    fun setItem(navItems: List<NavItem>, bg: Int, bg2: Int) {
+    fun setItem(navItems: List<NavItem>, bg: Int) {
         this.navItems.clear()
         this.navItems.addAll(navItems)
         this.bg = bg
-        this.bg2 = bg2
-
     }
 
     init {
@@ -96,32 +104,41 @@ class LeftNavigationView @JvmOverloads constructor(
     //背景需要绘制区域
     private var itemBgSrcRangeRect = Rect()
 
-    //背景bitmap2
-    private lateinit var itemBgBitmap2: Bitmap
-
-    //背景需要绘制区域2
-    private var itemBgSrcRangeRect2 = Rect()
-
-    //背景绘制区域2,只用来定位左下角背景的位置
-    private var itemBgRect = Rect()
-
     var onItemChangeListener: OnItemChangeListener? = null
+
+    //背景和底色的间隔
+    var bgMargin: Float = 1f
 
     override fun onDraw(canvas: Canvas) {
         canvas?.let {
+            drawBg(canvas)
             navItems.forEachIndexed { index, item ->
                 drawItem(canvas, index)
             }
-            drawBg2(canvas)
+
         }
     }
 
-    private fun drawBg2(canvas: Canvas) {
-        canvas.drawBitmap(
-            itemBgBitmap2,
-            itemBgSrcRangeRect2,
-            itemBgRect,
-            paintBg
+    private fun drawBg(canvas: Canvas) {
+        paintItemBg.color = colorTextSelected
+        canvas.drawRoundRect(
+            0f,
+            0f,
+            measuredWidth - 0f * 2,
+            measuredHeight - 0f * 2,
+            16F,
+            16F,
+            paintItemBg
+        )
+        paintItemBg.color = colorBg
+        canvas.drawRoundRect(
+            bgMargin,
+            bgMargin,
+            measuredWidth - bgMargin * 2,
+            measuredHeight - bgMargin * 2,
+            16F,
+            16F,
+            paintItemBg
         )
     }
 
@@ -174,20 +191,21 @@ class LeftNavigationView @JvmOverloads constructor(
 
     private fun drawItem(canvas: Canvas, index: Int) {
         if (navItems.isEmpty()) return
-        drawBg(canvas, index)
-        drawIcon(canvas, index)
-        drawText(canvas, index)
+        drawItemBg(canvas, index)
+        drawItemIcon(canvas, index)
+        drawItemText(canvas, index)
     }
 
-    private fun drawText(canvas: Canvas, index: Int) {
+    private fun drawItemText(canvas: Canvas, index: Int) {
         paintText.apply {
             if (index == curIndex) {
                 color = colorTextSelected
             } else {
-                color = colorWhite
+                color = colorText
             }
         }
-        val x = leftPadding.toFloat()
+        val textWidth = paintText.measureText(navItems[index].title)
+        val x = measuredWidth / 2 - textWidth / 2
         val y = (itemSrcRect[index].bottom + textHeight / 2 + 10 + textMarginTop).toFloat()
         canvas.drawText(
             navItems[index].title, x, y,
@@ -196,16 +214,27 @@ class LeftNavigationView @JvmOverloads constructor(
     }
 
     private fun initParams() {
+        if (itemRect.isNotEmpty()) {
+            itemRect.clear()
+            itemBitmap.clear()
+            selectItemBitmap.clear()
+            itemSrcRangeRect.clear()
+            itemSrcRect.clear()
+        }
         navItems?.forEachIndexed { index, src ->
             //背景区域
             val tempH =
                 if (index == 0) {
-                    0
+                    bgItemMargin
                 } else {
-                    (itemHeight + itemMargin) * index
+                    (itemHeight * index) + bgItemMargin
                 }
-            itemRect.add(Rect(0, tempH, measuredWidth, tempH + itemHeight))
-            itemBgBitmap = (resources.getDrawable(bg) as BitmapDrawable).bitmap
+            itemBgBitmap = (resources.getDrawable(bg) as GradientDrawable).toBitmap(
+                width = itemWidth,
+                height = itemHeight,
+            )
+            i("tempH=$tempH tempH + itemHeight=${tempH + itemHeight}")
+            itemRect.add(Rect(bgItemMargin, tempH, itemWidth + bgItemMargin, tempH + itemHeight))
             itemBgSrcRangeRect =
                 Rect(
                     0,
@@ -220,27 +249,22 @@ class LeftNavigationView @JvmOverloads constructor(
             itemBitmap.add((resources.getDrawable(navItems[index].icon) as BitmapDrawable).bitmap)
             selectItemBitmap.add((resources.getDrawable(navItems[index].selectIcon) as BitmapDrawable).bitmap)
             itemSrcRangeRect.add(Rect(0, 0, itemBitmap[index].width, itemBitmap[index].height))
+            val left =
+                (itemWidth / 2 - itemSrcRangeRect[index].width() / 2 - bgMargin - bgItemMargin).toInt()
+            i("left=$left")
             itemSrcRect.add(
                 Rect(
-                    item.left + leftPadding,
+                    left,
                     item.top + topPadding,
-                    item.left + leftPadding + itemSrcRangeRect[index].width(),
+                    left + itemSrcRangeRect[index].width(),
                     item.top + topPadding + itemSrcRangeRect[index].height()
                 )
             )
         }
-        itemBgBitmap2 = (resources.getDrawable(bg2) as BitmapDrawable).bitmap
-        itemBgRect = Rect(0, measuredHeight - itemBgBitmap2.height, measuredWidth, measuredHeight)
-        itemBgSrcRangeRect2 =
-            Rect(
-                0,
-                0,
-                itemBgBitmap2.width,
-                itemBgBitmap2.height
-            )
+
     }
 
-    private fun drawIcon(canvas: Canvas, index: Int) {
+    private fun drawItemIcon(canvas: Canvas, index: Int) {
         if (index == curIndex) {
             selectItemBitmap[index]
         } else {
@@ -256,24 +280,39 @@ class LeftNavigationView @JvmOverloads constructor(
 
     }
 
-    private fun drawBg(canvas: Canvas, index: Int) {
+    private fun drawItemBg(canvas: Canvas, index: Int) {
         if (index == curIndex) {
-            canvas.drawRect(itemRect[index], paintBg)
-        } else {
             canvas.drawBitmap(
                 itemBgBitmap,
                 itemBgSrcRangeRect,
                 itemRect[index],
                 paintBg
             )
+        } else {
+            canvas.drawRect(itemRect[index], paintItemBg)
+            if (index < itemRect.lastIndex) {
+                canvas.drawLine(
+                    10f,
+                    itemRect[index].bottom.toFloat(),
+                    itemRect[index].right.toFloat() - 10 * 2,
+                    itemRect[index].bottom.toFloat(),
+                    paintItemMarin
+                )
+            }
         }
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
 
+        itemHeight = (measuredHeight - bgItemMargin * 2) / 4
+        itemWidth = measuredWidth - bgItemMargin * 2
+
         initParams()
+        i("measuredWidth=$measuredWidth measuredHeight=$measuredHeight itemHeight=$itemHeight itemWidth=$itemWidth")
+
     }
+
 
     data class NavItem(val icon: Int, val selectIcon: Int, val title: String)
 }

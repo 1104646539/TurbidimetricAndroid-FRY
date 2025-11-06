@@ -4,6 +4,7 @@
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:minHeight="48dp"
         android:orientation="vertical">
 
         <TextView
@@ -11,7 +12,8 @@
             style="@style/TextItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textColor="@color/textColor"
             android:gravity="center"
-            android:textSize="28sp" />
+            android:textSize="24sp" />
     </LinearLayout>
 </layout>

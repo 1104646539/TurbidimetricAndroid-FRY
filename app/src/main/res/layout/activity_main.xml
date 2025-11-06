@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <RelativeLayout
         android:id="@+id/rl_root"
         android:layout_width="match_parent"
+        android:background="@color/bg_gray"
         android:layout_height="match_parent">
 
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            xmlns:tools="http://schemas.android.com/tools"
+        <LinearLayout
             android:id="@+id/ll_root"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -33,6 +32,9 @@
                 <androidx.viewpager2.widget.ViewPager2
                     android:id="@+id/vp"
                     android:layout_width="0dp"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginBottom="24dp"
+                    android:layout_marginRight="24dp"
                     android:layout_height="match_parent"
                     android:visibility="visible"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -42,8 +44,9 @@
 
                 <com.wl.turbidimetric.view.dialog.LeftNavigationView
                     android:id="@+id/lnv"
-                    android:layout_width="335dp"
+                    android:layout_width="240dp"
                     android:layout_height="match_parent"
+                    android:layout_margin="24dp"
                     android:visibility="visible"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintLeft_toLeftOf="parent"
@@ -51,10 +54,9 @@
                     app:layout_constraintTop_toTopOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </LinearLayout>
-
         <ImageView
             android:id="@+id/iv_start"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent" />
     </RelativeLayout>
 </layout>

@@ -4,60 +4,71 @@
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_root"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/white"
-        android:id="@+id/cl_root"
+        android:background="@drawable/bg_fragment"
         android:orientation="vertical">
 
-        <ImageView
-            android:id="@+id/iv_indicate"
-            android:layout_width="5dp"
+        <LinearLayout
+            android:id="@+id/ll_header"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:layout_marginTop="30dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/iv_indicate1"
+            android:background="@drawable/bg_datamanager_header"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/tv_title"
-            style="@style/TextHilt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="12dp"
-            android:text="数据管理"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@id/iv_indicate"
-            app:layout_constraintLeft_toRightOf="@id/iv_indicate"
-            app:layout_constraintTop_toTopOf="@id/iv_indicate" />
+            <ImageView
+                android:id="@+id/iv_indicate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/iv_indicate1"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/tvCount"
-            style="@style/TextHilt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="12dp"
-            android:text="(100)"
-            android:textColor="@color/themePositiveColor"
-            app:layout_constraintBottom_toBottomOf="@id/iv_indicate"
-            app:layout_constraintLeft_toRightOf="@id/tv_title"
-            app:layout_constraintTop_toTopOf="@id/iv_indicate" />
+            <TextView
+                android:id="@+id/tv_title"
+                style="@style/TextHilt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:textColor="@color/textColor"
+                android:text="数据管理"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@id/iv_indicate"
+                app:layout_constraintLeft_toRightOf="@id/iv_indicate"
+                app:layout_constraintTop_toTopOf="@id/iv_indicate" />
+
+            <TextView
+                android:id="@+id/tvCount"
+                style="@style/TextHilt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:text="100"
+                android:textColor="@color/themePositiveColor"
+                app:layout_constraintBottom_toBottomOf="@id/iv_indicate"
+                app:layout_constraintLeft_toRightOf="@id/tv_title"
+                app:layout_constraintTop_toTopOf="@id/iv_indicate" />
+
+        </LinearLayout>
 
         <com.wl.turbidimetric.view.TextImageButton
             android:id="@+id/btn_condition"
-            style="@style/BtnPositive"
+            style="@style/BtnPositive2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
             android:layout_marginRight="20dp"
-            android:minWidth="150dp"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp"
+            android:textColor="@color/text_gray"
+            android:minWidth="180dp"
             android:src="@drawable/datamanager_zoom"
             android:text="数据筛选"
-            app:layout_constraintBottom_toBottomOf="@id/iv_indicate"
+            app:layout_constraintBottom_toBottomOf="@id/ll_header"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -71,7 +82,7 @@
             android:layout_marginRight="20dp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/iv_indicate" />
+            app:layout_constraintTop_toBottomOf="@id/ll_header" />
 
 
         <androidx.recyclerview.widget.RecyclerView
@@ -112,7 +123,7 @@
             android:id="@+id/v_bottom_bg"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:background="@color/themePositiveColor"
+            android:background="@drawable/bg_shadow"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
@@ -125,8 +136,8 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="20dp"
             android:minWidth="150dp"
-            android:visibility="gone"
             android:text="打印报告"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@id/v_bottom_bg"
             app:layout_constraintRight_toLeftOf="@id/btn_export_pdf"
             app:layout_constraintTop_toTopOf="@id/v_bottom_bg" />

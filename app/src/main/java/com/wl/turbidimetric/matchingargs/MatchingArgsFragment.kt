@@ -1,9 +1,12 @@
 package com.wl.turbidimetric.matchingargs
 
+import android.graphics.Typeface
 import android.os.Bundle
 import android.view.Gravity
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.lxj.xpopup.XPopup
 import com.wl.turbidimetric.R
@@ -18,7 +21,6 @@ import com.wl.turbidimetric.view.dialog.HiltDialog
 import com.wl.turbidimetric.view.dialog.showPop
 import com.wl.wllib.LogToFile.i
 import com.wl.turbidimetric.base.BaseFragment
-import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.view.MatchingConfigLayout
 import com.wl.turbidimetric.view.dialog.ICON_HINT
 import com.wl.turbidimetric.view.dialog.MatchingConfigDialog
@@ -78,6 +80,7 @@ class MatchingArgsFragment :
 
     private fun initView() {
         test()
+        vd.btnMatching.setTextStyle(Typeface.BOLD)
     }
 
 
@@ -88,6 +91,14 @@ class MatchingArgsFragment :
     private fun listenerView() {
         vd.rv.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+        vd.rv.itemAnimator = DefaultItemAnimator()
+        val itemDividerMode = DividerItemDecoration(
+            requireContext(), android.widget.LinearLayout.VERTICAL
+        ).apply { setDrawable(resources.getDrawable(R.drawable.item_hori_divider)!!) }
+        vd.rv.addItemDecoration(
+            itemDividerMode
+        )
+
         vd.rv.adapter = adapter
 
 //        val gm = GridLayoutManager(requireContext(), 1, LinearLayoutManager.VERTICAL, false)
@@ -151,7 +162,7 @@ class MatchingArgsFragment :
                 changeCurve(it.curProject)
             }
         }
-        vd.vMatching.setOnClickListener {
+        vd.btnMatching.setOnClickListener {
             u("开始拟合")
             startMatching()
         }
@@ -183,31 +194,31 @@ class MatchingArgsFragment :
     }
 
     private fun enableView(enable: Boolean) {
-        vd.vMatching.isEnabled = enable
+        vd.btnMatching.isEnabled = enable
         vd.vConfig.isEnabled = enable
     }
 
     private fun changeAnalyseState(testState: TestState) {
         if (!appVm.testType.isMatchingArgs() && testState.isRunning()) {
-            vd.vMatching.setBackgroundResource(R.drawable.shape_analyse_test_bg)
-            vd.tvMatching.setText("正在运行……")
+//            vd.vMatching.setBackgroundResource(R.drawable.shape_analyse_test_bg)
+            vd.btnMatching.setText("正在运行……")
             vm.configEnable.postValue(false)
         } else {
             if (testState.isRunning()) {
-                vd.vMatching.setBackgroundResource(R.drawable.shape_analyse_test_bg)
-                vd.tvMatching.setText("生成曲线中……")
+//                vd.vMatching.setBackgroundResource(R.drawable.shape_analyse_test_bg)
+                vd.btnMatching.setText("生成曲线中……")
                 vm.configEnable.postValue(false)
             } else if (testState.isRunningError()) {
-                vd.vMatching.setBackgroundResource(R.drawable.shape_analyse_test_bg)
-                vd.tvMatching.setText("运行错误")
+//                vd.vMatching.setBackgroundResource(R.drawable.shape_analyse_test_bg)
+                vd.btnMatching.setText("运行错误")
                 vm.configEnable.postValue(false)
             } else if (testState.isPreheatTime()) {
-                vd.vMatching.setBackgroundResource(R.drawable.shape_analyse_test_bg)
-                vd.tvMatching.setText("正在预热")
+//                vd.vMatching.setBackgroundResource(R.drawable.shape_analyse_test_bg)
+                vd.btnMatching.setText("正在预热")
                 vm.configEnable.postValue(false)
             } else {
-                vd.vMatching.setBackgroundResource(R.drawable.shape_analyse_test_bg2)
-                vd.tvMatching.setText("开始拟合")
+//                vd.vMatching.setBackgroundResource(R.drawable.shape_analyse_test_bg2)
+                vd.btnMatching.setText("开始拟合")
                 vm.configEnable.postValue(true)
             }
         }

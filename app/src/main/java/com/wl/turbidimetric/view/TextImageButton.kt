@@ -44,6 +44,7 @@ class TextImageButton : LinearLayout {
             R.styleable.TextImageButton_android_textSize,
             context.resources.getDimension(R.dimen.text_size_default)
         )
+
         tv.text = text
         tv.setTextColor(textColor)
         tv.textSize = textSize
@@ -59,6 +60,10 @@ class TextImageButton : LinearLayout {
 
     fun setText(text: String) {
         tv.text = text
+    }
+
+    fun setTextStyle(testStyle: Int) {
+        tv.setTypeface(null, testStyle)
     }
 
 

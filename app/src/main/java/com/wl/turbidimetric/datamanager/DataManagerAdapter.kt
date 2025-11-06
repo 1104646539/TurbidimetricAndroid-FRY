@@ -12,13 +12,19 @@ import androidx.recyclerview.widget.RecyclerView
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.ItemDatamanagerResultBinding
 import com.wl.turbidimetric.ex.DisplayUtil
+import com.wl.turbidimetric.ex.nullOfDefault
 import com.wl.turbidimetric.model.ResultState
 import com.wl.turbidimetric.model.TestResultAndCurveModel
+import com.wl.turbidimetric.model.TestResultModel
 import com.wl.turbidimetric.view.dialog.isShow
 import com.wl.wllib.LogToFile.i
 import com.wl.wllib.toTimeStr
 
-class DataManagerAdapter :
+class DataManagerAdapter(
+    var textColorN: Int,
+    var textColorP: Int,
+    var textColorO: Int
+) :
     PagingDataAdapter<TestResultAndCurveModel, DataManagerAdapter.DataManagerViewHolder>(
         diffCallback = MyDiff()
     ) {
@@ -58,6 +64,7 @@ class DataManagerAdapter :
     }
 
     class DataManagerViewHolder(
+        var textColorN: Int, var textColorP: Int, var textColorO: Int,
         val binding: ItemDatamanagerResultBinding
     ) :
         RecyclerView.ViewHolder(binding.root) {
@@ -65,11 +72,11 @@ class DataManagerAdapter :
 //            binding.setVariable(BR.item, item)
             binding.tvId.text = item?.result?.resultId.toString()
             binding.tvDetectionNum.text = item?.result?.detectionNum ?: "-"
-            binding.tvProjectName.text = item?.curve?.projectName ?: "-"
-            binding.tvName.text = item?.result?.name ?: "-"
-            binding.tvGender.text = item?.result?.gender ?: "-"
-            binding.tvBarcode.text = item?.result?.sampleBarcode ?: "-"
-            binding.tvAge.text = item?.result?.age ?: "-"
+            binding.tvProjectName.text = item?.curve?.projectName ?.nullOfDefault("--")
+            binding.tvName.text = item?.result?.name?.nullOfDefault("--")
+            binding.tvGender.text = item?.result?.gender ?.nullOfDefault("--")
+            binding.tvBarcode.text = item?.result?.sampleBarcode ?.nullOfDefault("--")
+            binding.tvAge.text = item?.result?.age ?.nullOfDefault("--")
             binding.tvAbsorbances.text =
                 item?.result?.absorbances?.toInt().toString()
 //            binding.tvAbsorbances.text =
@@ -87,37 +94,51 @@ class DataManagerAdapter :
                 item?.result?.testValue3?.toInt().toString()
             binding.tvTestValue4.text =
                 item?.result?.testValue4?.toInt().toString()
-            binding.tvTestOriginalValue1.text = item?.result?.testOriginalValue1?.toString() ?: "-"
-            binding.tvTestOriginalValue2.text = item?.result?.testOriginalValue2?.toString() ?: "-"
-            binding.tvTestOriginalValue3.text = item?.result?.testOriginalValue3?.toString() ?: "-"
-            binding.tvTestOriginalValue4.text = item?.result?.testOriginalValue4?.toString() ?: "-"
+            binding.tvTestOriginalValue1.text = item?.result?.testOriginalValue1?.toString() ?.nullOfDefault("--")
+            binding.tvTestOriginalValue2.text = item?.result?.testOriginalValue2?.toString() ?.nullOfDefault("--")
+            binding.tvTestOriginalValue3.text = item?.result?.testOriginalValue3?.toString() ?.nullOfDefault("--")
+            binding.tvTestOriginalValue4.text = item?.result?.testOriginalValue4?.toString() ?.nullOfDefault("--")
             if (item?.result?.uploaded == true) {
                 binding.ivStateUpload.setImageResource(R.drawable.icon_state_upload_finish)
             } else {
                 binding.ivStateUpload.setImageResource(R.drawable.icon_state_upload_wait)
             }
             binding.tvResult.text = item?.result?.getShowResult()
-
+            binding.tvResult.setTextColor(getShowResultColor(item?.result))
             showHideView(debug);
 
             if (debug) {
                 updateLayoutParams(binding.root.context, binding.tvId, 80)
-                updateLayoutParams(binding.root.context, binding.tvBarcode, 100)
+//                    updateLayoutParams(binding.root.context, binding.tvBarcode, 125)
+//                    updateLayoutParams(binding.root.context, binding.tvGender, 100)
                 updateLayoutParams(binding.root.context, binding.tvDetectionNum, 100)
-                updateLayoutParams(binding.root.context, binding.tvProjectName, 115)
+//                    updateLayoutParams(binding.root.context, binding.tvProjectName, 145)
                 updateLayoutParams(binding.root.context, binding.tvTestTime, 220)
                 updateLayoutParams(binding.root.context, binding.tvResult, 100)
                 updateLayoutParams(binding.root.context, binding.tvConcentration, 80)
-                updateLayoutParams(binding.root.context, binding.tvAbsorbances, 100)
-            } else {
-                updateLayoutParams(binding.root.context, binding.tvId, 110)
-                updateLayoutParams(binding.root.context, binding.tvBarcode, 120)
-                updateLayoutParams(binding.root.context, binding.tvDetectionNum, 120)
-                updateLayoutParams(binding.root.context, binding.tvProjectName, 135)
-                updateLayoutParams(binding.root.context, binding.tvTestTime, 240)
-                updateLayoutParams(binding.root.context, binding.tvResult, 130)
-                updateLayoutParams(binding.root.context, binding.tvConcentration, 100)
                 updateLayoutParams(binding.root.context, binding.tvAbsorbances, 120)
+            } else {
+                updateLayoutParams(binding.root.context, binding.tvId, 115)
+//                    updateLayoutParams(binding.root.context, binding.tvBarcode, 125)
+//                updateLayoutParams(binding.root.context, binding.tvGender, 125)
+                updateLayoutParams(binding.root.context, binding.tvDetectionNum, 125)
+//                    updateLayoutParams(binding.root.context, binding.tvProjectName, 145)
+                updateLayoutParams(binding.root.context, binding.tvTestTime, 280)
+                updateLayoutParams(binding.root.context, binding.tvResult, 120)
+                updateLayoutParams(binding.root.context, binding.tvConcentration, 125)
+                updateLayoutParams(binding.root.context, binding.tvAbsorbances, 120)
+            }
+        }
+
+        private fun getShowResultColor(result: TestResultModel?): Int {
+            if (result?.resultState == ResultState.SamplingFailed.ordinal || result?.resultState == ResultState.TakeReagentFailed.ordinal) {
+                //取样失败
+                return textColorO
+            } else if (result?.testResult?.equals("阳性") == true) {
+                //阳性
+                return textColorP
+            } else {
+                return textColorN
             }
         }
 
@@ -131,8 +152,10 @@ class DataManagerAdapter :
             binding.tvName.visibility = debug.not().isShow()
             binding.tvGender.visibility = debug.not().isShow()
             binding.tvAge.visibility = debug.not().isShow()
-            binding.tvAbsorbances.visibility = debug.isShow()
+            binding.tvBarcode.visibility = debug.not().isShow()
+            binding.tvProjectName.visibility = debug.not().isShow()
 
+            binding.tvAbsorbances.visibility = debug.isShow()
             binding.tvTestValue1.visibility = debug.isShow()
             binding.tvTestValue2.visibility = debug.isShow()
             binding.tvTestValue3.visibility = debug.isShow()
@@ -223,7 +246,7 @@ class DataManagerAdapter :
             parent,
             false
         )
-        return DataManagerViewHolder(binding)
+        return DataManagerViewHolder(textColorN, textColorP, textColorO, binding)
     }
 
 

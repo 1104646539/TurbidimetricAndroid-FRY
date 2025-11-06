@@ -233,7 +233,7 @@ class AppViewModel(
     private fun listenerTime() {
         viewModelScope.launch(Dispatchers.IO) {
             while (true) {
-                _nowTimeStr.emit(DateUtil.date2Str(Date(), DateUtil.Time6Format))
+                _nowTimeStr.emit(DateUtil.date2Str(Date(), DateUtil.Time7Format))
                 delay(30000)
             }
         }

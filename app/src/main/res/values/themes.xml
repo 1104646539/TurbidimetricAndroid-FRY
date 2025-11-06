@@ -30,9 +30,10 @@
 
     <style name="TextHilt">
         <item name="android:textSize">24sp</item>
-        <item name="android:textColor">@color/textColor</item>
+        <item name="android:textColor">@color/text_gray</item>
         <item name="android:gravity">center</item>
     </style>
+
     <style name="TextNormal">
         <item name="android:textSize">22sp</item>
         <item name="android:textColor">@color/textColor</item>
@@ -68,13 +69,19 @@
         <item name="android:background">@drawable/select_rip_negative</item>
     </style>
 
-    <style name="BtnDataManager" parent="BtnDefault">
-        <item name="android:background">@drawable/rip_datamanager</item>
-        <item name="android:textColor">@color/black2</item>
+    <style name="BtnDataManager" parent="BtnPositive"></style>
+
+    <style name="BtnMainBig" parent="BtnPositive">
+        <item name="android:background">@drawable/select_rip_positive_main</item>
     </style>
 
     <style name="BtnPositive" parent="BtnDefault">
         <item name="android:background">@drawable/select_rip_positive</item>
+    </style>
+
+    <style name="BtnPositiveFrame" parent="BtnDefault">
+        <item name="android:textColor">@color/themePositiveColor</item>
+        <item name="android:background">@drawable/select_rip_positive_frame</item>
     </style>
 
     <style name="BtnPositive2" parent="BtnDefault">

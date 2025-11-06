@@ -200,7 +200,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
 
     override fun init() {
 //        initShutDown()
-        showSplash()
+//        showSplash()
         listener()
         initNavigation()
 //        test()
@@ -247,8 +247,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         vd.vp.offscreenPageLimit = 6
         vd.lnv.setItem(
             SystemGlobal.navItems,
-            R.drawable.left_nav_item_bg,
-            R.drawable.left_nav_item_bg2
+            R.drawable.left_nav_selected_bg
         )
         vd.lnv.onItemChangeListener = {
             vm.processIntent(MainIntent.ChangeNavCurIndex(it))
@@ -643,7 +642,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         super.onMessageEvent(event)
         when (event.what) {
             EventGlobal.WHAT_HIDE_SPLASH -> {//自检结束
-                hideSplash()
+//                hideSplash()
                 initShutDown()
             }
 
@@ -652,7 +651,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
             }
 
             EventGlobal.WHAT_HOME_INIT_FINISH -> {//首屏加载完毕，执行显示主页面动画
-                showAnimStart()
+//                showAnimStart()
             }
 
             EventGlobal.WHAT_HOME_ADD_PRINT_ANIM -> {//首屏加载完毕，执行显示主页面动画

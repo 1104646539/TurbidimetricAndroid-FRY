@@ -18,7 +18,7 @@
         <View
             android:layout_width="1px"
             android:layout_height="match_parent"
-            android:background="@color/black2" />
+            android:background="@color/frameColor" />
 
         <TextView
             android:id="@+id/tv_target_con"
@@ -32,7 +32,7 @@
         <View
             android:layout_width="1px"
             android:layout_height="match_parent"
-            android:background="@color/black2" />
+            android:background="@color/frameColor" />
 
 
         <TextView
@@ -46,7 +46,7 @@
         <View
             android:layout_width="1px"
             android:layout_height="match_parent"
-            android:background="@color/black2" />
+            android:background="@color/frameColor" />
 
         <TextView
             android:id="@+id/tv_result_con"

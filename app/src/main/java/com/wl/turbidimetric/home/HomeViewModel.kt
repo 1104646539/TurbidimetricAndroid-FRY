@@ -113,6 +113,16 @@ class HomeViewModel(
     //region [test]
     //endregion
     /**
+     * 开机自检
+     */
+    fun startGetMachineState() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _dialogUiState.emit(HomeDialogUiState.GetMachineShow)
+        }
+        goGetMachineState()
+    }
+
+    /**
      * 自检
      */
     fun goGetMachineState() {

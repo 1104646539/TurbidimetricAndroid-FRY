@@ -22,14 +22,16 @@ class SettingItemView @JvmOverloads constructor(
     private var selectable: Boolean = false
     private var selected: Boolean = false
 
-    private var textColor: Int = context.resources.getColor(R.color.white)
+    private var textColor: Int = context.resources.getColor(R.color.textColor)
+    private var selectedTextColor: Int = context.resources.getColor(R.color.white)
     private var text: String? = ""
+    private var textSize: Float = 10f
     private var icon: Int = -1
     private var bg: Int = -1
     var l: OnClickListener? = null
 
     init {
-        root = LayoutInflater.from(context).inflate(R.layout.layout_settings_item, this, true)
+        root = LayoutInflater.from(context).inflate(R.layout.layout_settings_item, this, false)
         initAttr(context, attributeSet, defStyleAttr)
         isEnabled = true
         initView()
@@ -43,12 +45,17 @@ class SettingItemView @JvmOverloads constructor(
         )
         textColor = ta.getColor(
             R.styleable.SettingsItemView_textColor,
+            context.resources.getColor(R.color.textColor)
+        )
+        selectedTextColor = ta.getColor(
+            R.styleable.SettingsItemView_selectedTextColor,
             context.resources.getColor(R.color.white)
         )
         text = ta.getString(R.styleable.SettingsItemView_text)
         selectable = ta.getBoolean(R.styleable.SettingsItemView_selectable, false)
         icon = ta.getResourceId(R.styleable.SettingsItemView_icon, -1)
         bg = ta.getResourceId(R.styleable.SettingsItemView_bg, -1)
+        textSize = ta.getDimension(R.styleable.SettingsItemView_textSize, 10f)
     }
 
     private fun listenerView() {
@@ -63,30 +70,33 @@ class SettingItemView @JvmOverloads constructor(
             selected = !selected
             isSelected = selected
         }
+        updateTextColor()
+    }
+
+    fun updateTextColor() {
+        tvTitle?.setTextColor(if (isSelected) selectedTextColor else textColor)
     }
 
 
     private fun initView() {
-        root?.apply {
-            ivIcon = findViewById(R.id.iv_icon)
-            clRoot = findViewById(R.id.cl_root)
-            tvTitle = findViewById(R.id.tv_title)
-        }
+        ivIcon = root?.findViewById(R.id.iv_icon)
+        clRoot = root?.findViewById(R.id.cl_root)
+        tvTitle = root?.findViewById(R.id.tv_title)
 
         if (icon > 0) {
             ivIcon?.setImageResource(icon)
         } else {
             ivIcon?.setImageDrawable(null)
         }
-        tvTitle?.setText(text)
+        tvTitle?.text = text
         tvTitle?.setTextColor(textColor)
+        tvTitle?.textSize = textSize
 
         if (bg > 0) {//在这里设背景的原因是有个bug，在xml设置background，selector无效。
             val bd = context.getDrawable(bg)
             background = bd
-
         }
-
+        addView(root)
     }
 
     override fun setOnClickListener(l: OnClickListener?) {

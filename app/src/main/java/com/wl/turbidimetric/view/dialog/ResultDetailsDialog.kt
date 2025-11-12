@@ -34,7 +34,7 @@ class ResultDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog
     var etSampleBarcode: EditText? = null
     var tvProjectName: TextView? = null
     var etAge: EditText? = null
-
+    var isDebug: Boolean = false
 
     var result: TestResultAndCurveModel? = null
     open fun showDialog(
@@ -59,16 +59,12 @@ class ResultDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog
         }
         this.cancelText = "取消"
         this.cancelClick = { dismiss() }
-
+        this.isDebug = isDebug
         this.result = result
 
         if (isCreated) {
             setContent()
         }
-        etDetectionNum?.isEnabled = isDebug
-        etAbs?.isEnabled = isDebug
-        etCon?.isEnabled = isDebug
-        etResult?.isEnabled = false
         super.show()
     }
 
@@ -110,6 +106,21 @@ class ResultDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog
             } else {
                 spnGender?.setSelection(0)//没有设置性别默认为- 未知
             }
+        }
+        etDetectionNum?.isEnabled = isDebug
+        etAbs?.isEnabled = isDebug
+        etCon?.isEnabled = isDebug
+        etResult?.isEnabled = false
+        if(isDebug){
+            etDetectionNum?.setBackgroundResource(R.drawable.bg_et_gray)
+            etAbs?.setBackgroundResource(R.drawable.bg_et_gray)
+            etCon?.setBackgroundResource(R.drawable.bg_et_gray)
+            etResult?.setBackgroundResource(R.drawable.bg_et_gray)
+        }else{
+            etDetectionNum?.setBackgroundResource(R.drawable.bg_white)
+            etAbs?.setBackgroundResource(R.drawable.bg_white)
+            etCon?.setBackgroundResource(R.drawable.bg_white)
+            etResult?.setBackgroundResource(R.drawable.bg_white)
         }
     }
 

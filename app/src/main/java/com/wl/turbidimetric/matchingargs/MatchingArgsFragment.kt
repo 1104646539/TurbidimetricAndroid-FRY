@@ -63,7 +63,7 @@ class MatchingArgsFragment :
      * 显示调试时详情的对话框
      */
     private val debugShowDetailsDialog: HiltDialog by lazy {
-        HiltDialog(requireContext())
+        HiltDialog(requireContext ())
     }
 
 

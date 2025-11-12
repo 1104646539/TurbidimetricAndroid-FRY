@@ -36,7 +36,7 @@
                     android:paddingLeft="20dp"
                     android:paddingRight="20dp"
                     android:src="@drawable/settings_settings"
-                    app:bg="@drawable/bg_item_settings_title"
+                    app:bg="@drawable/bg_item"
                     app:selectable="false"
                     app:text="基本设置"
                     app:textColor="@color/black"
@@ -123,10 +123,10 @@
                     app:selectedTextColor="@color/white"
                     app:textSize="20sp" />
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/frameColor" />
+<!--                <View-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="1dp"-->
+<!--                    android:background="@color/frameColor" />-->
 
                 <com.wl.turbidimetric.view.SettingItemView
                     android:id="@+id/siv_debug_title"
@@ -135,7 +135,7 @@
                     android:paddingLeft="20dp"
                     android:paddingRight="20dp"
                     android:src="@drawable/settings_debug"
-                    app:bg="@drawable/bg_item_settings_title"
+                    app:bg="@drawable/bg_item"
                     app:selectable="false"
                     app:text="调试功能"
                     app:textColor="@color/black"
@@ -202,10 +202,10 @@
                     app:textColor="@color/textColor"
                     app:textSize="20sp" />
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/frameColor" />
+<!--                <View-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="1dp"-->
+<!--                    android:background="@color/frameColor" />-->
 
                 <com.wl.turbidimetric.view.SettingItemView
                     android:layout_width="match_parent"
@@ -213,7 +213,7 @@
                     android:paddingLeft="20dp"
                     android:paddingRight="20dp"
                     android:src="@drawable/settings_upload"
-                    app:bg="@drawable/bg_item_settings_title"
+                    app:bg="@drawable/bg_item"
                     app:selectable="false"
                     app:text="上传设置"
                     app:textColor="@color/black"
@@ -243,10 +243,10 @@
                     app:textColor="@color/textColor"
                     app:textSize="20sp" />
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/frameColor" />
+<!--                <View-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="1dp"-->
+<!--                    android:background="@color/frameColor" />-->
 
                 <com.wl.turbidimetric.view.SettingItemView
                     android:layout_width="match_parent"
@@ -254,7 +254,7 @@
                     android:paddingLeft="20dp"
                     android:paddingRight="20dp"
                     android:src="@drawable/settings_version"
-                    app:bg="@drawable/bg_item_settings_title"
+                    app:bg="@drawable/bg_item"
                     app:selectable="false"
                     app:text="软件版本"
                     app:textColor="@color/black"
@@ -278,7 +278,7 @@
                         android:paddingLeft="20dp"
                         android:paddingRight="20dp"
                         android:text="上位机软件版本"
-                        app:textSize="20sp" />
+                        android:textSize="20sp" />
 
                     <TextView
                         android:id="@+id/tv_soft_version_mcu"
@@ -291,7 +291,7 @@
                         android:paddingLeft="20dp"
                         android:paddingRight="20dp"
                         android:text="上位机软件版本"
-                        app:textSize="20sp" />
+                        android:textSize="20sp" />
                 </LinearLayout>
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>

@@ -49,7 +49,7 @@ android {
                 //只处理生产版本
                 if (buildType.name == 'release') {
                     def createTime = new Date().format("YYYY-MM-dd", TimeZone.getTimeZone("GMT+08:00"))
-                    outputFileName = "免疫比浊" + defaultConfig.versionName + "_" + createTime + ".apk"
+                    outputFileName = "特定蛋白分析仪控制软件" + defaultConfig.versionName + "_" + createTime + ".apk"
                 }
             }
     }

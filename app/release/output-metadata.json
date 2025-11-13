@@ -13,7 +13,7 @@
       "attributes": [],
       "versionCode": 1,
       "versionName": "1.0.0.1",
-      "outputFile": "免疫比浊1.0.0.1_2025-11-12.apk"
+      "outputFile": "特定蛋白分析仪控制软件1.0.0.1_2025-11-12.apk"
     }
   ],
   "elementType": "File",
@@ -22,14 +22,14 @@
       "minApi": 28,
       "maxApi": 30,
       "baselineProfiles": [
-        "baselineProfiles/1/免疫比浊1.0.0.1_2025-11-12.dm"
+        "baselineProfiles/1/特定蛋白分析仪控制软件1.0.0.1_2025-11-12.dm"
       ]
     },
     {
       "minApi": 31,
       "maxApi": 2147483647,
       "baselineProfiles": [
-        "baselineProfiles/0/免疫比浊1.0.0.1_2025-11-12.dm"
+        "baselineProfiles/0/特定蛋白分析仪控制软件1.0.0.1_2025-11-12.dm"
       ]
     }
   ],

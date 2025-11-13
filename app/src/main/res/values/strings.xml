@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">桐康乳胶比浊法自动检测软件</string>
+    <string name="app_name">特定蛋白分析仪控制软件V1</string>
     <string name="nav_analyse">样本分析</string>
     <string name="nav_datamanager">数据管理</string>
     <string name="nav_matching">曲线拟合</string>

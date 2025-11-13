@@ -374,7 +374,7 @@ class MatchingArgsViewModel(
     /**
      * 选择用来拟合的方程
      */
-    var selectFitterType: FitterType = FitterType.Four
+    var selectFitterType: FitterType = FitterType.Three
 
     /**
      * 拟合梯度对应的浓度

@@ -27,9 +27,9 @@ object LocalDataGlobal {
     }
 
     object Default {
-        val TakeReagentR1 = 216
-        val TakeReagentR2 = 24
-        val SamplingVolume = 9.0
+        val TakeReagentR1 = 300
+        val TakeReagentR2 = 60
+        val SamplingVolume = 25.0
         val CurrentVersion = 0
         val FirstOpen = true
         val DetectionNum = "1"
@@ -42,10 +42,10 @@ object LocalDataGlobal {
         val SelectProjectID = 0L
         val DebugMode = false
         val Test1DelayTime = 30 * 1000L
-        val Test2DelayTime = 330 * 1000L
-        val Test3DelayTime = 0 * 1000L
-        val Test4DelayTime = 0 * 1000L
-        val ReactionTime = Test2DelayTime - Test1DelayTime
+        val Test2DelayTime = 90 * 1000L
+        val Test3DelayTime = 150 * 1000L
+        val Test4DelayTime = 220 * 1000L
+        val ReactionTime = Test4DelayTime - Test1DelayTime
         val LooperTest = false
         val HospitalName = ""
         val DetectionDoctor = ""

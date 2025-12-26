@@ -534,7 +534,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         }
         lifecycleScope.launch {
             vm.dialogUiState.collect { state ->
-                i("launchAndRepeatWithViewLifecycle state=${state}")
+//                i("launchAndRepeatWithViewLifecycle state=${state}")
                 when (state) {
                     /**
                      * 自检中
@@ -552,7 +552,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     is HomeDialogUiState.DoorHintShow -> {
                         doorDialog.showPop(requireContext(), isCancelable = false) {
                             it.showDialog(
-                                msg = "请关闭仓门",
+                                msg = "仓门意外打开，请关闭仓门后重新自检。",
                                 confirmText = "我已关闭",
                                 confirmClick = { baseDialog: BasePopupView ->
 //                                    it.dismiss()

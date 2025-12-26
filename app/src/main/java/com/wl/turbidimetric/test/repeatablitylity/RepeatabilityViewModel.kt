@@ -426,6 +426,10 @@ class RepeatabilityViewModel(
 
     }
 
+    override fun readDataKillAllModel(reply: ReplyModel<KillAllModel>) {
+
+    }
+
     /**
      * 接收到获取状态
      * @param reply ReplyModel<GetStateModel>

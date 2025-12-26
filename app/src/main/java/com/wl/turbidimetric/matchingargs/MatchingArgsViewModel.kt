@@ -30,6 +30,7 @@ import com.wl.turbidimetric.model.FullR1Model
 import com.wl.turbidimetric.model.GetMachineStateModel
 import com.wl.turbidimetric.model.GetStateModel
 import com.wl.turbidimetric.model.GetVersionModel
+import com.wl.turbidimetric.model.KillAllModel
 import com.wl.turbidimetric.model.MotorModel
 import com.wl.turbidimetric.model.MoveCuvetteDripReagentModel
 import com.wl.turbidimetric.model.MoveCuvetteDripSampleModel
@@ -549,6 +550,10 @@ class MatchingArgsViewModel(
     override fun readDataFullR1Model(reply: ReplyModel<FullR1Model>) {
     }
 
+    override fun readDataKillAllModel(reply: ReplyModel<KillAllModel>) {
+
+    }
+
     /**
      * 显示拟合配置对话框
      */
@@ -746,7 +751,8 @@ class MatchingArgsViewModel(
             i("没有样本架")
             discArray.add("样本架")
         } else if (matchingType == MatchingConfigLayout.MatchingType.Matching
-            && sampleShelfStates.filter { it == 1 }.size < 2 && (gradsNum + qualityNum) > 5) {
+            && sampleShelfStates.filter { it == 1 }.size < 2 && (gradsNum + qualityNum) > 5
+        ) {
             //如果需要的拟合数量+质控数量>5，则需要最少有两个样本架
             i("样本架不足")
             discArray.add("样本架")
@@ -1369,6 +1375,16 @@ class MatchingArgsViewModel(
                 tempTarget.add("${qualityLow1}-${qualityLow2}")
                 tempTarget.add("${qualityHigh1}-${qualityHigh2}")
             }
+            val tempYZS = if (quality) {
+                val low = cf.ratCalcCon(cf.params, absorbancys[absorbancys.lastIndex - 1])
+                val high = cf.ratCalcCon(cf.params, absorbancys[absorbancys.lastIndex])
+                cf.yss.toMutableList().apply {
+                    add(low)
+                    add(high)
+                }.map { it.toInt() }.toIntArray()
+            } else {
+                cf.yss.map { it.toInt() }.toIntArray()
+            }
             curProject = CurveModel().apply {
                 this.f0 = cf.params.getOrNull(0) ?: 0.0
                 this.f1 = cf.params.getOrNull(1) ?: 0.0
@@ -1386,7 +1402,7 @@ class MatchingArgsViewModel(
 //                        .subList(0, this@MatchingArgsViewModel.gradsNum)
                         .map { it.toInt() }
                         .toIntArray()
-                this.yzs = cf.yss.map { it.toInt() }.toIntArray()
+                this.yzs = tempYZS
             }.copyForProject(selectMatchingProject!!)
             testMsg.postValue(msg.toString())
             showMatchingStateDialog()

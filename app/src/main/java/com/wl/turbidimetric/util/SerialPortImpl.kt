@@ -85,6 +85,10 @@ class SerialPortImpl(
     private var mOnResult: ((UpdateResult) -> Unit)? = null
 
     /**
+     * 停止运行
+     */
+    private var stopRunning = false
+    /**
      * 在仪器已经报错的情况下，还能发送的命令
      */
     private val runningErrorAllowCMD = arrayOf(
@@ -404,6 +408,12 @@ class SerialPortImpl(
                 }
 
             }
+            SerialGlobal.CMD_KillAll -> {
+                callback {
+                    it.readDataKillAllModel(transitionKillAllModel(ready))
+                }
+
+            }
 
             else -> {}
         }
@@ -449,6 +459,10 @@ class SerialPortImpl(
                         //升级中不发送任何命令
                         continue
                     }
+                    if(stopRunning){
+                        //停止运行
+                        continue
+                    }
 //                    println("take=$take")
                     if (take != null) {
                         if (isNeedRetry(take)) {
@@ -465,7 +479,17 @@ class SerialPortImpl(
             }
         }
     }
-
+    /**
+     * 停止所有任务
+     */
+    fun stopRunning(){
+        //停止所有重发
+        scope?.launch {
+            retryJobQueue.forEach {
+                it.value.cancelAndJoin()
+            }
+        }
+    }
     /**
      * 该是否需要重发
      * 自检、获取温度不需要重发
@@ -514,10 +538,16 @@ class SerialPortImpl(
                     data.addAll(re)
                     c("每次接收的re=${re.toHex()}")
                 }
+                if(stopRunning){
+                    //停止运行
+                    data.clear()
+                    continue
+                }
                 if (SystemGlobal.mcuUpdate) {
                     parseMcuUpdate()
                     continue
                 }
+
                 if (data.size < hCount + allCount) {
                     continue
                 }
@@ -1030,6 +1060,14 @@ class SerialPortImpl(
             createCmd(SerialGlobal.CMD_Squeezing, data4 = if (enable) 0x1u else 0x0u)
         )
     }
+    /**
+     * 下位机杀死所有进程
+     */
+    override fun killAll() {
+        writeAsync(
+            createCmd(SerialGlobal.CMD_KillAll)
+        )
+    }
 
     /**
      * 获取当前温度
@@ -1090,6 +1128,16 @@ class SerialPortImpl(
                 SerialGlobal.CMD_FullR1,
             )
         )
+    }
+
+    override fun stopRunning(stop: Boolean) {
+        stopRunning = stop
+        if(stopRunning){
+            //停止运行
+            stopRunning()
+        }else{
+            //恢复
+        }
     }
 
 

@@ -265,7 +265,7 @@ class AppViewModel(
     }
 
     /**
-     * 更新当前时间
+     * 更新样本门状态
      */
     private fun listenerSampleDoorState() {
         viewModelScope.launch(Dispatchers.IO) {

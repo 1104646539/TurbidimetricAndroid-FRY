@@ -135,6 +135,10 @@ object SerialGlobal {
      * 填充R1
      */
     const val CMD_FullR1: UByte = 0x1Bu
+    /**
+     * 通知下位机杀死所有进程
+     */
+    const val CMD_KillAll: UByte = 0x1Cu
 
     /**
      * 响应

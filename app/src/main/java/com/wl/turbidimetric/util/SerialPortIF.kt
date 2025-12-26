@@ -103,6 +103,10 @@ interface SerialPortIF {
      * @param squeezing 是否挤压
      */
     fun sampling(volume: Int, sampleType: SampleType)
+    /**
+     * 杀死所有进程
+     */
+    fun killAll()
 
     /**
      * 取样针清洗
@@ -231,6 +235,10 @@ interface SerialPortIF {
      */
     fun fullR1()
 
+    /**
+     * 是否停止运行
+     */
+    fun stopRunning(stop: Boolean)
     /**
      * 创建一个完整的命令
      */

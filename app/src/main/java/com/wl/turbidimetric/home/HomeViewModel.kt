@@ -35,6 +35,7 @@ import com.wl.turbidimetric.model.GetMachineStateModel
 import com.wl.turbidimetric.model.GetStateModel
 import com.wl.turbidimetric.model.GetVersionModel
 import com.wl.turbidimetric.model.Item
+import com.wl.turbidimetric.model.KillAllModel
 import com.wl.turbidimetric.model.MachineTestModel
 import com.wl.turbidimetric.model.MotorModel
 import com.wl.turbidimetric.model.MoveCuvetteDripReagentModel
@@ -82,6 +83,7 @@ import com.wl.turbidimetric.util.SerialPortImpl
 import com.wl.wllib.LogToFile.c
 import com.wl.wllib.LogToFile.i
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -586,11 +588,14 @@ class HomeViewModel(
     //测试用 每个比色皿之间的检测间隔
     val testP: Long = 100
 
+    var jobListenerTempState: Job? = null
+
     /**
      * 一直获取温度状态
      */
     private fun listenerTempState() {
-        viewModelScope.launch(Dispatchers.IO) {
+        if (jobListenerTempState?.isActive == true) return
+        jobListenerTempState = viewModelScope.launch(Dispatchers.IO) {
             while (true) {
                 if (allowTemp && !appViewModel.testState.isRunningError()) {
                     appViewModel.serialPort.getTemp()
@@ -1040,6 +1045,15 @@ class HomeViewModel(
                 showFullR1FailedDialog()
             }
         }
+    }
+
+    /**
+     * 接收到 杀死所有进程
+     */
+    override fun readDataKillAllModel(reply: ReplyModel<KillAllModel>) {
+        c("接收到 杀死所有进程 reply=$reply")
+
+        appViewModel.serialPort.stopRunning(true)
     }
 
     /**
@@ -2832,6 +2846,7 @@ class HomeViewModel(
         appViewModel.testState = TestState.None
         if (errorInfo.isNullOrEmpty()) {
             appViewModel.testState = TestState.PreheatTime
+            preheatFinish = false
             //自检成功后获取一下r1,r2，清洗液状态，获取温度
             getState()
             listenerTempState()
@@ -2867,28 +2882,45 @@ class HomeViewModel(
      */
     var showDoorDialog = false
 
+    var jobListenerDoorState: Job? = null
+
     /**
      * 监听样本仓门状态
      */
     private fun listenerDoorState() {
-        viewModelScope.launch {
+        if (jobListenerDoorState?.isActive == true) return
+        jobListenerDoorState = viewModelScope.launch {
             appViewModel.obSampleDoorIsClose.collectLatest { isClose ->
-                if (SystemGlobal.isCodeDebug && (appViewModel.testType.isTest() || appViewModel.testType.isMatchingArgs())) {
+                if (SystemGlobal.isCodeDebug || (appViewModel.testType.isTest() || appViewModel.testType.isMatchingArgs())) {
                     if (!isClose) {
                         if (appViewModel.testState.isRunning()) {
                             showDoorDialog = true
                             showDoorDialog()
+                            stopRunning()
                         } else if (showDoorDialog) {
                             showDoorDialog = false
                             hideDoorDialog()
+                            resetRunning()
                         }
                     } else if (showDoorDialog) {
                         showDoorDialog = false
                         hideDoorDialog()
+                        resetRunning()
                     }
                 }
             }
         }
+    }
+
+    private fun resetRunning() {
+        //恢复运行，需要自检
+        appViewModel.serialPort.stopRunning(false)
+        appViewModel.testState = TestState.None
+    }
+
+    private fun stopRunning() {
+        //通知下位机
+        appViewModel.serialPort.killAll()
     }
 
     private fun showDoorDialog() {

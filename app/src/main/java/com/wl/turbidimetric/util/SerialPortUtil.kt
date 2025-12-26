@@ -7,6 +7,7 @@ import com.wl.turbidimetric.model.FullR1Model
 import com.wl.turbidimetric.model.GetMachineStateModel
 import com.wl.turbidimetric.model.GetStateModel
 import com.wl.turbidimetric.model.GetVersionModel
+import com.wl.turbidimetric.model.KillAllModel
 import com.wl.turbidimetric.model.McuUpdateModel
 import com.wl.turbidimetric.model.MotorModel
 import com.wl.turbidimetric.model.MoveCuvetteDripReagentModel
@@ -55,6 +56,7 @@ interface Callback2 {
     fun readDataMotor(reply: ReplyModel<MotorModel>)
     fun readDataOverloadParamsModel(reply: ReplyModel<OverloadParamsModel>)
     fun readDataFullR1Model(reply: ReplyModel<FullR1Model>)
+    fun readDataKillAllModel(reply: ReplyModel<KillAllModel>)
 }
 
 fun interface McuUpdateCallBack {

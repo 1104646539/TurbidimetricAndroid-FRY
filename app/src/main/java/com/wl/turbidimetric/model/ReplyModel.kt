@@ -265,3 +265,9 @@ data class OverloadParamsModel(val v: Int = 0)
  * @constructor
  */
 data class FullR1Model(val state: Int = 0)
+/**
+ * 杀死所有进程
+ * @property v Int
+ * @constructor
+ */
+data class KillAllModel(val v: Int = 0)

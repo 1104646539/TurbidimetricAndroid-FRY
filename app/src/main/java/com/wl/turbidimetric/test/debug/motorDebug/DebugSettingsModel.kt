@@ -14,6 +14,7 @@ import com.wl.turbidimetric.model.FullR1Model
 import com.wl.turbidimetric.model.GetMachineStateModel
 import com.wl.turbidimetric.model.GetStateModel
 import com.wl.turbidimetric.model.GetVersionModel
+import com.wl.turbidimetric.model.KillAllModel
 import com.wl.turbidimetric.model.MotorModel
 import com.wl.turbidimetric.model.MoveCuvetteDripReagentModel
 import com.wl.turbidimetric.model.MoveCuvetteDripSampleModel
@@ -177,6 +178,10 @@ class MotorDebugViewModel(private val appViewModel: AppViewModel) : BaseViewMode
     }
 
     override fun readDataFullR1Model(reply: ReplyModel<FullR1Model>) {
+
+    }
+
+    override fun readDataKillAllModel(reply: ReplyModel<KillAllModel>) {
 
     }
 

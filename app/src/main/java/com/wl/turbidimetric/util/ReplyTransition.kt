@@ -364,3 +364,15 @@ fun transitionFullR1Model(data: UByteArray): ReplyModel<FullR1Model> {
         )
     )
 }
+/**
+ * 杀死所有进程
+ * @param data UByteArray
+ * @return ReplyModel<SqueezingModel>
+ */
+fun transitionKillAllModel(data: UByteArray): ReplyModel<KillAllModel> {
+    return ReplyModel(
+        SerialGlobal.CMD_KillAll, convertReplyState(data[1].toInt()), KillAllModel(
+            data[5].toInt(),
+        )
+    )
+}

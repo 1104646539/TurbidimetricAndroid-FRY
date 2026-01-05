@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "76bceff37caeb5228e2d7304d9c4a656",
+    "identityHash": "dea5b069585ace2122b434aed78b9477",
     "entities": [
       {
         "tableName": "TestResultModel",
@@ -384,7 +384,7 @@
       },
       {
         "tableName": "GlobalConfig",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `DetectionNum` TEXT NOT NULL, `TakeReagentR1` INTEGER NOT NULL, `TakeReagentR2` INTEGER NOT NULL, `SamplingVolume` REAL NOT NULL, `CurrentVersion` INTEGER NOT NULL, `StirDuration` INTEGER NOT NULL, `StirProbeCleaningDuration` INTEGER NOT NULL, `SamplingProbeCleaningDuration` INTEGER NOT NULL, `CurMachineTestModel` TEXT NOT NULL, `SampleExist` INTEGER NOT NULL, `ScanCode` INTEGER NOT NULL, `SelectProjectID` INTEGER NOT NULL, `DebugMode` INTEGER NOT NULL, `Test1DelayTime` INTEGER NOT NULL, `Test2DelayTime` INTEGER NOT NULL, `Test3DelayTime` INTEGER NOT NULL, `Test4DelayTime` INTEGER NOT NULL, `ReactionTime` INTEGER NOT NULL, `LooperTest` INTEGER NOT NULL, `HospitalName` TEXT NOT NULL, `DetectionDoctor` TEXT NOT NULL, `AutoPrintReceipt` INTEGER NOT NULL, `AutoPrintReport` INTEGER NOT NULL, `ReportFileNameBarcode` INTEGER NOT NULL, `ReportIntervalTime` INTEGER NOT NULL, `TempUpLimit` INTEGER NOT NULL, `TempLowLimit` INTEGER NOT NULL, `WaitPreheatTime` INTEGER NOT NULL, `PreheatTime` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `DetectionNum` TEXT NOT NULL, `TakeReagentR1` INTEGER NOT NULL, `TakeReagentR2` INTEGER NOT NULL, `SamplingVolume` REAL NOT NULL, `CurrentVersion` INTEGER NOT NULL, `StirDuration` INTEGER NOT NULL, `StirProbeCleaningDuration` INTEGER NOT NULL, `SamplingProbeCleaningDuration` INTEGER NOT NULL, `CurMachineTestModel` TEXT NOT NULL, `SampleExist` INTEGER NOT NULL, `ScanCode` INTEGER NOT NULL, `SelectProjectID` INTEGER NOT NULL, `DebugMode` INTEGER NOT NULL, `Test1DelayTime` INTEGER NOT NULL, `Test2DelayTime` INTEGER NOT NULL, `Test3DelayTime` INTEGER NOT NULL, `Test4DelayTime` INTEGER NOT NULL, `ReactionTime` INTEGER NOT NULL, `LooperTest` INTEGER NOT NULL, `HospitalName` TEXT NOT NULL, `DetectionDoctor` TEXT NOT NULL, `AutoPrintReceipt` INTEGER NOT NULL, `AutoPrintReport` INTEGER NOT NULL, `ReportFileNameBarcode` INTEGER NOT NULL, `ReportIntervalTime` INTEGER NOT NULL, `TempUpLimit` INTEGER NOT NULL, `TempLowLimit` INTEGER NOT NULL, `WaitPreheatTime` INTEGER NOT NULL, `PreheatTime` INTEGER NOT NULL, `QualityLow1` INTEGER NOT NULL, `QualityLow2` INTEGER NOT NULL, `QualityHigh1` INTEGER NOT NULL, `QualityHigh2` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -565,6 +565,30 @@
             "columnName": "PreheatTime",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "QualityLow1",
+            "columnName": "QualityLow1",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "QualityLow2",
+            "columnName": "QualityLow2",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "QualityHigh1",
+            "columnName": "QualityHigh1",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "QualityHigh2",
+            "columnName": "QualityHigh2",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -624,7 +648,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '76bceff37caeb5228e2d7304d9c4a656')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'dea5b069585ace2122b434aed78b9477')"
     ]
   }
 }

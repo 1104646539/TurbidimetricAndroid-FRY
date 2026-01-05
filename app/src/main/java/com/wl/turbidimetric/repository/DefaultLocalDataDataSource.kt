@@ -159,6 +159,21 @@ class DefaultLocalDataDataSource(
     override fun getPreheatTime(): Int {
         return global().PreheatTime
     }
+    override fun getQualityLow1(): Int {
+        return global().QualityLow1
+    }
+
+    override fun getQualityLow2(): Int {
+        return global().QualityLow2
+    }
+
+    override fun getQualityHigh1(): Int {
+        return global().QualityHigh1
+    }
+
+    override fun getQualityHigh2(): Int {
+        return global().QualityHigh2
+    }
 
     override fun setLooperTest(looperTest: Boolean) {
         update {
@@ -343,6 +358,30 @@ class DefaultLocalDataDataSource(
     override fun setPreheatTime(second: Int) {
         update {
             it.copy(PreheatTime = second)
+        }
+    }
+
+    override fun setQualityLow1(v: Int) {
+        update {
+            it.copy(QualityLow1 = v)
+        }
+    }
+
+    override fun setQualityLow2(v: Int) {
+        update {
+            it.copy(QualityLow2 = v)
+        }
+    }
+
+    override fun setQualityHigh1(v: Int) {
+        update {
+            it.copy(QualityHigh1 = v)
+        }
+    }
+
+    override fun setQualityHigh2(v: Int) {
+        update {
+            it.copy(QualityHigh2 = v)
         }
     }
 }

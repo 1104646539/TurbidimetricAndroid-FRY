@@ -422,6 +422,7 @@ class MatchingArgsFragment :
             .dismissOnTouchOutside(false)
             .dismissOnBackPressed(false)
             .autoOpenSoftInput(false)
+            .moveUpToKeyboard(true)
             .autoFocusEditText(false)
             .isDestroyOnDismiss(false)
             .asCustom(MatchingConfigDialog(requireContext())) as MatchingConfigDialog

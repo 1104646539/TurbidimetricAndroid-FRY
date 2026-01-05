@@ -1,6 +1,8 @@
 package com.wl.turbidimetric.db
 
+import android.content.Context
 import androidx.room.Database
+import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.wl.turbidimetric.db.converters.StringToStringListConverters
@@ -37,24 +39,24 @@ abstract class MainRoomDatabase : RoomDatabase() {
     abstract fun logDao(): LogDao
 
 
-//    companion object {
-//        @Volatile
-//        private var INSTANCE: MainRoomDatabase? = null
-//        fun getDatabase(context: Context): MainRoomDatabase {
-//            return INSTANCE ?: synchronized(this) {
-//                val instance = Room.databaseBuilder(
-//                    context.applicationContext,
-//                    MainRoomDatabase::class.java,
-//                    "word_database"
-//                )
-//                    .allowMainThreadQueries()
-////                    .createFromFile(File("sdcard/bf/word_database"))
-////                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
-//                    .build()
-//                INSTANCE = instance
-//                instance
-//            }
-//        }
+    companion object {
+        @Volatile
+        private var INSTANCE: MainRoomDatabase? = null
+        fun getDatabase(context: Context, path: String): MainRoomDatabase {
+            return INSTANCE ?: synchronized(this) {
+                val instance = Room.databaseBuilder(
+                    context.applicationContext,
+                    MainRoomDatabase::class.java,
+                    path
+                )
+                    .allowMainThreadQueries()
+//                    .createFromFile(File("sdcard/bf/word_database"))
+//                    .addMigrations(MIGRATION_1_2)
+                    .build()
+                INSTANCE = instance
+                instance
+            }
+        }
 
 //        val MIGRATION_1_2 = object : Migration(1, 2) {
 //            override fun migrate(database: SupportSQLiteDatabase) {
@@ -66,6 +68,6 @@ abstract class MainRoomDatabase : RoomDatabase() {
 //                database.execSQL("ALTER TABLE TestResultModel ADD COLUMN testV varchar")
 //            }
 //        }
-//    }
+    }
 }
 

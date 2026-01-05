@@ -129,4 +129,20 @@ data class GlobalConfig(
      * 等待预热时间 秒
      */
     val PreheatTime: Int = LocalDataGlobal.Default.PreheatTime,
+    /**
+     * 质控默认的值 浓度
+     */
+    val QualityLow1: Int = LocalDataGlobal.Default.QualityLow1,
+    /**
+     * 质控默认的值 浓度
+     */
+    val QualityLow2: Int = LocalDataGlobal.Default.QualityLow2,
+    /**
+     * 质控默认的值 浓度
+     */
+    val QualityHigh1: Int = LocalDataGlobal.Default.QualityHigh1,
+    /**
+     * 质控默认的值 浓度
+     */
+    val QualityHigh2: Int = LocalDataGlobal.Default.QualityHigh2,
 )

@@ -31,6 +31,11 @@ class DataManagerAdapter(
     //局部刷新 选择改变
     private val REFRESH_SELECT_CHANGE = 100
     var OnSelectedChange: (() -> Unit)? = null
+
+    companion object{
+        val DefaultShow = "--"
+    }
+
     class MyDiff : DiffUtil.ItemCallback<TestResultAndCurveModel>() {
         override fun areItemsTheSame(
             oldItem: TestResultAndCurveModel,
@@ -79,21 +84,23 @@ class DataManagerAdapter(
         fun bindData(debug: Boolean, item: TestResultAndCurveModel?) {
 //            binding.setVariable(BR.item, item)
             binding.tvId.text = item?.result?.resultId.toString()
-            binding.tvDetectionNum.text = item?.result?.detectionNum ?: "-"
-            binding.tvProjectName.text = item?.curve?.projectName ?.nullOfDefault("--")
-            binding.tvName.text = item?.result?.name?.nullOfDefault("--")
-            binding.tvGender.text = item?.result?.gender ?.nullOfDefault("--")
-            binding.tvBarcode.text = item?.result?.sampleBarcode ?.nullOfDefault("--")
-            binding.tvAge.text = item?.result?.age ?.nullOfDefault("--")
+            binding.tvDetectionNum.text = item?.result?.detectionNum ?: DefaultShow
+            binding.tvProjectName.text = item?.curve?.projectName?.nullOfDefault(DefaultShow)
+            binding.tvName.text = item?.result?.name?.nullOfDefault(DefaultShow)
+            binding.tvGender.text = item?.result?.gender?.nullOfDefault(DefaultShow)
+            binding.tvBarcode.text = item?.result?.sampleBarcode?.nullOfDefault(DefaultShow)
+            binding.tvAge.text = item?.result?.age?.nullOfDefault(DefaultShow)
             binding.tvAbsorbances.text =
                 item?.result?.absorbances?.toInt().toString()
 //            binding.tvAbsorbances.text =
 //                item?.result?.absorbances?.setScale(5, RoundingMode.HALF_UP).toString()
-//            binding.tvResult.text = item?.result?.testResult ?: "-"
-            binding.tvConcentration.text = item?.result?.concentration?.toString() ?: "-"
+//            binding.tvResult.text = item?.result?.testResult ?: DefaultShow
+            binding.tvConcentration.text =
+                if (item?.result?.testTime == 0L) DefaultShow else item?.result?.concentration?.toString()
+                    ?: DefaultShow
             binding.tvTestTime.text =
-                if (item?.result?.testTime == 0L) "-" else item?.result?.testTime?.toTimeStr()
-                    ?: "-"
+                if (item?.result?.testTime == 0L) DefaultShow else item?.result?.testTime?.toTimeStr()
+                    ?: DefaultShow
             binding.tvTestValue1.text =
                 item?.result?.testValue1?.toInt().toString()
             binding.tvTestValue2.text =
@@ -102,10 +109,14 @@ class DataManagerAdapter(
                 item?.result?.testValue3?.toInt().toString()
             binding.tvTestValue4.text =
                 item?.result?.testValue4?.toInt().toString()
-            binding.tvTestOriginalValue1.text = item?.result?.testOriginalValue1?.toString() ?.nullOfDefault("--")
-            binding.tvTestOriginalValue2.text = item?.result?.testOriginalValue2?.toString() ?.nullOfDefault("--")
-            binding.tvTestOriginalValue3.text = item?.result?.testOriginalValue3?.toString() ?.nullOfDefault("--")
-            binding.tvTestOriginalValue4.text = item?.result?.testOriginalValue4?.toString() ?.nullOfDefault("--")
+            binding.tvTestOriginalValue1.text =
+                item?.result?.testOriginalValue1?.toString()?.nullOfDefault(DefaultShow)
+            binding.tvTestOriginalValue2.text =
+                item?.result?.testOriginalValue2?.toString()?.nullOfDefault(DefaultShow)
+            binding.tvTestOriginalValue3.text =
+                item?.result?.testOriginalValue3?.toString()?.nullOfDefault(DefaultShow)
+            binding.tvTestOriginalValue4.text =
+                item?.result?.testOriginalValue4?.toString()?.nullOfDefault(DefaultShow)
             if (item?.result?.uploaded == true) {
                 binding.ivStateUpload.setImageResource(R.drawable.icon_state_upload_finish)
             } else {

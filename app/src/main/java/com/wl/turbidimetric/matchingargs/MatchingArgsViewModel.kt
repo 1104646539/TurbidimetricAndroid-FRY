@@ -397,10 +397,10 @@ class MatchingArgsViewModel(
      */
     var curves = mutableListOf<CurveModel>()
 
-    var qualityLow1 = 85
-    var qualityLow2 = 115
-    var qualityHigh1 = 340
-    var qualityHigh2 = 460
+    var qualityLow1 = localDataRepository.getQualityLow1()
+    var qualityLow2 = localDataRepository.getQualityLow2()
+    var qualityHigh1 = localDataRepository.getQualityHigh1()
+    var qualityHigh2 = localDataRepository.getQualityHigh2()
 
     /**
      * 比色皿舱门正在操作 （现在用作结束检测，将r2试剂转出来）
@@ -1258,6 +1258,10 @@ class MatchingArgsViewModel(
         moveCuvetteShelf(-1)
         moveSampleShelf(-1)
         openAllDoor()
+        localDataRepository.setQualityLow1(qualityLow1)
+        localDataRepository.setQualityLow2(qualityLow2)
+        localDataRepository.setQualityHigh1(qualityHigh1)
+        localDataRepository.setQualityHigh2(qualityHigh2)
     }
 
     /**

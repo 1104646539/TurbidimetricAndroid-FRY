@@ -31,6 +31,10 @@ interface LocalDataSource {
     fun getTempLowLimit(): Int
     fun getWaitPreheatTime(): Boolean
     fun getPreheatTime(): Int
+    fun getQualityLow1(): Int
+    fun getQualityLow2(): Int
+    fun getQualityHigh1(): Int
+    fun getQualityHigh2(): Int
 
     fun setLooperTest(looperTest: Boolean)
     fun setHospitalName(name: String)
@@ -62,5 +66,9 @@ interface LocalDataSource {
     fun setTempLowLimit(temp: Int)
     fun setWaitPreheatTime(wait: Boolean)
     fun setPreheatTime(second: Int)
+    fun setQualityLow1(v: Int)
+    fun setQualityLow2(v: Int)
+    fun setQualityHigh1(v: Int)
+    fun setQualityHigh2(v: Int)
     fun resetGlobal()
 }

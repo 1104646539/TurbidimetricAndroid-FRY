@@ -115,15 +115,16 @@ object ServiceLocator {
                     .allowMainThreadQueries()
                     .build()
             } else {
-                Room.databaseBuilder(
-                    context.applicationContext,
-                    MainRoomDatabase::class.java,
-                    path
-                )
-                    .allowMainThreadQueries()
-//                    .createFromFile(File("sdcard/bf/word_database"))
-//                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
-                    .build()
+//                Room.databaseBuilder(
+//                    context.applicationContext,
+//                    MainRoomDatabase::class.java,
+//                    path
+//                )
+//                    .allowMainThreadQueries()
+////                    .createFromFile(File("sdcard/bf/word_database"))
+////                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+//                    .build()
+                MainRoomDatabase.getDatabase(context,path)
             }
             instance
         }

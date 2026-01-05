@@ -22,7 +22,7 @@
             android:id="@+id/tv_cancel_select"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingLeft="5dp"
+            android:paddingLeft="10dp"
             android:textSize="20sp"
             android:visibility="invisible"
             android:text="取消\n选中" />

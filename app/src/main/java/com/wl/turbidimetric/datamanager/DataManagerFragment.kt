@@ -192,6 +192,16 @@ class DataManagerFragment :
             u("上传")
             upload()
         }
+        adapter.OnSelectedChange = {
+            vd.header.tvCancelSelect.visibility =
+                if (adapter.IsSelectedEmpty()) View.INVISIBLE else View.VISIBLE
+        }
+        vd.header.tvCancelSelect.setOnClickListener {
+            u("取消选择")
+            adapter.clearSelected()
+            adapter.notifyDataSetChanged()
+            vd.header.tvCancelSelect.visibility = View.INVISIBLE
+        }
         lifecycleScope.launch {
             vm.resultSize.collectLatest {
                 vd.tvCount.text = "(${it}条)"

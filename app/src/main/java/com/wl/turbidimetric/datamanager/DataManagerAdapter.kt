@@ -30,7 +30,7 @@ class DataManagerAdapter(
     ) {
     //局部刷新 选择改变
     private val REFRESH_SELECT_CHANGE = 100
-
+    var OnSelectedChange: (() -> Unit)? = null
     class MyDiff : DiffUtil.ItemCallback<TestResultAndCurveModel>() {
         override fun areItemsTheSame(
             oldItem: TestResultAndCurveModel,
@@ -55,6 +55,14 @@ class DataManagerAdapter(
      */
     fun clearSelected() {
         selectedIds.clear()
+    }
+
+    /**
+     * 是否选中了数据
+     * @return Boolean
+     */
+    fun IsSelectedEmpty(): Boolean {
+        return selectedIds.isEmpty()
     }
 
     private var debug: Boolean = false
@@ -201,6 +209,7 @@ class DataManagerAdapter(
                                 holder.binding.root.setBackgroundColor(Color.WHITE)
                                 holder.binding.ivSelect.isSelected = false
                             }
+                            OnSelectedChange?.invoke()
                         }
                     }
                 }

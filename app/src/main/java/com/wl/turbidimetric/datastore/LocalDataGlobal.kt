@@ -61,6 +61,7 @@ object LocalDataGlobal {
         val QualityLow2 = 115
         val QualityHigh1 = 340
         val QualityHigh2 = 460
+        val DoorEnable = true
     }
 
 

@@ -353,9 +353,9 @@ class DataManagerFragment :
 //                    updateLayoutParams(requireContext(), vd.header.tvGender, 100)
 //                    updateLayoutParams(requireContext(), vd.header.tvAge, 100)
 //                    updateLayoutParams(requireContext(), vd.header.tvProjectName, 145)
-                    updateLayoutParams(requireContext(), vd.header.tvTestTime, 220)
+                    updateLayoutParams(requireContext(), vd.header.tvTestTime, 215)
                     updateLayoutParams(requireContext(), vd.header.tvResult, 100)
-                    updateLayoutParams(requireContext(), vd.header.tvConcentration, 80)
+                    updateLayoutParams(requireContext(), vd.header.tvConcentration, 75)
                     updateLayoutParams(requireContext(), vd.header.tvAbsorbances, 120)
                 } else {
                     updateLayoutParams(requireContext(), vd.header.tvId, 120)

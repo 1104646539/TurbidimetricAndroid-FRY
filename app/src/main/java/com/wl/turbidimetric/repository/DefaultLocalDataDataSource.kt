@@ -174,6 +174,9 @@ class DefaultLocalDataDataSource(
     override fun getQualityHigh2(): Int {
         return global().QualityHigh2
     }
+    override fun getDoorEnable(): Boolean {
+        return global().DoorEnable
+    }
 
     override fun setLooperTest(looperTest: Boolean) {
         update {
@@ -382,6 +385,11 @@ class DefaultLocalDataDataSource(
     override fun setQualityHigh2(v: Int) {
         update {
             it.copy(QualityHigh2 = v)
+        }
+    }
+    override fun setDoorEnable(enable: Boolean) {
+        update {
+            it.copy(DoorEnable = enable)
         }
     }
 }

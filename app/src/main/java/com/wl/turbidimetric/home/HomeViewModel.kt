@@ -626,7 +626,7 @@ class HomeViewModel(
         val errorMsg = if (appViewModel.testState.isRunning()) {
             "正在检测，请勿操作！"
             //        } else if (SystemGlobal.isCodeDebug && !appViewModel.sampleDoorIsClose()) {
-        } else if (!appViewModel.sampleDoorIsClose()) {
+        } else if ((!appViewModel.sampleDoorIsClose() && localDataRepository.getDoorEnable())) {
             "请关闭仓门"
         } else if (appViewModel.testState.isRunningError()) {
             "请停止使用仪器并联系供应商维修"
@@ -2891,7 +2891,9 @@ class HomeViewModel(
         if (jobListenerDoorState?.isActive == true) return
         jobListenerDoorState = viewModelScope.launch {
             appViewModel.obSampleDoorIsClose.collectLatest { isClose ->
-                if (SystemGlobal.isCodeDebug || (appViewModel.testType.isTest() || appViewModel.testType.isMatchingArgs())) {
+                if ((SystemGlobal.isCodeDebug || (appViewModel.testType.isTest() || appViewModel.testType.isMatchingArgs()))
+                    && localDataRepository.getDoorEnable()
+                ) {
                     if (!isClose) {
                         if (appViewModel.testState.isRunning()) {
                             showDoorDialog = true

@@ -145,4 +145,8 @@ data class GlobalConfig(
      * 质控默认的值 浓度
      */
     val QualityHigh2: Int = LocalDataGlobal.Default.QualityHigh2,
+    /**
+     * 是否使用门传感器
+     */
+    val DoorEnable: Boolean = LocalDataGlobal.Default.DoorEnable,
 )

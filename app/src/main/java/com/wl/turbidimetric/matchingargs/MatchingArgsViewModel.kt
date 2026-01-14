@@ -632,7 +632,7 @@ class MatchingArgsViewModel(
             }
             return
         }
-        if (!appViewModel.sampleDoorIsClose()) {
+        if (!appViewModel.sampleDoorIsClose() && localDataRepository.getDoorEnable()) {
             viewModelScope.launch {
                 _dialogUiState.emit(
                     MatchingArgsDialogUiState.Accident("请关闭仓门")

@@ -132,9 +132,9 @@ class DataManagerAdapter(
 //                    updateLayoutParams(binding.root.context, binding.tvGender, 100)
                 updateLayoutParams(binding.root.context, binding.tvDetectionNum, 100)
 //                    updateLayoutParams(binding.root.context, binding.tvProjectName, 145)
-                updateLayoutParams(binding.root.context, binding.tvTestTime, 220)
+                updateLayoutParams(binding.root.context, binding.tvTestTime, 215)
                 updateLayoutParams(binding.root.context, binding.tvResult, 100)
-                updateLayoutParams(binding.root.context, binding.tvConcentration, 80)
+                updateLayoutParams(binding.root.context, binding.tvConcentration, 75)
                 updateLayoutParams(binding.root.context, binding.tvAbsorbances, 120)
             } else {
                 updateLayoutParams(binding.root.context, binding.tvId, 115)

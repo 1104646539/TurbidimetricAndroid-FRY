@@ -122,7 +122,7 @@
         <TextView
             android:id="@+id/tv_test_time"
             style="@style/TextHilt"
-            android:layout_width="280dp"
+            android:layout_width="275dp"
             android:textColor="@color/textColor"
             android:layout_height="wrap_content"
             android:text="检测时间" />

@@ -218,6 +218,7 @@
         <TextView
             android:id="@+id/tv_state_upload"
             style="@style/TextHilt"
+            android:textColor="@color/textColor"
             android:layout_width="140dp"
             android:layout_height="wrap_content"
             android:text="上传"

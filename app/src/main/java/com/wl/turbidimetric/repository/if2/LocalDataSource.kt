@@ -35,6 +35,7 @@ interface LocalDataSource {
     fun getQualityLow2(): Int
     fun getQualityHigh1(): Int
     fun getQualityHigh2(): Int
+    fun getDoorEnable(): Boolean
 
     fun setLooperTest(looperTest: Boolean)
     fun setHospitalName(name: String)
@@ -70,5 +71,6 @@ interface LocalDataSource {
     fun setQualityLow2(v: Int)
     fun setQualityHigh1(v: Int)
     fun setQualityHigh2(v: Int)
+    fun setDoorEnable(enable: Boolean)
     fun resetGlobal()
 }

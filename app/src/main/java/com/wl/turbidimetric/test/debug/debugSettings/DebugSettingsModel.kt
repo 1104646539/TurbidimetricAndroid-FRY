@@ -22,15 +22,21 @@ class DebugSettingsViewModel(
     val preheatTime = MutableLiveData(appViewModel.getPreheatTime().toString())
     val tempLowLimit = MutableLiveData(localDataSource.getTempLowLimit().toString())
     val tempUpLimit = MutableLiveData(localDataSource.getTempUpLimit().toString())
+    val doorEnable = MutableLiveData(localDataSource.getDoorEnable())
 
     fun saveConfig() {
         localDataSource.setLooperTest(looperTest.value ?: false)
         localDataSource.setWaitPreheatTime(waitPreheatTime.value ?: false)
-        localDataSource.setPreheatTime( preheatTime.value?.toIntOrNull() ?: LocalDataGlobal.Default.PreheatTime)
+        localDataSource.setPreheatTime(
+            preheatTime.value?.toIntOrNull() ?: LocalDataGlobal.Default.PreheatTime
+        )
         localDataSource.setTempLowLimit(
             tempLowLimit.value?.toIntOrNull() ?: LocalDataGlobal.Default.TempLowLimit
         )
-        localDataSource.setTempUpLimit(tempUpLimit.value?.toIntOrNull() ?: LocalDataGlobal.Default.TempUpLimit)
+        localDataSource.setTempUpLimit(
+            tempUpLimit.value?.toIntOrNull() ?: LocalDataGlobal.Default.TempUpLimit
+        )
+        localDataSource.setDoorEnable(doorEnable.value ?: false)
     }
 
 

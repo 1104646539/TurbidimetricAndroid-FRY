@@ -2167,16 +2167,16 @@ class HomeViewModel(
                 )
                 DbLogUtil.err(
                     TestType.Test,
-                    "比色皿不为空:比色皿位置:${cuvetteShelfPos + 1}-$cuvettePos \n样本位置${sampleShelfPos + 1}- $samplePos"
+                    "比色皿不为空:比色皿位置:${cuvetteShelfPos + 1}-$cuvettePos \n样本位置${sampleShelfPos + 1} - ${samplePos-1}"
                 )
             } else {//正常加样，继续
                 updateCuvetteState(
-                    cuvettePos, CuvetteState.DripSample, null, "${sampleShelfPos + 1}- $samplePos"
+                    cuvettePos, CuvetteState.DripSample, null, "${sampleShelfPos + 1} - ${samplePos-1}"
                 )
             }
             changeSampleResultToCuvette(samplePos - 2)
             updateSampleState(
-                samplePos - 2, null, null, null, "${cuvetteShelfPos + 1}- ${cuvettePos + 1}"
+                samplePos - 2, null, null, null, "${cuvetteShelfPos + 1} - ${cuvettePos + 1}"
             )
             samplingProbeCleaning()
 

@@ -4,6 +4,8 @@ import android.view.View
 import androidx.activity.viewModels
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
+import android.os.Build
+import android.view.textclassifier.TextClassifier
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.base.BaseActivity
 import com.wl.turbidimetric.databinding.ActivityUploadSettingsBinding
@@ -93,6 +95,14 @@ class UploadSettingsActivity :
         vd.nav.setRight1("保存配置") {
             saveConfig()
         }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            setNoOpTextClassifier(vd.etSocketIp)
+            setNoOpTextClassifier(vd.etSocketPort)
+            setNoOpTextClassifier(vd.etRetryCount)
+            setNoOpTextClassifier(vd.etTimeoutTime)
+            setNoOpTextClassifier(vd.etUploadInterval)
+            setNoOpTextClassifier(vd.tvLog)
+        }
         openUploadChange(vm.openUpload.value)
         vd.swOpenUpload.setOnCheckedChangeListener { buttonView, isChecked ->
             vm.openUpload.value = isChecked
@@ -107,6 +117,9 @@ class UploadSettingsActivity :
         vd.swTwoway.setOnCheckedChangeListener { buttonView, isChecked ->
             vm.twoway.value = isChecked
             vd.llTimeout.visibility = isChecked.isShow()
+        }
+        vd.swTls.setOnCheckedChangeListener { buttonView, isChecked ->
+            vm.tlsEnabled.value = isChecked
         }
         vd.swGetPatient.setOnCheckedChangeListener { buttonView, isChecked ->
             vm.getPatient.value = isChecked
@@ -208,6 +221,7 @@ class UploadSettingsActivity :
         vd.etTimeoutTime.isEnabled = checked
         vd.etSocketIp.isEnabled = checked
         vd.etSocketPort.isEnabled = checked
+        vd.swTls.isEnabled = checked
         vd.etUploadInterval.isEnabled = checked
         vd.swGetPatient.isEnabled = checked
         vd.rbBc.isEnabled = checked
@@ -219,6 +233,13 @@ class UploadSettingsActivity :
 
         if (!checked) {
             HL7Helper.disconnect()
+        }
+    }
+
+    private fun setNoOpTextClassifier(target: Any) {
+        runCatching {
+            val method = target.javaClass.getMethod("setTextClassifier", TextClassifier::class.java)
+            method.invoke(target, TextClassifier.NO_OP)
         }
     }
 
@@ -506,6 +527,11 @@ class UploadSettingsActivity :
             vm.port.collectLatest {
                 vd.etSocketPort.setText(it)
                 vd.etSocketPort.selectionLast()
+            }
+        }
+        lifecycleScope.launch {
+            vm.tlsEnabled.collectLatest {
+                vd.swTls.isChecked = it
             }
         }
         lifecycleScope.launch {

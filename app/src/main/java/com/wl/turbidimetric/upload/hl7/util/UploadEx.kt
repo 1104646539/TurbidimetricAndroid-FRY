@@ -97,9 +97,9 @@ fun defaultConfig(): ConnectConfig {
     return ConnectConfig(
         openUpload = false,
         autoUpload = false,
-        "192.168.0.133",
-        22222,
-        "UTF-8",
+        ip = "192.168.0.110",
+        port = 22222,
+        charset = "UTF-8",
         serialPort = false,
         serialPortBaudRate = 9600,
         serialPortName = WQSerialGlobal.COM4,

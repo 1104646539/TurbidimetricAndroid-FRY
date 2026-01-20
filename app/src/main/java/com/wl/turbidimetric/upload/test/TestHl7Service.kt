@@ -26,10 +26,10 @@ class TestHl7Service : Service() {
                     ConnectConfig(
                         openUpload = false,
                         autoUpload = false,
-                        "192.168.0.1",
-                        22222,
+                        ip = "192.168.0.1",
+                        port = 22222,
 //                        Charset.forName("UTF-8"),
-                        "GBK",
+                        charset = "GBK",
                         serialPort = true,
                         serialPortBaudRate = 9600,
                         serialPortName = "COM3"

@@ -5,6 +5,7 @@ data class ConnectConfig(
     var autoUpload: Boolean = true,//是否自动上传结果
     var ip: String = "",//网络连接的IP
     var port: Int = 22222,//网络连接的IP
+    var tlsEnabled: Boolean = false,//是否开启TLS加密(仅网口)
     var charset: String = "UTF-8",//字符集
     var reconnectionTimeout: Long = 15000,//重新建立连接的间隔
     var uploadInterval: Long = 500,//上传结果的间隔时间

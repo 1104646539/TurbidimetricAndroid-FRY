@@ -26,6 +26,7 @@ class UploadSettingsViewModel(
 
     var ip = MutableStateFlow("0.0.0.0")
     var port = MutableStateFlow("")
+    var tlsEnabled = MutableStateFlow(false)
     var timeout = MutableStateFlow("")
     var retryCount = MutableStateFlow("")
     var serialPortBaudRate = MutableStateFlow("")
@@ -41,6 +42,7 @@ class UploadSettingsViewModel(
         autoUpload.value = SystemGlobal.uploadConfig.autoUpload
         ip.value = SystemGlobal.uploadConfig.ip
         port.value = SystemGlobal.uploadConfig.port.toString()
+        tlsEnabled.value = SystemGlobal.uploadConfig.tlsEnabled
         timeout.value = SystemGlobal.uploadConfig.timeout.toString()
         retryCount.value = SystemGlobal.uploadConfig.retryCount.toString()
         serialPortBaudRate.value = SystemGlobal.uploadConfig.serialPortBaudRate.toString()
@@ -75,6 +77,7 @@ class UploadSettingsViewModel(
             serialPortName = WQSerialGlobal.COM4,
             ip = ip.value,
             port = port.value.toInt(),
+            tlsEnabled = tlsEnabled.value,
             timeout = timeout.value.toLong(),
             retryCount = retryCount.value.toInt(),
             serialPortBaudRate = serialPortBaudRate.value.toInt(),

@@ -707,9 +707,20 @@ class DataManagerFragment :
                 withContext(Dispatchers.Main) {
                     if (vd.rv.scrollState == RecyclerView.SCROLL_STATE_IDLE)
                         vd.rv.scrollToPosition(0)
+
+                    if (isEmptyCondition(condition)) {
+                        vd.btnCondition.setText("数据筛选")
+                    } else {
+                        vd.btnCondition.setText("已筛选")
+                    }
                 }
             }
         }
+    }
+
+    private fun isEmptyCondition(condition: ConditionModel): Boolean {
+        return (condition.name.isEmpty() && condition.name.isEmpty() && condition.conMin == 0 && condition.conMax == 0 &&
+                condition.results.isEmpty() && condition.selectProjects.isEmpty() && condition.testTimeMin == 0L && condition.testTimeMax == 0L)
     }
 
 

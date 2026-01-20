@@ -225,15 +225,15 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         vd.svCuvette4.itemPaddingVer = 28f
 
         vd.svCuvette3.clickIndex = { it, item ->
-            showDetails(1, it, item)
+            showDetails(0, it, item)
         }
         vd.svCuvette4.clickIndex = { it, item ->
-            showDetails(0, it, item)
+            showDetails(1, it, item)
         }
         lifecycleScope.launchWhenCreated {
             vm.cuvetteStates.collectLatest {
-                vd.svCuvette3.itemStates = it[1]
-                vd.svCuvette4.itemStates = it[0]
+                vd.svCuvette3.itemStates = it[0]
+                vd.svCuvette4.itemStates = it[1]
             }
         }
         lifecycleScope.launchWhenCreated {
@@ -510,8 +510,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         arraySample.add(vd.svSample2)
         arraySample.add(vd.svSample3)
         arraySample.add(vd.svSample4)
-        arrayCuvette.add(vd.svCuvette4)
         arrayCuvette.add(vd.svCuvette3)
+        arrayCuvette.add(vd.svCuvette4)
         lifecycleScope.launch {
             /**
              * 显示调试的数据

@@ -204,7 +204,7 @@ class SerialPortImpl(
     }
 
     /**
-     * 收到的消息分发
+     * 收到的消息分发 
      */
     @OptIn(ExperimentalUnsignedTypes::class)
     private fun dispatchData(ready: UByteArray) = runBlocking {
@@ -372,6 +372,8 @@ class SerialPortImpl(
             }
 
             SerialGlobal.CMD_GetSetTemp -> {
+                // 串口连接检测成功
+                onConnectionCheckSuccess()
                 callback {
                     it.readDataTempModel(transitionTempModel(ready))
                 }
@@ -1128,6 +1130,64 @@ class SerialPortImpl(
                 SerialGlobal.CMD_FullR1,
             )
         )
+    }
+
+    /**
+     * 串口连接检测相关变量
+     */
+    private var connectionCheckRetryCount = 0
+    private val connectionCheckMaxRetry = 3
+    private val connectionCheckTimeout = 10000L
+    private var connectionCheckJob: Job? = null
+    private var isCheckingConnection = false
+
+    /**
+     * 检测串口连接
+     * 通过发送获取温度命令来检测串口是否正常连接
+     * 10秒超时，3次失败则回调 onSerialPortConnectionError
+     */
+    override fun checkSerialPortConnection() {
+        if (isCheckingConnection) return
+        isCheckingConnection = true
+        connectionCheckRetryCount = 0
+        sendConnectionCheckCommand()
+    }
+
+    /**
+     * 发送串口连接检测命令
+     */
+    private fun sendConnectionCheckCommand() {
+        connectionCheckJob?.cancel()
+        connectionCheckJob = scope?.launch(Dispatchers.IO) {
+            delay(connectionCheckTimeout)
+            // 超时处理
+            connectionCheckRetryCount++
+            c("串口连接检测超时，第 $connectionCheckRetryCount 次")
+            if (connectionCheckRetryCount >= connectionCheckMaxRetry) {
+                // 3次失败，触发错误回调
+                isCheckingConnection = false
+                callback {
+                    it.onSerialPortConnectionError()
+                }
+                c("串口连接检测失败，超过 $connectionCheckMaxRetry 次")
+            } else {
+                // 重试
+                sendConnectionCheckCommand()
+            }
+        }
+        // 发送获取温度命令
+        getTemp()
+    }
+
+    /**
+     * 串口连接检测成功（收到温度回复时调用）
+     */
+    private fun onConnectionCheckSuccess() {
+        if (isCheckingConnection) {
+            connectionCheckJob?.cancel()
+            isCheckingConnection = false
+            c("串口连接检测成功")
+        }
     }
 
     override fun stopRunning(stop: Boolean) {

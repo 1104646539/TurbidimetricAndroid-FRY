@@ -313,6 +313,10 @@ class TestModuleDebugViewModel(private val appViewModel: AppViewModel) : BaseVie
 
     }
 
+    override fun onSerialPortConnectionError() {
+
+    }
+
     fun startIntervalTest(
         firstTestPos: Boolean,
         twoTestPos: Boolean,

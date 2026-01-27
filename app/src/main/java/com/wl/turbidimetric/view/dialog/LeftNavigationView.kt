@@ -233,7 +233,7 @@ class LeftNavigationView @JvmOverloads constructor(
                 width = itemWidth,
                 height = itemHeight,
             )
-            i("tempH=$tempH tempH + itemHeight=${tempH + itemHeight}")
+//            i("tempH=$tempH tempH + itemHeight=${tempH + itemHeight}")
             itemRect.add(Rect(bgItemMargin, tempH, itemWidth + bgItemMargin, tempH + itemHeight))
             itemBgSrcRangeRect =
                 Rect(
@@ -251,7 +251,7 @@ class LeftNavigationView @JvmOverloads constructor(
             itemSrcRangeRect.add(Rect(0, 0, itemBitmap[index].width, itemBitmap[index].height))
             val left =
                 (itemWidth / 2 - itemSrcRangeRect[index].width() / 2 - bgMargin - bgItemMargin).toInt()
-            i("left=$left")
+//            i("left=$left")
             itemSrcRect.add(
                 Rect(
                     left,

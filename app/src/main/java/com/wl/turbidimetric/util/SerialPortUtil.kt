@@ -57,6 +57,10 @@ interface Callback2 {
     fun readDataOverloadParamsModel(reply: ReplyModel<OverloadParamsModel>)
     fun readDataFullR1Model(reply: ReplyModel<FullR1Model>)
     fun readDataKillAllModel(reply: ReplyModel<KillAllModel>)
+    /**
+     * 串口连接错误回调，在开机自检前检测串口连接失败时触发
+     */
+    fun onSerialPortConnectionError()
 }
 
 fun interface McuUpdateCallBack {

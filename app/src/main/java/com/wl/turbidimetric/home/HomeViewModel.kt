@@ -121,13 +121,32 @@ class HomeViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             _dialogUiState.emit(HomeDialogUiState.GetMachineShow)
         }
+        // 先进行串口连接检测，检测成功后再执行自检
+//        appViewModel.serialPort.checkSerialPortConnection()
         goGetMachineState()
     }
+
+    /**
+     * 串口连接检测成功后执行自检
+     */
+    private fun onSerialPortCheckSuccess() {
+        c("串口测试成功，开始自检")
+        getMachineState2()
+    }
+
+    var checkSerialPortConnection = false
 
     /**
      * 自检
      */
     fun goGetMachineState() {
+        c("串口测试开始")
+        checkSerialPortConnection = true
+        appViewModel.serialPort.checkSerialPortConnection()
+
+    }
+
+    fun getMachineState2() {
         appViewModel.testState = TestState.GetMachineState
         getMachineState()
     }
@@ -904,6 +923,12 @@ class HomeViewModel(
      */
     override fun readDataTempModel(reply: ReplyModel<TempModel>) {
         c("接收到 获取设置温度 reply=$reply")
+        // 串口连接检测成功，执行自检
+        if (checkSerialPortConnection
+        ) {
+            checkSerialPortConnection = false
+            onSerialPortCheckSuccess()
+        }
 
         appViewModel.processIntent(AppIntent.TempChange(reply.data.reactionTemp, reply.data.r1Temp))
         _testMachineUiState.update {
@@ -1054,6 +1079,20 @@ class HomeViewModel(
         c("接收到 杀死所有进程 reply=$reply")
 
         appViewModel.serialPort.stopRunning(true)
+    }
+
+    /**
+     * 串口连接错误回调，在3次检测失败后触发
+     */
+    override fun onSerialPortConnectionError() {
+        c("串口连接错误，检测失败")
+        viewModelScope.launch {
+//            _dialogUiState.emit(HomeDialogUiState.GetMachineHide)
+            _dialogUiState.emit(HomeDialogUiState.GetMachineFailedShow("串口连接失败，请检查连接"))
+        }
+        viewModelScope.launch(Dispatchers.IO) {
+            _dialogUiState.emit(HomeDialogUiState.GetMachineDismiss)
+        }
     }
 
     /**
@@ -2167,11 +2206,14 @@ class HomeViewModel(
                 )
                 DbLogUtil.err(
                     TestType.Test,
-                    "比色皿不为空:比色皿位置:${cuvetteShelfPos + 1}-$cuvettePos \n样本位置${sampleShelfPos + 1} - ${samplePos-1}"
+                    "比色皿不为空:比色皿位置:${cuvetteShelfPos + 1}-$cuvettePos \n样本位置${sampleShelfPos + 1} - ${samplePos - 1}"
                 )
             } else {//正常加样，继续
                 updateCuvetteState(
-                    cuvettePos, CuvetteState.DripSample, null, "${sampleShelfPos + 1} - ${samplePos-1}"
+                    cuvettePos,
+                    CuvetteState.DripSample,
+                    null,
+                    "${sampleShelfPos + 1} - ${samplePos - 1}"
                 )
             }
             changeSampleResultToCuvette(samplePos - 2)

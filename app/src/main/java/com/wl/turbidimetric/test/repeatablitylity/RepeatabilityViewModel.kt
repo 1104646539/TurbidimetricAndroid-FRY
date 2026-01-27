@@ -430,6 +430,10 @@ class RepeatabilityViewModel(
 
     }
 
+    override fun onSerialPortConnectionError() {
+
+    }
+
     /**
      * 接收到获取状态
      * @param reply ReplyModel<GetStateModel>

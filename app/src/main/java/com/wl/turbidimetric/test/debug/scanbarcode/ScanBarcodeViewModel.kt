@@ -342,6 +342,10 @@ class ScanBarcodeViewModel(private val appViewModel: AppViewModel) : BaseViewMod
 
     }
 
+    override fun onSerialPortConnectionError() {
+
+    }
+
 
     /**
      * 移动样本

@@ -195,7 +195,7 @@ fun calcCon(absorbance: BigDecimal, project: CurveModel): Int {
     if (con.compareTo(0.0) <= 0) {
         con = 0.0
     }
-    i("type=${FitterType.toValue(project.fitterType)} absorbance=${absorbance.toDouble()}")
+//    i("type=${FitterType.toValue(project.fitterType)} absorbance=${absorbance.toDouble()}")
     return con.toInt()
 }
 

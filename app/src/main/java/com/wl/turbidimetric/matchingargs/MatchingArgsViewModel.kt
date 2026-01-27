@@ -554,6 +554,10 @@ class MatchingArgsViewModel(
 
     }
 
+    override fun onSerialPortConnectionError() {
+
+    }
+
     /**
      * 显示拟合配置对话框
      */

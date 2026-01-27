@@ -221,6 +221,10 @@ class SingleCmdViewModel(private val appViewModel: AppViewModel) : BaseViewModel
 
     }
 
+    override fun onSerialPortConnectionError() {
+
+    }
+
     /**
      * 自检
      */

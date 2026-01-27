@@ -31,7 +31,7 @@ fun transitionGetMachineStateModel(data: UByteArray): ReplyModel<GetMachineState
 
     for (i in Errors.indices) {
         val num = (states shr i) and 1
-        println("states=$states num=$num i =$i ")
+//        println("states=$states num=$num i =$i ")
         if (num > 0) {
             errorInfo.add(ErrorInfo("错误号:$num", "错误信息:${Errors[i]}"))
         }

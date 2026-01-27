@@ -185,6 +185,10 @@ class MotorDebugViewModel(private val appViewModel: AppViewModel) : BaseViewMode
 
     }
 
+    override fun onSerialPortConnectionError() {
+
+    }
+
     fun listener() {
         appViewModel.serialPort.addCallback(this)
         appViewModel.testType = TestType.Debug

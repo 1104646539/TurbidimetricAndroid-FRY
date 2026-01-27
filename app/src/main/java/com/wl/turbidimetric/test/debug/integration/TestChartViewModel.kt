@@ -183,6 +183,10 @@ class TestChartViewModel(private val appViewModel: AppViewModel) : BaseViewModel
 
     }
 
+    override fun onSerialPortConnectionError() {
+
+    }
+
     var intervalTestTimer: Timer? = null
     fun startIntervalTest(msg: String) {
         if (msg.isNullOrEmpty()) {

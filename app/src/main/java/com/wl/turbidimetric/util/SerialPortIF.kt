@@ -236,6 +236,13 @@ interface SerialPortIF {
     fun fullR1()
 
     /**
+     * 检测串口连接
+     * 通过发送获取温度命令来检测串口是否正常连接
+     * 10秒超时，3次失败则回调 onSerialPortConnectionError
+     */
+    fun checkSerialPortConnection()
+
+    /**
      * 是否停止运行
      */
     fun stopRunning(stop: Boolean)

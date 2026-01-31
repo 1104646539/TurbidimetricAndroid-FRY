@@ -25,12 +25,10 @@
 
         <Spinner
             android:id="@+id/spn_motor"
-            android:layout_width="wrap_content"
-            android:minWidth="200dp"
-            android:textSize="30sp"
-            android:layout_height="wrap_content"
-            android:selectedItemPosition="@={vm.motorIndex}"
             android:layout_marginLeft="30dp"
+            android:layout_width="380dp"
+            android:layout_height="50dp"
+            android:selectedItemPosition="@={vm.motorIndex}"
             app:layout_constraintLeft_toRightOf="@id/tv_motor"
             app:layout_constraintTop_toTopOf="@id/tv_motor" />
 
@@ -106,10 +104,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="50dp"
-            android:minWidth="200dp"
-            android:text="执行"
-            android:onClick="@{()->vm.action()}"
             android:enabled="@{vm.enable}"
+            android:minWidth="200dp"
+            android:onClick="@{()->vm.action()}"
+            android:text="执行"
             android:textSize="30sp"
             app:layout_constraintLeft_toRightOf="@id/til_motor_params"
             app:layout_constraintTop_toTopOf="@id/til_motor_params" />

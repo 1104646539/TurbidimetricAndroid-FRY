@@ -9,7 +9,8 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-
+    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS"/>
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
     <application
         android:name=".app.App"
         android:allowBackup="true"
@@ -25,6 +26,7 @@
         tools:replace="android:extractNativeLibs">
         <activity
             android:name=".upload.view.UploadSettingsActivity"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|screenLayout|smallestScreenSize|density"
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"
@@ -32,19 +34,19 @@
         </activity>
         <activity
             android:name=".test.TestActivity"
-            android:configChanges="orientation|keyboardHidden|keyboard"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|screenLayout|smallestScreenSize|density"
             android:exported="true"
             android:windowSoftInputMode="adjustPan|stateAlwaysHidden" /> <!-- android:windowSoftInputMode="adjustPan|stateAlwaysHidden|adjustNothing" -->
         <!-- android:configChanges="orientation|keyboardHidden|keyboard" -->
         <activity
             android:name=".test.debug.DebugActivity"
-            android:configChanges="orientation|keyboardHidden|keyboard"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|screenLayout|smallestScreenSize|density"
             android:windowSoftInputMode="adjustPan|stateAlwaysHidden"></activity>
         <activity android:name=".project.list.ProjectListActivity"></activity>
         <activity android:name=".project.details.ProjectDetailsActivity"></activity>
         <activity
             android:name=".main.MainActivity"
-            android:configChanges="orientation|keyboardHidden|keyboard"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|screenLayout|smallestScreenSize|density"
             android:exported="true"
             android:theme="@style/AppTheme.StartingWindowTheme"
             android:windowSoftInputMode="adjustPan|stateAlwaysHidden">

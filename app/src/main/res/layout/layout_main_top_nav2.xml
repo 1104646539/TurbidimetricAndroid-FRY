@@ -24,7 +24,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/iv_back"
             android:layout_alignParentLeft="true"
-            android:src="@drawable/icon_back" />
+            android:src="@drawable/icon_back_w" />
 
         <TextView
             android:id="@+id/tv_title"

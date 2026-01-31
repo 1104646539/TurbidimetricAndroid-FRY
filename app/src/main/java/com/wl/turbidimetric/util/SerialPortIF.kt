@@ -103,6 +103,7 @@ interface SerialPortIF {
      * @param squeezing 是否挤压
      */
     fun sampling(volume: Int, sampleType: SampleType)
+
     /**
      * 杀死所有进程
      */
@@ -196,7 +197,7 @@ interface SerialPortIF {
     /**
      * 设置温度
      */
-    fun setTemp(reactionTemp: Int = 0, r1Temp: Int = 0)
+    fun setTemp(reactionSymbol: Int = 0, reactionTemp: Int = 0, r1TempSymbol: Int = 0,r1Temp: Int = 0)
 
     /**
      * 关机
@@ -246,6 +247,7 @@ interface SerialPortIF {
      * 是否停止运行
      */
     fun stopRunning(stop: Boolean)
+
     /**
      * 创建一个完整的命令
      */

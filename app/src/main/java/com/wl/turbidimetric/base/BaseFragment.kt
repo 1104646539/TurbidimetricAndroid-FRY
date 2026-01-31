@@ -16,20 +16,26 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 
-open abstract class BaseFragment<VM : ViewModel, VD : ViewDataBinding>(@LayoutRes val layoutId: Int) : Fragment() {
+open abstract class BaseFragment<VM : ViewModel, VD : ViewDataBinding>(
+        @LayoutRes val layoutId: Int
+) : Fragment() {
     protected abstract val vm: VM
-    lateinit var vd: VD
+    private var _vd: VD? = null
+    protected val vd: VD
+        get() = _vd!!
     val appVm: AppViewModel by lazy { getAppViewModel(AppViewModel::class.java) }
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
-        return DataBindingUtil.inflate<VD>(inflater, layoutId, container, false).also {
-            it.lifecycleOwner = viewLifecycleOwner
-            vd = it
-        }.root
+        return DataBindingUtil.inflate<VD>(inflater, layoutId, container, false)
+                .also {
+                    it.lifecycleOwner = viewLifecycleOwner
+                    _vd = it
+                }
+                .root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -44,11 +50,9 @@ open abstract class BaseFragment<VM : ViewModel, VD : ViewDataBinding>(@LayoutRe
     override fun onDestroyView() {
         super.onDestroyView()
         EventBus.getDefault().unregister(this)
+        _vd = null
     }
     abstract fun init(savedInstanceState: Bundle?)
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    open fun onMessageEvent(event: EventMsg<Any>) {
-
-    }
+    @Subscribe(threadMode = ThreadMode.MAIN) open fun onMessageEvent(event: EventMsg<Any>) {}
 }

@@ -85,7 +85,14 @@ class HomeConfigDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_ho
         etDetectionNum?.isEnabled = configViewEnable ?: false
         etSampleNum?.isEnabled = configViewEnable ?: false
 
-        val selectedIndex = items.indexOf(curveModel)
+        var selectedIndex = 0
+        if (items.isNotEmpty() && curveModel != null) {
+            selectedIndex = items.indexOfFirst { it -> it.reagentNO == curveModel!!.reagentNO }
+            selectProject = curveModel
+        }
+        if (selectedIndex < 0 && items.isNotEmpty()) {
+            selectedIndex = 0
+        }
         spnProject?.setSelection(selectedIndex)
 
         if (items.size == 1) {//解决从没有项目到只有一个项目时，出现的不能选中的bug

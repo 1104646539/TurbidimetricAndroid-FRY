@@ -75,20 +75,25 @@ class NetworkFragment :
 
 
     private fun initData() {
-        val ip = Settings.Global.getString(requireContext().contentResolver, "ethernet_static_ip")?:""
+        val ip =
+            Settings.Global.getString(requireContext().contentResolver, "ethernet_static_ip") ?: "192.168.1.100"
         val mask =
-            Settings.Global.getString(requireContext().contentResolver, "ethernet_static_mask")?:""
+            Settings.Global.getString(requireContext().contentResolver, "ethernet_static_mask")
+                ?: "255.255.255.0"
         val gateway =
-            Settings.Global.getString(requireContext().contentResolver, "ethernet_static_gateway")?:""
+            Settings.Global.getString(requireContext().contentResolver, "ethernet_static_gateway")
+                ?: "192.168.1.1"
         val dns1 =
-            Settings.Global.getString(requireContext().contentResolver, "ethernet_static_dns1")?:""
-        vm.changeConfig(ip, mask, gateway, dns1)
+            Settings.Global.getString(requireContext().contentResolver, "ethernet_static_dns1")
+                ?: "8.8.8.8"
+        vm.changeConfig(ip, gateway, mask, dns1)
     }
 
     fun setConfig(
         ip: String, gateway: String, netmask: String, dns1: String
     ) {
-        NetworkUtil.setStaticIp(requireContext(), ip,  netmask,gateway, dns1)
+        val ret = NetworkUtil.setStaticIp(requireContext(), ip, netmask, gateway, dns1)
+        ToastUtil.showToast(if (ret) "设置成功" else "设置失败")
     }
 
     companion object {

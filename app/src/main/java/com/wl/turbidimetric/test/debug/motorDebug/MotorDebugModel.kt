@@ -3,6 +3,7 @@ package com.wl.turbidimetric.test.debug.motorDebug
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.asFlow
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.app.AppViewModel
 import com.wl.turbidimetric.base.BaseViewModel
@@ -58,10 +59,22 @@ class MotorDebugViewModel(private val appViewModel: AppViewModel) : BaseViewMode
         "10（试剂泵）",
         "11（搅拌）",
         "12（扶正）",
-        "13（试剂）"
+        "13（试剂）",
+        "14 (样本清洗槽上水阀)",
+        "15 (搅拌清洗槽上水阀)",
+        "16 (试剂清洗槽上水阀)",
+        "17 (样本针内部上水阀)",
+        "18 (样本清洗槽下水阀)",
+        "19 (搅拌清洗槽下水阀)",
+        "20 (试剂清洗槽下水阀)",
+        "21 (中央下水阀)",
+        "22 (试剂R1控制阀)",
+        "23 (清洗液上水泵)",
+        "24 (清洗液下水泵)",
+        "25 (蒸馏水泵)"
     )
     val motorIndex = MutableLiveData(0);
-
+    val MotorIndexFlow = motorIndex.asFlow()
     fun action() {
         i("chekckID=${chekckID.value} enable=${enable.value} params=${params.value} motorIndex=${motorIndex.value}")
         enable.value = false

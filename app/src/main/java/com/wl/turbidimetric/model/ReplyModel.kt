@@ -32,7 +32,7 @@ enum class ReplyState {
     CUVETTE_NOT_EMPTY,
 
     /**
-     * 加试剂失败
+     * 取试剂失败
      */
     TAKE_REAGENT_FAILED,
 

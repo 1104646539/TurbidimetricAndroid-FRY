@@ -66,6 +66,7 @@ class SingleCmdFragment :
                 vd.btnDrainWater.isEnabled = it
                 vd.btnSampleDoorState.isEnabled = it
                 vd.btnCuvetteDoorState.isEnabled = it
+                vd.btnCurrentTempOffset.isEnabled = it
             }
         }
     }
@@ -118,6 +119,9 @@ class SingleCmdFragment :
                 vd.rbDripSampleBlendingY.isChecked,
                 vd.rbDripSampleInplaceY.isChecked
             )
+        }
+        vd.btnCurrentTempOffset.setOnClickListener {
+            vm.getTempOffset()
         }
         vd.btnTakeReagent.setOnClickListener {
             vm.takeReagent(vd.tetTakeReagentR1.text.toString(), vd.tetTakeReagentR2.text.toString())

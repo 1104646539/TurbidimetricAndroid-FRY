@@ -13,11 +13,8 @@ import com.wl.turbidimetric.databinding.ActivityDebugBinding
 import com.wl.turbidimetric.global.EventGlobal
 import com.wl.turbidimetric.global.EventMsg
 import com.wl.turbidimetric.util.ActivityDataBindingDelegate
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.greenrobot.eventbus.EventBus
 
 class DebugActivity : BaseActivity<DebugViewModel, ActivityDebugBinding>() {
@@ -34,6 +31,8 @@ class DebugActivity : BaseActivity<DebugViewModel, ActivityDebugBinding>() {
                 vd.nav.setOnBack { finishAfterTransition() }
                 vd.vp.isUserInputEnabled = false
                 vd.vp.offscreenPageLimit = ViewPager2.OFFSCREEN_PAGE_LIMIT_DEFAULT
+                (vd.vp.getChildAt(0) as androidx.recyclerview.widget.RecyclerView).recycledViewPool
+                        .setMaxRecycledViews(0, 0)
                 vd.vp.adapter = DebugViewPagerAdapter(this@DebugActivity)
 
                 vd.tl.addTab(vd.tl.newTab().setText("单步调试"))
@@ -43,23 +42,20 @@ class DebugActivity : BaseActivity<DebugViewModel, ActivityDebugBinding>() {
                 vd.tl.addTab(vd.tl.newTab().setText("电机调试"))
                 vd.tl.addTab(vd.tl.newTab().setText("检测模块调试"))
 
-                vd.tl.addOnTabSelectedListener(object : OnTabSelectedListener {
-                    override fun onTabSelected(tab: TabLayout.Tab?) {
-                        vd.vp.setCurrentItem(tab?.position ?: 0, false)
-                    }
+                vd.tl.addOnTabSelectedListener(
+                        object : OnTabSelectedListener {
+                            override fun onTabSelected(tab: TabLayout.Tab?) {
+                                vd.vp.setCurrentItem(tab?.position ?: 0, false)
+                            }
 
-                    override fun onTabUnselected(tab: TabLayout.Tab?) {
+                            override fun onTabUnselected(tab: TabLayout.Tab?) {}
 
-                    }
-
-                    override fun onTabReselected(tab: TabLayout.Tab?) {
-
-                    }
-                })
+                            override fun onTabReselected(tab: TabLayout.Tab?) {}
+                        }
+                )
             }
         }
     }
-
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
@@ -75,9 +71,7 @@ class DebugActivity : BaseActivity<DebugViewModel, ActivityDebugBinding>() {
     }
 
     private fun listenerEvent() {
-        vd.btnClear.setOnClickListener {
-            vd.tvMsg.text = ""
-        }
+        vd.btnClear.setOnClickListener { vd.tvMsg.text = "" }
     }
 
     private fun listenerView() {

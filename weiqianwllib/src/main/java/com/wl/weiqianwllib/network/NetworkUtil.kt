@@ -141,9 +141,13 @@ object NetworkUtil {
 
     //根据子网掩码，自动计算前缀长度
     private fun getPrefixLength(mask: String): Int {
-        val strs = mask.split("\\.").toTypedArray()
+        val strs = mask.split(".").toTypedArray()
         var count = 0
-        for (str in strs) if (str == "255") ++count
+        for (str in strs) {
+            if (str == "255"){
+                ++count
+            }
+        }
         return count * 8
     }
 

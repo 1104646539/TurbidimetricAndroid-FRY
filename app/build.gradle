@@ -32,7 +32,7 @@ android {
         minSdk 24
         targetSdk 32
         versionCode 1
-        versionName "1.0.1.0-添加串口检测"
+        versionName "1.0.1.0-添加电机命令"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 
@@ -233,4 +233,16 @@ dependencies {
     //内存泄露检测
     debugImplementation libs.leakcanary.android
     implementation libs.fondesa.recycler.divider
+}
+
+task forceStop(type: Exec) {
+    group = "debug"
+    description = "Force stops the application using root permissions"
+    def adb = android.getAdbExecutable().toString()
+    // Explicitly pass arguments to avoid shell interpretation issues
+    commandLine adb, 'shell', 'su', '-c', 'am force-stop com.wl.turbidimetric'
+    ignoreExitValue true
+    doLast {
+        println "Force stop command executed."
+    }
 }

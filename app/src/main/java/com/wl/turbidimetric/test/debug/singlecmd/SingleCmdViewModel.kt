@@ -41,6 +41,7 @@ import com.wl.turbidimetric.model.convertReplyState
 import com.wl.turbidimetric.util.Callback2
 import com.wl.wllib.LogToFile.i
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlin.math.absoluteValue
 
 class SingleCmdViewModel(private val appViewModel: AppViewModel) : BaseViewModel(), Callback2 {
     val testMsg = MutableStateFlow("")
@@ -113,17 +114,19 @@ class SingleCmdViewModel(private val appViewModel: AppViewModel) : BaseViewModel
     }
 
     override fun readDataSamplingModel(reply: ReplyModel<SamplingModel>) {
-        var msg = "取样完成"
+        var msg = if (reply.state == ReplyState.SAMPLING_FAILED) "取样失败" else "取样成功"
+
         changeResult(msg)
     }
 
     override fun readDataTakeReagentModel(reply: ReplyModel<TakeReagentModel>) {
-        var msg = "取试剂完成"
+        var msg = if (reply.state == ReplyState.TAKE_REAGENT_FAILED) "取试剂失败" else "取试剂成功"
+
         changeResult(msg)
     }
 
     override fun readDataDripSampleModel(reply: ReplyModel<DripSampleModel>) {
-        var msg = "加样完成"
+        var msg = if (reply.state == ReplyState.CUVETTE_NOT_EMPTY) "比色皿非空" else "加样成功"
         changeResult(msg)
     }
 
@@ -199,7 +202,8 @@ class SingleCmdViewModel(private val appViewModel: AppViewModel) : BaseViewModel
     }
 
     override fun readDataSqueezing(reply: ReplyModel<SqueezingModel>) {
-        var msg = "挤压完成"
+        var msg = if (reply.state == ReplyState.SQUEEZING_FAILED) "挤压错误" else "挤压成功"
+
         changeResult(msg)
     }
 
@@ -535,6 +539,13 @@ class SingleCmdViewModel(private val appViewModel: AppViewModel) : BaseViewModel
         appViewModel.serialPort.getTemp()
     }
 
+    /**
+     * 获取温度偏移量
+     */
+    fun getTempOffset() {
+        enable.postValue(false)
+        appViewModel.serialPort.setTemp(255, 255, 255, 255)
+    }
 
     /**
      * 检测
@@ -585,7 +596,14 @@ class SingleCmdViewModel(private val appViewModel: AppViewModel) : BaseViewModel
      */
     fun correctionTemp(tempReaction: String, tempR1: String) {
         enable.postValue(false)
-        appViewModel.serialPort.setTemp(tempReaction.toInt(), tempR1.toInt())
+        val reactionS = if (tempReaction.toInt() >= 0) 0 else 1
+        val r1S = if (tempR1.toInt() >= 0) 0 else 1
+        appViewModel.serialPort.setTemp(
+            reactionS,
+            tempReaction.toInt().absoluteValue,
+            r1S,
+            tempR1.toInt().absoluteValue
+        )
     }
 
     fun sampleDoor() {

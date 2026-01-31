@@ -88,6 +88,7 @@ class SerialPortImpl(
      * 停止运行
      */
     private var stopRunning = false
+
     /**
      * 在仪器已经报错的情况下，还能发送的命令
      */
@@ -204,7 +205,7 @@ class SerialPortImpl(
     }
 
     /**
-     * 收到的消息分发 
+     * 收到的消息分发
      */
     @OptIn(ExperimentalUnsignedTypes::class)
     private fun dispatchData(ready: UByteArray) = runBlocking {
@@ -410,6 +411,7 @@ class SerialPortImpl(
                 }
 
             }
+
             SerialGlobal.CMD_KillAll -> {
                 callback {
                     it.readDataKillAllModel(transitionKillAllModel(ready))
@@ -461,7 +463,7 @@ class SerialPortImpl(
                         //升级中不发送任何命令
                         continue
                     }
-                    if(stopRunning){
+                    if (stopRunning) {
                         //停止运行
                         continue
                     }
@@ -481,10 +483,11 @@ class SerialPortImpl(
             }
         }
     }
+
     /**
      * 停止所有任务
      */
-    fun stopRunning(){
+    fun stopRunning() {
         //停止所有重发
         scope?.launch {
             retryJobQueue.forEach {
@@ -492,6 +495,7 @@ class SerialPortImpl(
             }
         }
     }
+
     /**
      * 该是否需要重发
      * 自检、获取温度不需要重发
@@ -540,7 +544,7 @@ class SerialPortImpl(
                     data.addAll(re)
                     c("每次接收的re=${re.toHex()}")
                 }
-                if(stopRunning){
+                if (stopRunning) {
                     //停止运行
                     data.clear()
                     continue
@@ -1030,16 +1034,16 @@ class SerialPortImpl(
     /**
      * 设置温度
      */
-    override fun setTemp(reactionTemp: Int, r1Temp: Int) {
-        val symbolReaction = if (reactionTemp >= 0) 0 else 1
-        val symbolR1 = if (r1Temp >= 0) 0 else 1
+    override fun setTemp(reactionSymbol: Int, reactionTemp: Int, r1TempSymbol: Int, r1Temp: Int) {
+//        val symbolReaction = if (reactionTemp >= 0) 0 else 1
+//        val symbolR1 = if (r1Temp >= 0) 0 else 1
         writeAsync(
             createCmd(
                 SerialGlobal.CMD_GetSetTemp,
-                symbolReaction.toUByte(),
-                (reactionTemp.absoluteValue).toUByte(),
-                symbolR1.toUByte(),
-                (r1Temp.absoluteValue).toUByte()
+                reactionSymbol.toUByte(),
+                (reactionTemp).toUByte(),
+                r1TempSymbol.toUByte(),
+                (r1Temp).toUByte()
             )
         )
     }
@@ -1062,6 +1066,7 @@ class SerialPortImpl(
             createCmd(SerialGlobal.CMD_Squeezing, data4 = if (enable) 0x1u else 0x0u)
         )
     }
+
     /**
      * 下位机杀死所有进程
      */
@@ -1075,7 +1080,7 @@ class SerialPortImpl(
      * 获取当前温度
      */
     override fun getTemp() {
-        setTemp(0, 0)
+        setTemp(0, 0, 0, 0)
     }
 
     /**
@@ -1192,10 +1197,10 @@ class SerialPortImpl(
 
     override fun stopRunning(stop: Boolean) {
         stopRunning = stop
-        if(stopRunning){
+        if (stopRunning) {
             //停止运行
             stopRunning()
-        }else{
+        } else {
             //恢复
         }
     }

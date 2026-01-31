@@ -148,11 +148,22 @@
                     app:layout_constraintStart_toStartOf="@+id/btn_get_machine_state"
                     app:layout_constraintTop_toBottomOf="@+id/btn_get_machine_state" />
 
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btn_current_temp_offset"
+                    style="@style/BtnPositive"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:minWidth="150dp"
+                    android:text="获取当前偏移量"
+                    app:layout_constraintLeft_toRightOf="@id/btn_correction_temp"
+                    app:layout_constraintTop_toBottomOf="@+id/btn_get_machine_state" />
+
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/til_correction_temp_reaction"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:layout_constraintLeft_toRightOf="@+id/btn_move_sample_shelf"
+                    app:layout_constraintLeft_toRightOf="@+id/btn_current_temp_offset"
                     app:layout_constraintTop_toTopOf="@+id/btn_correction_temp">
 
                     <com.google.android.material.textfield.TextInputEditText

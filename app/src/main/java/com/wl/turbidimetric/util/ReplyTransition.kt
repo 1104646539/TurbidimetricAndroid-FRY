@@ -292,12 +292,24 @@ fun transitionGetVersionModel(data: UByteArray): ReplyModel<GetVersionModel> {
  * @param data UByteArray
  */
 fun transitionTempModel(data: UByteArray): ReplyModel<TempModel> {
+    var reactionTemp = merge(ubyteArrayOf(data[2], data[3]))
+    var r1Temp = merge(ubyteArrayOf(data[4], data[5]))
+    reactionTemp = convertSymbol16(reactionTemp)
+    r1Temp = convertSymbol16(r1Temp)
     return ReplyModel(
         SerialGlobal.CMD_GetSetTemp, convertReplyState(data[1].toInt()), TempModel(
-            reactionTemp = merge(ubyteArrayOf(data[2], data[3])),
-            r1Temp = merge(ubyteArrayOf(data[4], data[5]))
+            reactionTemp = reactionTemp,
+            r1Temp = r1Temp
         )
     )
+}
+
+fun convertSymbol16(value: Int): Int {
+    return if (value and 0x8000 == 0x8000) {
+        -(value xor 0x8000)
+    } else {
+        value
+    }
 }
 
 /**
@@ -364,6 +376,7 @@ fun transitionFullR1Model(data: UByteArray): ReplyModel<FullR1Model> {
         )
     )
 }
+
 /**
  * 杀死所有进程
  * @param data UByteArray

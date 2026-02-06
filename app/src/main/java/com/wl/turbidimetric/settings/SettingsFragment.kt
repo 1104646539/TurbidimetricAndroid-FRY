@@ -105,6 +105,7 @@ class SettingsFragment constructor() :
                     vd.sivRepeatability.visibility = it
                     vd.sivExportLog.visibility = it
                     vd.sivDebugTitle.visibility = it
+                    vd.tvSoftVersionMcu.visibility = it
                 }
             }
         }

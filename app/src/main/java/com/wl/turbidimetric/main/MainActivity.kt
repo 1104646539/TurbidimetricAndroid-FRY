@@ -90,7 +90,6 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     override val vd: ActivityMainBinding by ActivityDataBindingDelegate(R.layout.activity_main)
     override val vm: MainViewModel by viewModels { MainViewModelFactory() }
     private var mPermissionIntent: PendingIntent? = null
-    private val splashFragment: SplashFragment = SplashFragment()
     private val mCurrentPosition = FloatArray(2)
 
     private val shutdownDialog by lazy {
@@ -286,19 +285,6 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
 
     private fun initTime() {
         vm.processIntent(MainIntent.ListenerTime)
-    }
-
-
-    private fun showSplash() {
-        supportFragmentManager.beginTransaction()
-            .add(R.id.cl_root, splashFragment, SplashFragment.TAG)
-            .show(splashFragment).commitAllowingStateLoss()
-    }
-
-    private fun hideSplash() {
-        supportFragmentManager.findFragmentByTag(SplashFragment.TAG)?.let {
-            supportFragmentManager.beginTransaction().hide(it).commitAllowingStateLoss()
-        }
     }
 
     /**

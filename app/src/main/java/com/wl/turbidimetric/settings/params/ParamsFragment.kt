@@ -69,14 +69,29 @@ class ParamsFragment :
                     vd.tilSamplingProbeCleaningTime.visibility = show.isShow()
                     vd.tilStirProbeCleaningTime.visibility = show.isShow()
                     vd.tilStirTime.visibility = show.isShow()
+                    vd.btnChange.visibility = show.isShow()
                 }
+                //非调试模式不能修改
+                vd.tilR1.isEnabled = debug
+                vd.tilR2.isEnabled = debug
+                vd.tilSampling.isEnabled = debug
+                vd.tilSamplingProbeCleaningTime.isEnabled = debug
+                vd.tilStirProbeCleaningTime.isEnabled = debug
+                vd.tilStirTime.isEnabled = debug
+                vd.tilTest1DelayTime.isEnabled = debug
+                vd.tilTest2DelayTime.isEnabled = debug
+                vd.tilTest3DelayTime.isEnabled = debug
+                vd.tilTest4DelayTime.isEnabled = debug
+                vd.tilReactionTime.isEnabled = debug
+
+
                 if (debug) {
                     vd.tietReactionTime.removeTextChangedListener(tw)
 
                     vd.tietTest2DelayTime.addTextChangedListener(tw)
                     vd.tietTest1DelayTime.addTextChangedListener(tw)
 
-                    vd.tilReactionTime.isEnabled = false
+//                    vd.tilReactionTime.isEnabled = false
 
                     //因为以前依赖的view隐藏了所有重新设置约束
                     val cs = ConstraintSet()
@@ -104,11 +119,12 @@ class ParamsFragment :
                         ConstraintSet.BOTTOM
                     )
                     cs2.applyTo(vd.clRoot)
+
                 } else {
                     vd.tietTest1DelayTime.removeTextChangedListener(tw)
                     vd.tietTest2DelayTime.removeTextChangedListener(tw)
 
-                    vd.tilReactionTime.isEnabled = true
+//                    vd.tilReactionTime.isEnabled = true
                     vd.tietReactionTime.addTextChangedListener(tw)
 
                     //因为以前依赖的view隐藏了所有重新设置约束

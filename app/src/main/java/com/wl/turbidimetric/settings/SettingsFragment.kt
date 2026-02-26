@@ -14,6 +14,8 @@ import com.wl.turbidimetric.ex.*
 import com.wl.turbidimetric.global.EventGlobal
 import com.wl.turbidimetric.global.EventMsg
 import com.wl.turbidimetric.global.SystemGlobal
+import com.wl.turbidimetric.login.details.UserDetailsFragment
+import com.wl.turbidimetric.login.list.UserListFragment
 import com.wl.turbidimetric.mcuupdate.McuUpdateHelper
 import com.wl.turbidimetric.mcuupdate.UpdateResult
 import com.wl.turbidimetric.model.TestState
@@ -40,6 +42,7 @@ import com.wl.wllib.LogToFile.i
 import com.wl.wllib.LogToFile.u
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.launch
 
 class SettingsFragment constructor() :
@@ -99,13 +102,29 @@ class SettingsFragment constructor() :
             appVm.obDebugMode.collectLatest {
                 i("obDebugMode $it")
                 it.isShow()?.let {
-                    vd.sivDebug.visibility = it
+//                    vd.sivDebug.visibility = it
                     vd.sivLauncher.visibility = it
                     vd.sivNav.visibility = it
                     vd.sivRepeatability.visibility = it
                     vd.sivExportLog.visibility = it
-                    vd.sivDebugTitle.visibility = it
+//                    vd.sivDebugTitle.visibility = it
                     vd.tvSoftVersionMcu.visibility = it
+
+                    if(appVm.userState.last()?.isAdmin() == true){
+                        vd.sivDebugTitle.visibility = true.isShow()
+                        vd.sivDebug.visibility = true.isShow()
+                    }else{
+                        vd.sivDebug.visibility = it
+                        vd.sivDebugTitle.visibility = it
+                    }
+                }
+            }
+        }
+        lifecycleScope.launch {
+            appVm.userState.collectLatest {
+                if(it?.isAdmin() == true){
+                    vd.sivDebugTitle.visibility = true.isShow()
+                    vd.sivDebug.visibility = true.isShow()
                 }
             }
         }
@@ -141,6 +160,11 @@ class SettingsFragment constructor() :
         vd.sivReportSettings.setOnClickListener {
             u("报告设置")
             changeContent(ReportFragment::class.java)
+            vd.wgpSelectable.setSelected(it.id)
+        }
+        vd.sivUserList.setOnClickListener {
+            u("用户管理")
+            changeContent(UserListFragment::class.java)
             vd.wgpSelectable.setSelected(it.id)
         }
         vd.sivLogList.setOnClickListener {
@@ -377,8 +401,20 @@ class SettingsFragment constructor() :
                 })
             }
 
+            EventGlobal.WHAT_USER_LIST_TO_DETAILS -> {
+                changeContent(UserDetailsFragment::class.java, bundle = Bundle().apply {
+                    if (event.data != null && event.data is Long) {
+                        putLong(UserDetailsFragment.ID, event.data)
+                    }
+                })
+            }
+
             EventGlobal.WHAT_PROJECT_DETAILS_FINISH -> {
                 changeContent(ProjectListFragment::class.java)
+            }
+
+            EventGlobal.WHAT_USER_DETAILS_FINISH -> {
+                changeContent(UserListFragment::class.java)
             }
         }
     }

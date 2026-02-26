@@ -8,6 +8,7 @@ import androidx.room.TypeConverters
 import com.wl.turbidimetric.db.converters.StringToStringListConverters
 import com.wl.turbidimetric.dao.GlobalDao
 import com.wl.turbidimetric.dao.LogDao
+import com.wl.turbidimetric.dao.LoginDao
 import com.wl.turbidimetric.dao.MainDao
 import com.wl.turbidimetric.db.converters.BigDecimalConverters
 import com.wl.turbidimetric.db.converters.DoubleArrayConverters
@@ -18,9 +19,11 @@ import com.wl.turbidimetric.model.CurveModel
 import com.wl.turbidimetric.model.GlobalConfig
 import com.wl.turbidimetric.model.ProjectModel
 import com.wl.turbidimetric.model.TestResultModel
+import com.wl.turbidimetric.model.UserModel
 
 @Database(
-    entities = [TestResultModel::class, ProjectModel::class, CurveModel::class, GlobalConfig::class, LogModel::class],
+    entities =
+        [TestResultModel::class, ProjectModel::class, CurveModel::class, GlobalConfig::class, LogModel::class, UserModel::class],
     version = 1,
     exportSchema = true,
 //    autoMigrations = [AutoMigration(from = 1, to = 2)]
@@ -35,6 +38,7 @@ import com.wl.turbidimetric.model.TestResultModel
 abstract class MainRoomDatabase : RoomDatabase() {
 
     abstract fun mainDao(): MainDao
+    abstract fun loginDao(): LoginDao
     abstract fun globalDao(): GlobalDao
     abstract fun logDao(): LogDao
 

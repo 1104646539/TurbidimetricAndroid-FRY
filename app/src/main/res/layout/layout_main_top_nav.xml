@@ -30,6 +30,19 @@
         app:layout_constraintLeft_toRightOf="@id/iv_logo"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <TextView
+        android:id="@+id/tv_user"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="50dp"
+        android:background="@drawable/bg_frame"
+        android:padding="10dp"
+        android:textColor="@color/white"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/iv_state_machine"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <ImageView
         android:id="@+id/iv_state_machine"
         android:layout_width="wrap_content"

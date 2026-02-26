@@ -28,6 +28,7 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout.LayoutParams
 import androidx.activity.viewModels
 import androidx.core.animation.addListener
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.lxj.xpopup.XPopup
 import com.wl.turbidimetric.R
@@ -37,9 +38,11 @@ import com.wl.turbidimetric.app.MachineState
 import com.wl.turbidimetric.app.PrinterState
 import com.wl.turbidimetric.base.BaseActivity
 import com.wl.turbidimetric.databinding.ActivityMainBinding
+import com.wl.turbidimetric.ex.toast
 import com.wl.turbidimetric.global.EventGlobal
 import com.wl.turbidimetric.global.EventMsg
 import com.wl.turbidimetric.global.SystemGlobal
+import com.wl.turbidimetric.login.LoginFragment
 import com.wl.turbidimetric.main.splash.SplashFragment
 import com.wl.turbidimetric.report.PrintSDKHelper
 import com.wl.turbidimetric.upload.hl7.HL7Helper
@@ -48,6 +51,7 @@ import com.wl.turbidimetric.upload.hl7.util.ConnectStatus
 import com.wl.turbidimetric.upload.service.OnConnectListener
 import com.wl.turbidimetric.util.ActivityDataBindingDelegate
 import com.wl.turbidimetric.util.ScanCodeUtil
+import com.wl.turbidimetric.view.CustomBubbleAttachLoginPopup
 import com.wl.turbidimetric.view.CustomBubbleAttachPopup
 import com.wl.turbidimetric.view.dialog.HiltDialog
 import com.wl.turbidimetric.view.dialog.isShow
@@ -207,6 +211,12 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         initUploadClient()
         initPrintSDK()
         OrderUtil.showHideNav(this, false)
+        showLoginUI()
+    }
+
+    private fun showLoginUI() {
+        supportFragmentManager.beginTransaction().add(R.id.rl_root, LoginFragment(), "login")
+            .commitNow()
     }
 
     private fun showAnimStart() {
@@ -269,6 +279,36 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     private fun showPopupView(attachView: View?, content: String, duration: Long = 5000) {
         if (attachView == null) return
         val contentView = CustomBubbleAttachPopup(this, content)
+        XPopup.Builder(this)
+            .hasShadowBg(true)
+            .isTouchThrough(true)
+            .isDestroyOnDismiss(true) //对于只使用一次的弹窗，推荐设置这个
+            .atView(attachView)
+            .isCenterHorizontal(true)
+            .hasShadowBg(false) // 去掉半透明背景
+            .asCustom(contentView)
+            .show()
+            .also {
+                mHandler.postDelayed({ it.dismiss() }, duration)
+            }
+    }
+
+    /**
+     * 显示一个气泡popup在view的下方
+     * @param attachView View?
+     * @param content String
+     * @param duration Long
+     */
+    private fun showPopupLoginView(attachView: View?, content: String, duration: Long = 5000) {
+        if (attachView == null) return
+        val contentView = CustomBubbleAttachLoginPopup(this, content, {
+            //切换用户
+            if (appVm.testState.isRunning()) {
+                toast("仪器正在运行")
+                return@CustomBubbleAttachLoginPopup
+            }
+            showLoginUI()
+        })
         XPopup.Builder(this)
             .hasShadowBg(true)
             .isTouchThrough(true)
@@ -365,6 +405,15 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
                 }
             }
             launch {
+                appVm.userState.collectLatest {
+                    vd.tnv.setUser("登录用户：${it?.userName}")
+                }
+                if (appVm.userModel?.isAdmin() == true) {
+                    appVm.isDebugMode = true
+                }
+            }
+
+            launch {
                 appVm.uploadState.collectLatest {
                     vd.tnv.setStateUploadSrc(it.id)
                 }
@@ -414,6 +463,13 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
                                 "${it.printerState.str}\n还有${it.printNum}个打印任务正在等待"
                             )
                         }
+
+                        is MainState.ShowPopupViewForLogin -> {
+                            showPopupLoginView(
+                                vd.tnv.getUserLogin(),
+                                "${it.userModel?.showLevel()}"
+                            )
+                        }
                     }
                 }
             }
@@ -441,6 +497,9 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         }
         vd.tnv.getStatePrinter()?.setOnClickListener {
             vm.processIntent(MainIntent.ShowPopupViewForPrinterState)
+        }
+        vd.tnv.getUserLogin()?.setOnClickListener {
+            vm.processIntent(MainIntent.ShowPopupViewForLogin)
         }
     }
 
@@ -640,11 +699,22 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
 //                showAnimStart()
             }
 
-            EventGlobal.WHAT_HOME_ADD_PRINT_ANIM -> {//首屏加载完毕，执行显示主页面动画
+            EventGlobal.WHAT_HOME_ADD_PRINT_ANIM -> {//添加打印动画
                 if (event.data is PrintAnimParams) {
                     addPrintWorkAnim(event.data)
                 }
             }
+
+            EventGlobal.WHAT_LOGIN_SUCCESS -> {//登录成功，初始化主页
+                showMainUI()
+            }
+        }
+    }
+
+    private fun showMainUI() {
+        val loginFragment = supportFragmentManager.findFragmentByTag("login") as? Fragment
+        if (loginFragment != null) {
+            supportFragmentManager.beginTransaction().remove(loginFragment).commitNow()
         }
     }
 }

@@ -1,16 +1,16 @@
-<?xml version="1.0" encoding="utf-8"?><!--android:sharedUserId="android.uid.system"-->
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS"/>
-    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+
     <application
         android:name=".app.App"
         android:allowBackup="true"
@@ -24,6 +24,25 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Mvvmdemo"
         tools:replace="android:extractNativeLibs">
+<!--        <activity-->
+<!--            android:name=".login.LoginActivity"-->
+<!--            android:exported="true"-->
+<!--            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|screenLayout|smallestScreenSize|density"-->
+<!--            android:theme="@style/AppTheme.StartingWindowTheme"-->
+<!--            android:windowSoftInputMode="adjustPan|stateAlwaysHidden">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.MAIN" />-->
+
+<!--                &lt;!&ndash; <category android:name="android.intent.category.HOME" /> &ndash;&gt;-->
+<!--                &lt;!&ndash; <category android:name="android.intent.category.DEFAULT" /> &ndash;&gt;-->
+<!--                &lt;!&ndash; <category android:name="android.intent.category.MONKEY" /> &ndash;&gt;-->
+<!--                <category android:name="android.intent.category.LAUNCHER" />-->
+<!--            </intent-filter>-->
+
+<!--            <meta-data-->
+<!--                android:name="android.app.lib_name"-->
+<!--                android:value="" />-->
+<!--        </activity>-->
         <activity
             android:name=".upload.view.UploadSettingsActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|screenLayout|smallestScreenSize|density"
@@ -41,9 +60,9 @@
         <activity
             android:name=".test.debug.DebugActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|screenLayout|smallestScreenSize|density"
-            android:windowSoftInputMode="adjustPan|stateAlwaysHidden"></activity>
-        <activity android:name=".project.list.ProjectListActivity"></activity>
-        <activity android:name=".project.details.ProjectDetailsActivity"></activity>
+            android:windowSoftInputMode="adjustPan|stateAlwaysHidden" />
+        <activity android:name=".project.list.ProjectListActivity" />
+        <activity android:name=".project.details.ProjectDetailsActivity" />
         <activity
             android:name=".main.MainActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|screenLayout|smallestScreenSize|density"
@@ -53,9 +72,9 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
-<!--                 <category android:name="android.intent.category.HOME" />-->
-<!--                 <category android:name="android.intent.category.DEFAULT" />-->
-<!--                 <category android:name="android.intent.category.MONKEY" />-->
+                <!-- <category android:name="android.intent.category.HOME" /> -->
+                <!-- <category android:name="android.intent.category.DEFAULT" /> -->
+                <!-- <category android:name="android.intent.category.MONKEY" /> -->
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
@@ -63,13 +82,16 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
-        <receiver android:name=".app.Auto"
+
+        <receiver
+            android:name=".app.Auto"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </receiver>
-<!--        <activity android:name=".ComposeTestActivity"></activity>-->
     </application>
+
 </manifest>

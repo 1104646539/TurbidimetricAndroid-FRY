@@ -54,4 +54,19 @@ object EventGlobal {
      * 项目详情，关闭
      */
     const val WHAT_PROJECT_DETAILS_FINISH = 190
+
+    /**
+     * 登录成功
+     */
+    const val WHAT_LOGIN_SUCCESS = 200
+
+    /**
+     * 用户详情，关闭
+     */
+    const val WHAT_USER_DETAILS_FINISH = 201
+
+    /**
+     * 用户列表，添加项目
+     */
+    const val WHAT_USER_LIST_TO_DETAILS = 202
 }

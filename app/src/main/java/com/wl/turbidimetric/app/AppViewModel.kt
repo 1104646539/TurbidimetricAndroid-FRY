@@ -9,6 +9,7 @@ import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.MachineTestModel
 import com.wl.turbidimetric.model.TestState
 import com.wl.turbidimetric.model.TestType
+import com.wl.turbidimetric.model.UserModel
 import com.wl.turbidimetric.print.ThermalPrintUtil
 import com.wl.turbidimetric.report.PrintHelper
 import com.wl.turbidimetric.repository.if2.LocalDataSource
@@ -43,6 +44,22 @@ class AppViewModel(
     val scanCodeUtil: ScanCodeUtil
 ) :
     ViewModel() {
+    /**
+     * 登录账户
+     */
+    var userModel: UserModel? = null
+        set(value) {
+            field = value
+            viewModelScope.launch {
+                _userState.emit(field)
+            }
+        }
+
+    /**
+     * 登录账户
+     */
+    private val _userState = MutableSharedFlow<UserModel?>()
+    val userState = _userState.asSharedFlow()
 
     /**
      * 仪器状态
@@ -97,7 +114,6 @@ class AppViewModel(
         }
     private val _obTestState = MutableStateFlow(TestState.None)
     val obTestState = _obTestState.asStateFlow()
-
 
     /**
      * 仪器检测模式

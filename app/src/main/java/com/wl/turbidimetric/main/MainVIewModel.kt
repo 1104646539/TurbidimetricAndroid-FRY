@@ -10,6 +10,7 @@ import com.wl.turbidimetric.app.PrinterState
 import com.wl.turbidimetric.app.UploadState
 import com.wl.turbidimetric.base.BaseViewModel
 import com.wl.turbidimetric.ex.getAppViewModel
+import com.wl.turbidimetric.model.UserModel
 import com.wl.weiqianwllib.upan.StorageState
 import com.wl.wllib.LogToFile.i
 import com.wl.wllib.LogToFile.u
@@ -66,6 +67,18 @@ class MainViewModel(private val appViewModel: WeakReference<AppViewModel>) : Bas
                 MainIntent.ShowPopupViewForPrinterState -> {
                     showPopupViewForPrinterState()
                 }
+
+                MainIntent.ShowPopupViewForLogin -> {
+                    showPopupViewForLogin()
+                }
+            }
+        }
+    }
+
+    private fun showPopupViewForLogin() {
+        viewModelScope.launch {
+            appViewModel.get()?.let { appViewModel ->
+                _uiState.emit(MainState.ShowPopupViewForLogin(appViewModel.userModel))
             }
         }
     }
@@ -134,13 +147,17 @@ class MainViewModel(private val appViewModel: WeakReference<AppViewModel>) : Bas
 sealed class MainState {
     object None : MainState()
     object ShowOpenDocumentTree : MainState()
-//    data class CurIndex(val index: Int) : MainState()
+
+    //    data class CurIndex(val index: Int) : MainState()
     data class ShowPopupViewForUploadState(val uploadState: UploadState) : MainState()
     data class ShowPopupViewForStorageState(val storageState: com.wl.turbidimetric.app.StorageState) :
         MainState()
 
     data class ShowPopupViewForMachineState(val machineState: MachineState) : MainState()
     data class ShowPopupViewForPrinterState(val printerState: PrinterState, val printNum: Int) :
+        MainState()
+
+    data class ShowPopupViewForLogin(val userModel: UserModel?) :
         MainState()
 }
 
@@ -156,6 +173,7 @@ sealed class MainIntent {
     object ShowPopupViewForStorageState : MainIntent() //显示u盘状态气泡
     object ShowPopupViewForMachineState : MainIntent() //显示仪器状态气泡
     object ShowPopupViewForPrinterState : MainIntent() //显示打印机状态气泡
+    object ShowPopupViewForLogin : MainIntent() //显示登录信息
 }
 
 class MainViewModelFactory(

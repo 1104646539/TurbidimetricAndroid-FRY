@@ -62,6 +62,8 @@ object LocalDataGlobal {
         val QualityHigh1 = 340
         val QualityHigh2 = 460
         val DoorEnable = true
+        val PrevUserName = "admin"
+        val PrevUserPsw = "admin"
     }
 
 

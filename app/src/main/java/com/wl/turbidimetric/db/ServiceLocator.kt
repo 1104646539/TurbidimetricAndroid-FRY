@@ -8,11 +8,13 @@ import com.wl.turbidimetric.repository.DefaultProjectDataSource
 import com.wl.turbidimetric.repository.DefaultTestResultDataSource
 import com.wl.turbidimetric.repository.DefaultLocalDataDataSource
 import com.wl.turbidimetric.repository.DefaultLogListDataSource
+import com.wl.turbidimetric.repository.DefaultUserModelSource
 import com.wl.turbidimetric.repository.if2.CurveSource
 import com.wl.turbidimetric.repository.if2.LocalDataSource
 import com.wl.turbidimetric.repository.if2.LogListDataSource
 import com.wl.turbidimetric.repository.if2.ProjectSource
 import com.wl.turbidimetric.repository.if2.TestResultSource
+import com.wl.turbidimetric.repository.if2.UserSource
 
 object ServiceLocator {
     @Volatile
@@ -23,6 +25,7 @@ object ServiceLocator {
     var projectDataSource: ProjectSource? = null
     var curveSource: CurveSource? = null
     var localDataSource: LocalDataSource? = null
+    var userSource: UserSource? = null
     var testResultSource: TestResultSource? = null
     var logListDataSource: LogListDataSource? = null
     val path = "word_database"
@@ -52,6 +55,14 @@ object ServiceLocator {
                 ?: DefaultLocalDataDataSource(globalDao = getDb(context).globalDao()).apply {
                     localDataSource = this
                 }
+        }
+    }
+
+    fun provideUserSource(context: Context): UserSource {
+        synchronized(this) {
+            return userSource ?: DefaultUserModelSource(dao = getDb(context).loginDao()).apply {
+                userSource = this
+            }
         }
     }
 
@@ -124,7 +135,7 @@ object ServiceLocator {
 ////                    .createFromFile(File("sdcard/bf/word_database"))
 ////                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
 //                    .build()
-                MainRoomDatabase.getDatabase(context,path)
+                MainRoomDatabase.getDatabase(context, path)
             }
             instance
         }

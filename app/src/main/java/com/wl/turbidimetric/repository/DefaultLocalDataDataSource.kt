@@ -1,5 +1,6 @@
 package com.wl.turbidimetric.repository
 
+import android.R
 import com.wl.turbidimetric.dao.GlobalDao
 import com.wl.turbidimetric.model.GlobalConfig
 import com.wl.turbidimetric.repository.if2.LocalDataSource
@@ -29,6 +30,18 @@ class DefaultLocalDataDataSource(
     override fun resetGlobal() {
         update {
             backupsGlobal()
+        }
+    }
+
+    override fun setPrevUserName(userName: String) {
+        update {
+            it.copy(PrevUserName = userName)
+        }
+    }
+
+    override fun setPrevUserPsw(psw: String) {
+        update {
+            it.copy(PrevUserPsw = psw)
         }
     }
 
@@ -176,6 +189,14 @@ class DefaultLocalDataDataSource(
     }
     override fun getDoorEnable(): Boolean {
         return global().DoorEnable
+    }
+
+    override fun getPrevUserName(): String {
+       return global().PrevUserName
+    }
+
+    override fun getPrevUserPsw(): String {
+        return global().PrevUserPsw
     }
 
     override fun setLooperTest(looperTest: Boolean) {

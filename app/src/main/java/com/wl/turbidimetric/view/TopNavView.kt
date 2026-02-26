@@ -23,6 +23,7 @@ class TopNavView @JvmOverloads constructor(
     private var ivStatePrinter: ImageView? = null
     private var llShutdown: View? = null
     private var tvTime: TextView? = null
+    private var tvUser: TextView? = null
     private var tvPrintNum: TextView? = null
 
     init {
@@ -39,7 +40,9 @@ class TopNavView @JvmOverloads constructor(
     fun setTime(timeStr: String) {
         tvTime?.text = timeStr
     }
-
+    fun setUser(userName: String) {
+        tvUser?.text = userName
+    }
     fun setShutdownListener(onClick: OnClickListener) {
         llShutdown?.setOnClickListener(onClick)
     }
@@ -87,6 +90,9 @@ class TopNavView @JvmOverloads constructor(
     fun getStateStorage(): View? {
         return ivStateStorage
     }
+    fun getUserLogin(): View? {
+        return tvUser
+    }
 
     private fun initView() {
         root?.apply {
@@ -98,6 +104,7 @@ class TopNavView @JvmOverloads constructor(
             llShutdown = findViewById(R.id.ll_shutdown)
             tvTime = findViewById(R.id.tv_time)
             tvPrintNum = findViewById(R.id.tv_print_num)
+            tvUser = findViewById(R.id.tv_user)
         }
     }
 

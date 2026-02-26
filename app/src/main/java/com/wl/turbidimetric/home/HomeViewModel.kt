@@ -2875,6 +2875,14 @@ class HomeViewModel(
     var errorInfo: MutableList<ErrorInfo>? = null
 
     /**
+     * 如果是第一次，就需要自检，如果已经自检过了，切换用户后就不需要再自检
+     * @return Boolean
+     */
+    fun isNeedGetMachineState(): Boolean {
+        return appViewModel.testState == TestState.None
+    }
+
+    /**
      * 接收到自检
      * @param reply ReplyModel<GetMachineStateModel>
      */

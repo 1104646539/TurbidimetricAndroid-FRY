@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@drawable/bg_item"
+        android:padding="8dp">
+
+        <TextView
+            android:id="@+id/tv_user_name"
+            style="@style/TextHilt"
+            android:layout_width="400dp"
+            android:textColor="@color/text_gray"
+            android:layout_height="wrap_content"
+            android:text="用户名" />
+
+        <TextView
+            android:id="@+id/tv_psw"
+            android:visibility="gone"
+            style="@style/TextHilt"
+            android:textColor="@color/text_gray"
+            android:layout_width="400dp"
+            android:layout_height="wrap_content"
+            android:text="密码" />
+
+        <TextView
+            android:id="@+id/tv_level"
+            style="@style/TextHilt"
+            android:textColor="@color/text_gray"
+            android:layout_width="400dp"
+            android:layout_height="wrap_content"
+            android:text="权限" />
+
+
+
+    </LinearLayout>
+</layout>

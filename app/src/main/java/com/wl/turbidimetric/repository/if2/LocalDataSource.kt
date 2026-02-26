@@ -1,5 +1,7 @@
 package com.wl.turbidimetric.repository.if2
 
+import android.R
+
 interface LocalDataSource {
     fun getDetectionNum(): String
     fun getTakeReagentR1(): Int
@@ -36,6 +38,8 @@ interface LocalDataSource {
     fun getQualityHigh1(): Int
     fun getQualityHigh2(): Int
     fun getDoorEnable(): Boolean
+    fun getPrevUserName(): String
+    fun getPrevUserPsw(): String
 
     fun setLooperTest(looperTest: Boolean)
     fun setHospitalName(name: String)
@@ -73,4 +77,6 @@ interface LocalDataSource {
     fun setQualityHigh2(v: Int)
     fun setDoorEnable(enable: Boolean)
     fun resetGlobal()
+    fun setPrevUserName(userName: String)
+    fun setPrevUserPsw(psw: String)
 }

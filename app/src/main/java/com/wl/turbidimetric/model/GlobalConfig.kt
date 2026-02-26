@@ -149,4 +149,12 @@ data class GlobalConfig(
      * 是否使用门传感器
      */
     val DoorEnable: Boolean = LocalDataGlobal.Default.DoorEnable,
+    /**
+     * 上一次登录的用户名
+     */
+    val PrevUserName: String = LocalDataGlobal.Default.PrevUserName,
+    /**
+     * 上一次登录的密码
+     */
+    val PrevUserPsw: String = LocalDataGlobal.Default.PrevUserPsw,
 )

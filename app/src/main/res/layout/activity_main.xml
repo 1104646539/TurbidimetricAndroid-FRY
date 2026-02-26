@@ -16,9 +16,6 @@
             android:orientation="vertical"
             tools:context=".main.MainActivity">
 
-            <!--        <include-->
-            <!--            android:id="@+id/top_nav"-->
-            <!--            layout="@layout/layout_main_top_nav" />-->
             <com.wl.turbidimetric.view.TopNavView
                 android:id="@+id/tnv"
                 android:layout_width="match_parent"

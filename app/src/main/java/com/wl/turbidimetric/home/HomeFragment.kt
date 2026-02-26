@@ -148,8 +148,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         initView()
         listener()
 
-        vm.startGetMachineState()
-        vm.goGetVersion()
+//        vm.startGetMachineState()
+//        vm.goGetVersion()
         lifecycleScope.launch {
             vm.projectDatas.collectLatest {
                 it.let { ret ->
@@ -166,6 +166,10 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         }
     }
 
+    private fun start() {
+        vm.startGetMachineState()
+        vm.goGetVersion()
+    }
 
     private fun initView() {
 
@@ -365,6 +369,12 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                         vm.getDetectionNum(),
                         vm.needTestNum
                     )
+                }
+            }
+
+            EventGlobal.WHAT_LOGIN_SUCCESS -> {//登录成功，初始化
+                if (vm.isNeedGetMachineState()) {
+                    start()
                 }
             }
 

@@ -21,6 +21,7 @@ import com.wl.turbidimetric.log.LogModel
 import com.wl.turbidimetric.model.CurveModel
 import com.wl.turbidimetric.model.GlobalConfig
 import com.wl.turbidimetric.model.ProjectModel
+import com.wl.turbidimetric.model.UserModel
 import com.wl.turbidimetric.print.ThermalPrintUtil
 import com.wl.turbidimetric.report.ExportReportHelper
 import com.wl.turbidimetric.report.PdfCreateUtil
@@ -94,9 +95,43 @@ class App : Application() {
             initDB()
 //            删除检测报告的缓存
             PdfCreateUtil.deleteCacheFolder(File(ExportReportHelper.defaultReportSavePath))
+            //没有账号时，新建管理员账号
+            initUser()
         }
         DbLogUtil.init(logDao)
 
+    }
+
+    fun initUser() {
+        val adminUser = "admin"
+        val adminPsw = "admin"
+        val bxUser = "bxadmin"
+        val bxPsw = "bxadmin"
+        GlobalScope.launch {
+            val userSource = ServiceLocator.provideUserSource(this@App)
+            val admin = userSource.getAdmin(adminUser, adminPsw)
+            if (admin == null) {
+                //创建管理员账号
+                userSource.addUser(UserModel().apply {
+                    userName = adminUser
+                    password = adminPsw
+                    level = 1
+                })
+            }else{
+                //已经有账号了
+            }
+            val bx = userSource.getAdmin(bxUser, bxPsw)
+            if (bx == null) {
+                //创建管理员账号
+                userSource.addUser(UserModel().apply {
+                    userName = bxUser
+                    password = bxPsw
+                    level = 0
+                })
+            }else{
+                //已经有账号了
+            }
+        }
     }
 
 
@@ -222,7 +257,7 @@ class App : Application() {
     }
 
     object AppViewModelStoreOwner : ViewModelStoreOwner {
-       override val viewModelStore = ViewModelStore()
+        override val viewModelStore = ViewModelStore()
         private val viewModelProvider: ViewModelProvider by lazy {
             ViewModelProvider(
                 this, AppViewModelFactory()

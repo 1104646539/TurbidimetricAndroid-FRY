@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "4866eb116bdd9deb421beba055233554",
+    "identityHash": "c5f3442e9b8efad5b1b3e338dc299602",
     "entities": [
       {
         "tableName": "TestResultModel",
@@ -384,7 +384,7 @@
       },
       {
         "tableName": "GlobalConfig",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `DetectionNum` TEXT NOT NULL, `TakeReagentR1` INTEGER NOT NULL, `TakeReagentR2` INTEGER NOT NULL, `SamplingVolume` REAL NOT NULL, `CurrentVersion` INTEGER NOT NULL, `StirDuration` INTEGER NOT NULL, `StirProbeCleaningDuration` INTEGER NOT NULL, `SamplingProbeCleaningDuration` INTEGER NOT NULL, `CurMachineTestModel` TEXT NOT NULL, `SampleExist` INTEGER NOT NULL, `ScanCode` INTEGER NOT NULL, `SelectProjectID` INTEGER NOT NULL, `DebugMode` INTEGER NOT NULL, `Test1DelayTime` INTEGER NOT NULL, `Test2DelayTime` INTEGER NOT NULL, `Test3DelayTime` INTEGER NOT NULL, `Test4DelayTime` INTEGER NOT NULL, `ReactionTime` INTEGER NOT NULL, `LooperTest` INTEGER NOT NULL, `HospitalName` TEXT NOT NULL, `DetectionDoctor` TEXT NOT NULL, `AutoPrintReceipt` INTEGER NOT NULL, `AutoPrintReport` INTEGER NOT NULL, `ReportFileNameBarcode` INTEGER NOT NULL, `ReportIntervalTime` INTEGER NOT NULL, `TempUpLimit` INTEGER NOT NULL, `TempLowLimit` INTEGER NOT NULL, `WaitPreheatTime` INTEGER NOT NULL, `PreheatTime` INTEGER NOT NULL, `QualityLow1` INTEGER NOT NULL, `QualityLow2` INTEGER NOT NULL, `QualityHigh1` INTEGER NOT NULL, `QualityHigh2` INTEGER NOT NULL, `DoorEnable` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `DetectionNum` TEXT NOT NULL, `TakeReagentR1` INTEGER NOT NULL, `TakeReagentR2` INTEGER NOT NULL, `SamplingVolume` REAL NOT NULL, `CurrentVersion` INTEGER NOT NULL, `StirDuration` INTEGER NOT NULL, `StirProbeCleaningDuration` INTEGER NOT NULL, `SamplingProbeCleaningDuration` INTEGER NOT NULL, `CurMachineTestModel` TEXT NOT NULL, `SampleExist` INTEGER NOT NULL, `ScanCode` INTEGER NOT NULL, `SelectProjectID` INTEGER NOT NULL, `DebugMode` INTEGER NOT NULL, `Test1DelayTime` INTEGER NOT NULL, `Test2DelayTime` INTEGER NOT NULL, `Test3DelayTime` INTEGER NOT NULL, `Test4DelayTime` INTEGER NOT NULL, `ReactionTime` INTEGER NOT NULL, `LooperTest` INTEGER NOT NULL, `HospitalName` TEXT NOT NULL, `DetectionDoctor` TEXT NOT NULL, `AutoPrintReceipt` INTEGER NOT NULL, `AutoPrintReport` INTEGER NOT NULL, `ReportFileNameBarcode` INTEGER NOT NULL, `ReportIntervalTime` INTEGER NOT NULL, `TempUpLimit` INTEGER NOT NULL, `TempLowLimit` INTEGER NOT NULL, `WaitPreheatTime` INTEGER NOT NULL, `PreheatTime` INTEGER NOT NULL, `QualityLow1` INTEGER NOT NULL, `QualityLow2` INTEGER NOT NULL, `QualityHigh1` INTEGER NOT NULL, `QualityHigh2` INTEGER NOT NULL, `DoorEnable` INTEGER NOT NULL, `PrevUserName` TEXT NOT NULL, `PrevUserPsw` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -595,6 +595,18 @@
             "columnName": "DoorEnable",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "PrevUserName",
+            "columnName": "PrevUserName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "PrevUserPsw",
+            "columnName": "PrevUserPsw",
+            "affinity": "TEXT",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -649,12 +661,60 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "UserModel",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`userId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `userName` TEXT NOT NULL, `password` TEXT NOT NULL, `level` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "userId",
+            "columnName": "userId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userName",
+            "columnName": "userName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "password",
+            "columnName": "password",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "level",
+            "columnName": "level",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "userId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_UserModel_userName",
+            "unique": true,
+            "columnNames": [
+              "userName"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_UserModel_userName` ON `${TABLE_NAME}` (`userName`)"
+          }
+        ],
+        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4866eb116bdd9deb421beba055233554')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c5f3442e9b8efad5b1b3e338dc299602')"
     ]
   }
 }

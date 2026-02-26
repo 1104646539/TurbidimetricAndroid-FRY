@@ -12,4 +12,5 @@ interface UserSource {
     suspend fun addUser(userModel: UserModel): Boolean
     suspend fun deleteUser(userModel: UserModel): Boolean
     suspend fun getAllUsers(level: Int): Flow<List<UserModel>>
+    suspend fun getAllUsers(): Flow<List<UserModel>>
 }

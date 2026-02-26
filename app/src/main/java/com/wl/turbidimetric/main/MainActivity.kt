@@ -2,6 +2,7 @@ package com.wl.turbidimetric.main
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.app.Activity
@@ -10,9 +11,13 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Path
 import android.graphics.PathMeasure
+import android.graphics.PixelFormat
+import android.graphics.drawable.BitmapDrawable
 import android.hardware.usb.UsbDevice
 import android.hardware.usb.UsbManager
 import android.net.Uri
@@ -22,6 +27,7 @@ import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.view.ViewAnimationUtils
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.LinearInterpolator
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -69,6 +75,8 @@ import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.greenrobot.eventbus.EventBus
+import kotlin.math.hypot
+import kotlin.math.max
 
 
 class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
@@ -211,12 +219,161 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         initUploadClient()
         initPrintSDK()
         OrderUtil.showHideNav(this, false)
-        showLoginUI()
+        showLoginUI(isFirstTime = true)
     }
 
-    private fun showLoginUI() {
-        supportFragmentManager.beginTransaction().add(R.id.rl_root, LoginFragment(), "login")
-            .commitNow()
+    private fun showLoginUI(isFirstTime: Boolean = false) {
+        if (isFirstTime) {
+            // 第一次显示：直接添加Fragment并执行揭示动画
+            vd.llRoot.visibility = View.INVISIBLE
+            val loginFragment = LoginFragment()
+            supportFragmentManager.beginTransaction()
+                .add(R.id.rl_root, loginFragment, "login")
+                .commitNow()
+
+            loginFragment.view?.post {
+                animateLoginFragmentReveal(loginFragment)
+            }
+        } else {
+            // 切换用户：缩小揭示效果
+            // 1. 生成底部主界面的快照
+            val snapshot = captureRootSnapshot()
+            if (snapshot != null) {
+                vd.ivStart.setImageBitmap(snapshot)
+            }
+
+            // 2. 把快照显示在最顶层，并确保它在最前面
+            vd.ivStart.visibility = View.VISIBLE
+            vd.ivStart.bringToFront()
+
+            // 3. 添加LoginFragment到底层（此时被快照遮住）
+            val loginFragment = LoginFragment()
+            supportFragmentManager.beginTransaction()
+                .add(R.id.rl_root, loginFragment, "login")
+                .commitNow()
+
+            // 4. 隐藏最底部的主界面View
+            vd.llRoot.visibility = View.INVISIBLE
+
+            // 5. 快照以登录视图为圆心逐渐缩小（300ms），揭示登录页面
+            loginFragment.view?.post {
+                animateSnapshotShrinkReveal()
+            }
+        }
+    }
+
+    /**
+     * 快照缩小揭示动画 - 以登录按钮为圆心逐渐缩小，揭示登录页面
+     */
+    private fun animateSnapshotShrinkReveal() {
+        // 确保快照在最顶层
+        vd.ivStart.bringToFront()
+
+        // 获取登录按钮位置作为动画圆心
+        val location = IntArray(2)
+        val rootLocation = IntArray(2)
+        vd.rlRoot.getLocationInWindow(rootLocation)
+
+        val loginView = vd.tnv.getUserLogin()
+        var centerX = vd.rlRoot.width / 2
+        var centerY = vd.rlRoot.height / 2
+
+        if (loginView != null) {
+            loginView.getLocationInWindow(location)
+            centerX = location[0] - rootLocation[0] + loginView.width / 2
+            centerY = location[1] - rootLocation[1] + loginView.height / 2
+        }
+
+        // 计算起始半径（覆盖整个屏幕）
+        val startRadius = hypot(
+            max(centerX, vd.rlRoot.width - centerX).toDouble(),
+            max(centerY, vd.rlRoot.height - centerY).toDouble()
+        ).toFloat()
+
+        // 创建圆形揭示动画（从大到小缩小）
+        val anim = ViewAnimationUtils.createCircularReveal(
+            vd.ivStart,
+            centerX,
+            centerY,
+            startRadius,
+            0f
+        )
+
+        anim.duration = 600
+        anim.interpolator = AccelerateDecelerateInterpolator()
+        anim.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator) {
+                // 动画结束后清理快照
+                vd.ivStart.visibility = View.GONE
+                vd.ivStart.setImageBitmap(null)
+            }
+        })
+        anim.start()
+    }
+
+    /**
+     * 登录界面揭示动画 - 从屏幕正中间圆形放大显示
+     */
+    private fun animateLoginFragmentReveal(loginFragment: Fragment) {
+        val loginRootView = loginFragment.view ?: return
+
+        // 1. 捕获登录界面的快照
+        val snapshot = captureViewSnapshot(loginRootView)
+        if (snapshot != null) {
+            vd.ivStart.setImageBitmap(snapshot)
+        }
+
+        // 2. 暂时隐藏登录Fragment的真实视图
+        loginRootView.visibility = View.INVISIBLE
+
+        // 3. 圆心固定为屏幕正中间
+        val centerX = vd.rlRoot.width / 2
+        val centerY = vd.rlRoot.height / 2
+
+        // 4. 计算动画半径（从圆心到屏幕最远角的距离）
+        val endRadius = hypot(
+            max(centerX, vd.rlRoot.width - centerX).toDouble(),
+            max(centerY, vd.rlRoot.height - centerY).toDouble()
+        ).toFloat()
+
+        // 5. 创建圆形揭示动画（从0开始放大）
+        val anim = ViewAnimationUtils.createCircularReveal(
+            vd.ivStart,
+            centerX,
+            centerY,
+            0f,
+            endRadius
+        )
+
+        vd.ivStart.visibility = View.VISIBLE
+        anim.duration = 600
+        anim.interpolator = AccelerateDecelerateInterpolator()
+        anim.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator) {
+                // 6. 动画结束后显示真正的登录界面并清理
+                loginRootView.visibility = View.VISIBLE
+                vd.ivStart.visibility = View.GONE
+                vd.ivStart.setImageBitmap(null)
+            }
+        })
+        anim.start()
+    }
+
+    /**
+     * 捕获任意View的快照
+     */
+    private fun captureViewSnapshot(view: View): Bitmap? {
+        if (view.width == 0 || view.height == 0) return null
+
+        val bitmap = Bitmap.createBitmap(
+            view.width,
+            view.height,
+            Bitmap.Config.ARGB_8888
+        )
+        val canvas = Canvas(bitmap)
+        view.draw(canvas)
+
+        return bitmap
     }
 
     private fun showAnimStart() {
@@ -229,14 +386,14 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         )
         vd.ivStart.visibility = View.VISIBLE
         anim.duration = 800
-        anim.interpolator = LinearInterpolator()
+        anim.interpolator = AccelerateDecelerateInterpolator()
         //监听动画结束，进行回调
         anim.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator) {
                 vd.ivStart.visibility = View.GONE
             }
         })
-        anim.startDelay = 1000
+        anim.startDelay = 600
         anim.start()
     }
 
@@ -713,8 +870,123 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
 
     private fun showMainUI() {
         val loginFragment = supportFragmentManager.findFragmentByTag("login") as? Fragment
-        if (loginFragment != null) {
-            supportFragmentManager.beginTransaction().remove(loginFragment).commitNow()
+
+        // 1. 确保llRoot可见并绘制完成，然后生成快照
+        vd.llRoot.visibility = View.VISIBLE
+        vd.llRoot.post {
+            // 2. 生成llRoot的快照
+            val snapshot = captureRootSnapshot()
+            if (snapshot != null) {
+                vd.ivStart.setImageBitmap(snapshot)
+            }
+
+            // 3. 隐藏llRoot，不让它显示
+            vd.llRoot.visibility = View.INVISIBLE
+
+            // 4. 同时执行：淡出登录界面(200ms) + 圆形揭示动画(800ms)
+            animateLoginFragmentFadeOut(loginFragment)
+            showLoginRevealAnimation {
+                // 5. 动画结束后显示llRoot并清理
+                vd.llRoot.visibility = View.VISIBLE
+                vd.ivStart.visibility = View.GONE
+                vd.ivStart.setImageBitmap(null)
+
+                // 6. 完全移除LoginFragment
+                if (loginFragment != null) {
+                    supportFragmentManager.beginTransaction().remove(loginFragment).commitNow()
+                }
+            }
         }
+    }
+
+    /**
+     * 登录界面淡出动画 - 200ms淡出效果
+     */
+    private fun animateLoginFragmentFadeOut(loginFragment: Fragment?) {
+        if (loginFragment == null) return
+
+        val loginRootView = loginFragment.view
+        if (loginRootView == null) {
+            supportFragmentManager.beginTransaction().hide(loginFragment).commitNow()
+            return
+        }
+
+        // 纯淡出动画，200ms
+        ObjectAnimator.ofFloat(loginRootView, "alpha", 1f, 0f).apply {
+            duration = 200
+            interpolator = AccelerateDecelerateInterpolator()
+            addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    // 动画结束后隐藏Fragment
+                    supportFragmentManager.beginTransaction().hide(loginFragment).commitNow()
+                    // 恢复透明度
+                    loginRootView.alpha = 1f
+                }
+            })
+            start()
+        }
+    }
+
+    /**
+     * 显示登录成功后的圆形揭示动画
+     * @param onAnimationEnd 动画结束回调
+     */
+    private fun showLoginRevealAnimation(onAnimationEnd: () -> Unit) {
+        // 获取登录按钮的位置作为动画圆心
+        val loginView = vd.tnv.getUserLogin()
+        val location = IntArray(2)
+
+        if (loginView != null) {
+            loginView.getLocationInWindow(location)
+        } else {
+            // 如果没有找到登录按钮，使用屏幕右上角作为默认位置
+            location[0] = vd.rlRoot.width
+            location[1] = 0
+        }
+
+        val centerX = location[0] + (loginView?.width ?: 0) / 2
+        val centerY = location[1] + (loginView?.height ?: 0) / 2
+
+        // 计算动画半径（从圆心到屏幕最远角的距离）
+        val endRadius = hypot(
+            max(centerX, vd.rlRoot.width - centerX).toDouble(),
+            max(centerY, vd.rlRoot.height - centerY).toDouble()
+        ).toFloat()
+
+        // 创建圆形揭示动画（从0开始放大）
+        val anim = ViewAnimationUtils.createCircularReveal(
+            vd.ivStart,
+            centerX,
+            centerY,
+            0f,
+            endRadius
+        )
+
+        vd.ivStart.visibility = View.VISIBLE
+        anim.duration = 1000
+        anim.interpolator = AccelerateDecelerateInterpolator()
+        anim.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator) {
+                onAnimationEnd.invoke()
+            }
+        })
+        anim.start()
+    }
+
+    /**
+     * 捕获llRoot的快照
+     */
+    private fun captureRootSnapshot(): Bitmap? {
+        if (vd.llRoot.width == 0 || vd.llRoot.height == 0) return null
+
+        val bitmap = Bitmap.createBitmap(
+            vd.llRoot.width,
+            vd.llRoot.height,
+            Bitmap.Config.ARGB_8888
+        )
+        val canvas = Canvas(bitmap)
+        vd.llRoot.draw(canvas)
+
+        return bitmap
     }
 }

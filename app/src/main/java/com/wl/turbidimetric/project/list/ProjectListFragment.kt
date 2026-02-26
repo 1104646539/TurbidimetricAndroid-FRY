@@ -2,6 +2,7 @@ package com.wl.turbidimetric.project.list
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.activity.viewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -13,6 +14,7 @@ import com.wl.turbidimetric.global.EventGlobal
 import com.wl.turbidimetric.global.EventMsg
 import com.wl.turbidimetric.project.details.ProjectDetailsActivity
 import com.wl.turbidimetric.util.ActivityDataBindingDelegate
+import com.wl.turbidimetric.view.dialog.isShow
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collectLatest
 import org.greenrobot.eventbus.EventBus
@@ -50,6 +52,7 @@ class ProjectListFragment :
 //                )
 //            })
         }
+        showAddBtn()
     }
 
     override fun onDestroy() {
@@ -74,5 +77,23 @@ class ProjectListFragment :
 //                )
 //            })
         }
+    }
+
+    /**
+     * 监听登录成功事件，刷新用户列表
+     */
+    override fun onMessageEvent(event: EventMsg<Any>) {
+        super.onMessageEvent(event)
+        when (event.what) {
+            EventGlobal.WHAT_LOGIN_SUCCESS -> {
+                // 切换用户后刷新是否显示添加项目
+                showAddBtn()
+            }
+        }
+    }
+
+    private fun showAddBtn() {
+        vd.btnAddProject.visibility = appVm.userModel?.isAdmin()?.isShow() ?: View.GONE
+
     }
 }

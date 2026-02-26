@@ -29,6 +29,9 @@ interface LoginDao {
     @Query("SELECT * FROM UserModel where level >= :level")
     fun getAllUsers(level: Int): Flow<List<UserModel>>
 
+    @Query("SELECT * FROM UserModel")
+    fun getAllUsers(): Flow<List<UserModel>>
+
     @Delete
     fun deleteUser(userModel: UserModel): Int
 }

@@ -54,6 +54,8 @@
         <ImageView
             android:id="@+id/iv_start"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:elevation="10dp"
+            android:visibility="gone" />
     </RelativeLayout>
 </layout>

@@ -31,6 +31,8 @@ class LoginFragment : BaseFragment<LoginViewModel, FragmentLoginBinding>(R.layou
     override fun init(savedInstanceState: Bundle?) {
         vd.etUserName.setText(vm.getPrevUserName())
         vd.etPassword.setText(vm.getPrevUserPsw())
+        vd.etUserName.setSelection(vd.etUserName.text.length)
+        vd.etPassword.setSelection(vd.etPassword.text.length)
         vd.btnLogin.setOnClickListener {
             vm.processIntent(
                 LoginViewModel.LoginIntent.Login(

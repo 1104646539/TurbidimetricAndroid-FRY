@@ -40,4 +40,8 @@ class DefaultUserModelSource(
     override suspend fun getAllUsers(level: Int): Flow<List<UserModel>> {
         return dao.getAllUsers(level)
     }
+
+    override suspend fun getAllUsers(): Flow<List<UserModel>> {
+        return dao.getAllUsers()
+    }
 }

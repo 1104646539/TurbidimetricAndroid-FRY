@@ -10,6 +10,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
+            android:layout_marginBottom="20dp"
             android:layout_marginTop="20dp"
             android:orientation="horizontal">
 
@@ -30,7 +31,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="80dp"
                 android:layout_marginRight="80dp"
-                android:layout_marginBottom="20dp"
                 android:minWidth="150dp"
                 android:src="@drawable/bg_frame"
                 android:text="添加用户" />

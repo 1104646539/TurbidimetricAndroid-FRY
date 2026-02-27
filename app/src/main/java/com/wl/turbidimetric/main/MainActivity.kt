@@ -907,7 +907,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
 
         val loginRootView = loginFragment.view
         if (loginRootView == null) {
-            supportFragmentManager.beginTransaction().hide(loginFragment).commitNow()
+            supportFragmentManager.beginTransaction().hide(loginFragment).commitAllowingStateLoss()
             return
         }
 
@@ -917,8 +917,8 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
             interpolator = AccelerateDecelerateInterpolator()
             addListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
-                    // 动画结束后隐藏Fragment
-                    supportFragmentManager.beginTransaction().hide(loginFragment).commitNow()
+                    // 动画结束后隐藏Fragment，使用commitAllowingStateLoss避免状态保存后崩溃
+                    supportFragmentManager.beginTransaction().hide(loginFragment).commitAllowingStateLoss()
                     // 恢复透明度
                     loginRootView.alpha = 1f
                 }

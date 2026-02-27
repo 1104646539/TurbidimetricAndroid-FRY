@@ -3,7 +3,6 @@ package com.wl.turbidimetric.settings
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
-import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -32,11 +31,8 @@ import com.wl.turbidimetric.test.TestActivity
 import com.wl.turbidimetric.test.debug.DebugActivity
 import com.wl.turbidimetric.upload.view.UploadSettingsActivity
 import com.wl.turbidimetric.util.ExportLogHelper
-import com.wl.turbidimetric.view.*
 import com.wl.turbidimetric.view.dialog.*
 import com.wl.weiqianwllib.OrderUtil
-import com.wl.weiqianwllib.upan.StorageState
-import com.wl.weiqianwllib.upan.StorageUtil
 import com.wl.wllib.LogToFile
 import com.wl.wllib.LogToFile.i
 import com.wl.wllib.LogToFile.u
@@ -101,34 +97,29 @@ class SettingsFragment constructor() :
         lifecycleScope.launch {
             appVm.obDebugMode.collectLatest {
                 i("obDebugMode $it")
-                it.isShow()?.let {
-//                    vd.sivDebug.visibility = it
-                    vd.sivLauncher.visibility = it
-                    vd.sivNav.visibility = it
-                    vd.sivRepeatability.visibility = it
-                    vd.sivExportLog.visibility = it
-//                    vd.sivDebugTitle.visibility = it
-                    vd.tvSoftVersionMcu.visibility = it
+                changeDebugView()
 
-                    if(appVm.userState.last()?.isAdmin() == true){
-                        vd.sivDebugTitle.visibility = true.isShow()
-                        vd.sivDebug.visibility = true.isShow()
-                    }else{
-                        vd.sivDebug.visibility = it
-                        vd.sivDebugTitle.visibility = it
-                    }
-                }
             }
         }
         lifecycleScope.launch {
             appVm.userState.collectLatest {
-                if(it?.isAdmin() == true){
-                    vd.sivDebugTitle.visibility = true.isShow()
-                    vd.sivDebug.visibility = true.isShow()
-                }
+                changeDebugView()
             }
         }
 
+    }
+
+    fun changeDebugView() {
+        val show = appVm.userModel?.isAdmin() == true || appVm.isDebugMode
+        show.isShow().let {
+            vd.sivLauncher.visibility = it
+            vd.sivNav.visibility = it
+            vd.sivRepeatability.visibility = it
+            vd.sivExportLog.visibility = it
+            vd.tvSoftVersionMcu.visibility = it
+            vd.sivDebugTitle.visibility = it
+            vd.sivDebug.visibility = it
+        }
     }
 
     private fun listenerView() {

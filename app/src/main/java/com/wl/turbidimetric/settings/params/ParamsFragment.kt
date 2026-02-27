@@ -61,94 +61,106 @@ class ParamsFragment :
 
         lifecycleScope.launch {
             appVm.obDebugMode.collectLatest { debug ->
-                debug?.let { show ->
-                    vd.tilTest1DelayTime.visibility = show.isShow()
-                    vd.tilTest2DelayTime.visibility = show.isShow()
-                    vd.tilTest3DelayTime.visibility = show.isShow()
-                    vd.tilTest4DelayTime.visibility = show.isShow()
-                    vd.tilSamplingProbeCleaningTime.visibility = show.isShow()
-                    vd.tilStirProbeCleaningTime.visibility = show.isShow()
-                    vd.tilStirTime.visibility = show.isShow()
-                    vd.btnChange.visibility = show.isShow()
-                }
-                //非调试模式不能修改
-                vd.tilR1.isEnabled = debug
-                vd.tilR2.isEnabled = debug
-                vd.tilSampling.isEnabled = debug
-                vd.tilSamplingProbeCleaningTime.isEnabled = debug
-                vd.tilStirProbeCleaningTime.isEnabled = debug
-                vd.tilStirTime.isEnabled = debug
-                vd.tilTest1DelayTime.isEnabled = debug
-                vd.tilTest2DelayTime.isEnabled = debug
-                vd.tilTest3DelayTime.isEnabled = debug
-                vd.tilTest4DelayTime.isEnabled = debug
-                vd.tilReactionTime.isEnabled = debug
+                showChangeView()
+            }
+        }
+        lifecycleScope.launch {
+            appVm.userState.collectLatest { user ->
+
+                showChangeView()
+            }
+        }
+    }
+
+    fun showChangeView() {
+        val show = appVm.userModel?.isAdmin() == true || appVm.isDebugMode
+
+        if (vd.tilTest1DelayTime.visibility == show.isShow()) return
+        vd.tilTest1DelayTime.visibility = show.isShow()
+        vd.tilTest2DelayTime.visibility = show.isShow()
+        vd.tilTest3DelayTime.visibility = show.isShow()
+        vd.tilTest4DelayTime.visibility = show.isShow()
+        vd.tilSamplingProbeCleaningTime.visibility = show.isShow()
+        vd.tilStirProbeCleaningTime.visibility = show.isShow()
+        vd.tilStirTime.visibility = show.isShow()
+        vd.btnChange.visibility = show.isShow()
+
+        //非调试模式不能修改
+        vd.tilR1.isEnabled = show
+        vd.tilR2.isEnabled = show
+        vd.tilSampling.isEnabled = show
+        vd.tilSamplingProbeCleaningTime.isEnabled = show
+        vd.tilStirProbeCleaningTime.isEnabled = show
+        vd.tilStirTime.isEnabled = show
+        vd.tilTest1DelayTime.isEnabled = show
+        vd.tilTest2DelayTime.isEnabled = show
+        vd.tilTest3DelayTime.isEnabled = show
+        vd.tilTest4DelayTime.isEnabled = show
+        vd.tilReactionTime.isEnabled = show
 
 
-                if (debug) {
-                    vd.tietReactionTime.removeTextChangedListener(tw)
+        if (show) {
+            vd.tietReactionTime.removeTextChangedListener(tw)
 
-                    vd.tietTest2DelayTime.addTextChangedListener(tw)
-                    vd.tietTest1DelayTime.addTextChangedListener(tw)
+            vd.tietTest2DelayTime.addTextChangedListener(tw)
+            vd.tietTest1DelayTime.addTextChangedListener(tw)
 
 //                    vd.tilReactionTime.isEnabled = false
 
-                    //因为以前依赖的view隐藏了所有重新设置约束
-                    val cs = ConstraintSet()
-                    cs.clone(vd.clRoot)
-                    cs.connect(
-                        vd.tilReactionTime.id,
-                        ConstraintSet.TOP,
-                        vd.tilTest4DelayTime.id,
-                        ConstraintSet.TOP
-                    )
-                    cs.connect(
-                        vd.tilReactionTime.id,
-                        ConstraintSet.LEFT,
-                        vd.tilTest2DelayTime.id,
-                        ConstraintSet.LEFT
-                    )
-                    cs.applyTo(vd.clRoot)
+            //因为以前依赖的view隐藏了所有重新设置约束
+            val cs = ConstraintSet()
+            cs.clone(vd.clRoot)
+            cs.connect(
+                vd.tilReactionTime.id,
+                ConstraintSet.TOP,
+                vd.tilTest4DelayTime.id,
+                ConstraintSet.TOP
+            )
+            cs.connect(
+                vd.tilReactionTime.id,
+                ConstraintSet.LEFT,
+                vd.tilTest2DelayTime.id,
+                ConstraintSet.LEFT
+            )
+            cs.applyTo(vd.clRoot)
 
-                    val cs2 = ConstraintSet()
-                    cs2.clone(vd.clRoot)
-                    cs2.connect(
-                        vd.btnChange.id,
-                        ConstraintSet.TOP,
-                        vd.tilTest4DelayTime.id,
-                        ConstraintSet.BOTTOM
-                    )
-                    cs2.applyTo(vd.clRoot)
+            val cs2 = ConstraintSet()
+            cs2.clone(vd.clRoot)
+            cs2.connect(
+                vd.btnChange.id,
+                ConstraintSet.TOP,
+                vd.tilTest4DelayTime.id,
+                ConstraintSet.BOTTOM
+            )
+            cs2.applyTo(vd.clRoot)
 
-                } else {
-                    vd.tietTest1DelayTime.removeTextChangedListener(tw)
-                    vd.tietTest2DelayTime.removeTextChangedListener(tw)
+        } else {
+            vd.tietTest1DelayTime.removeTextChangedListener(tw)
+            vd.tietTest2DelayTime.removeTextChangedListener(tw)
 
 //                    vd.tilReactionTime.isEnabled = true
-                    vd.tietReactionTime.addTextChangedListener(tw)
+            vd.tietReactionTime.addTextChangedListener(tw)
 
-                    //因为以前依赖的view隐藏了所有重新设置约束
-                    val cs = ConstraintSet()
-                    cs.clone(vd.clRoot)
-                    cs.connect(
-                        vd.tilReactionTime.id, ConstraintSet.TOP, vd.tilR1.id, ConstraintSet.BOTTOM
-                    )
-                    cs.connect(
-                        vd.tilReactionTime.id, ConstraintSet.LEFT, vd.tilR1.id, ConstraintSet.LEFT
-                    )
-                    cs.applyTo(vd.clRoot)
+            //因为以前依赖的view隐藏了所有重新设置约束
+            val cs = ConstraintSet()
+            cs.clone(vd.clRoot)
+            cs.connect(
+                vd.tilReactionTime.id, ConstraintSet.TOP, vd.tilR1.id, ConstraintSet.BOTTOM
+            )
+            cs.connect(
+                vd.tilReactionTime.id, ConstraintSet.LEFT, vd.tilR1.id, ConstraintSet.LEFT
+            )
+            cs.applyTo(vd.clRoot)
 
-                    val cs2 = ConstraintSet()
-                    cs2.clone(vd.clRoot)
-                    cs2.connect(
-                        vd.btnChange.id,
-                        ConstraintSet.TOP,
-                        vd.tilReactionTime.id,
-                        ConstraintSet.BOTTOM
-                    )
-                    cs2.applyTo(vd.clRoot)
-                }
-            }
+            val cs2 = ConstraintSet()
+            cs2.clone(vd.clRoot)
+            cs2.connect(
+                vd.btnChange.id,
+                ConstraintSet.TOP,
+                vd.tilReactionTime.id,
+                ConstraintSet.BOTTOM
+            )
+            cs2.applyTo(vd.clRoot)
         }
     }
 
@@ -176,10 +188,16 @@ class ParamsFragment :
         var r = (vd.tietReactionTime.text.toString().toLongOrNull() ?: 0) * 1000
         if (appVm.isDebugMode) {
             r = t2 - t1
+            // 移除监听器避免递归，设置完成后再添加回来
+            vd.tietReactionTime.removeTextChangedListener(tw)
             vd.tietReactionTime.setText((r / 1000).toString())
+            vd.tietReactionTime.addTextChangedListener(tw)
         } else {
             t2 = r + t1
+            // 移除监听器避免递归，设置完成后再添加回来
+            vd.tietTest2DelayTime.removeTextChangedListener(tw)
             vd.tietTest2DelayTime.setText((t2 / 1000).toString())
+            vd.tietTest2DelayTime.addTextChangedListener(tw)
         }
 
     }

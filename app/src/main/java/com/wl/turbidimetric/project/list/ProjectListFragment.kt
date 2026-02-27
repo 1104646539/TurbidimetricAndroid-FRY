@@ -67,8 +67,10 @@ class ProjectListFragment :
         vd.rv.adapter = adapter
 
         adapter.onItemClick = {
-            EventBus.getDefault()
-                .post(EventMsg<Long>(EventGlobal.WHAT_PROJECT_LIST_TO_DETAILS, it.projectId))
+            if (appVm.userModel?.isAdmin() == true) {
+                EventBus.getDefault()
+                    .post(EventMsg<Long>(EventGlobal.WHAT_PROJECT_LIST_TO_DETAILS, it.projectId))
+            }
 
 //            startActivity(Intent(requireContext(), ProjectDetailsActivity::class.java).apply {
 //                putExtra(

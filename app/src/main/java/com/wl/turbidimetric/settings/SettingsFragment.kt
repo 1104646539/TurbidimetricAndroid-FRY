@@ -201,7 +201,7 @@ class SettingsFragment constructor() :
         }
 
         vd.tvSoftVersionAndroid.text =
-            "上位机版本:${SystemGlobal.versionName} \n发布版本:1"
+            "上位机版本:${SystemGlobal.versionName} \n发布版本:V1"
         vd.tvSoftVersionMcu.text = "MCU版本:${SystemGlobal.mcuVersion}"
 
         vd.sivParamsSetting.performClick()

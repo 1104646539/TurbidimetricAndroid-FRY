@@ -33,13 +33,11 @@ class DebugSettingsFragment :
     }
 
     private fun initView() {
-//        vm.looperTest.observe(this){
-//            vm.changeLooperTest(it)
-//        }
         vd.btnSave.setOnClickListener {
             verify(
                 vm.tempLowLimit.value?.toIntOrNull() ?: LocalDataGlobal.Default.TempLowLimit,
                 vm.tempUpLimit.value?.toIntOrNull() ?: LocalDataGlobal.Default.TempUpLimit,
+                vm.preheatTime.value?.toIntOrNull() ?: 0,
             ).let {
                 if (it.isNotEmpty()) {
                     toast(it)
@@ -51,8 +49,15 @@ class DebugSettingsFragment :
         }
     }
 
-    private fun verify(tempLowLimit: Int, tempUpLimit: Int): String {
-        return if (tempLowLimit > tempUpLimit) "下限不能高于上限" else ""
+    private fun verify(tempLowLimit: Int, tempUpLimit: Int, preheatTime: Int): String {
+        var msg = ""
+        if (preheatTime < 10) {
+            msg = "预热时间必须大于10 "
+        }
+        if (tempLowLimit > tempUpLimit) {
+            msg = "下限不能高于上限"
+        }
+        return msg;
     }
 
 

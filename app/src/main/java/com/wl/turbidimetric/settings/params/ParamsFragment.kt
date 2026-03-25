@@ -96,13 +96,13 @@ class ParamsFragment :
         vd.tilTest2DelayTime.isEnabled = show
         vd.tilTest3DelayTime.isEnabled = show
         vd.tilTest4DelayTime.isEnabled = show
-        vd.tilReactionTime.isEnabled = show
+        vd.tilReactionTime.isEnabled = false
 
 
         if (show) {
             vd.tietReactionTime.removeTextChangedListener(tw)
 
-            vd.tietTest2DelayTime.addTextChangedListener(tw)
+            vd.tietTest4DelayTime.addTextChangedListener(tw)
             vd.tietTest1DelayTime.addTextChangedListener(tw)
 
 //                    vd.tilReactionTime.isEnabled = false
@@ -136,7 +136,7 @@ class ParamsFragment :
 
         } else {
             vd.tietTest1DelayTime.removeTextChangedListener(tw)
-            vd.tietTest2DelayTime.removeTextChangedListener(tw)
+            vd.tietTest4DelayTime.removeTextChangedListener(tw)
 
 //                    vd.tilReactionTime.isEnabled = true
             vd.tietReactionTime.addTextChangedListener(tw)
@@ -184,20 +184,20 @@ class ParamsFragment :
      */
     private fun onTestTimeChange() {
         var t1 = (vd.tietTest1DelayTime.text.toString().toLongOrNull() ?: 0) * 1000
-        var t2 = (vd.tietTest2DelayTime.text.toString().toLongOrNull() ?: 0) * 1000
+        var t4 = (vd.tietTest4DelayTime.text.toString().toLongOrNull() ?: 0) * 1000
         var r = (vd.tietReactionTime.text.toString().toLongOrNull() ?: 0) * 1000
-        if (appVm.isDebugMode) {
-            r = t2 - t1
+        if (vd.tietReactionTime.isEnabled) {
+            t4 = r + t1
+            // 移除监听器避免递归，设置完成后再添加回来
+            vd.tietTest4DelayTime.removeTextChangedListener(tw)
+            vd.tietTest4DelayTime.setText((t4 / 1000).toString())
+            vd.tietTest4DelayTime.addTextChangedListener(tw)
+        } else {
+            r = t4 - t1
             // 移除监听器避免递归，设置完成后再添加回来
             vd.tietReactionTime.removeTextChangedListener(tw)
             vd.tietReactionTime.setText((r / 1000).toString())
             vd.tietReactionTime.addTextChangedListener(tw)
-        } else {
-            t2 = r + t1
-            // 移除监听器避免递归，设置完成后再添加回来
-            vd.tietTest2DelayTime.removeTextChangedListener(tw)
-            vd.tietTest2DelayTime.setText((t2 / 1000).toString())
-            vd.tietTest2DelayTime.addTextChangedListener(tw)
         }
 
     }
@@ -235,6 +235,8 @@ class ParamsFragment :
                 (vd.tietTest4DelayTime.text.toString().toLongOrNull() ?: 0) * 1000,
                 (vd.tietReactionTime.text.toString().toLongOrNull() ?: 0) * 1000,
             )
+
+//            vm.reset()
         }
     }
 

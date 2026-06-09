@@ -26,6 +26,11 @@ object SystemGlobal {
      */
     var isCodeDebug = true
 
+    /**
+     * 是否真机模式（false=模拟器，不连接硬件）
+     */
+    var isRealDevice = false
+
 
     /**
      * 是否是在升级中

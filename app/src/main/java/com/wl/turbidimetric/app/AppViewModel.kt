@@ -422,7 +422,7 @@ class AppViewModel(
      * @return Boolean
      */
     fun sampleDoorIsClose(): Boolean {
-        if (SystemGlobal.isCodeDebug) return true
+        if (!SystemGlobal.isRealDevice || SystemGlobal.isCodeDebug) return true
         return doorHelper.SampleDoorIsClose()
     }
 
@@ -431,7 +431,7 @@ class AppViewModel(
      * @return Boolean
      */
     fun cuvetteDoorIsClose(): Boolean {
-        if (SystemGlobal.isCodeDebug) return true
+        if (!SystemGlobal.isRealDevice || SystemGlobal.isCodeDebug) return true
         return doorHelper.CuvetteDoorIsClose()
     }
 

@@ -62,6 +62,7 @@ class App : Application() {
     val serialPort: SerialPortIF by lazy {
         SerialPortImpl(
             SystemGlobal.isCodeDebug,
+            SystemGlobal.isRealDevice,
         )
     }
     val thermalPrintUtil: ThermalPrintUtil by lazy {

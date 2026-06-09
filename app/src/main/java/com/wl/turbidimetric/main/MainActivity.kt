@@ -110,10 +110,13 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         i("onCreate savedInstanceState=${savedInstanceState}")
+
         App.instance?.serialPort?.open(lifecycleScope)
-        App.instance?.thermalPrintUtil?.open(lifecycleScope)
+        if (SystemGlobal.isRealDevice) {
+            App.instance?.thermalPrintUtil?.open(lifecycleScope)
+            App.instance?.scanCodeUtil?.open(lifecycleScope)
+        }
         App.instance?.printHelper?.open(lifecycleScope, appVm.getReportIntervalTime())
-        App.instance?.scanCodeUtil?.open(lifecycleScope)
         setTheme(R.style.Theme_Mvvmdemo) //恢复原有的样式
         super.onCreate(savedInstanceState)
     }
@@ -177,9 +180,11 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     override fun onDestroy() {
         super.onDestroy()
 //        ScanCodeUtil.onScanResult = null
-        appVm.scanCodeUtil.close()
-        App.instance?.serialPort?.close()
+        if (SystemGlobal.isRealDevice) {
+            appVm.scanCodeUtil.close()
+            App.instance?.serialPort?.close()
 //        App.instance?.thermalPrintUtil?.close()
+        }
         unregisterReceiver(usbFlashDiskReceiver)
         unregisterReceiver(mUsbReceiver)
         appVm.printHelper.onSizeChange = null
@@ -918,7 +923,8 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
             addListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
                     // 动画结束后隐藏Fragment，使用commitAllowingStateLoss避免状态保存后崩溃
-                    supportFragmentManager.beginTransaction().hide(loginFragment).commitAllowingStateLoss()
+                    supportFragmentManager.beginTransaction().hide(loginFragment)
+                        .commitAllowingStateLoss()
                     // 恢复透明度
                     loginRootView.alpha = 1f
                 }

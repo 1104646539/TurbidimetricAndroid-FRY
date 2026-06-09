@@ -1,13 +1,23 @@
 package com.wl.turbidimetric.view.dialog
 
+import android.app.Activity
 import android.content.Context
 import android.widget.EditText
 import android.widget.Spinner
 import android.widget.TextView
+import com.github.gzuliyujiang.wheelpicker.DatimePicker
+import com.github.gzuliyujiang.wheelpicker.annotation.DateMode
+import com.github.gzuliyujiang.wheelpicker.annotation.TimeMode
+import com.github.gzuliyujiang.wheelpicker.entity.DateEntity
+import com.github.gzuliyujiang.wheelpicker.entity.DatimeEntity
+import com.github.gzuliyujiang.wheelpicker.entity.TimeEntity
 import com.wl.turbidimetric.R
+import com.wl.turbidimetric.ex.getResource
 import com.wl.turbidimetric.matchingargs.SpnSampleAdapter
 import com.wl.turbidimetric.model.TestResultAndCurveModel
 import com.wl.wllib.toTimeStr
+import java.util.Calendar
+import java.util.Date
 
 /**
  * 编辑检测结果的对话框
@@ -36,6 +46,12 @@ class ResultDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog
     var etAge: EditText? = null
     var isDebug: Boolean = false
 
+    /** 原始检测时间（数据库中的值），用于比对是否变更 */
+    private var originalTestTime: Long = 0
+
+    /** 用户新选择的检测时间，null 表示未修改 */
+    private var newTestTime: Long? = null
+
     var result: TestResultAndCurveModel? = null
     open fun showDialog(
         result: TestResultAndCurveModel,
@@ -53,6 +69,16 @@ class ResultDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog
             result.result.testResult = etResult?.text.toString()
             result.result.sampleBarcode = etSampleBarcode?.text.toString()
             result.result.age = etAge?.text.toString()
+
+            // 仅在 debug 且时间变更时才更新 testTime
+            if (isDebug) {
+                newTestTime?.let {
+                    if (it != originalTestTime) {
+                        result.result.testTime = it
+                    }
+                }
+            }
+
             dismiss().takeIf {
                 onConfirm.invoke(result)
             }
@@ -61,6 +87,8 @@ class ResultDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog
         this.cancelClick = { dismiss() }
         this.isDebug = isDebug
         this.result = result
+        originalTestTime = result.result.testTime
+        newTestTime = null
 
         if (isCreated) {
             setContent()
@@ -111,17 +139,60 @@ class ResultDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog
         etAbs?.isEnabled = isDebug
         etCon?.isEnabled = isDebug
         etResult?.isEnabled = false
-        if(isDebug){
+        if (isDebug) {
             etDetectionNum?.setBackgroundResource(R.drawable.bg_et_gray)
             etAbs?.setBackgroundResource(R.drawable.bg_et_gray)
             etCon?.setBackgroundResource(R.drawable.bg_et_gray)
             etResult?.setBackgroundResource(R.drawable.bg_et_gray)
-        }else{
+            tvTestTime?.setBackgroundResource(R.drawable.bg_et_gray)
+            tvTestTime?.setOnClickListener {
+                val calendar = Calendar.getInstance().apply {
+                    time = Date(newTestTime ?: result?.result?.testTime ?: System.currentTimeMillis())
+                }
+                showSelectTimeDialog(calendar) { time ->
+                    tvTestTime?.text = time.toTimeStr()
+                    newTestTime = time
+                }
+            }
+        } else {
             etDetectionNum?.setBackgroundResource(R.drawable.bg_white)
             etAbs?.setBackgroundResource(R.drawable.bg_white)
             etCon?.setBackgroundResource(R.drawable.bg_white)
             etResult?.setBackgroundResource(R.drawable.bg_white)
+            tvTestTime?.setBackgroundResource(R.drawable.bg_white)
+            tvTestTime?.setOnClickListener(null)
         }
+    }
+
+    private fun showSelectTimeDialog(
+        calendar: Calendar = Calendar.getInstance(),
+        onDateSet: (time: Long) -> Unit
+    ) {
+        val start = DatimeEntity().apply {
+            date = DateEntity.target(Date(1262315415000L))
+            time = TimeEntity.target(Date(1262315415000L))
+        }
+        val picker = DatimePicker(context as Activity)
+        val wheelLayout = picker.wheelLayout
+        picker.setOnDatimePickedListener { year, month, day, hour, minute, second ->
+            calendar.set(year, month - 1, day)
+            calendar.set(Calendar.HOUR_OF_DAY, hour)
+            calendar.set(Calendar.MINUTE, minute)
+            calendar.set(Calendar.SECOND, second)
+            onDateSet(calendar.time.time)
+        }
+        wheelLayout.setDateMode(DateMode.YEAR_MONTH_DAY)
+        wheelLayout.setTimeMode(TimeMode.HOUR_24_NO_SECOND)
+        wheelLayout.setRange(start, DatimeEntity.yearOnFuture(50), DatimeEntity().apply {
+            date = DateEntity.target(calendar)
+            time = TimeEntity.target(calendar)
+        })
+        wheelLayout.setDateLabel("年", "月", "日")
+        wheelLayout.setTimeLabel("时", "分", "秒")
+        wheelLayout.setSelectedTextColor(getResource().getColor(R.color.themePositiveColor))
+        wheelLayout.setSelectedTextSize(26f)
+        wheelLayout.setSelectedTextBold(true)
+        picker.show()
     }
 
     override fun getResId(): Int {

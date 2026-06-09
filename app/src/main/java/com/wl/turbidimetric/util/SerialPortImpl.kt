@@ -25,7 +25,8 @@ import kotlin.math.absoluteValue
  * 串口操作类
  */
 class SerialPortImpl(
-    private val isCodeDebug: Boolean
+    private val isCodeDebug: Boolean,
+    private val isRealDevice: Boolean = true,
 ) : SerialPortIF {
 //    private val scope = externalScope ?: CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
@@ -104,7 +105,7 @@ class SerialPortImpl(
 
     override fun open(scope: CoroutineScope) {
         this.scope = scope
-        if (isCodeDebug) {
+        if (!isRealDevice || isCodeDebug) {
             TestSerialPort.callback = this::dispatchData
         } else {
             serialPort.openSerial(WQSerialGlobal.COM1, 115200, 8)
@@ -660,7 +661,7 @@ class SerialPortImpl(
 
     private fun write(data: UByteArray) {
         c("write ${data.toHex()}")
-        if (isCodeDebug) {
+        if (!isRealDevice || isCodeDebug) {
             scope?.launch(Dispatchers.IO) {
                 TestSerialPort.testReply(data)
             }

@@ -4,7 +4,6 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
     id("kotlin-parcelize")
-    id 'kotlin-android'
 }
 
 android {
@@ -36,10 +35,11 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments += ["room.schemaLocation": "$projectDir/schemas".toString()]
-            }
+    }
+
+    kapt {
+        arguments {
+            arg("room.schemaLocation", "$projectDir/schemas")
         }
     }
     //release版本输出包名自动追加版本号和版本名称
@@ -113,6 +113,8 @@ dependencies {
 
 //    implementation 'androidx.core:core-animation:1.0.0'
 //    implementation files('libs\\iText-5.0.5.jar')
+    //test junit
+    testImplementation libs.junit
     //test mock
     testImplementation libs.mockito.core
     androidTestImplementation libs.mockito.android

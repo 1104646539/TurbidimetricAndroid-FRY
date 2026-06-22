@@ -144,23 +144,23 @@ class ResultDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog
             etAbs?.setBackgroundResource(R.drawable.bg_et_gray)
             etCon?.setBackgroundResource(R.drawable.bg_et_gray)
             etResult?.setBackgroundResource(R.drawable.bg_et_gray)
-            tvTestTime?.setBackgroundResource(R.drawable.bg_et_gray)
-            tvTestTime?.setOnClickListener {
-                val calendar = Calendar.getInstance().apply {
-                    time = Date(newTestTime ?: result?.result?.testTime ?: System.currentTimeMillis())
-                }
-                showSelectTimeDialog(calendar) { time ->
-                    tvTestTime?.text = time.toTimeStr()
-                    newTestTime = time
-                }
-            }
+//            tvTestTime?.setBackgroundResource(R.drawable.bg_et_gray)
+//            tvTestTime?.setOnClickListener {
+//                val calendar = Calendar.getInstance().apply {
+//                    time = Date(newTestTime ?: result?.result?.testTime ?: System.currentTimeMillis())
+//                }
+//                showSelectTimeDialog(calendar) { time ->
+//                    tvTestTime?.text = time.toTimeStr()
+//                    newTestTime = time
+//                }
+//            }
         } else {
             etDetectionNum?.setBackgroundResource(R.drawable.bg_white)
             etAbs?.setBackgroundResource(R.drawable.bg_white)
             etCon?.setBackgroundResource(R.drawable.bg_white)
             etResult?.setBackgroundResource(R.drawable.bg_white)
-            tvTestTime?.setBackgroundResource(R.drawable.bg_white)
-            tvTestTime?.setOnClickListener(null)
+//            tvTestTime?.setBackgroundResource(R.drawable.bg_white)
+//            tvTestTime?.setOnClickListener(null)
         }
     }
 
@@ -182,7 +182,7 @@ class ResultDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog
             onDateSet(calendar.time.time)
         }
         wheelLayout.setDateMode(DateMode.YEAR_MONTH_DAY)
-        wheelLayout.setTimeMode(TimeMode.HOUR_24_NO_SECOND)
+        wheelLayout.setTimeMode(TimeMode.HOUR_24_HAS_SECOND)
         wheelLayout.setRange(start, DatimeEntity.yearOnFuture(50), DatimeEntity().apply {
             date = DateEntity.target(calendar)
             time = TimeEntity.target(calendar)

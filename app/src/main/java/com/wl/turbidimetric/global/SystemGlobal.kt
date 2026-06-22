@@ -24,12 +24,12 @@ object SystemGlobal {
     /**
      * 是否是在只使用安卓板时调试用的
      */
-    var isCodeDebug = true
+    var isCodeDebug = false
 
     /**
      * 是否真机模式（false=模拟器，不连接硬件）
      */
-    var isRealDevice = false
+    var isRealDevice = true
 
 
     /**

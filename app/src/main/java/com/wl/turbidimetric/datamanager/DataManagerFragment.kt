@@ -19,9 +19,12 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.wl.turbidimetric.R
+import com.wl.turbidimetric.app.App
 import com.wl.turbidimetric.base.BaseFragment
 import com.wl.turbidimetric.databinding.FragmentDataManagerBinding
+import com.wl.turbidimetric.datastore.LocalDataGlobal
 import com.wl.turbidimetric.ex.DisplayUtil
+import com.wl.turbidimetric.ex.PD
 import com.wl.turbidimetric.ex.dpToPx
 import com.wl.turbidimetric.ex.getPrintParamsAnim
 import com.wl.turbidimetric.ex.toast
@@ -30,6 +33,7 @@ import com.wl.turbidimetric.global.EventMsg
 import com.wl.turbidimetric.global.SystemGlobal
 import com.wl.turbidimetric.model.ConditionModel
 import com.wl.turbidimetric.model.TestResultAndCurveModel
+import com.wl.turbidimetric.model.TestResultModel
 import com.wl.turbidimetric.print.ThermalPrintUtil
 import com.wl.turbidimetric.report.ExportReportHelper
 import com.wl.turbidimetric.report.PrintSDKHelper
@@ -49,6 +53,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.greenrobot.eventbus.EventBus
+import java.util.Date
 
 
 /**
@@ -139,36 +144,36 @@ class DataManagerFragment :
 //        }
 //    }
 //
-//    private fun createTestData(): List<TestResultModel> {
-//        return mutableListOf<TestResultModel>().apply {
-//            for (i in 0..100) {
-//                val dr = TestResultModel(
-//                    testResult = (i % 2 == 0).PD("阳性", "阴性"),
-//                    concentration = 66 + i,
-//                    absorbances = "121120".toBigDecimal(),
-//                    name = (i % 2 == 0).PD("张三", "李四"),
-//                    gender = (i % 2 == 0).PD("男", "女"),
-//                    age = (i % 90).toString(),
-//                    detectionNum = LocalData.getDetectionNumInc(),
-//                    testOriginalValue1 = 52111,
-//                    testOriginalValue2 = 52112,
-//                    testOriginalValue3 = 52113,
-//                    testOriginalValue4 = 52114,
-//                    testValue1 = "52.31".toBigDecimal(),
-//                    testValue2 = "52.32".toBigDecimal(),
-//                    testValue3 = "52.33".toBigDecimal(),
-//                    testValue4 = "52.34".toBigDecimal(),
-//                    testTime = Date().time,
-//                    deliveryTime = "",
-//                    deliveryDepartment = "",
-//                    deliveryDoctor = "",
-//                    sampleBarcode = "ABCD$i",
-//                    curveOwnerId = 0
-//                )
-//                add(dr)
-//            }
-//        }
-//    }
+    private fun createTestData(): List<TestResultModel> {
+        return mutableListOf<TestResultModel>().apply {
+            for (i in 0..100) {
+                val dr = TestResultModel(
+                    testResult = (i % 2 == 0).PD("阳性", "阴性"),
+                    concentration = 66 + i,
+                    absorbances = "121120".toBigDecimal(),
+                    name = (i % 2 == 0).PD("张三", "李四"),
+                    gender = (i % 2 == 0).PD("男", "女"),
+                    age = (i % 90).toString(),
+                    detectionNum = "0",
+                    testOriginalValue1 = 52111,
+                    testOriginalValue2 = 52112,
+                    testOriginalValue3 = 52113,
+                    testOriginalValue4 = 52114,
+                    testValue1 = "52.31".toBigDecimal(),
+                    testValue2 = "52.32".toBigDecimal(),
+                    testValue3 = "52.33".toBigDecimal(),
+                    testValue4 = "52.34".toBigDecimal(),
+                    testTime = Date().time,
+                    deliveryTime = "",
+                    deliveryDepartment = "",
+                    deliveryDoctor = "",
+                    sampleBarcode = "ABCD$i",
+                    curveOwnerId = 0
+                )
+                add(dr)
+            }
+        }
+    }
 
 
     private fun listener() {

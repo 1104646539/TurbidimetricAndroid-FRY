@@ -62,18 +62,22 @@ object LogToFile {
 
     @JvmStatic
     fun init() {
-        file1 = File(fileName1)
-        file2 = File(fileName2)
-        if (!file1!!.exists()) {
-            file1!!.parentFile.mkdirs()
-            file1!!.createNewFile()
+        try {
+            file1 = File(fileName1)
+            file2 = File(fileName2)
+            if (!file1!!.exists()) {
+                file1!!.parentFile.mkdirs()
+                file1!!.createNewFile()
+            }
+            if (!file2!!.exists()) {
+                file2!!.parentFile.mkdirs()
+                file2!!.createNewFile()
+            }
+            curFile = getFile()
+            fos = FileOutputStream(curFile, true)
+        } catch (e: Exception) {
+
         }
-        if (!file2!!.exists()) {
-            file2!!.parentFile.mkdirs()
-            file2!!.createNewFile()
-        }
-        curFile = getFile()
-        fos = FileOutputStream(curFile, true)
     }
 
     /**

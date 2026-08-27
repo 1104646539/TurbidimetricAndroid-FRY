@@ -679,6 +679,7 @@ class HomeViewModel(
         sampleMoveFinish = false
         sampleShelfMoveFinish = false
         cuvetteShelfMoveFinish = false
+        continueTestGetState = false
         testMsg.value = ""
         appViewModel.testState = TestState.DripSample
         cuvetteShelfPos = -1

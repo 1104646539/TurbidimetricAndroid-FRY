@@ -1,6 +1,7 @@
 package com.wl.turbidimetric.print
 
 import com.wl.turbidimetric.ex.scale
+import com.wl.turbidimetric.ex.displayBarcode
 import com.wl.turbidimetric.model.TestResultAndCurveModel
 import com.wl.turbidimetric.util.WorkQueue
 import com.wl.weiqianwllib.serialport.BaseSerialPort
@@ -146,7 +147,7 @@ class ThermalPrintUtil(private val serialPort: BaseSerialPort) {
         sb.append("\n")
 
         sb.append("编号:${result.result.detectionNum}\n")
-        sb.append("条码:${result.result.sampleBarcode}\n")
+        sb.append("条码:${result.result.sampleBarcode.displayBarcode()}\n")
         sb.append("姓名:${result.result.name}\n")
         sb.append("性别:${result.result.gender}\n")
         sb.append("年龄:${result.result.age}\n")

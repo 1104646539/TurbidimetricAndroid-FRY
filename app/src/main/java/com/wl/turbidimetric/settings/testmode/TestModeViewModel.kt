@@ -26,7 +26,8 @@ class TestModeViewModel(private val localDataSource: LocalDataSource) : BaseView
                 TestModeUiState(
                     MachineTestModel.valueOf(localDataSource.getCurMachineTestModel()),
                     localDataSource.getSampleExist(),
-                    localDataSource.getScanCode()
+                    localDataSource.getScanCode(),
+                    localDataSource.getScanFailedContinue()
                 )
             )
         }
@@ -36,6 +37,7 @@ class TestModeViewModel(private val localDataSource: LocalDataSource) : BaseView
         machineTestModel: MachineTestModel,
         sampleExist: Boolean,
         scanCode: Boolean,
+        scanFailedContinue: Boolean,
     ) {
         verifyChange(machineTestModel, sampleExist, scanCode).let { ret ->
             if (ret.isNotEmpty()) {
@@ -48,6 +50,7 @@ class TestModeViewModel(private val localDataSource: LocalDataSource) : BaseView
         localDataSource.setCurMachineTestModel(machineTestModel.name)
         localDataSource.setSampleExist(sampleExist)
         localDataSource.setScanCode(scanCode)
+        localDataSource.setScanFailedContinue(scanFailedContinue)
         viewModelScope.launch {
             _hiltText.emit("修改成功")
         }
@@ -85,4 +88,5 @@ data class TestModeUiState(
     val machineTestModel: MachineTestModel,
     val sampleExist: Boolean,
     val scanCode: Boolean,
+    val scanFailedContinue: Boolean,
 )

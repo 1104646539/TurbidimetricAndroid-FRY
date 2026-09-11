@@ -2,6 +2,7 @@ package com.wl.turbidimetric.report
 
 import android.content.Context
 import com.wl.turbidimetric.model.TestResultAndCurveModel
+import com.wl.turbidimetric.ex.displayBarcode
 import com.wl.weiqianwllib.upan.StorageUtil
 import com.wl.wllib.DateUtil
 import com.wl.wllib.LogToFile
@@ -22,7 +23,7 @@ object ExportReportHelper {
         var fileName = ""
         val time = model.result.testTime.toTimeStr(DateUtil.Date1Format)
         if (barcode) {
-            fileName += time + " " + model.result.sampleBarcode + ".pdf"
+            fileName += time + " " + model.result.sampleBarcode.displayBarcode() + ".pdf"
         } else {
             fileName += time + " " + model.result.detectionNum + ".pdf"
         }

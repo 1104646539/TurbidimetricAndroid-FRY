@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.databinding.ItemDatamanagerResultBinding
 import com.wl.turbidimetric.ex.DisplayUtil
+import com.wl.turbidimetric.ex.displayBarcode
 import com.wl.turbidimetric.ex.nullOfDefault
 import com.wl.turbidimetric.model.ResultState
 import com.wl.turbidimetric.model.TestResultAndCurveModel
@@ -88,7 +89,7 @@ class DataManagerAdapter(
             binding.tvProjectName.text = item?.curve?.projectName?.nullOfDefault(DefaultShow)
             binding.tvName.text = item?.result?.name?.nullOfDefault(DefaultShow)
             binding.tvGender.text = item?.result?.gender?.nullOfDefault(DefaultShow)
-            binding.tvBarcode.text = item?.result?.sampleBarcode?.nullOfDefault(DefaultShow)
+            binding.tvBarcode.text = item?.result?.sampleBarcode?.displayBarcode(DefaultShow)
             binding.tvAge.text = item?.result?.age?.nullOfDefault(DefaultShow)
             binding.tvAbsorbances.text =
                 item?.result?.absorbances?.toInt().toString()

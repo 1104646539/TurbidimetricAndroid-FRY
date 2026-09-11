@@ -52,7 +52,7 @@ object TestSerialPort {
                 delay(100)
 //                if (index in 0 .. 5) {
 //                reply = ubyteArrayOf(data[0], 0x01u, 0x0u, 0x0u, 0x0u, 0x0u)
-                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x2u))//0不存在 1样本管 2比色杯
+                reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x1u))//0不存在 1样本管 2比色杯
 //                } else {
 //                    reply = reply.plus(ubyteArrayOf(0x0u, 0x0u, 0x0u, 0x0u))//0不存在 1样本管 2比色杯
 //                }

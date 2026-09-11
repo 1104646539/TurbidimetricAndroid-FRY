@@ -51,6 +51,14 @@
                 android:minHeight="50dp"
                 android:text="开启扫码器"
                 android:textSize="18sp" />
+
+            <CheckBox
+                android:id="@+id/cb_scan_failed_continue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="50dp"
+                android:text="扫码失败继续检测"
+                android:textSize="18sp" />
         </LinearLayout>
 
         <LinearLayout

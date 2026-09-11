@@ -115,3 +115,12 @@ fun <T> Boolean.PD(t1: T, t2: T): T {
 fun String?.nullOfDefault(defaultValue: String): String {
     return if (this.isNullOrEmpty()) defaultValue else this
 }
+
+/** User-facing barcode text. Keeps the internal scan-failure marker out of UI output. */
+fun String?.displayBarcode(defaultValue: String = "--"): String {
+    return when {
+        this.isNullOrEmpty() -> defaultValue
+        this == "SCAN_FAILED" -> "扫码失败"
+        else -> this
+    }
+}

@@ -89,6 +89,10 @@ class DefaultLocalDataDataSource(
         return global().ScanCode
     }
 
+    override fun getScanFailedContinue(): Boolean {
+        return global().ScanFailedContinue
+    }
+
     override fun getSelectProjectID(): Long {
         return global().SelectProjectID
     }
@@ -292,6 +296,12 @@ class DefaultLocalDataDataSource(
     override fun setScanCode(value: Boolean) {
         update {
             it.copy(ScanCode = value)
+        }
+    }
+
+    override fun setScanFailedContinue(value: Boolean) {
+        update {
+            it.copy(ScanFailedContinue = value)
         }
     }
 

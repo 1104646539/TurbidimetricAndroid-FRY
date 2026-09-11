@@ -55,6 +55,10 @@ data class GlobalConfig(
      */
     val ScanCode: Boolean = LocalDataGlobal.Default.ScanCode,
     /**
+     * 自动模式下，扫码失败后是否继续检测
+     */
+    val ScanFailedContinue: Boolean = LocalDataGlobal.Default.ScanFailedContinue,
+    /**
      * 检测时，选择的检测项目的ID
      */
     val SelectProjectID: Long = LocalDataGlobal.Default.SelectProjectID,

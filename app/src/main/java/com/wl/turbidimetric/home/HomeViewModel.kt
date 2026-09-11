@@ -80,6 +80,7 @@ import com.wl.turbidimetric.upload.service.OnUploadCallback
 import com.wl.turbidimetric.util.Callback2
 import com.wl.turbidimetric.util.OnScanResult
 import com.wl.turbidimetric.util.SerialPortImpl
+import com.wl.wllib.LogToFile
 import com.wl.wllib.LogToFile.c
 import com.wl.wllib.LogToFile.i
 import kotlinx.coroutines.Dispatchers
@@ -595,7 +596,7 @@ class HomeViewModel(
         intArrayOf(56000, 56000, 56000, 56000, 56000, 56000, 56000, 56000, 56000, 56000)
 
     //测试用，扫码是否成功
-    val tempSampleState = intArrayOf(1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+    val tempSampleState = intArrayOf(1, 1, 1, 0, 1, 1, 1, 1, 1, 1)
 //  val tempSampleState = intArrayOf(1, 0, 1, 0, 1, 0, 0, 0, 0, 1)
 
     //测试用，样本是否存在
@@ -1342,6 +1343,7 @@ class HomeViewModel(
                 appViewModel.scanCodeUtil.startScan()
             }
         } else {
+            LogToFile.i("$sampleType")
             /**
              * 以下情况不扫码，直接成功
              * 1、如果是测试用的并且测试数据是扫码成功
@@ -1502,6 +1504,10 @@ class HomeViewModel(
      * 扫码失败
      */
     override fun scanFailed() {
+        if (isAuto() && localDataRepository.getScanFailedContinue()) {
+            scanSuccess("SCAN_FAILED")
+            return
+        }
         i("扫码失败")
         updateSampleState(samplePos, SampleState.ScanFailed, sampleType = sampleType)
         scanFinish = true

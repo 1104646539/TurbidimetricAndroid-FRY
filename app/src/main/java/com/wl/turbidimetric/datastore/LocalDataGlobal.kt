@@ -39,6 +39,7 @@ object LocalDataGlobal {
         val MachineTestModelDefault = MachineTestModel.Auto
         val SampleExist = true
         val ScanCode = false
+        val ScanFailedContinue = false
         val SelectProjectID = 0L
         val DebugMode = false
         val Test1DelayTime = 30 * 1000L

@@ -13,6 +13,7 @@ import com.github.gzuliyujiang.wheelpicker.entity.DatimeEntity
 import com.github.gzuliyujiang.wheelpicker.entity.TimeEntity
 import com.wl.turbidimetric.R
 import com.wl.turbidimetric.ex.getResource
+import com.wl.turbidimetric.ex.displayBarcode
 import com.wl.turbidimetric.matchingargs.SpnSampleAdapter
 import com.wl.turbidimetric.model.TestResultAndCurveModel
 import com.wl.wllib.toTimeStr
@@ -67,7 +68,12 @@ class ResultDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog
                 (etAbs?.text.toString().toDoubleOrNull() ?: 0.0).toBigDecimal()
             result.result.concentration = etCon?.text.toString().toIntOrNull() ?: 0
             result.result.testResult = etResult?.text.toString()
-            result.result.sampleBarcode = etSampleBarcode?.text.toString()
+            val barcodeText = etSampleBarcode?.text.toString()
+            result.result.sampleBarcode = if (barcodeText == "扫码失败") {
+                "SCAN_FAILED"
+            } else {
+                barcodeText
+            }
             result.result.age = etAge?.text.toString()
 
             // 仅在 debug 且时间变更时才更新 testTime
@@ -124,7 +130,7 @@ class ResultDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog
         etAbs?.setText(result?.result?.absorbances?.toInt().toString())
         etCon?.setText(result?.result?.concentration.toString())
         etResult?.setText(result?.result?.testResult)
-        etSampleBarcode?.setText(result?.result?.sampleBarcode)
+        etSampleBarcode?.setText(result?.result?.sampleBarcode.displayBarcode(""))
         etAge?.setText(result?.result?.age)
         tvProjectName?.setText(result?.curve?.projectName)
 

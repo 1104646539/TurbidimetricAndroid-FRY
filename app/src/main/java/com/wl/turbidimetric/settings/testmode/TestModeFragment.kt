@@ -39,9 +39,12 @@ class TestModeFragment :
 
                 vd.rbAuto?.setOnCheckedChangeListener { buttonView, isChecked ->
                     vd.llAuto?.visibility = isChecked.isShow()
+                    vd.cbScanFailedContinue?.visibility = isChecked.isShow()
                 }
                 vd.llAuto?.visibility = vd.rbAuto?.isChecked.isShow()
                 vd.cbScanCode?.isChecked = it.scanCode == true
+                vd.cbScanFailedContinue?.isChecked = it.scanFailedContinue
+                vd.cbScanFailedContinue?.visibility = (it.machineTestModel == MachineTestModel.Auto).isShow()
             }
         }
 
@@ -86,6 +89,7 @@ class TestModeFragment :
                 machineTestModel,
                 true,//原来是是否使用样本管传感器，后面崔总说取消这个功能，一定要用
                 vd.cbScanCode.isChecked,
+                vd.cbScanFailedContinue.isChecked,
             )
             appVm.processIntent(AppIntent.MachineTestModelChange(machineTestModel))
         }

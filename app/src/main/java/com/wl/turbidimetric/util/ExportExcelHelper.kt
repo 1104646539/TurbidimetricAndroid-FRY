@@ -2,6 +2,7 @@ package com.wl.turbidimetric.util
 
 import android.content.Context
 import com.wl.turbidimetric.global.SystemGlobal
+import com.wl.turbidimetric.ex.displayBarcode
 import com.wl.turbidimetric.model.TestResultAndCurveModel
 import com.wl.turbidimetric.model.TestResultModel
 import com.wl.weiqianwllib.upan.StorageUtil
@@ -127,7 +128,7 @@ object ExportExcelHelper {
                 add("${it.result.gender}")
                 add("${it.result.age}")
                 add("${it.curve?.projectName ?: "-"}")
-                add("${it.result.sampleBarcode}")
+                add(it.result.sampleBarcode.displayBarcode())
                 add("${it.result.detectionNum}")
                 add("${it.result.concentration}")
                 add("${it.result.getShowResult()}")

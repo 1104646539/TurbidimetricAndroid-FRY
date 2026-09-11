@@ -21,6 +21,7 @@ import com.itextpdf.layout.properties.UnitValue
 import com.itextpdf.layout.properties.VerticalAlignment
 import com.wl.turbidimetric.model.CurveModel
 import com.wl.turbidimetric.model.TestResultAndCurveModel
+import com.wl.turbidimetric.ex.displayBarcode
 import com.wl.turbidimetric.view.ReportChartView
 import com.wl.wllib.DateUtil
 import com.wl.wllib.LogToFile
@@ -487,7 +488,7 @@ object PdfCreateUtil {
         val paragraphPeople3_3 = Paragraph("条码")
         paragraphPeople3_3.setTextAlignment(TextAlignment.CENTER)
         val cellPeople3_3: Cell = Cell(1, 1).add(paragraphPeople3_3)
-        val paragraphPeople3_4 = Paragraph(resultModel?.result?.sampleBarcode ?: "")
+        val paragraphPeople3_4 = Paragraph(resultModel?.result?.sampleBarcode.displayBarcode())
         paragraphPeople3_4.setTextAlignment(TextAlignment.CENTER)
         val cellPeople3_4: Cell = Cell(1, 1).add(paragraphPeople3_4)
 

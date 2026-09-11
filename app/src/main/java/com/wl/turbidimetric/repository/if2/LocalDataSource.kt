@@ -14,6 +14,7 @@ interface LocalDataSource {
     fun getCurMachineTestModel(): String
     fun getSampleExist(): Boolean
     fun getScanCode(): Boolean
+    fun getScanFailedContinue(): Boolean
     fun getSelectProjectID(): Long
     fun getDebugMode(): Boolean
     fun getTest1DelayTime(): Long
@@ -56,6 +57,7 @@ interface LocalDataSource {
     fun setCurMachineTestModel(value: String)
     fun setSampleExist(value: Boolean)
     fun setScanCode(value: Boolean)
+    fun setScanFailedContinue(value: Boolean)
     fun setSelectProjectID(value: Long)
     fun setDebugMode(value: Boolean)
     fun setTest1DelayTime(value: Long)

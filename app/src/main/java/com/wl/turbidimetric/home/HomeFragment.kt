@@ -17,6 +17,7 @@ import com.wl.turbidimetric.base.BaseFragment
 import com.wl.turbidimetric.databinding.FragmentHomeBinding
 import com.wl.turbidimetric.ex.throttle
 import com.wl.turbidimetric.ex.toast
+import com.wl.turbidimetric.ex.displayBarcode
 import com.wl.turbidimetric.global.EventGlobal
 import com.wl.turbidimetric.global.EventMsg
 import com.wl.turbidimetric.global.SystemGlobal
@@ -742,7 +743,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 vd.tvDetailsState.setTextColor(resources.getColor(it.item.state.color))
                 vd.tvDetailsNo.text = "${it.item.id ?: "-"}"
                 vd.tvDetailsNum.text = "${it.item.testResult?.detectionNum ?: "-"}"
-                vd.tvDetailsBarcode.text = "${it.item.testResult?.sampleBarcode ?: "-"}"
+                vd.tvDetailsBarcode.text = it.item.testResult?.sampleBarcode.displayBarcode()
                 vd.tvDetailsId.text = "${it.item.testResult?.resultId ?: "-"}"
                 vd.tvDetailsResult.text = "${it.item.testResult?.testResult ?: "-"}"
 

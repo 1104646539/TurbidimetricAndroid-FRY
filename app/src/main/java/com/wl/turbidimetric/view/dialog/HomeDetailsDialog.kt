@@ -8,6 +8,7 @@ import com.wl.turbidimetric.R
 import com.wl.turbidimetric.home.HomeViewModel
 import com.wl.turbidimetric.model.CuvetteState
 import com.wl.turbidimetric.model.SampleState
+import com.wl.turbidimetric.ex.displayBarcode
 import com.wl.turbidimetric.model.SampleType
 import com.wl.turbidimetric.model.TestResultModel
 
@@ -152,7 +153,7 @@ class HomeDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog_h
         tvLabel?.text = label
         tvLabelHilt?.text = labelHilt.takeIf { !it.isNullOrEmpty() } ?: "-"
         tvDetectionNum?.text = detectionNum.takeIf { !it.isNullOrEmpty() } ?: "-"
-        tvDetectionBarcode?.text = detectionBarcode.takeIf { !it.isNullOrEmpty() } ?: "-"
+        tvDetectionBarcode?.text = detectionBarcode.displayBarcode()
         tDetectionResult?.text = result.takeIf { !it.isNullOrEmpty() } ?: "-"
         llSampleType?.visibility = (sampleType != null).isShow()
         tvSampleType?.text = sampleType?.state ?: "-"

@@ -2,6 +2,9 @@ package com.wl.turbidimetric.view.dialog
 
 import android.app.Activity
 import android.content.Context
+import android.text.InputFilter
+import android.text.InputType
+import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.Spinner
 import android.widget.TextView
@@ -116,6 +119,16 @@ class ResultDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog
         tvProjectName = findViewById(R.id.tv_project_name)
         etAge = findViewById(R.id.et_age)
 
+        etSampleBarcode?.apply {
+            inputType = InputType.TYPE_CLASS_TEXT
+            isSingleLine = true
+            imeOptions = EditorInfo.IME_ACTION_DONE
+            filters = arrayOf(InputFilter { source, start, end, _, _, _ ->
+                val filtered = source.subSequence(start, end).filter { it != '\r' && it != '\n' }
+                if (filtered.length == end - start) null else filtered
+            })
+        }
+
 
         spnGender?.adapter = SpnSampleAdapter(rootView.context, sexs.toMutableList())
     }
@@ -130,7 +143,16 @@ class ResultDetailsDialog(val ct: Context) : CustomBtn3Popup(ct, R.layout.dialog
         etAbs?.setText(result?.result?.absorbances?.toInt().toString())
         etCon?.setText(result?.result?.concentration.toString())
         etResult?.setText(result?.result?.testResult)
-        etSampleBarcode?.setText(result?.result?.sampleBarcode.displayBarcode(""))
+        val scanFailed = result?.result?.sampleBarcode == "SCAN_FAILED"
+        etSampleBarcode?.setText(
+            if (scanFailed) "" else result?.result?.sampleBarcode.displayBarcode("")
+        )
+        if (scanFailed) {
+            etSampleBarcode?.postDelayed({
+                etSampleBarcode?.requestFocus()
+                imm.showSoftInput(etSampleBarcode, 0)
+            }, 150)
+        }
         etAge?.setText(result?.result?.age)
         tvProjectName?.setText(result?.curve?.projectName)
 

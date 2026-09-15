@@ -740,7 +740,12 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 //更新详情显示
                 vd.gpDetails.visibility = (!it.hiltDetails).isShow()
                 vd.tvDetailsState.text = "${it.item.state.state ?: "-"}"
-                vd.tvDetailsState.setTextColor(resources.getColor(it.item.state.color))
+                val stateColor = if (it.item.testResult?.sampleBarcode == "SCAN_FAILED") {
+                    R.color.shelf_error
+                } else {
+                    it.item.state.color
+                }
+                vd.tvDetailsState.setTextColor(resources.getColor(stateColor))
                 vd.tvDetailsNo.text = "${it.item.id ?: "-"}"
                 vd.tvDetailsNum.text = "${it.item.testResult?.detectionNum ?: "-"}"
                 vd.tvDetailsBarcode.text = it.item.testResult?.sampleBarcode.displayBarcode()

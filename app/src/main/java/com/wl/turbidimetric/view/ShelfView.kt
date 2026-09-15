@@ -157,15 +157,21 @@ class ShelfView :
     private fun drawItems(canvas: Canvas) {
         for (i in 0 until size) {
             if (itemStates?.getOrNull(i) != null) {
-                drawItem(canvas, i, itemRects[i], itemStates!![i].state)
+                drawItem(canvas, i, itemRects[i], itemStates!![i])
             }
         }
     }
 
     val colorMap = hashMapOf<Int, Int>()
-    private fun drawItem(canvas: Canvas, index: Int, rectF: RectF?, itemState: ItemState) {
+    private fun drawItem(canvas: Canvas, index: Int, rectF: RectF?, item: Item) {
+        val itemState = item.state
         rectF?.let { rect ->
-            val color = getColorCache(itemState.color)
+            val colorRes = if (item.testResult?.sampleBarcode == "SCAN_FAILED") {
+                R.color.shelf_error
+            } else {
+                itemState.color
+            }
+            val color = getColorCache(colorRes)
             paintItem.color = color
             if (shape == ShelfView.Shape.Circle) {
                 canvas.drawCircle(rect.centerX(), rect.centerY(), itemWidth / 2, paintItem)

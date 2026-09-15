@@ -1469,8 +1469,22 @@ class HomeViewModel(
         return testResultRepository.getTestResultAndCurveModelById(id)
     }
 
-    suspend fun update(model: TestResultAndCurveModel): Int {
-        return testResultRepository.updateTestResult(model.result)
+    suspend fun update(model: TestResultAndCurveModel, preserveBarcode: Boolean = true): Int {
+        return update(model.result, preserveBarcode)
+    }
+
+    /**
+     * Merge the barcode from the latest database row before writing a test-process update.
+     * The process keeps an in-memory snapshot for a long time, while data management can
+     * edit the same record concurrently.
+     */
+    private suspend fun update(model: TestResultModel, preserveBarcode: Boolean = true): Int {
+        if (preserveBarcode) {
+            model.sampleBarcode = testResultRepository
+                .getTestResultModelById(model.resultId)
+                .sampleBarcode
+        }
+        return testResultRepository.updateTestResult(model)
     }
 
     /**
@@ -1486,7 +1500,8 @@ class HomeViewModel(
             result.result.deliveryDepartment = patient.deliveryDepartments
             result.result.gender = patient.sex
             result.result.sampleBarcode = patient.bc
-            update(result)
+            // Patient lookup is the explicit owner of this barcode change.
+            update(result, preserveBarcode = false)
 
             resultModelsForSample.indexOfFirst { it?.result?.resultId == resultId }.let { index ->
                 if (index in resultModelsForSample.indices) {
@@ -1795,10 +1810,12 @@ class HomeViewModel(
                     testValue2 = it.testValue2
                     testValue3 = it.testValue3
                     testValue4 = it.testValue4
-                    sampleBarcode = it.sampleBarcode
+                    // sampleBarcode may be edited in data management while the test is running.
+                    // Do not copy the stale in-memory value (for example SCAN_FAILED) back here;
+                    // keep the value currently stored in the database.
                     concentration = it.concentration
                     absorbances = it.absorbances
-                    testResultRepository.updateTestResult(this)
+                    update(this)
                 }
             }
         }

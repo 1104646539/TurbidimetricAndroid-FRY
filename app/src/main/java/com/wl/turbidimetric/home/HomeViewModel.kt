@@ -3473,6 +3473,7 @@ class HomeViewModel(
     private fun dripSample() {
         c("发送 加样")
         dripSampleFinish = false
+        samplingProbeCleaningFinish = false
         appViewModel.serialPort.dripSample(
             false,
             false,

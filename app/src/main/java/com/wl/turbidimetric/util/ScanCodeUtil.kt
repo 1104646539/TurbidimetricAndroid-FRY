@@ -40,7 +40,7 @@ class ScanCodeUtil() {
     /**
      * 超时停止时间
      */
-    private val timeout: Long = 3000
+    private val timeout: Long = 1000
 
     /**
      * 停止扫码的任务

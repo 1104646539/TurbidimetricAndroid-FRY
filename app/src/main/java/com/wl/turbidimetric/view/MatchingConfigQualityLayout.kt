@@ -42,11 +42,13 @@ class MatchingConfigQualityLayout : FrameLayout {
     var qualityLow2: Int = 0
     var qualityHigh1: Int = 0
     var qualityHigh2: Int = 0
+    var qualitySkipNum: Int = 0
 
     var etQualityLow1: EditText? = null
     var etQualityLow2: EditText? = null
     var etQualityHigh1: EditText? = null
     var etQualityHigh2: EditText? = null
+    var etQualitySkip: EditText? = null
     var cdvDetails: CurveDetailsView? = null
     private var spnProjectAdapter: SpnSampleAdapter? = null
 
@@ -55,6 +57,7 @@ class MatchingConfigQualityLayout : FrameLayout {
         etQualityLow2 = findViewById(R.id.et_quality_low_2)
         etQualityHigh1 = findViewById(R.id.et_quality_high_1)
         etQualityHigh2 = findViewById(R.id.et_quality_high_2)
+        etQualitySkip = findViewById(R.id.et_quality_skip)
         spnProject = findViewById(R.id.spn_fitter_project)
         cdvDetails = findViewById(R.id.cdv_details)
 
@@ -88,6 +91,7 @@ class MatchingConfigQualityLayout : FrameLayout {
         etQualityLow2?.setText(qualityLow2.toString())
         etQualityHigh1?.setText(qualityHigh1.toString())
         etQualityHigh2?.setText(qualityHigh2.toString())
+        etQualitySkip?.setText(qualitySkipNum.toString())
 
         spnProject?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
@@ -115,6 +119,7 @@ class MatchingConfigQualityLayout : FrameLayout {
         qualityLow2: Int,
         qualityHigh1: Int,
         qualityHigh2: Int,
+        qualitySkipNum: Int,
     ) {
 
         this.selectCurve = selectCurve
@@ -122,6 +127,7 @@ class MatchingConfigQualityLayout : FrameLayout {
         this.qualityLow2 = qualityLow2
         this.qualityHigh1 = qualityHigh1
         this.qualityHigh2 = qualityHigh2
+        this.qualitySkipNum = qualitySkipNum
         this.curves.clear()
         this.curves.addAll(curves)
         this.projectNames.clear()
@@ -139,6 +145,7 @@ class MatchingConfigQualityLayout : FrameLayout {
         qualityLow2 = etQualityLow2?.text.toString().toInt()
         qualityHigh1 = etQualityHigh1?.text.toString().toInt()
         qualityHigh2 = etQualityHigh2?.text.toString().toInt()
+        qualitySkipNum = etQualitySkip?.text.toString().toIntOrNull() ?: 0
     }
 
 

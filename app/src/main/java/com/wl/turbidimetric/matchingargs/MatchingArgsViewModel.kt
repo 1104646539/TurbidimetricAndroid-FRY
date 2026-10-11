@@ -401,6 +401,7 @@ class MatchingArgsViewModel(
     var qualityLow2 = localDataRepository.getQualityLow2()
     var qualityHigh1 = localDataRepository.getQualityHigh1()
     var qualityHigh2 = localDataRepository.getQualityHigh2()
+    var qualitySkipNum = 0
 
     /**
      * 比色皿舱门正在操作 （现在用作结束检测，将r2试剂转出来）
@@ -570,6 +571,7 @@ class MatchingArgsViewModel(
                     qualityLow2,
                     qualityHigh1,
                     qualityHigh2,
+                    qualitySkipNum,
                     reagentNOStr,
                     quality,
                     projects,
@@ -695,6 +697,12 @@ class MatchingArgsViewModel(
         resultOriginalTest2.clear()
         resultOriginalTest3.clear()
         resultOriginalTest4.clear()
+        cuvetteStates = initCuvetteStates()
+        if (matchingType == MatchingConfigLayout.MatchingType.Quality) {
+            repeat(qualitySkipNum) { index ->
+                updateCuvetteState(index, CuvetteState.Skip)
+            }
+        }
         appViewModel.testState = TestState.None
         sampleStep = 0
         testMsg.postValue("")
@@ -886,7 +894,7 @@ class MatchingArgsViewModel(
         cuvettePos = 0
         when (appViewModel.testState) {
             TestState.MoveSample -> {
-                moveCuvetteDripSample()
+                moveCuvetteDripSample(if (matchingType == MatchingConfigLayout.MatchingType.Quality) qualitySkipNum + 1 else 1)
             }
 
             TestState.Test1 -> {
@@ -1090,7 +1098,7 @@ class MatchingArgsViewModel(
         }
 
         if ((matchingType == MatchingConfigLayout.MatchingType.Matching && (cuvettePos == (gradsNum + 6) && quality) || (cuvettePos == (gradsNum + 4) && !quality))
-            || (matchingType == MatchingConfigLayout.MatchingType.Quality && cuvettePos == 6)
+            || (matchingType == MatchingConfigLayout.MatchingType.Quality && cuvettePos == 6 + qualitySkipNum)
         ) {
             //最后一个也检测结束了
             appViewModel.testState = TestState.Test2
@@ -1251,7 +1259,7 @@ class MatchingArgsViewModel(
      */
     fun testStepIsFinish(cuvettePos: Int): Boolean {
         return (matchingType == MatchingConfigLayout.MatchingType.Matching && (cuvettePos == (gradsNum - 1) && !quality) || (cuvettePos == (gradsNum + 1) && quality))
-                || (matchingType == MatchingConfigLayout.MatchingType.Quality && cuvettePos == 1)
+                || (matchingType == MatchingConfigLayout.MatchingType.Quality && cuvettePos == qualitySkipNum + 1)
     }
 
     /**
@@ -1497,7 +1505,7 @@ class MatchingArgsViewModel(
 
         //记录当前比色皿架第一个加样的时间
 
-        if (cuvettePos == 1) {
+        if (cuvettePos == if (matchingType == MatchingConfigLayout.MatchingType.Quality) qualitySkipNum + 1 else 1) {
             cuvetteShelfStartDuration = Date().time
             i("加样时间同步 登记起始时间=${cuvetteShelfStartDuration} cuvettePos=$cuvettePos samplePos=$samplePos")
         }
@@ -1616,7 +1624,7 @@ class MatchingArgsViewModel(
             val firstTime = getFirstDelayTime()
             viewModelScope.launch {
                 delay(firstTime)
-                moveCuvetteTest()
+                moveCuvetteTest(if (matchingType == MatchingConfigLayout.MatchingType.Quality) qualitySkipNum + 1 else 1)
             }
         } else {
             test()
@@ -1730,7 +1738,9 @@ class MatchingArgsViewModel(
                     delay(needDelayDuration.seconds)
 
                     moveSample(-samplePos + 2)
-                    moveCuvetteDripReagent()
+                    moveCuvetteDripReagent(
+                        if (matchingType == MatchingConfigLayout.MatchingType.Quality) qualitySkipNum + 1 else 1
+                    )
 
                     takeReagent()
                 }
@@ -2259,6 +2269,7 @@ class MatchingArgsViewModel(
         qualityLow2: Int,
         qualityHigh1: Int,
         qualityHigh2: Int,
+        qualitySkipNum: Int,
         reagentNo: String,
         quality: Boolean,
         gradsNum: Int,
@@ -2273,6 +2284,7 @@ class MatchingArgsViewModel(
         this.qualityLow2 = qualityLow2
         this.qualityHigh1 = qualityHigh1
         this.qualityHigh2 = qualityHigh2
+        this.qualitySkipNum = qualitySkipNum
         this.reagentNOStr = reagentNo
         this.quality = quality
         this.gradsNum = gradsNum
@@ -2306,7 +2318,9 @@ class MatchingArgsViewModel(
             }
         } else {
             //质控
-            if (qualityLow1 <= 0 || qualityLow2 <= 0 || qualityHigh1 <= 0 || qualityHigh2 <= 0) {
+            if (qualitySkipNum !in 0..8) {
+                hilt = "跳过比色皿必须为0-8"
+            } else if (qualityLow1 <= 0 || qualityLow2 <= 0 || qualityHigh1 <= 0 || qualityHigh2 <= 0) {
                 hilt = "请输入质控浓度"
             } else if (selectQualityCurve == null) {
                 hilt = "请选择质控曲线"

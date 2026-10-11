@@ -9,7 +9,7 @@
 
     <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="120dp"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
@@ -17,13 +17,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
             <TextView
                 style="@style/TextTitle"
-                android:layout_width="140dp"
+                android:layout_width="160dp"
                 android:layout_height="wrap_content"
                 android:gravity="left|center_vertical"
                 android:text="选择曲线:" />
@@ -35,15 +34,41 @@
                 android:layout_marginLeft="10dp"
                 android:minHeight="50dp" />
         </LinearLayout>
-
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/TextTitle"
+                android:layout_width="160dp"
+                android:layout_height="wrap_content"
+                android:gravity="left|center_vertical"
+                android:text="跳过比色皿:" />
+
+            <EditText
+                android:id="@+id/et_quality_skip"
+                android:layout_width="200dp"
+                android:layout_height="48dp"
+                android:layout_marginLeft="10dp"
+                android:background="@drawable/bg_et_gray"
+                android:inputType="number"
+                android:paddingLeft="10dp"
+                android:text="0"
+                android:textColor="@color/textColor"
+                android:textSize="18sp" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
             android:orientation="vertical">
 
             <TextView
                 style="@style/TextTitle"
-                android:layout_width="140dp"
+                android:layout_width="160dp"
                 android:layout_height="wrap_content"
                 android:gravity="left|center_vertical"
                 android:text="质控浓度:" />
@@ -145,7 +170,10 @@
                     android:textSize="18sp" />
 
             </LinearLayout>
+
+
         </LinearLayout>
+
     </LinearLayout>
 
     <com.wl.turbidimetric.view.CurveDetailsView

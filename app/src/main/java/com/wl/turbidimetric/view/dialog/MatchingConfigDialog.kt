@@ -67,6 +67,7 @@ class MatchingConfigDialog(val ct: Context) :
         val qualityLow2: Int,
         val qualityHigh1: Int,
         val qualityHigh2: Int,
+        val qualitySkipNum: Int,
         val reagentNo: String = "",
         val quality: Boolean = false,
         val projects: List<ProjectModel>,
@@ -76,7 +77,7 @@ class MatchingConfigDialog(val ct: Context) :
         val selectFitterType: FitterType = FitterType.Three,
         val targetCons: List<Double> = mutableListOf(),
         val onConfirmClick: (
-            matchingType: MatchingConfigLayout.MatchingType, selectCurve: CurveModel?, qualityLow1: Int, qualityLow2: Int, qualityHigh1: Int, qualityHigh2: Int,
+            matchingType: MatchingConfigLayout.MatchingType, selectCurve: CurveModel?, qualityLow1: Int, qualityLow2: Int, qualityHigh1: Int, qualityHigh2: Int, qualitySkipNum: Int,
             reagentNo: String, quality: Boolean, gradsNum: Int, autoAttenuation: Boolean, selectProject: ProjectModel?, selectFitterType: FitterType, cons: List<Double>
         ) -> Unit,
         val onCancelClick: onClick
@@ -89,6 +90,7 @@ class MatchingConfigDialog(val ct: Context) :
         qualityLow2: Int,
         qualityHigh1: Int,
         qualityHigh2: Int,
+        qualitySkipNum: Int = 0,
         reagentNo: String = "",
         quality: Boolean = false,
         projects: List<ProjectModel>,
@@ -98,7 +100,7 @@ class MatchingConfigDialog(val ct: Context) :
         selectFitterType: FitterType = FitterType.Three,
         targetCons: List<Double> = mutableListOf(),
         onConfirmClick: (
-            matchingType: MatchingConfigLayout.MatchingType, selectCurve: CurveModel?, qualityLow1: Int, qualityLow2: Int, qualityHigh1: Int, qualityHigh2: Int,
+            matchingType: MatchingConfigLayout.MatchingType, selectCurve: CurveModel?, qualityLow1: Int, qualityLow2: Int, qualityHigh1: Int, qualityHigh2: Int, qualitySkipNum: Int,
             reagentNo: String, quality: Boolean, gradsNum: Int, autoAttenuation: Boolean, selectProject: ProjectModel?, selectFitterType: FitterType, cons: List<Double>
         ) -> Unit,
         onCancelClick: onClick
@@ -111,6 +113,7 @@ class MatchingConfigDialog(val ct: Context) :
             qualityLow2,
             qualityHigh1,
             qualityHigh2,
+            qualitySkipNum,
             reagentNo,
             quality,
             projects,
@@ -132,6 +135,7 @@ class MatchingConfigDialog(val ct: Context) :
                     mcl.qualityLow2,
                     mcl.qualityHigh1,
                     mcl.qualityHigh2,
+                    mcl.qualitySkipNum,
                     mcl.reagentNo,
                     mcl.quality,
                     mcl.gradsNum,
@@ -302,6 +306,7 @@ class MatchingConfigDialog(val ct: Context) :
                     data.qualityLow2,
                     data.qualityHigh1,
                     data.qualityHigh2,
+                    data.qualitySkipNum,
                     data.reagentNo,
                     data.quality,
                     data.projects!!,

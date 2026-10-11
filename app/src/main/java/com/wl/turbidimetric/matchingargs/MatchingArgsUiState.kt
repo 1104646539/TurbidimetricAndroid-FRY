@@ -49,6 +49,7 @@ sealed class MatchingArgsDialogUiState {
         val qualityLow2: Int,
         val qualityHigh1: Int,
         val qualityHigh2: Int,
+        val qualitySkipNum: Int,
         val reagentNo: String,
         val quality: Boolean,
         val projects: List<ProjectModel>,

@@ -98,6 +98,7 @@ class MatchingConfigLayout : FrameLayout {
     var qualityLow2: Int = 0
     var qualityHigh1: Int = 0
     var qualityHigh2: Int = 0
+    var qualitySkipNum: Int = 0
     var selectCurve: CurveModel? = null
     fun updateContent(
         matchingType: MatchingType,
@@ -106,6 +107,7 @@ class MatchingConfigLayout : FrameLayout {
         qualityLow2: Int,
         qualityHigh1: Int,
         qualityHigh2: Int,
+        qualitySkipNum: Int = 0,
         reagentNo: String = "",
         quality: Boolean = false,
         projects: List<ProjectModel>,
@@ -122,6 +124,7 @@ class MatchingConfigLayout : FrameLayout {
         this.qualityLow2 = qualityLow2
         this.qualityHigh1 = qualityHigh1
         this.qualityHigh2 = qualityHigh2
+        this.qualitySkipNum = qualitySkipNum
         this.reagentNo = reagentNo
         this.quality = quality
         this.projects = projects
@@ -158,6 +161,7 @@ class MatchingConfigLayout : FrameLayout {
                 qualityLow2 = mcql.qualityLow2
                 qualityHigh1 = mcql.qualityHigh1
                 qualityHigh2 = mcql.qualityHigh2
+                qualitySkipNum = mcql.qualitySkipNum
                 selectCurve = mcql.selectCurve
                 quality = true
             }
@@ -194,6 +198,7 @@ class MatchingConfigLayout : FrameLayout {
                 qualityLow2,
                 qualityHigh1,
                 qualityHigh2,
+                qualitySkipNum,
             )
         }
         mcml?.visibility = (matchingType == MatchingType.Matching).isShow()

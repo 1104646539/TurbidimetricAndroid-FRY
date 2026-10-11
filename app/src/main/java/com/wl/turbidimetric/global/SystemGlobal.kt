@@ -29,7 +29,7 @@ object SystemGlobal {
     /**
      * 是否真机模式（false=模拟器，不连接硬件）
      */
-    var isRealDevice = false
+    var isRealDevice = true
 
 
     /**

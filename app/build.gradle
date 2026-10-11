@@ -31,7 +31,7 @@ android {
         minSdk 24
         targetSdk 32
         versionCode 1
-        versionName "1.1.4.0-修改条码修改步骤"
+        versionName "1.1.4.0-修改扫码超时时间"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 

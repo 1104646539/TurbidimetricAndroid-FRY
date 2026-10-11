@@ -938,13 +938,23 @@ class HomeViewModel(
                 reactionTemp = reply.data.reactionTemp / 10.0, r1Temp = reply.data.r1Temp / 10.0
             )
         }
-        listenerR1Temp()
+        listenerR1Temp(reply.data.reactionTemp, reply.data.r1Temp)
     }
 
     /**
      * 预热完成已执行
      */
     var preheatFinish = false
+    private var preheatWaitJob: Job? = null
+    private var preheatCycleId = 0L
+    private var enhancedPreheat = false
+
+    private fun resetPreheatWait() {
+        preheatWaitJob?.cancel()
+        preheatWaitJob = null
+        preheatCycleId++
+        enhancedPreheat = false
+    }
 
     /**
      * 填充R1已完成
@@ -958,19 +968,32 @@ class HomeViewModel(
      * 2、等待指定时间 15分钟
      * 3、填充R1
      */
-    private fun listenerR1Temp() {
-        if (appViewModel.testState.isPreheatTime()) {
-            if (appViewModel.getTempCanBeTest()) {
-                //温度合格，进入第2阶段
-                if (localDataRepository.getWaitPreheatTime() && !SystemGlobal.isCodeDebug) {
-                    viewModelScope.launch(Dispatchers.IO) {
-                        delay(localDataRepository.getPreheatTime().seconds)
-                        preheatFinish()
-                    }
-                } else {
-                    //不等待直接预热完成
-                    preheatFinish()
-                }
+    private fun listenerR1Temp(reactionTemp: Int, r1Temp: Int) {
+        if (!appViewModel.testState.isPreheatTime() || preheatFinish) return
+
+        val waitPreheatTime = localDataRepository.getWaitPreheatTime() && !SystemGlobal.isCodeDebug
+        if (!waitPreheatTime) {
+            preheatFinish(preheatCycleId)
+            return
+        }
+
+        val cycleId = preheatCycleId
+        val targetTemp = localDataRepository.getTempLowLimit()
+        if (reactionTemp >= 300) {
+            enhancedPreheat = true
+        }
+        val temperatureReady = if (enhancedPreheat) {
+            reactionTemp >= targetTemp && r1Temp >= targetTemp
+        } else {
+            appViewModel.getTempCanBeTest()
+        }
+        if (!temperatureReady || preheatWaitJob?.isActive == true) return
+
+        val waitSeconds = if (enhancedPreheat) 90 else localDataRepository.getPreheatTime()
+        preheatWaitJob = viewModelScope.launch(Dispatchers.IO) {
+            delay(waitSeconds.seconds)
+            if (cycleId == preheatCycleId) {
+                preheatFinish(cycleId)
             }
         }
     }
@@ -979,8 +1002,8 @@ class HomeViewModel(
     /**
      * 预热完成,开始填充R1
      */
-    private fun preheatFinish() {
-        if (preheatFinish) return
+    private fun preheatFinish(cycleId: Long) {
+        if (preheatFinish || cycleId != preheatCycleId || !appViewModel.testState.isPreheatTime()) return
         preheatFinish = true;
         fullR1()
     }
@@ -2659,6 +2682,7 @@ class HomeViewModel(
      * 停止运行
      */
     private fun stateErrorStopRunning() {
+        resetPreheatWait()
         appViewModel.testState = TestState.RunningError
     }
 
@@ -2919,6 +2943,7 @@ class HomeViewModel(
         errorInfo = reply.data.errorInfo
         appViewModel.testState = TestState.None
         if (errorInfo.isNullOrEmpty()) {
+            resetPreheatWait()
             appViewModel.testState = TestState.PreheatTime
             preheatFinish = false
             //自检成功后获取一下r1,r2，清洗液状态，获取温度
@@ -2926,6 +2951,7 @@ class HomeViewModel(
             listenerTempState()
             listenerDoorState()
         } else {
+            resetPreheatWait()
             EventBus.getDefault().post(EventMsg<Any>(what = EventGlobal.WHAT_HIDE_SPLASH))
             appViewModel.testState = TestState.NotGetMachineState
             val sb = StringBuffer()
@@ -2990,6 +3016,7 @@ class HomeViewModel(
 
     private fun resetRunning() {
         //恢复运行，需要自检
+        resetPreheatWait()
         appViewModel.serialPort.stopRunning(false)
         appViewModel.testState = TestState.None
     }

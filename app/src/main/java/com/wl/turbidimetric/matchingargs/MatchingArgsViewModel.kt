@@ -160,7 +160,7 @@ class MatchingArgsViewModel(
     /**
      * 是否要同时质控
      */
-    var quality: Boolean = false
+    var quality: Boolean = true
 
     /**
      * 当前取样的步骤
@@ -355,7 +355,7 @@ class MatchingArgsViewModel(
     /**
      * 拟合梯度数量
      */
-    var gradsNum = 5
+    var gradsNum = 6
 
 //    /**
 //     * 平均值
@@ -375,12 +375,12 @@ class MatchingArgsViewModel(
     /**
      * 选择用来拟合的方程
      */
-    var selectFitterType: FitterType = FitterType.Three
+    var selectFitterType: FitterType = FitterType.Four
 
     /**
      * 拟合梯度对应的浓度
      */
-    var targetCons = mutableListOf<Double>(0.0, 25.0, 52.0, 200.0, 500.0, 1000.0)
+    var targetCons = mutableListOf<Double>(0.0, 50.0, 100.0, 200.0, 500.0, 1000.0)
 
     /**
      * 选择用来质控的曲线
@@ -2407,6 +2407,7 @@ class MatchingArgsViewModel(
                     Date().toTimeStr(),
                     curve.projectName,
                     curve.reagentNO,
+                    curve.projectUnit,
                     mutableListOf(curve.f0, curve.f1, curve.f2, curve.f3),
                     qualityLow1,
                     qualityLow2,

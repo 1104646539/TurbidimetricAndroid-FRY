@@ -70,7 +70,7 @@ object ExportExcelHelper {
         }
         val fileName = getFileName()
 
-        val newfile = StorageUtil.createFile("数据表/$fileName", context, false)
+        val newfile = StorageUtil.createFile("特定蛋白分析仪(BX2000)数据表/$fileName", context, false)
         var excelOutputStream: OutputStream? = null
         try {
             excelOutputStream =
@@ -87,7 +87,7 @@ object ExportExcelHelper {
                     excelOutputStream
                 )
             if (isSuccess) {
-                onSuccess("数据表/$fileName")
+                onSuccess("特定蛋白分析仪(BX2000)数据表/$fileName")
             } else {
                 onFailed("无法写入")
             }

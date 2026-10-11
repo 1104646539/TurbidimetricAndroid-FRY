@@ -58,10 +58,10 @@ object LocalDataGlobal {
         val TempLowLimit = 360
         val WaitPreheatTime = true
         val PreheatTime = 900
-        val QualityLow1 = 85
-        val QualityLow2 = 115
-        val QualityHigh1 = 340
-        val QualityHigh2 = 460
+        val QualityLow1 = 80
+        val QualityLow2 = 120
+        val QualityHigh1 = 400
+        val QualityHigh2 = 600
         val DoorEnable = true
         val PrevUserName = "admin"
         val PrevUserPsw = "admin"

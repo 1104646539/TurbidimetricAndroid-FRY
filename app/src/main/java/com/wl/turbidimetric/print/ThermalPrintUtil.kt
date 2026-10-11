@@ -238,8 +238,8 @@ class ThermalPrintUtil(private val serialPort: BaseSerialPort) {
 
         val sb = StringBuilder()
         sb.append("\n\n")
-        sb.append("序号:$reagentNo\n")
-        sb.append("项目名:$projectName\n")
+        sb.append("曲线序号:$reagentNo\n")
+        sb.append("项目名称:$projectName\n")
         sb.append("质控时间:$createTime\n")
         repeat(matchingNum) {
             val nd = "${targets[it]}${projectUnit}".fix(15)
@@ -253,23 +253,24 @@ class ThermalPrintUtil(private val serialPort: BaseSerialPort) {
 
         sb.append("\n")
 
-        if (yzs.size > matchingNum && absorbancys.size > matchingNum) {
+        if (yzs.size > matchingNum + 1 && absorbancys.size > matchingNum + 1 && orderTargets.size >= 2) {
             sb.append(" \n")
-            val nd = "${orderTargets[0]}${projectUnit}".fix(13)
-            val abs = "${absorbancys[matchingNum].toInt()}".fix(5)
-            sb.append("low $nd $abs")
-            sb.append("\n")
-            val yz = "(${yzs[matchingNum]}${projectUnit})".fix(16)
-            sb.append(" $yz ")
-            sb.append("\n")
-
-            val nd2 = "${orderTargets[1]}${projectUnit}".fix(12)
-            val abs2 = "${absorbancys[matchingNum + 1].toInt()}".fix(5)
-            sb.append("high $nd2 $abs2")
-            sb.append("\n")
-            val yz2 = "(${yzs[matchingNum + 1]}${projectUnit})".fix(16)
-            sb.append(" $yz2 ")
-            sb.append("\n")
+            appendQualityRow(
+                sb,
+                "低值",
+                projectUnit,
+                orderTargets[0],
+                yzs[matchingNum].toString(),
+                absorbancys[matchingNum].toString()
+            )
+            appendQualityRow(
+                sb,
+                "高值",
+                projectUnit,
+                orderTargets[1],
+                yzs[matchingNum + 1].toString(),
+                absorbancys[matchingNum + 1].toString()
+            )
             sb.append(" \n")
             sb.append(" \n")
 //            sb.append("${yzs[matchingNum]}ng/mL")
@@ -282,13 +283,13 @@ class ThermalPrintUtil(private val serialPort: BaseSerialPort) {
 //            sb.append("\n\n")
         }
 
-        sb.append("F(0)=${params[0].scale(10)}")
+        sb.append("a=${params[0].scale(10)}")
         sb.append("\n")
-        sb.append("F(1)=${params[1].scale(10)}")
+        sb.append("b=${params[1].scale(10)}")
         sb.append("\n")
-        sb.append("F(2)=${params[2].scale(10)}")
+        sb.append("c=${params[2].scale(10)}")
         sb.append("\n")
-        sb.append("F(3)=${params[3].scale(10)}")
+        sb.append("d=${params[3].scale(10)}")
         sb.append("\n")
         sb.append("\n")
         sb.append("\n")
@@ -339,6 +340,24 @@ class ThermalPrintUtil(private val serialPort: BaseSerialPort) {
         return this.fixMin(length, true)
     }
 
+    private fun appendQualityRow(
+        sb: StringBuilder,
+        label: String,
+        projectUnit: String,
+        range: String,
+        concentration: String,
+        reaction: String,
+    ) {
+        sb.append("$label($projectUnit)".fixMinAfter(16))
+            .append("浓度".fixMinAfter(8))
+            .append("反应度")
+            .append("\n")
+        sb.append(range.fixMinAfter(18))
+            .append(concentration.fixMinAfter(9))
+            .append(reaction)
+            .append("\n")
+    }
+
     /**
      * 打印质控结果
      */
@@ -346,6 +365,7 @@ class ThermalPrintUtil(private val serialPort: BaseSerialPort) {
         createTime: String,
         projectName: String,
         reagentNo: String,
+        projectUnit: String,
         params: MutableList<Double>,
         qualityLow1: Int,
         qualityLow2: Int,
@@ -361,6 +381,7 @@ class ThermalPrintUtil(private val serialPort: BaseSerialPort) {
             createTime,
             projectName,
             reagentNo,
+            projectUnit,
             params,
             qualityLow1,
             qualityLow2,
@@ -379,6 +400,7 @@ class ThermalPrintUtil(private val serialPort: BaseSerialPort) {
         createTime: String,
         projectName: String,
         reagentNo: String,
+        projectUnit: String,
         params: MutableList<Double>,
         qualityLow1: Int,
         qualityLow2: Int,
@@ -396,28 +418,34 @@ class ThermalPrintUtil(private val serialPort: BaseSerialPort) {
         sb.append("\n")
         sb.append("\n")
         sb.append("\n")
-        sb.append("序号:$reagentNo\n")
-        sb.append("项目名:$projectName\n")
+        sb.append("曲线序号:$reagentNo\n")
+        sb.append("项目名称:$projectName\n")
         sb.append("质控时间:$createTime\n")
 
-        sb.append(
-            "$qualityLow1-$qualityLow2".fixMinAfter(10) + "$qualityLowCon".fixMinAfter(8) + "$qualityLowAbs".fixMinAfter(
-                8
-            ) + "\n"
+        appendQualityRow(
+            sb,
+            "低值",
+            projectUnit,
+            "$qualityLow1-$qualityLow2",
+            qualityLowCon.toString(),
+            qualityLowAbs.toString()
         )
-        sb.append(
-            "$qualityHigh1-$qualityHigh2".fixMinAfter(10) + "$qualityHighCon".fixMinAfter(8) + "$qualityHighAbs".fixMinAfter(
-                8
-            ) + "\n"
+        appendQualityRow(
+            sb,
+            "高值",
+            projectUnit,
+            "$qualityHigh1-$qualityHigh2",
+            qualityHighCon.toString(),
+            qualityHighAbs.toString()
         )
 
-        sb.append("F(0)=${params[0].scale(10)}")
+        sb.append("a=${params[0].scale(10)}")
         sb.append("\n")
-        sb.append("F(1)=${params[1].scale(10)}")
+        sb.append("b=${params[1].scale(10)}")
         sb.append("\n")
-        sb.append("F(2)=${params[2].scale(10)}")
+        sb.append("c=${params[2].scale(10)}")
         sb.append("\n")
-        sb.append("F(3)=${params[3].scale(10)}")
+        sb.append("d=${params[3].scale(10)}")
         sb.append("\n")
         sb.append("结论:$result")
         sb.append("\n")

@@ -15,7 +15,7 @@ import java.io.File
 
 object ExportReportHelper {
     const val defaultReportSavePath = "sdcard/检测报告"
-    const val defaultStorageCatalogue = "免疫比浊检测报告"
+    const val defaultStorageCatalogue = "特定蛋白分析仪(BX2000)检测报告"
     val root = File(defaultReportSavePath)
 
     @JvmStatic

@@ -228,7 +228,7 @@ class DataManagerFragment :
         }
         vd.btnExportPdf.setOnClickListener {
             u("导出报告")
-            exportReport()
+            exportReportSelected()
 
         }
         vd.btnPrintPdf.setOnClickListener {
@@ -272,7 +272,6 @@ class DataManagerFragment :
         popupWindow?.dismiss()
     }
 
-
     private fun printReport() {
         val data = getSelectData()
         vm.processIntent(
@@ -283,7 +282,7 @@ class DataManagerFragment :
         )
     }
 
-    private fun exportReport() {
+    private fun exportReportSelected() {
         val data = getSelectData()
         vm.processIntent(DataManagerViewModel.DataManagerIntent.ExportReportSelected(data))
     }

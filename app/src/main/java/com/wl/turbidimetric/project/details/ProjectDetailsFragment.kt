@@ -172,6 +172,7 @@ class ProjectDetailsFragment :
 //            finishAfterTransition()
             EventBus.getDefault().post(EventMsg<String>(EventGlobal.WHAT_PROJECT_DETAILS_FINISH))
         }
+        vd.btnSave.setOnClickListener(onRight)
     }
 
     companion object {
